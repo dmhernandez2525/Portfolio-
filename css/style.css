@@ -380,7 +380,7 @@ h1 span{
   position:relative;
   margin:0 auto;
   border:8px solid #ebebeb;
-  background: url(../img/icons/responsive.png) #f3f3f3 no-repeat center center;
+  background: url(../img/background/image\ \(1\).png) #f3f3f3 no-repeat center center;
   -moz-border-radius:174px;
   -webkit-border-radius:174px;
   border-radius: 174px;
@@ -810,3 +810,9 @@ textarea{
   color:#5f666e;
 }
 
+/* .person-img img {
+  border: 8px solid #fff;
+}
+.img {
+  max-width: 100%;
+} */
