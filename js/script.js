@@ -102,5 +102,9 @@ jQuery(document).ready(function($){
     });
   });
 
+  // document.getElementById("resume-click").addEventListener("click", () => {
+
+  // })
+
   
 });
