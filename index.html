@@ -748,7 +748,8 @@
 									<div class="col-md-12">
 										<div class="mu-contact-bottom">
 										<div id="form-messages"></div>
-											<form id="ajax-contact" method="post" action="mailer.php" class="mu-contact-form">
+										<!-- New form -->
+											<form id="ajax-contact" action="mailto:danielmark2525@gmail.com" method="post" enctype="text/plain" class="mu-contact-form">
 												<div class="form-group">                
 													<input type="text" class="form-control" placeholder="Name" id="name" name="name" required>
 												</div>
@@ -759,7 +760,24 @@
 													<textarea class="form-control" placeholder="Message" id="message" name="message" required></textarea>
 												</div>
 												<button type="submit" class="mu-send-msg-btn"><span>SUBMIT</span></button>
-								            </form>
+												<input type="reset" class="mu-send-msg-btn"  value="RESET">
+											</form>
+										<!-- New form -->
+
+											<!-- Old form -->
+											<!-- <form id="ajax-contact" method="post" action="mailer.php" class="mu-contact-form">
+												<div class="form-group">                
+													<input type="text" class="form-control" placeholder="Name" id="name" name="name" required>
+												</div>
+												<div class="form-group">                
+													<input type="email" class="form-control" placeholder="Enter Email" id="email" name="email" required>
+												</div>              
+												<div class="form-group">
+													<textarea class="form-control" placeholder="Message" id="message" name="message" required></textarea>
+												</div>
+												<button type="submit" class="mu-send-msg-btn"><span>SUBMIT</span></button>
+											</form> -->
+											<!-- Old form -->											
 										</div>
 									</div>	
 
