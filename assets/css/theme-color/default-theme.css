@@ -38,7 +38,9 @@ Author URI : http://www.markups.io/
 .mu-skill-progress-bar .mu-pro-bar,
 #mu-featured-slider,
 #mu-header.mu-fixed-nav {
-	background-color: #339999;
+	/* background-color: #339999; rfq */ 
+	/* background-color: #89f7fe; rfq  */
+	background-color: gray;
 }
 
 .mu-contact-form .form-control:focus {
