@@ -1443,6 +1443,9 @@ button:focus {
 }
 .container-sec{
 	/* background-image: url("./img/favicon.png"); */
-	background-color: #cccccc;
-	background-image: linear-gradient(red, yellow);
+	/* background-color: #cccccc; */
+	/* background-image: linear-gradient(red, yellow); */
+	    /* background-image: linear-gradient(#cccccc, black); */
+	    background-image: linear-gradient(#89f7fe, #4676fa);
+
 }
