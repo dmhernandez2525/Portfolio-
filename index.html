@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Daniel : Home</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/icon" href="assets/images/favicon.ico"/>
+    <link rel="shortcut icon" type="image/icon" href="assets/images/favicon.png"/>
     <!-- Font Awesome -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
     <!-- Bootstrap -->
@@ -749,23 +749,7 @@
 										<div class="mu-contact-bottom">
 										<div id="form-messages"></div>
 										<!-- New form -->
-											<form id="ajax-contact" action="mailto:danielmark2525@gmail.com" method="post" enctype="text/plain" class="mu-contact-form">
-												<div class="form-group">                
-													<input type="text" class="form-control" placeholder="Name" id="name" name="name" required>
-												</div>
-												<div class="form-group">                
-													<input type="email" class="form-control" placeholder="Enter Email" id="email" name="email" required>
-												</div>              
-												<div class="form-group">
-													<textarea class="form-control" placeholder="Message" id="message" name="message" required></textarea>
-												</div>
-												<button type="submit" class="mu-send-msg-btn"><span>SUBMIT</span></button>
-												<input type="reset" class="mu-send-msg-btn"  value="RESET">
-											</form>
-										<!-- New form -->
-
-											<!-- Old form -->
-											<!-- <form id="ajax-contact" method="post" action="mailer.php" class="mu-contact-form">
+											<!-- <form id="ajax-contact" action="mailto:danielmark2525@gmail.com" method="post" target="_top" enctype="text/plain" class="mu-contact-form">
 												<div class="form-group">                
 													<input type="text" class="form-control" placeholder="Name" id="name" name="name" required>
 												</div>
@@ -777,6 +761,22 @@
 												</div>
 												<button type="submit" class="mu-send-msg-btn"><span>SUBMIT</span></button>
 											</form> -->
+										<!-- New form -->
+
+											<!-- Old form -->
+											<form id="ajax-contact" method="post" action="mailer.php" class="mu-contact-form">
+												<div class="form-group">                
+													<input type="text" class="form-control" placeholder="Name" id="name" name="name" required>
+												</div>
+												<div class="form-group">                
+													<input type="email" class="form-control" placeholder="Enter Email" id="email" name="email" required>
+												</div>              
+												<div class="form-group">
+													<textarea class="form-control" placeholder="Message" id="message" name="message" required></textarea>
+												</div>
+												<button type="submit" class="mu-send-msg-btn"><span>SUBMIT</span></button>
+												<input type="reset" class="mu-send-msg-btn" value="RESET">
+											</form>
 											<!-- Old form -->											
 										</div>
 									</div>	
