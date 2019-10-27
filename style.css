@@ -1441,3 +1441,8 @@ button:focus {
 	height: 100px;
 	width: 100px;
 }
+.container-sec{
+	/* background-image: url("./img/favicon.png"); */
+	background-color: #cccccc;
+	background-image: linear-gradient(red, yellow);
+}
