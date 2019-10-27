@@ -599,12 +599,12 @@ button:focus {
 
 .mu-service-icon-box {
 	font-size: 30px;
-	margin-bottom: 20px;
-	display: inline-block;
-	border-radius: 50%;
-	width: 75px;
-	height: 75px;
-	line-height: 75px;
+    margin-bottom: 20px;
+    display: inline-block;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    line-height: 130px;
 }
 
 .mu-service-content-single h4{
@@ -1432,4 +1432,12 @@ button:focus {
 	.demo .main-title {
 		font-size: 3em;
 	}
+}
+
+
+/* Addid after  */
+
+.logo-img{
+	height: 100px;
+	width: 100px;
 }
