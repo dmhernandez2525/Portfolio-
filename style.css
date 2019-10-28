@@ -1444,6 +1444,12 @@ button:focus {
 	height: 100px;
 	width: 100px;
 }
+
+.logo-img-head{
+    max-width: 75px;
+    max-height: 75px;
+}
+
 .container-sec{
 	/* background-image: url("./img/favicon.png"); */
 	/* background-color: #cccccc; */
