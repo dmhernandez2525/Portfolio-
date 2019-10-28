@@ -710,6 +710,8 @@ button:focus {
 	        transform: scale(1);
 	-webkit-transition: all 0.5s;
 	transition: all 0.5s;
+	width: 281px;
+	height: 211px;
 }
 
 .filtr-item:hover .mu-item-thumbonail img {
@@ -719,6 +721,7 @@ button:focus {
 
 .filtr-item:hover .mu-filter-item-content{
 	opacity: 0.94;
+	background-color: #89f7fe;
 }
 
 .mu-filter-link,
