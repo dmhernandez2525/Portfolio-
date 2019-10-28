@@ -1452,3 +1452,7 @@ button:focus {
 	    background-image: linear-gradient(#89f7fe, #4676fa);
 
 }
+
+.mu-filter-item-title{
+	color: #4676fa
+}
