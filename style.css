@@ -1463,3 +1463,14 @@ button:focus {
 .mu-filter-item-title{
 	color: #4676fa
 }
+
+.con-icon{
+	display: flex;
+	justify-content: space-evenly;
+}
+
+@media only screen and (max-width: 768px) {
+	.con-icon {
+		display: block;
+	}
+}
