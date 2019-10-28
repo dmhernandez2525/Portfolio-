@@ -256,8 +256,10 @@ button:focus {
 	font-size: 35px;
 	font-family: 'Poppins', sans-serif;
 	margin-top: 0;
+	padding: 0%;
 	/* width: 120px; */
 	line-height: 18px;
+	height: 100%;
 }
 
 .navbar-brand img {
