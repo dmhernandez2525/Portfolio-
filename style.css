@@ -124,7 +124,7 @@ kbd {
 	background-color: #ddd;
 	padding: 4px 6px;
 	border-radius: 2px;
-	color: ;
+	
 }
 
 address {
@@ -1495,6 +1495,7 @@ button:focus {
 .skillss {
 	display: flex;
 	flex-flow: wrap;
+	justify-content: center;
 }
 .wordpress_PNG74 {
     width: 50%;
@@ -1536,6 +1537,15 @@ button:focus {
 	.fa-phone:before {
 		font-size: 15vw;
 	}
+	#small-phone-mail::before {
+		font-size: 10vw;
+	}
+	#small-phone-mail::before {
+		font-size: 10vw;
+	}
+	#small-phone-git::before {
+		font-size: 10vw;
+	}
 
 	.fa-envelope:before {
 		font-size: 15vw;
@@ -1568,4 +1578,34 @@ button:focus {
 	.small-resume {
 		display: block;
 	}
+
+	.filtr-item:hover .mu-filter-item-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: unset;
+	}
+}
+.live-git-port {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: baseline;
+	margin: 10px 0;
+}
+.live-git-port li {
+	list-style-type: none
+}
+.mu-filter-link,
+.mu-filter-imglink-new, a{
+	color: white;
+	font-size: 15px;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+.mu-filter-link:hover,
+.mu-filter-imglink-new:hover,
+.mu-filter-link:focus,
+.mu-filter-imglink-new:focus {
+	background-color: #fff;
 }
