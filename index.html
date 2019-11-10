@@ -135,6 +135,7 @@
 		
 	<main role="main">
 
+
 		<!-- Start About -->
 		<section id="mu-about">
 			<div class="container">
@@ -206,18 +207,24 @@
 
 											  <!-- Download Ressume Button -->
 											<a href="./Daniel_Hernandez_Resume.pdf" target="_blank" download="Daniel_Hernandez_Resume.pdf" class="mu-resume-btn">Download My Resume</a>
-											<a href="./Daniel_Hernandez_Resume.pdf" class="mu-resume-btn">View My Resume</a>
+											<a onclick="displayResume()" class="mu-resume-btn">View My Resume</a>
 										</div>
 									</div>
 								</div>
 							</div>
 							<!-- End About Us Content -->
 
+								<article id="resume" class="nono yesyes">
+									<iframe src="Daniel_Hernandez_Resume.pdf" width="1000%" height="750"></iframe>
+								</article>
+
 						</div>
 					</div>
 				</div>
 			</div>
+			
 		</section>
+		
 		<!-- End About -->
 
 		<!-- Start Skills -->
@@ -761,6 +768,10 @@
 	</main>
 	
 	<!-- End main content -->	
+
+
+
+
 			
 	<!-- Start footer -->
 	<footer id="mu-footer" role="contentinfo">

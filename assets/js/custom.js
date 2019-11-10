@@ -205,6 +205,9 @@
 })( jQuery );
 
 
+function displayResume() {
+	let element = document.getElementById("resume");
+	element.classList.toggle("nono");
+}
 
-  
 	
