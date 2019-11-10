@@ -1385,15 +1385,6 @@ button:focus {
 
 
 
-@media (max-width: 320px){
-	
-	
-	
-	
-	
-}
-
-
 
 
 
@@ -1529,4 +1520,52 @@ button:focus {
 
 .nono{
 	display: none;
+}
+
+.small-resume {
+	display: none;
+}
+
+@media (max-width: 400px) {
+
+	.fab {
+		font-size: 15vw;
+
+	}
+
+	.fa-phone:before {
+		font-size: 15vw;
+	}
+
+	.fa-envelope:before {
+		font-size: 15vw;
+	}
+
+	.mu-social-media a {
+		border-radius: unset;
+		display: inline;
+		border: none;
+		transition: all 0.5s;
+	}
+
+	.mu-social-media {
+		padding: 20px 0;
+	}
+
+	.small-icons,
+	img {
+		max-width: 100%;
+	}
+
+	.expertise-icon-s {
+		width: 100% !important;
+	}
+
+	.big-resume {
+		display: none;
+	}
+
+	.small-resume {
+		display: block;
+	}
 }
