@@ -1508,3 +1508,25 @@ button:focus {
 .wordpress_PNG74 {
     width: 50%;
 }
+
+
+.yesyes{
+	-webkit-transform: translateY(0.25rem);
+	-ms-transform: translateY(0.25rem);
+	transform: translateY(0.25rem);
+	-moz-transition: opacity 0.325s ease-in-out,
+	-moz-transform 0.325s ease-in-out;
+	-webkit-transition: opacity 0.325s ease-in-out,
+	-webkit-transform 0.325s ease-in-out;
+	-ms-transition: opacity 0.325s ease-in-out,
+	-ms-transform 0.325s ease-in-out;
+	transition: opacity 0.325s ease-in-out,
+	transform 0.325s ease-in-out;
+	padding: 0px 7%;
+	display: flex;
+	justify-content: center;
+}
+
+.nono{
+	display: none;
+}
