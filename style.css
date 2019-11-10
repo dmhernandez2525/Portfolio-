@@ -1526,7 +1526,7 @@ button:focus {
 	display: none;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 800px) {
 
 	.fab {
 		font-size: 15vw;
