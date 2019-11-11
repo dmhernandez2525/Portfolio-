@@ -339,6 +339,7 @@ button:focus {
 	display: inline;
 	float: left;
 	width: 100%;
+	background: linear-gradient(120deg, #89f7fe 0, #4676fa);
 }
 
 
@@ -605,10 +606,28 @@ button:focus {
 	font-size: 30px;
     margin-bottom: 20px;
     display: inline-block;
-    border-radius: 50%;
+    border-radius: 37%;
     width: 150px;
     height: 150px;
-    line-height: 130px;
+	line-height: 130px;
+	border: 4px solid #89f7fe;
+
+	border-top: 15px solid;
+	border-right: 4px solid;
+	border-bottom: 8px solid;
+	border-left: 8px solid;
+
+	border-top-color: #89f7fe;
+	border-right-color: #4676fa;
+	border-bottom-color: #EE7752;
+	border-left-color:#E73C7E;
+
+
+	border-top-left-radius: 1%;
+	border-top-right-radius: 38%;
+	border-bottom-left-radius: 3%;
+	border-bottom-right-radius: -13%;
+	/* border-image: linear-gradient(to right, grey 25%, yellow 25%, yellow 50%, red 50%, red 75%, teal 75%) 5; */
 }
 
 .mu-service-content-single h4{
@@ -1531,16 +1550,17 @@ button:focus {
 
 	.fab {
 		font-size: 15vw;
-
+		color: #111;
 	}
 
 	.fa-phone:before {
 		font-size: 15vw;
+		color: #000;
 	}
-	#small-phone-mail::before {
+	#small-phone::before {
 		font-size: 10vw;
 	}
-	#small-phone-mail::before {
+	#small-mail::before {
 		font-size: 10vw;
 	}
 	#small-phone-git::before {
@@ -1549,6 +1569,7 @@ button:focus {
 
 	.fa-envelope:before {
 		font-size: 15vw;
+		color: #000;
 	}
 
 	.mu-social-media a {
