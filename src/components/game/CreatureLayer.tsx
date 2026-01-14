@@ -36,7 +36,7 @@ const COLORS = {
 const generateSwarm = (creature: Creature) => {
     const now = Date.now();
     return Array.from({ length: 5 }).map((_, i) => ({
-        id: now + i,
+        id: now + (i * 1000) + Math.floor(Math.random() * 999),
         type: "bug" as CreatureType,
         x: Math.max(0, Math.min(100, creature.x + (Math.random() * 30 - 15))),
         y: Math.max(0, Math.min(100, creature.y + (Math.random() * 30 - 15))),
@@ -99,10 +99,11 @@ export function CreatureLayer() {
   })
   
   // Calculate spawn interval based on high water mark
+  // Mobile already has larger base intervals defined above
   const calculateSpawnInterval = useCallback(() => {
       const range = BASE_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL
       return BASE_SPAWN_INTERVAL - (maxScrollRef.current * range)
-  }, [])
+  }, [BASE_SPAWN_INTERVAL, MIN_SPAWN_INTERVAL])
   
   // Spawn a random creature
   const spawnRandomCreature = useCallback(() => {
@@ -449,40 +450,85 @@ export function CreatureLayer() {
                    <div className="text-neon-purple drop-shadow-[0_0_8px_rgba(157,70,250,0.8)] text-4xl">⚡️</div>
                ) : (
                    <div className="relative">
-                      {creature.type === 'daniel' ? (
-                          <div className="relative">
-                            <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 border-2 border-neon-blue shadow-[0_0_15px_var(--neon-blue)]">
-                                <img src="/favicon.svg" alt="DH" className="w-8 h-8" />
-                            </div>
-                            <motion.div 
-                                animate={{ rotate: [0, 10, 0, -10, 0] }} 
-                                transition={{ repeat: Infinity, duration: 2 }}
-                                className="absolute -right-2 -bottom-2 bg-neon-pink rounded-full p-1"
-                            >
-                                <Trash2 className="w-4 h-4 text-white" />
-                            </motion.div>
-                          </div>
-                      ) : (
-                          <Icon className={cn("w-8 h-8")} />
-                      )}
-                      
-                      {(creature.type === 'daniel' && wizardMessage) && (
-                          <motion.div 
-                            initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            className="absolute bottom-full right-full mb-2 w-48 bg-white text-black p-3 rounded-xl rounded-tr-none text-xs font-bold shadow-lg border-2 border-neon-purple z-50 pointer-events-none"
-                          >
-                              {wizardMessage}
-                          </motion.div>
-                      )}
-                   </div>
+                       {creature.type === 'daniel' ? (
+                           <>
+                             {/* Desktop: small floating DH */}
+                             <div className="hidden md:block relative">
+                               <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 border-2 border-neon-blue shadow-[0_0_15px_var(--neon-blue)]">
+                                   <img src="/favicon.svg" alt="DH" className="w-8 h-8" />
+                               </div>
+                               <motion.div 
+                                   animate={{ rotate: [0, 10, 0, -10, 0] }} 
+                                   transition={{ repeat: Infinity, duration: 2 }}
+                                   className="absolute -right-2 -bottom-2 bg-neon-pink rounded-full p-1"
+                               >
+                                   <Trash2 className="w-4 h-4 text-white" />
+                               </motion.div>
+                             </div>
+                             
+                             {/* Mobile: Compact centered DH */}
+                             <motion.div 
+                               className="md:hidden fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] flex flex-col items-center"
+                               animate={{ scale: [1, 1.02, 1] }}
+                               transition={{ repeat: Infinity, duration: 1.5 }}
+                             >
+                               <div className="bg-black/80 backdrop-blur-md rounded-xl p-3 border-2 border-neon-blue shadow-[0_0_20px_var(--neon-blue)]">
+                                   <img src="/favicon.svg" alt="DH" className="w-12 h-12" />
+                                   <motion.div 
+                                       animate={{ rotate: [0, 10, 0, -10, 0] }} 
+                                       transition={{ repeat: Infinity, duration: 1.5 }}
+                                       className="absolute -right-2 -bottom-2 bg-neon-pink rounded-full p-1"
+                                   >
+                                       <Trash2 className="w-4 h-4 text-white" />
+                                   </motion.div>
+                               </div>
+                               {/* Compact tap hint */}
+                               <motion.div 
+                                 animate={{ y: [0, -3, 0] }}
+                                 transition={{ repeat: Infinity, duration: 0.8 }}
+                                 className="mt-2 bg-white text-black px-3 py-1 rounded-full text-xs font-bold shadow-md"
+                               >
+                                 👆 TAP
+                               </motion.div>
+                             </motion.div>
+                           </>
+                       ) : (
+                           <Icon className={cn("w-8 h-8")} />
+                       )}
+                       
+                       {/* Desktop: attached message */}
+                       {(creature.type === 'daniel' && wizardMessage) && (
+                           <motion.div 
+                             initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                             animate={{ opacity: 1, y: 0, scale: 1 }}
+                             className="hidden md:block absolute bottom-full right-full mb-2 w-48 bg-white text-black p-3 rounded-xl rounded-tr-none text-xs font-bold shadow-lg border-2 border-neon-purple z-50 pointer-events-none"
+                           >
+                               {wizardMessage}
+                           </motion.div>
+                       )}
+                    </div>
+                )}
+               
+               {/* Mobile: compact centered message for Daniel */}
+               {(creature.type === 'daniel' && wizardMessage) && (
+                   <motion.div 
+                     initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                     animate={{ opacity: 1, y: 0, scale: 1 }}
+                     className="md:hidden fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[75vw] max-w-xs bg-white text-black p-3 rounded-xl text-xs shadow-xl border-2 border-neon-blue z-[100] pointer-events-none text-center"
+                   >
+                       <div className="flex items-center justify-center gap-2 mb-2">
+                           <img src="/favicon.svg" alt="DH" className="w-6 h-6" />
+                           <span className="text-neon-blue font-bold text-sm">DH</span>
+                       </div>
+                       <p className="text-gray-600 text-xs leading-relaxed">{wizardMessage}</p>
+                   </motion.div>
                )}
                
-               {/* Click Hint */}
+               {/* Click Hint - desktop only, mobile has its own */}
                <motion.div 
                  initial={{ opacity: 0, scale: 0 }}
                  whileHover={{ opacity: 1, scale: 1 }}
-                 className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white/90 text-black px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap pointer-events-none z-50 shadow-sm"
+                 className="hidden md:block absolute -top-6 left-1/2 -translate-x-1/2 bg-white/90 text-black px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap pointer-events-none z-50 shadow-sm"
                >
                   CLICK ME!
                </motion.div>
