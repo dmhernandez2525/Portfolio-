@@ -245,3 +245,15 @@
     radial-gradient(at 80% 50%, hsla(var(--primary) / 0.04) 0px, transparent 50%),
     radial-gradient(at 0% 100%, hsla(var(--secondary) / 0.06) 0px, transparent 50%);
 }
+
+/* Safe area padding for iOS devices */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Add bottom padding on mobile for fixed bottom nav */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4rem; /* Height of bottom nav */
+  }
+}
