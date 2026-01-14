@@ -89,16 +89,28 @@ export function Wizard({ id, x, y, quote, onDespawn }: WizardProps) {
         >
             <div className="relative">
                  <div className="text-5xl filter drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]">🧙‍♂️</div>
+                 {/* Desktop: attached message */}
                  {message && (
                      <motion.div 
                         initial={{ opacity: 0, y: 10, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        className="absolute bottom-full right-full mb-4 w-48 bg-white text-black p-3 rounded-xl rounded-tr-none text-xs font-bold shadow-lg border-2 border-neon-purple z-50 pointer-events-none"
+                        className="hidden md:block absolute bottom-full right-full mb-4 w-48 bg-white text-black p-3 rounded-xl rounded-tr-none text-xs font-bold shadow-lg border-2 border-neon-purple z-50 pointer-events-none"
                      >
                          {message}
                      </motion.div>
                  )}
             </div>
+            {/* Mobile: compact centered message */}
+            {message && (
+                <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    className="md:hidden fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[200px] bg-white text-black p-3 rounded-xl text-xs shadow-xl border-2 border-neon-purple z-[100] pointer-events-none text-center"
+                >
+                    <div className="text-xl mb-1">🧙‍♂️</div>
+                    <p className="text-gray-600 leading-relaxed">{message}</p>
+                </motion.div>
+            )}
         </motion.div>
     )
 }
