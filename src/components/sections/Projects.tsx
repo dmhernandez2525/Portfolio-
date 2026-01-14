@@ -160,7 +160,7 @@ export function Projects() {
       <div
         ref={containerRef}
         className="relative hidden md:block"
-        style={{ height: `${Math.max(100, scrollWidth / 3)}px` }}
+        style={{ height: `${Math.max(100, scrollWidth / 3)}px`, position: 'relative' }}
       >
         <div className="sticky top-20 overflow-hidden">
           <motion.div

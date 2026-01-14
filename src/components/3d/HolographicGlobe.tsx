@@ -574,6 +574,7 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
             <EllipseGraphics
               semiMinorAxis={pulse.radius}
               semiMajorAxis={pulse.radius}
+              height={0}
               material={new ColorMaterialProperty(Color.CYAN.withAlpha(pulse.opacity * 0.3))}
               outline
               outlineColor={Color.CYAN.withAlpha(pulse.opacity)}
@@ -862,7 +863,7 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
             <div className="flex gap-1">
               {LOCATIONS.filter(l => l.id !== "secret").map((loc, i) => (
                 <div
-                  key={i}
+                  key={loc.id}
                   className={cn(
                     "w-2.5 h-2.5 rounded-full transition-all",
                     i < journeyIndex ? "bg-cyan-400" : i === journeyIndex ? "bg-cyan-400 animate-pulse scale-125" : "bg-gray-600"

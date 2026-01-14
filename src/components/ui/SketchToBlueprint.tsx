@@ -1026,6 +1026,12 @@ export function SketchToBlueprint() {
   // Particles
   const [particles, setParticles] = useState<Particle[]>([])
   const particleIdRef = useRef(0)
+  
+  // Generate unique particle ID (combines counter + random to ensure uniqueness)
+  const getUniqueParticleId = useCallback(() => {
+    particleIdRef.current++
+    return particleIdRef.current * 1000 + Math.floor(Math.random() * 999)
+  }, [])
 
   // Interactive states
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, text: "" })
@@ -1211,11 +1217,11 @@ export function SketchToBlueprint() {
 
         // Add pencil particles at the tip
         if (Math.random() > 0.6) {
-          particleIdRef.current++
+          const particleId = getUniqueParticleId()
           setParticles((prev) => [
             ...prev.slice(-25),
             {
-              id: particleIdRef.current,
+              id: particleId,
               x: pencilPos.x,
               y: pencilPos.y + 28,
               vx: (Math.random() - 0.5) * 3,
@@ -1316,11 +1322,11 @@ export function SketchToBlueprint() {
 
           // Add eraser particles
           if (eraserProgress > 0.05 && eraserProgress < 0.95 && Math.random() > 0.5) {
-            particleIdRef.current++
+            const particleId = getUniqueParticleId()
             setParticles((prev) => [
               ...prev.slice(-30),
               {
-                id: particleIdRef.current,
+                id: particleId,
                 x: eraserPos.x + (Math.random() - 0.5) * 40,
                 y: eraserPos.y + 15,
                 vx: (Math.random() - 0.5) * 2,
@@ -1381,11 +1387,11 @@ export function SketchToBlueprint() {
 
           // Add pencil particles during refinement
           if (refinementProgress > 0.1 && refinementProgress < 0.9 && Math.random() > 0.7) {
-            particleIdRef.current++
+            const particleId = getUniqueParticleId()
             setParticles((prev) => [
               ...prev.slice(-20),
               {
-                id: particleIdRef.current,
+                id: particleId,
                 x: pencilPos.x,
                 y: pencilPos.y + 28,
                 vx: (Math.random() - 0.5) * 2,
@@ -1464,13 +1470,13 @@ export function SketchToBlueprint() {
 
         // Ink splatter particles during transform
         if (Math.random() > 0.7) {
-          particleIdRef.current++
+          const particleId = getUniqueParticleId()
           const splatterX = 100 + Math.random() * 600
           const splatterY = 100 + Math.random() * 350
           setParticles((prev) => [
             ...prev.slice(-50),
             {
-              id: particleIdRef.current,
+              id: particleId,
               x: splatterX,
               y: splatterY,
               vx: (Math.random() - 0.5) * 5,
