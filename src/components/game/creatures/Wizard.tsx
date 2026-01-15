@@ -17,7 +17,7 @@ export function Wizard({ id, x, y, quote, onDespawn }: WizardProps) {
         if (message) {
             const timer = setTimeout(() => {
                 setIsExiting(true)
-            }, 3000)
+            }, 8000) // Stay visible longer (8 seconds)
             return () => clearTimeout(timer)
         }
     }, [message])

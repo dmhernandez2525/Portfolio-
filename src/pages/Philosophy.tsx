@@ -2,26 +2,11 @@ import { motion } from "framer-motion"
 import { Link } from "react-router-dom"
 import { ArrowLeft, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ContactModal } from "@/components/shared/ContactModal"
 
 export function Philosophy() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Portfolio
-          </Link>
-          <Link
-            to="/#contact"
-            className="text-primary hover:underline"
-          >
-            Let's Talk
-          </Link>
-        </div>
-      </header>
-
       <main className="pt-24 pb-20">
         <div className="container max-w-3xl">
           {/* Hero */}
@@ -30,6 +15,22 @@ export function Philosophy() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
+            {/* Hero Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8 flex justify-center"
+            >
+              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg shadow-primary/20">
+                <img 
+                  src="/photos/daniel-ar-coding.png" 
+                  alt="Daniel Hernandez" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
+            
             <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
               The Long Game
             </h1>
@@ -255,12 +256,12 @@ export function Philosophy() {
                 Back to Portfolio
               </Link>
             </Button>
-            <Button asChild size="lg">
-              <Link to="/#contact">
+            <ContactModal>
+              <Button size="lg">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Let's Talk
-              </Link>
-            </Button>
+              </Button>
+            </ContactModal>
           </motion.div>
         </div>
       </main>

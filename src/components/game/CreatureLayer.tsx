@@ -81,10 +81,10 @@ export function CreatureLayer() {
   // Check for mobile - reduce creatures on smaller screens
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768
 
-  // Constants - fewer creatures on mobile for better UX
-  const MAX_CREATURES = isMobile ? 4 : 8
-  const BASE_SPAWN_INTERVAL = isMobile ? 8000 : 6000
-  const MIN_SPAWN_INTERVAL = isMobile ? 3000 : 1500
+  // Constants - 1/4 creatures everywhere for better UX
+  const MAX_CREATURES = isMobile ? 2 : 2
+  const BASE_SPAWN_INTERVAL = isMobile ? 12000 : 10000
+  const MIN_SPAWN_INTERVAL = isMobile ? 6000 : 4000
   
   // Parallax Scroll Effect + High Water Mark Tracking
   const { scrollY, scrollYProgress } = useScroll()
@@ -107,21 +107,29 @@ export function CreatureLayer() {
   
   // Spawn a random creature
   const spawnRandomCreature = useCallback(() => {
-    //   const typeKeys: CreatureType[] = ["ghost", "bug", "sparkle", "zap"]
-      const typeKeys: CreatureType[] = [ "bug", "zap"]
-      const type = typeKeys[Math.floor(Math.random() * typeKeys.length)]
+      // Ghost is rare, others are common
+      const rand = Math.random()
+      let type: CreatureType
+      if (rand < 0.08) {
+        type = "ghost" // 8% chance for ghost (boss)
+      } else if (rand < 0.38) {
+        type = "bug" // 30% chance for bug
+      } else if (rand < 0.68) {
+        type = "zap" // 30% chance for zap
+      } else {
+        type = "sparkle" // 32% chance for sparkle
+      }
       
       const edgeX = Math.random() > 0.5 ? Math.random() * 20 : 80 + Math.random() * 20
-      const quote = type === 'wizard' ? WIZARD_QUOTES[Math.floor(Math.random() * WIZARD_QUOTES.length)] : undefined
       
       const newCreature: Creature = {
           id: Date.now() + Math.floor(Math.random() * 1000),
           type,
-          x: edgeX, 
+          x: edgeX,
           y: Math.random() * 80 + 10,
           delay: Math.random() * 2,
           scale: 0.5 + Math.random() * 0.5,
-          fullData: { quote }
+          fullData: undefined
       }
       
       setCreatures(prev => prev.length < MAX_CREATURES ? [...prev, newCreature] : prev)
