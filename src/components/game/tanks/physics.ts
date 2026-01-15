@@ -1,5 +1,4 @@
 import type { Entity, Wall, Bullet } from "./types"
-import { TANK_RADIUS, BULLET_RADIUS } from "./constants"
 
 // Check intersection between Circle and AABB (Wall)
 export function checkWallCollision(entity: Entity, wall: Wall): boolean {
