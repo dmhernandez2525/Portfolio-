@@ -3,69 +3,15 @@ import { Button } from "@/components/ui/button"
 import { Play, RotateCcw, Trophy, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
-
-// --- Types ---
-interface Cell {
-  id: string
-  x: number
-  y: number
-  radius: number
-  color: string
-  vx: number
-  vy: number
-  isPlayer?: boolean
-  name?: string
-}
-
-interface Food {
-  id: string
-  x: number
-  y: number
-  radius: number
-  color: string
-}
-
-interface AIBehavior {
-  targetX: number
-  targetY: number
-  lastDecision: number
-}
-
-// --- Constants ---
-const WORLD_SIZE = 10000 // Much bigger world!
-const INITIAL_RADIUS = 30
-const MAX_SPEED = 4
-const FOOD_COUNT = 1500 // More food for bigger world
-const AI_COUNT = 25 // More AI players
-const FOOD_RADIUS = 8
-const SPLIT_VELOCITY = 15
-const MERGE_DELAY = 10000 // 10 seconds to merge back
-const MAX_CELLS = 256 // Allow many more splits
-const MIN_SPLIT_RADIUS = 15 // Minimum radius to split
-
-// Virus mechanics
-const VIRUS_COUNT = 30 // Number of viruses on map
-const VIRUS_RADIUS = 40
-const VIRUS_SPLIT_THRESHOLD = 133 // Mass needed to be split by virus
-const VIRUS_FEED_COUNT = 7 // Blobs needed to shoot a virus
-
-// Eject mass mechanics  
-const EJECT_MASS_COST = 16 // Mass lost when ejecting
-const EJECT_MASS_VALUE = 12 // Mass gained when eating ejected blob
-const EJECT_VELOCITY = 20 // Speed of ejected mass
-const EJECT_RADIUS = 12 // Size of ejected blob
-
-const COLORS = [
-  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-  "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
-  "#F8B500", "#00CED1", "#FF69B4", "#32CD32", "#FF4500"
-]
-
-const AI_NAMES = [
-  "Bot Alpha", "Cell Master", "Nom Nom", "Blobby", "Sphere",
-  "Hungry", "Chomper", "Absorb", "Mass King", "Cell Lord",
-  "Devourer", "Blob Boss", "Circle", "Orb", "Nucleus"
-]
+import type { 
+  Cell, Food, Virus, EjectedMass, AIBehavior 
+} from "./types"
+import {
+  WORLD_SIZE, INITIAL_RADIUS, MAX_SPEED, FOOD_COUNT, AI_COUNT,
+  FOOD_RADIUS, SPLIT_VELOCITY, MERGE_DELAY, MAX_CELLS, MIN_SPLIT_RADIUS,
+  VIRUS_COUNT, VIRUS_RADIUS, EJECT_MASS_COST, EJECT_MASS_VALUE,
+  EJECT_VELOCITY, EJECT_RADIUS, COLORS, AI_NAMES
+} from "./constants"
 
 // --- Utility Functions ---
 function generateId(): string {
@@ -102,6 +48,8 @@ export function AgarGame() {
   const playerCellsRef = useRef<Cell[]>([])
   const aiCellsRef = useRef<Cell[]>([])
   const foodRef = useRef<Food[]>([])
+  const virusesRef = useRef<Virus[]>([])
+  const ejectedMassRef = useRef<EjectedMass[]>([])
   const aiBehaviorsRef = useRef<Map<string, AIBehavior>>(new Map())
   const mouseRef = useRef({ x: 0, y: 0 })
   const cameraRef = useRef({ x: 0, y: 0, scale: 1 })
@@ -160,6 +108,20 @@ export function AgarGame() {
     aiCellsRef.current = aiCells
   }, [])
 
+  // Initialize viruses
+  const initializeViruses = useCallback(() => {
+    const viruses: Virus[] = []
+    for (let i = 0; i < VIRUS_COUNT; i++) {
+      viruses.push({
+        id: generateId(),
+        x: Math.random() * WORLD_SIZE,
+        y: Math.random() * WORLD_SIZE,
+        radius: VIRUS_RADIUS
+      })
+    }
+    virusesRef.current = viruses
+  }, [])
+
   // Start game
   const startGame = useCallback(() => {
     // Initialize player
@@ -178,11 +140,13 @@ export function AgarGame() {
     lastSplitRef.current.clear()
     initializeFood()
     initializeAI()
+    initializeViruses()
+    ejectedMassRef.current = []
 
     setIsPlaying(true)
     setGameOver(false)
     setScore(0)
-  }, [initializeFood, initializeAI])
+  }, [initializeFood, initializeAI, initializeViruses])
 
   // End game
   const endGame = useCallback(() => {
@@ -251,6 +215,45 @@ export function AgarGame() {
     })
 
     playerCellsRef.current = [...playerCellsRef.current, ...newCells]
+  }, [isPlaying])
+
+  // Eject mass
+  const ejectMass = useCallback(() => {
+    if (!isPlaying) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const camera = cameraRef.current
+    const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
+    const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
+
+    playerCellsRef.current.forEach(cell => {
+      // Must be large enough to eject
+      if (cell.radius < 35) return
+
+      const newRadius = getRadiusFromMass(getMass(cell.radius) - EJECT_MASS_COST)
+      
+      const dx = worldMouseX - cell.x
+      const dy = worldMouseY - cell.y
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const dirX = dist > 0 ? dx / dist : 1
+      const dirY = dist > 0 ? dy / dist : 0
+
+      // Update cell size
+      cell.radius = newRadius
+
+      // Create blob
+      ejectedMassRef.current.push({
+        id: generateId(),
+        x: cell.x + dirX * (cell.radius + EJECT_RADIUS + 5),
+        y: cell.y + dirY * (cell.radius + EJECT_RADIUS + 5),
+        radius: EJECT_RADIUS,
+        color: cell.color,
+        vx: dirX * EJECT_VELOCITY,
+        vy: dirY * EJECT_VELOCITY,
+        creatorId: cell.id
+      })
+    })
   }, [isPlaying])
 
   // Update AI behavior
@@ -329,6 +332,18 @@ export function AgarGame() {
     const now = Date.now()
 
     // --- UPDATE ---
+
+    // Update ejected mass physics
+    ejectedMassRef.current.forEach(mass => {
+      mass.x += mass.vx
+      mass.y += mass.vy
+      mass.vx *= 0.9
+      mass.vy *= 0.9
+      
+      // Clamp bounds
+      if (mass.x < 0 || mass.x > WORLD_SIZE) mass.vx *= -1
+      if (mass.y < 0 || mass.y > WORLD_SIZE) mass.vy *= -1
+    })
 
     // Update player cells
     const playerCells = playerCellsRef.current
@@ -426,6 +441,72 @@ export function AgarGame() {
     }
 
     playerCellsRef.current = playerCells
+
+    // Check player eating ejected mass
+    playerCellsRef.current.forEach(cell => {
+      ejectedMassRef.current = ejectedMassRef.current.filter(mass => {
+        // Can't eat own mass immediately (simple check: if fast, ignore)
+        if (mass.creatorId === cell.id && (Math.abs(mass.vx) > 5 || Math.abs(mass.vy) > 5)) return true
+        
+        const dist = getDistance(cell.x, cell.y, mass.x, mass.y)
+        if (cell.radius > mass.radius * 1.1 && dist < cell.radius - mass.radius * 0.5) {
+          cell.radius = getRadiusFromMass(getMass(cell.radius) + EJECT_MASS_VALUE)
+          return false
+        }
+        return true
+      })
+    })
+
+    // Check player hitting viruses
+    const newVirusSplits: Cell[] = []
+    
+    playerCellsRef.current.forEach((cell) => {
+      let exploded = false
+      virusesRef.current = virusesRef.current.filter(virus => {
+        const dist = getDistance(cell.x, cell.y, virus.x, virus.y)
+        
+        // Check collision
+        if (dist < cell.radius + virus.radius * 0.5) {
+          // If player is bigger than virus, explode!
+          if (cell.radius > virus.radius && !exploded) {
+            if (cell.radius >= 35) { // Minimum mass to explode
+                // Explode logic: split into many pieces
+                exploded = true
+                
+                // Max cells we can add
+                const spotsAvailable = MAX_CELLS - playerCellsRef.current.length - newVirusSplits.length
+                const splitCount = Math.min(spotsAvailable, 8) 
+                
+                if (splitCount > 0) {
+                    const massPerPiece = getMass(cell.radius) / (splitCount + 1)
+                    cell.radius = getRadiusFromMass(massPerPiece)
+                    
+                    for(let i=0; i<splitCount; i++) {
+                        const angle = (Math.PI * 2 * i) / splitCount
+                        newVirusSplits.push({
+                            id: generateId(),
+                            x: cell.x,
+                            y: cell.y,
+                            radius: getRadiusFromMass(massPerPiece),
+                            color: cell.color,
+                            vx: Math.cos(angle) * 15,
+                            vy: Math.sin(angle) * 15,
+                            isPlayer: true,
+                            name: "You"
+                        })
+                    }
+                }
+                return false // Remove virus
+            }
+          }
+        }
+        return true
+      })
+    })
+    
+    if (newVirusSplits.length > 0) {
+        playerCellsRef.current = [...playerCellsRef.current, ...newVirusSplits]
+    }
 
     // Update AI cells
     aiCellsRef.current.forEach(ai => {
@@ -646,6 +727,44 @@ export function AgarGame() {
       }
     })
 
+    // Draw ejected mass
+    ejectedMassRef.current.forEach(mass => {
+      ctx.fillStyle = mass.color
+      ctx.beginPath()
+      ctx.arc(mass.x, mass.y, mass.radius, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.strokeStyle = "rgba(0,0,0,0.2)"
+      ctx.lineWidth = 1
+      ctx.stroke()
+    })
+
+    // Draw viruses
+    virusesRef.current.forEach(virus => {
+      ctx.fillStyle = "#33ff33"
+      ctx.beginPath()
+      
+      // Draw spiky virus
+      const spikes = 20
+      const outerRad = virus.radius + 5
+      const innerRad = virus.radius - 5
+      
+      for(let i=0; i<spikes * 2; i++) {
+        const rad = (i % 2 === 0) ? outerRad : innerRad
+        const angle = (Math.PI * 2 * i) / (spikes * 2)
+        const x = virus.x + Math.cos(angle) * rad
+        const y = virus.y + Math.sin(angle) * rad
+        if (i===0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+      
+      ctx.closePath()
+      ctx.fill()
+      
+      ctx.strokeStyle = "#22cc22"
+      ctx.lineWidth = 4
+      ctx.stroke()
+    })
+
     // Draw player cells (on top)
     playerCellsRef.current.forEach(cell => {
       // Cell body with glow
@@ -730,11 +849,15 @@ export function AgarGame() {
         e.preventDefault()
         splitPlayer()
       }
+      if (e.code === "KeyW") {
+        e.preventDefault()
+        ejectMass()
+      }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [splitPlayer])
+  }, [splitPlayer, ejectMass])
 
   // Resize canvas
   useEffect(() => {
