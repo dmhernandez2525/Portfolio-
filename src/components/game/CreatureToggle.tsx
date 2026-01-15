@@ -103,6 +103,14 @@ export function CreatureToggle() {
                         exit={{ opacity: 0, y: -10, scale: 0.9 }}
                         className="fixed top-20 right-4 z-50 max-w-sm"
                     >
+                        {/* Arrow pointing up to the toggle */}
+                        <motion.div
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 0.8, repeat: Infinity }}
+                            className="flex justify-end pr-16 mb-1"
+                        >
+                            <span className="text-neon-purple text-xl">↑</span>
+                        </motion.div>
                         <div className="bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 backdrop-blur-md px-4 py-3 rounded-xl border border-neon-purple/30 shadow-lg">
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-2 text-sm">
@@ -148,6 +156,12 @@ export function CreatureToggle() {
                                 <p className="text-xs text-muted-foreground text-center">
                                     Click or drag them to interact!
                                 </p>
+                                {/* How to turn off */}
+                                <div className="border-t border-white/10 pt-2 mt-1">
+                                    <p className="text-[10px] text-muted-foreground text-center">
+                                        <span className="text-neon-purple">Tip:</span> Click the toggle above to turn creatures off
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </motion.div>

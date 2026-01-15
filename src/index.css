@@ -28,6 +28,12 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* Neon colors for games and accents */
+  --color-neon-cyan: hsl(var(--neon-cyan));
+  --color-neon-pink: hsl(var(--neon-pink));
+  --color-neon-blue: hsl(var(--neon-blue));
+  --color-neon-purple: hsl(var(--neon-purple));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -227,6 +233,20 @@
 @keyframes stars-drift {
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 100%; }
+}
+
+/* Globe scan line animation - prevents React re-renders */
+@keyframes scan-line {
+  0% {
+    background: linear-gradient(transparent 0%, rgba(0,212,255,0.3) 1%, transparent 2%);
+  }
+  100% {
+    background: linear-gradient(transparent 98%, rgba(0,212,255,0.3) 99%, transparent 100%);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 5s linear infinite;
 }
 
 /* Section backgrounds - subtle depth layers */

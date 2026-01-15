@@ -4,6 +4,7 @@ import { ArrowRight, Download } from "lucide-react"
 import { HeroBackground } from "./HeroBackground"
 import { ParticleBackground } from "@/components/ui/ParticleBackground"
 import { MagneticButton } from "@/components/ui/MagneticButton"
+import { ContactModal } from "@/components/shared/ContactModal"
 
 const heroTaglines = [
   "Jack of all trades. Master of... okay fine, like four of them.",
@@ -125,12 +126,13 @@ export function Hero() {
           >
             Download Resume <Download className="h-4 w-4" />
           </MagneticButton>
-          <MagneticButton
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth'})}
-            className="h-11 px-8 gap-2 text-md bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600"
-          >
-            Let's Talk ✉
-          </MagneticButton>
+          <ContactModal>
+            <MagneticButton
+              className="h-11 px-8 gap-2 text-md bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600"
+            >
+              Let's Talk ✉
+            </MagneticButton>
+          </ContactModal>
         </motion.div>
 
         {/* Easter Egg Icons */}
