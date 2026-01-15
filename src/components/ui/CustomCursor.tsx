@@ -20,8 +20,9 @@ export function CustomCursor() {
     setIsVisible(true)
 
     const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 16)
-      cursorY.set(e.clientY - 16)
+      // Position at top-left of cursor (the tip)
+      cursorX.set(e.clientX)
+      cursorY.set(e.clientY)
     }
 
     const handleMouseEnter = () => setIsVisible(true)
@@ -62,25 +63,6 @@ export function CustomCursor() {
     }
   }, [cursorX, cursorY])
 
-  const variants = {
-    default: {
-      width: 32,
-      height: 32,
-      backgroundColor: "rgba(0, 212, 255, 0.3)",
-    },
-    pointer: {
-      width: 48,
-      height: 48,
-      backgroundColor: "rgba(123, 45, 255, 0.25)",
-    },
-    text: {
-      width: 4,
-      height: 24,
-      backgroundColor: "rgba(0, 212, 255, 0.6)",
-      borderRadius: "2px",
-    },
-  }
-
   if (!isVisible) return null
 
   return (
@@ -94,15 +76,64 @@ export function CustomCursor() {
         }
       `}</style>
 
+      {/* Main cursor - arrow/pointer shape with clear tip */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[9999]"
         style={{
           x: springX,
           y: springY,
         }}
-        variants={variants}
-        animate={cursorVariant}
+        animate={{
+          scale: cursorVariant === "pointer" ? 1.2 : 1,
+        }}
         transition={{ type: "spring", stiffness: 500, damping: 28 }}
+      >
+        {/* Arrow cursor SVG - tip at top-left */}
+        <svg
+          width={cursorVariant === "text" ? "4" : "24"}
+          height={cursorVariant === "text" ? "24" : "28"}
+          viewBox="0 0 24 28"
+          fill="none"
+          className={cursorVariant === "text" ? "hidden" : "block"}
+          style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
+        >
+          {/* Main arrow shape */}
+          <path
+            d="M1 1L1 21L6.5 16L11 26L14 24.5L9.5 14.5L17 14.5L1 1Z"
+            fill={cursorVariant === "pointer" ? "rgba(123, 45, 255, 0.9)" : "rgba(0, 212, 255, 0.9)"}
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+        </svg>
+
+        {/* Text cursor (I-beam) */}
+        {cursorVariant === "text" && (
+          <div
+            className="w-[3px] h-6 bg-cyan-400 rounded-sm"
+            style={{
+              boxShadow: "0 0 8px rgba(0, 212, 255, 0.8)",
+              marginLeft: "-1.5px"
+            }}
+          />
+        )}
+      </motion.div>
+
+      {/* Trailing glow effect */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full"
+        style={{
+          x: springX,
+          y: springY,
+          width: cursorVariant === "pointer" ? 40 : 24,
+          height: cursorVariant === "pointer" ? 40 : 24,
+          marginLeft: cursorVariant === "pointer" ? -8 : -4,
+          marginTop: cursorVariant === "pointer" ? -8 : -4,
+          background: cursorVariant === "pointer"
+            ? "radial-gradient(circle, rgba(123, 45, 255, 0.3) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%)",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
       />
     </>
   )

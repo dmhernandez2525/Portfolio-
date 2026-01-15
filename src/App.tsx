@@ -5,6 +5,7 @@ import { GamificationProvider } from "@/components/providers/GamificationProvide
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
 import { CustomCursor } from "@/components/ui/CustomCursor"
+import { ScrollToTop } from "@/components/shared/ScrollToTop"
 import { AppRoutes } from "./AppRoutes"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -54,6 +55,7 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <GamificationProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <SmoothScrollProvider>
             <CustomCursor />
             <CreatureLayer />

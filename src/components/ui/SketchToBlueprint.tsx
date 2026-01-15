@@ -2,6 +2,7 @@ import { motion, useInView, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import { interpolate } from "flubber"
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react"
+import { useTheme } from "@/components/providers/ThemeProvider"
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -996,11 +997,18 @@ function ControlPanel({ isPlaying, onPlayPause, onReplay, soundEnabled, onToggle
 export function SketchToBlueprint() {
   const containerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(containerRef, { once: false, margin: "-50px" })
+  const { theme } = useTheme()
 
   // Check for reduced motion preference
   const prefersReducedMotion = typeof window !== "undefined"
     ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
     : false
+
+  // Theme-aware colors
+  const isDarkMode = theme === "dark"
+  const sketchStrokeColor = isDarkMode ? "#888" : "#444" // Lighter in dark mode for visibility
+  const paperColor = isDarkMode ? "#1a1a1a" : "#F5F5DC"
+  const blueprintBgColor = "#001830" // Always dark for blueprint phase
 
   // Animation state
   const [phase, setPhase] = useState<number>(PHASES.BLANK)
@@ -1588,7 +1596,13 @@ export function SketchToBlueprint() {
   // Visual states
   const isSketchPhase = phase < PHASES.TRANSFORM
   const isBlueprintPhase = phase >= PHASES.DIMENSIONS
-  const strokeColor = isBlueprintPhase ? "#00D4FF" : isSketchPhase ? "#444" : `rgb(${Math.round(68 + morphProgress * (0 - 68))}, ${Math.round(68 + morphProgress * (212 - 68))}, ${Math.round(68 + morphProgress * (255 - 68))})`
+  // Use theme-aware colors - interpolate from sketch color to cyan
+  const sketchColorRgb = isDarkMode ? { r: 136, g: 136, b: 136 } : { r: 68, g: 68, b: 68 }
+  const strokeColor = isBlueprintPhase
+    ? "#00D4FF"
+    : isSketchPhase
+    ? sketchStrokeColor
+    : `rgb(${Math.round(sketchColorRgb.r + morphProgress * (0 - sketchColorRgb.r))}, ${Math.round(sketchColorRgb.g + morphProgress * (212 - sketchColorRgb.g))}, ${Math.round(sketchColorRgb.b + morphProgress * (255 - sketchColorRgb.b))})`
   const strokeWidth = isBlueprintPhase ? 1.5 : isSketchPhase ? 2.5 : 2.5 - morphProgress
 
   // Get phase name
@@ -1624,11 +1638,11 @@ export function SketchToBlueprint() {
       }}
       onClick={() => setClickCount((c) => c + 1)}
     >
-      {/* Background transition */}
+      {/* Background transition - theme aware */}
       <motion.div
         className="absolute inset-0 rounded-xl overflow-hidden"
-        initial={{ backgroundColor: "#F5F5DC" }}
-        animate={{ backgroundColor: phase >= PHASES.TRANSFORM ? "#001830" : "#F5F5DC" }}
+        initial={{ backgroundColor: paperColor }}
+        animate={{ backgroundColor: phase >= PHASES.TRANSFORM ? blueprintBgColor : paperColor }}
         transition={{ duration: 2 }}
       />
 

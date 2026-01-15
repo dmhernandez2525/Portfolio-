@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { ArrowLeft, MessageSquare, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ContactModal } from "@/components/shared/ContactModal"
 
 type InventionCategory = "All" | "Hardware" | "Software" | "Automation" | "Concepts"
 type InventionStatus = "Built" | "Designed" | "Concept" | "Hobby"
@@ -354,22 +355,6 @@ export function Inventions() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Portfolio
-          </Link>
-          <Link
-            to="/#contact"
-            className="text-primary hover:underline"
-          >
-            Let's Talk
-          </Link>
-        </div>
-      </header>
-
       <main className="pt-24 pb-20">
         <div className="container max-w-6xl">
           {/* Hero */}
@@ -489,6 +474,166 @@ export function Inventions() {
             </AnimatePresence>
           </div>
 
+          {/* Photo Showcase - Real Builds */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-16"
+          >
+            <h3 className="text-2xl font-bold text-center mb-2 text-primary">From the Workshop</h3>
+            <p className="text-center text-muted-foreground mb-8">Proof that I actually build things</p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Alarm Clock Print */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/print-alarm-clock.png" 
+                  alt="3D printed alarm clock prototype" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">3D PRINTED PROTOTYPE</p>
+                    <p className="text-white font-medium mb-1">Alarm Clock Design</p>
+                    <p className="text-white/70 text-sm">
+                      "50% scale test print. If it fails small, it fails cheap."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Business Card Holder */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/print-business-card.png" 
+                  alt="3D printed laptop business card holder" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">BRAINY DEVELOPER ERA</p>
+                    <p className="text-white font-medium mb-1">Laptop Business Card Holder</p>
+                    <p className="text-white/70 text-sm">
+                      "16-hour print. Because why buy what you can build?"
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Print Farm Enclosure */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/print-farm.png" 
+                  alt="Temperature controlled 3D print farm" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">DIY PRINT FARM</p>
+                    <p className="text-white font-medium mb-1">Temperature Controlled Enclosure</p>
+                    <p className="text-white/70 text-sm">
+                      "Two Ender 3s, stacked. Temperature controlled for consistent prints."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Lithophane */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/lithophane.png" 
+                  alt="3D printed lithophane" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">LITHOPHANE</p>
+                    <p className="text-white font-medium mb-1">Backlit Photo Print</p>
+                    <p className="text-white/70 text-sm">
+                      "Photos become 3D. Light reveals the image."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Row 2: Repair & Electronics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+              {/* Bionic Finger */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/bionic-finger.png" 
+                  alt="3D printing bionic finger parts" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">BIONIC FINGER</p>
+                    <p className="text-white font-medium mb-1">24-Hour Print</p>
+                    <p className="text-white/70 text-sm">
+                      "Redesigning prosthetic parts. 9 hours in on a 24-hour print."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Phone Repair */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/phone-repair.png" 
+                  alt="iPhone water damage repair" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">PHONE REPAIR ERA</p>
+                    <p className="text-white font-medium mb-1">Water Damage Recovery</p>
+                    <p className="text-white/70 text-sm">
+                      "Side hustle: fixing iPhones. Bowl of isopropyl and patience."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Workbench */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/workbench.png" 
+                  alt="Electronics workbench for Kickstarter project" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">1AM INSPIRATION</p>
+                    <p className="text-white font-medium mb-1">Kickstarter Project</p>
+                    <p className="text-white/70 text-sm">
+                      "When inspiration hits at 1am, you don't ignore it."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Robotic Hand */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/robotic-hand.png" 
+                  alt="3D printed robotic prosthetic hand" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">PROSTHETICS</p>
+                    <p className="text-white font-medium mb-1">Robotic Hand</p>
+                    <p className="text-white/70 text-sm">
+                      "Robotic arm, here we come. Full prosthetic prototype."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Footer CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -506,12 +651,12 @@ export function Inventions() {
                   Back to Portfolio
                 </Link>
               </Button>
-              <Button asChild size="lg">
-                <Link to="/#contact">
+              <ContactModal>
+                <Button size="lg">
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Let's Talk
-                </Link>
-              </Button>
+                </Button>
+              </ContactModal>
             </div>
           </motion.div>
         </div>

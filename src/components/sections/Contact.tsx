@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Send, CheckCircle, Loader2 } from "lucide-react"
+import { Send, CheckCircle, Loader2, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -189,6 +189,28 @@ export function Contact() {
                     )}
                 </CardContent>
             </Card>
+        </motion.div>
+
+        {/* Resume CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 text-center"
+        >
+          <p className="text-sm text-muted-foreground mb-3">
+            Prefer to review my background first?
+          </p>
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2"
+            onClick={() => window.open('/resume.pdf', '_blank')}
+          >
+            <Download className="h-4 w-4" />
+            Download Resume
+          </Button>
         </motion.div>
 
         {/* Hire Easter Egg Toast */}
