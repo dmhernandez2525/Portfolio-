@@ -1,5 +1,4 @@
-import { useRef, useEffect, useState } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion } from "framer-motion"
 import { Github, ExternalLink, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -121,79 +120,28 @@ function ProjectCard({ project, index }: { project: ProjectItem; index: number }
 }
 
 export function Projects() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [scrollWidth, setScrollWidth] = useState(0)
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      setScrollWidth(scrollRef.current.scrollWidth - window.innerWidth + 100)
-    }
-  }, [])
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  })
-
-  const x = useTransform(scrollYProgress, [0, 1], [0, -scrollWidth])
-
   return (
     <section id="projects" className="py-20 bg-muted/20">
-      {/* Header - always visible */}
-      <div className="container mb-12">
+      <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center"
+          className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-4">Featured Projects</h2>
           <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
             From web applications to hardware engineering and game development.
           </p>
         </motion.div>
-      </div>
 
-      {/* Horizontal Scroll Container - Desktop */}
-      <div
-        ref={containerRef}
-        className="relative hidden md:block"
-        style={{ height: `${Math.max(100, scrollWidth / 3)}px`, position: 'relative' }}
-      >
-        <div className="sticky top-20 overflow-hidden">
-          <motion.div
-            ref={scrollRef}
-            style={{ x }}
-            className="flex gap-6 px-8 py-4"
-          >
-            {projectsData.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Mobile Grid Layout */}
-      <div className="md:hidden container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Project Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projectsData.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </div>
-      </div>
-
-      {/* Scroll hint - Desktop only */}
-      <div className="container hidden md:block">
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center text-sm text-muted-foreground mt-8"
-        >
-          ↓ Scroll to explore more projects
-        </motion.p>
       </div>
     </section>
   )
