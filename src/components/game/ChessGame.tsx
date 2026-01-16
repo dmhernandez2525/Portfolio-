@@ -787,7 +787,7 @@ export function ChessGame() {
   // AI move
   useEffect(() => {
     if (gameState.turn !== playerColor && !gameState.isCheckmate && !gameState.isStalemate) {
-      setIsThinking(true)
+      setTimeout(() => setIsThinking(true), 0)
 
       // Delay to show "thinking"
       const timer = setTimeout(() => {
@@ -949,7 +949,7 @@ export function ChessGame() {
   }, [gameState.moveHistory])
 
   // Get algebraic notation for move
-  const getMoveNotation = (move: Move, _index: number): string => {
+  const getMoveNotation = (move: Move): string => {
     const files = "abcdefgh"
     const ranks = "87654321"
 
@@ -1152,8 +1152,8 @@ export function ChessGame() {
               return (
                 <div key={i} className="flex gap-2">
                   <span className="text-muted-foreground w-6">{i + 1}.</span>
-                  <span className="w-16">{getMoveNotation(whiteMove, i * 2)}</span>
-                  <span className="w-16">{blackMove ? getMoveNotation(blackMove, i * 2 + 1) : ""}</span>
+                  <span className="w-16">{getMoveNotation(whiteMove)}</span>
+                  <span className="w-16">{blackMove ? getMoveNotation(blackMove) : ""}</span>
                 </div>
               )
             })

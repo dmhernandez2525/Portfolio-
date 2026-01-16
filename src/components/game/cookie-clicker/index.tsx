@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
 import { ArrowLeft, Trophy, Sparkles, Skull } from "lucide-react"
 import type { Building, Upgrade, Achievement, GameState, Wrinkler, ClickEffect } from "./types"
+import type { SavedGameData } from "./types_saved"
 import { INITIAL_BUILDINGS, UPGRADES_DATA, ACHIEVEMENTS_DATA, SAVE_KEY } from "./constants"
 
 function formatNumber(n: number): string {
@@ -65,7 +66,7 @@ export function CookieClickerGame() {
     const witherRate = wrinklers.length * 0.05
     
     return base * mult * (1 - witherRate)
-  }, [buildings, upgrades, cpsMultiplier, wrinklers.length])
+  }, [buildings, upgrades, cpsMultiplier, wrinklers.length, heavenlyChips])
   
   const clickPower = useMemo(() => {
     let base = 1
@@ -79,11 +80,11 @@ export function CookieClickerGame() {
     return base * clickMultiplier
   }, [upgrades, clickMultiplier])
   
-  const gameState: GameState = {
+  const gameState: GameState = useMemo(() => ({
     cookies, totalCookies, totalClicks, cookiesPerClick: clickPower, cookiesPerSecond: cps,
     clickMultiplier, cpsMultiplier, buildings, upgrades, achievements,
     grandmapocalypseLevel: grandmaLevel, wrinklers, heavenlyChips: 0, ascensionLevel: 0
-  }
+  }), [cookies, totalCookies, totalClicks, clickPower, cps, clickMultiplier, cpsMultiplier, buildings, upgrades, achievements, grandmaLevel, wrinklers])
 
   // --- GAME LOOP ---
   useEffect(() => {
@@ -128,28 +129,37 @@ export function CookieClickerGame() {
         }
     }, tickRate)
     return () => clearInterval(interval)
-  }, [cps, grandmaLevel, wrinklers, gameState]) 
+  }, [cps, wrinklers.length, grandmaLevel, gameState]) 
 
-  // --- SAVE / LOAD & GOLDEN COOKIE ---
+
+
+// ... imports
+
+// ... function
+  
+  // Save / Load
   // Load
   useEffect(() => {
       const saved = localStorage.getItem(SAVE_KEY)
       if (saved) {
           try {
-              const data = JSON.parse(saved)
-              if(data.cookies) setCookies(data.cookies)
-              if(data.totalCookies) setTotalCookies(data.totalCookies)
-              if(data.buildings) {
-                  setBuildings(prev => prev.map(b => {
-                      const s = data.buildings.find((sb: any) => sb.id === b.id)
-                      return s ? {...b, owned: s.owned} : b
-                  }))
-              }
-              if(data.upgrades) {
-                  setUpgrades(prev => prev.map(u => ({...u, purchased: data.upgrades.includes(u.id)})))
-              }
-              if(data.grandmaLevel) setGrandmaLevel(data.grandmaLevel)
-              if(data.heavenlyChips) setHeavenlyChips(data.heavenlyChips)
+              const data = JSON.parse(saved) as SavedGameData
+              
+              setTimeout(() => {
+                if(data.cookies) setCookies(data.cookies)
+                if(data.totalCookies) setTotalCookies(data.totalCookies)
+                if(data.buildings) {
+                    setBuildings(prev => prev.map(b => {
+                        const s = data.buildings.find(sb => sb.id === b.id)
+                        return s ? {...b, owned: s.owned} : b
+                    }))
+                }
+                if(data.upgrades) {
+                    setUpgrades(prev => prev.map(u => ({...u, purchased: data.upgrades.includes(u.id)})))
+                }
+                if(data.grandmaLevel) setGrandmaLevel(data.grandmaLevel)
+                if(data.heavenlyChips) setHeavenlyChips(data.heavenlyChips)
+              }, 0)
           } catch(e) { console.error(e) }
       }
   }, [])
@@ -166,7 +176,7 @@ export function CookieClickerGame() {
       }
       const i = setInterval(save, 30000)
       return () => clearInterval(i)
-  }, [cookies, totalCookies, buildings, upgrades, grandmaLevel])
+  }, [cookies, totalCookies, buildings, upgrades, grandmaLevel, heavenlyChips])
 
   // Golden Cookie Spawner
   useEffect(() => {

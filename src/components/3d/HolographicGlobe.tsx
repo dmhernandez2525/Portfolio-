@@ -1,5 +1,5 @@
 import { Viewer, Entity, PointGraphics, PolylineGraphics } from "resium"
-import { Cartesian3, Color, type Viewer as CesiumViewer, PolylineGlowMaterialProperty, CallbackProperty } from "cesium"
+import { Cartesian3, Color, type Viewer as CesiumViewer, PolylineGlowMaterialProperty, CallbackProperty, JulianDate } from "cesium"
 import "@/lib/cesium-config" // Initialize Cesium Ion token
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import type { ComponentProps } from "react"
@@ -172,8 +172,10 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
   }, [timeSpeed])
 
   // Create CallbackProperty for ISS position (smooth animation without React re-renders)
-  const issPositionCallback = useMemo(() => new CallbackProperty(() => {
-    const now = Date.now() * timeSpeedRef.current
+  const issPositionCallback = useMemo(() => new CallbackProperty((time) => {
+    const validTime = time || JulianDate.now()
+    const now = JulianDate.toDate(validTime).getTime() * timeSpeedRef.current
+    
     const orbitProgress = (now % (ISS_ORBITAL_PERIOD * 60 * 1000)) / (ISS_ORBITAL_PERIOD * 60 * 1000)
     const angle = orbitProgress * 360
     const inclination = 51.6
@@ -186,8 +188,10 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
   const satellitePositionCallbacks = useMemo(() => {
     return satelliteData.current.map(sat => ({
       id: sat.id,
-      positionCallback: new CallbackProperty(() => {
-        const now = Date.now() * timeSpeedRef.current
+      positionCallback: new CallbackProperty((time) => {
+        const validTime = time || JulianDate.now();
+        const now = JulianDate.toDate(validTime).getTime() * timeSpeedRef.current;
+        
         const orbitProgress = ((now * sat.speed) % (90 * 60 * 1000)) / (90 * 60 * 1000)
         const angle = (orbitProgress * 360 + sat.phase) % 360
         const lat = sat.inclination * Math.sin((angle * Math.PI) / 180)
@@ -351,6 +355,12 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
   // Holographic scan line effect - moved to CSS animation to prevent re-renders
 
   // Rocket launch easter egg - with dramatic camera follow
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message)
+    setTimeout(() => setToastMessage(null), 3500)
+  }, [])
+
+
   const launchRocket = useCallback((lat: number, lon: number) => {
     const viewer = viewerRef.current?.cesiumElement
     if (!viewer) return
@@ -416,12 +426,9 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
         }
       }, 80) // Slower interval for smoother animation
     }, 1200)
-  }, [])
+  }, [showToast])
 
-  const showToast = useCallback((message: string) => {
-    setToastMessage(message)
-    setTimeout(() => setToastMessage(null), 3500)
-  }, [])
+
 
   // Journey playback - slower pace for better viewing
   useEffect(() => {
@@ -587,6 +594,7 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
     const controller = viewer.scene.screenSpaceCameraController
 
     // Enable/disable all camera controls based on interaction state
+    // eslint-disable-next-line react-hooks/immutability
     controller.enableRotate = isInteracting
     controller.enableZoom = isInteracting
     controller.enableTilt = isInteracting

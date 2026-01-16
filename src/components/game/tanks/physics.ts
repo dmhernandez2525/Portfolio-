@@ -119,15 +119,15 @@ export function calculateAIShot(
     wind: number
 ): { angle: number, power: number } {
     const dx = toX - fromX
-
-    const distance = Math.abs(dx)
-    
-    // Power based on distance
-    let power = Math.min(95, Math.max(40, distance * 0.12 + Math.random() * 10))
+    const dy = _toY - _fromY
     
     // Angle (mostly lobs)
     let angle = dx > 0 ? 45 : 135
     angle += (Math.random() - 0.5) * 20
+    const angleRad = angle * Math.PI / 180
+    
+    // Power based on physics formula
+    const power = Math.min(100, Math.max(0, (Math.sqrt((dx*dx + dy*dy) * GRAVITY / Math.sin(2 * angleRad)) / 20) * 100))
     
     // Compensate for wind
     angle -= wind * 2
