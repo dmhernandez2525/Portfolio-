@@ -151,7 +151,7 @@ export function CreatureLayer() {
       }
       
       setCreatures(prev => prev.length < MAX_CREATURES ? [...prev, newCreature] : prev)
-  }, [])
+  }, [creatures.length, MAX_CREATURES])
   
   // Start spawn loop when creatures are enabled
   useEffect(() => {
@@ -195,7 +195,7 @@ export function CreatureLayer() {
       }))
       
       setCreatures(prev => [...prev, ...burstCreatures].slice(0, MAX_CREATURES))
-  }, [])
+  }, [MAX_CREATURES])
   
   // Listen for burst event from CreatureToggle
   useEffect(() => {

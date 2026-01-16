@@ -606,6 +606,36 @@ interface EraserProps {
   isErasing: boolean
 }
 
+function EraserShaving({ index }: { index: number }) {
+  // Pre-calculate random values once on mount
+  // Pre-calculate random values once on mount using useState lazy initializer
+  const [randoms] = useState(() => ({
+    rotateInit: Math.random() * 360,
+    yTarget: 35 + Math.random() * 25,
+    xTarget: (Math.random() - 0.5) * 30,
+    rotateTarget: Math.random() * 720,
+    duration: 0.6 + Math.random() * 0.3
+  }))
+
+  return (
+    <motion.ellipse
+      cx={(index - 4) * 6}
+      cy="18"
+      rx="3"
+      ry="1.5"
+      fill="#FFCDD2"
+      initial={{ opacity: 0.9, y: 18, rotate: randoms.rotateInit }}
+      animate={{
+        opacity: 0,
+        y: randoms.yTarget,
+        x: randoms.xTarget,
+        rotate: randoms.rotateTarget,
+      }}
+      transition={{ duration: randoms.duration, repeat: Infinity, delay: index * 0.08 }}
+    />
+  )
+}
+
 function Eraser({ x, y, rotation, visible, isErasing }: EraserProps) {
   return (
     <motion.g
@@ -629,24 +659,10 @@ function Eraser({ x, y, rotation, visible, isErasing }: EraserProps) {
       </text>
       {/* Eraser shavings when erasing */}
       {isErasing && (
+
         <>
           {[...Array(8)].map((_, i) => (
-            <motion.ellipse
-              key={i}
-              cx={(i - 4) * 6}
-              cy="18"
-              rx="3"
-              ry="1.5"
-              fill="#FFCDD2"
-              initial={{ opacity: 0.9, y: 18, rotate: Math.random() * 360 }}
-              animate={{
-                opacity: 0,
-                y: 35 + Math.random() * 25,
-                x: (Math.random() - 0.5) * 30,
-                rotate: Math.random() * 720,
-              }}
-              transition={{ duration: 0.6 + Math.random() * 0.3, repeat: Infinity, delay: i * 0.08 }}
-            />
+            <EraserShaving key={i} index={i} />
           ))}
           {/* Eraser dust cloud */}
           <motion.ellipse
@@ -661,6 +677,7 @@ function Eraser({ x, y, rotation, visible, isErasing }: EraserProps) {
           />
         </>
       )}
+
     </motion.g>
   )
 }
@@ -1062,21 +1079,6 @@ export function SketchToBlueprint() {
     return result
   }, [])
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
-        e.preventDefault()
-        setIsPlaying((p) => !p)
-      } else if (e.code === "KeyR") {
-        handleReplay()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
-
   // Handle replay
   const handleReplay = useCallback(() => {
     setCurrentTime(0)
@@ -1098,21 +1100,41 @@ export function SketchToBlueprint() {
     setHasStarted(true)
   }, [])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        e.preventDefault()
+        setIsPlaying((p) => !p)
+      } else if (e.code === "KeyR") {
+        handleReplay()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [handleReplay])
+
+
+
   // Main animation loop
   useEffect(() => {
     if (!isInView || !isPlaying || prefersReducedMotion) {
       if (prefersReducedMotion) {
-        setPhase(PHASES.COMPLETE)
-        setMorphProgress(1)
-        strokes.forEach((stroke) => {
-          setStrokeProgress((prev) => ({ ...prev, [stroke.id]: 1 }))
-        })
+        setTimeout(() => {
+          setPhase(PHASES.COMPLETE)
+          setMorphProgress(1)
+          strokes.forEach((stroke) => {
+            setStrokeProgress((prev) => ({ ...prev, [stroke.id]: 1 }))
+          })
+        }, 0)
+
       }
       return
     }
 
     if (!hasStarted) {
-      setHasStarted(true)
+      setTimeout(() => setHasStarted(true), 0)
     }
 
     const animate = (timestamp: number) => {
@@ -1523,7 +1545,7 @@ export function SketchToBlueprint() {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [isInView, isPlaying, hasStarted, prefersReducedMotion])
+  }, [isInView, isPlaying, hasStarted, prefersReducedMotion, getUniqueParticleId])
 
   // Pause handling
   useEffect(() => {
@@ -1585,7 +1607,7 @@ export function SketchToBlueprint() {
 
   useEffect(() => {
     if (clickCount >= 5 && !spinTriggered) {
-      setSpinTriggered(true)
+      setTimeout(() => setSpinTriggered(true), 0)
       setTimeout(() => {
         setClickCount(0)
         setSpinTriggered(false)

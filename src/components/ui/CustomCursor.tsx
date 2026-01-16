@@ -17,7 +17,6 @@ export function CustomCursor() {
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches
     if (!hasFinePointer) return
 
-    setIsVisible(true)
 
     const moveCursor = (e: MouseEvent) => {
       // Position at top-left of cursor (the tip)
