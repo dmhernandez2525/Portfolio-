@@ -1,6 +1,6 @@
 // Physics utilities for artillery tanks
-import { GRAVITY, CANVAS_WIDTH, CANVAS_HEIGHT, EXPLOSION_RADIUS } from "./constants"
-import type { WeaponType } from "./types"
+import { GRAVITY, CANVAS_HEIGHT } from "./constants"
+
 
 // Generate procedural terrain using sine waves
 export function generateTerrain(width: number, resolution: number): number[] {
@@ -114,12 +114,12 @@ export function checkTankCollision(
 
 // Simple AI: Calculate angle and power to hit target
 export function calculateAIShot(
-    fromX: number, fromY: number,
-    toX: number, toY: number,
+    fromX: number, _fromY: number,
+    toX: number, _toY: number,
     wind: number
 ): { angle: number, power: number } {
     const dx = toX - fromX
-    const dy = toY - fromY
+
     const distance = Math.abs(dx)
     
     // Power based on distance
