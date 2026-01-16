@@ -7,37 +7,61 @@ import { SketchToBlueprint } from "@/components/ui/SketchToBlueprint"
 import { Button } from "@/components/ui/button"
 import { timelineData } from "@/data/timeline"
 
-// Photo data for the carousel
+// Photo data for the carousel - The Journey from waiter to senior engineer
 const journeyPhotos = [
+  {
+    src: "/photos/daniel-waiter.png",
+    alt: "Daniel working as a waiter at Steak n Shake",
+    year: "2017 · Origin Story",
+    caption: "Setting another brick for the foundation of my empire. Working nights, dreaming of code."
+  },
+  {
+    src: "/photos/csharp-hello-world.png",
+    alt: "First C# program Hello World",
+    year: "2018 · The Spark",
+    caption: "And the journey begins. My first C# program. That feeling when it finally compiles."
+  },
+  {
+    src: "/photos/python-book.png",
+    alt: "Daniel studying Python at Steak n Shake",
+    year: "2018 · Chronicles of a Programmer",
+    caption: "The start to another late night—or extremely early morning. #HustlingEveryday"
+  },
   {
     src: "/photos/coding-2am.png",
     alt: "Daniel coding at 2am",
     year: "2018 · The Grind",
-    caption: "Coding session at 2am. This is where it all started."
+    caption: "Coding session at 2 in the morning. 🤙 When you love what you're building, sleep is optional."
+  },
+  {
+    src: "/photos/mind-control-headset.png",
+    alt: "Daniel with mind-control VR headset",
+    year: "2018 · Mad Scientist Era",
+    caption: "Mind-controlled VR pong. EEG headset sensing alpha and beta brain waves as game inputs."
   },
   {
     src: "/photos/daniel-slack-hq.png",
     alt: "Daniel at Slack HQ Denver",
-    year: "2019 · Denver",
-    caption: "Job hunting and manifesting. Walked past Slack HQ."
+    year: "2019 · Manifesting",
+    caption: "Job hunting in Denver. Walked past Slack HQ. Speaking it into existence."
   },
   {
     src: "/photos/daniel-bootcamp.png",
     alt: "Daniel during coding bootcamp",
-    year: "2020",
-    caption: "The year I bet on myself. 60-hour weeks learning to code."
+    year: "2020 · All In",
+    caption: "The year I bet everything on myself. 60-hour weeks, caffeine-fueled, zero regrets."
   },
   {
     src: "/photos/daniel-ar-coding.png",
     alt: "Daniel coding with AR glasses",
-    year: "Now",
-    caption: "Testing AR dev tools at 1am. Yes, this is normal."
+    year: "2024 · Senior Engineer",
+    caption: "Testing AR dev tools at 1am. Some things never change. The grind just upgraded."
   },
   {
     src: "/photos/daniel-comedy.png",
     alt: "Daniel at comedy show",
-    year: "Life",
-    caption: "Work hard, laugh harder. Catching Josh Johnson live."
+    year: "Life · Balance",
+    caption: "Work hard, laugh harder. Catching Josh Johnson live. You gotta enjoy the wins."
   }
 ]
 
