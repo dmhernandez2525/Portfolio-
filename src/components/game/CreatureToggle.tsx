@@ -33,7 +33,7 @@ export function CreatureToggle() {
         }, 50)
 
         return () => clearInterval(interval)
-    }, [hasLoaded]) // Only run once on mount (Issue #5)
+    }, [hasLoaded, creaturesEnabled, toggleCreatures]) // Only run once on mount (Issue #5)
 
     // Show hint on scroll (after creatures are loaded and not dismissed)
     useEffect(() => {

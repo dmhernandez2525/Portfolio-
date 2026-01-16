@@ -324,7 +324,7 @@ export function AgarGame() {
   }, [])
 
   // Game loop
-  const gameLoop = useCallback(() => {
+  const gameLoop = useCallback(function loop() {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx || !isPlaying) return
@@ -792,7 +792,7 @@ export function AgarGame() {
     ctx.restore()
 
     // Continue loop
-    gameLoopRef.current = requestAnimationFrame(gameLoop)
+    gameLoopRef.current = requestAnimationFrame(loop)
   }, [isPlaying, endGame, updateAIBehavior])
 
   // Start/stop game loop

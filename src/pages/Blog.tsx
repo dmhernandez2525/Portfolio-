@@ -114,7 +114,7 @@ function BlogPostModal({ post, onClose }: { post: BlogPost; onClose: () => void 
                   <ul key={i} className="space-y-2 my-4">
                     {items.map((item, j) => (
                       <li key={j} className="text-muted-foreground">
-                        {item.replace(/^[\d]+\.\s|\-\s/, "")}
+                        {item.replace(/^[\d]+\.\s|-\s/, "")}
                       </li>
                     ))}
                   </ul>
