@@ -5,9 +5,10 @@ interface UseEasterEggsProps {
     onGandalf: () => void
     onDaniel: () => void
     onGhost: () => void
+    onMonkey?: () => void
 }
 
-export function useEasterEggs({ onKonami, onGandalf, onDaniel, onGhost }: UseEasterEggsProps) {
+export function useEasterEggs({ onKonami, onGandalf, onDaniel, onGhost, onMonkey }: UseEasterEggsProps) {
     const [, setInputBuffer] = useState("")
 
     useEffect(() => {
@@ -33,6 +34,10 @@ export function useEasterEggs({ onKonami, onGandalf, onDaniel, onGhost }: UseEas
                 }
                 if (newBuffer.endsWith("ghost")) {
                     onGhost()
+                    return ""
+                }
+                if (newBuffer.endsWith("monkey") && onMonkey) {
+                    onMonkey()
                     return ""
                 }
                 
@@ -69,5 +74,5 @@ export function useEasterEggs({ onKonami, onGandalf, onDaniel, onGhost }: UseEas
             window.removeEventListener("keydown", handleKeyDown)
             window.removeEventListener("keydown", handleKonami)
         }
-    }, [onKonami, onGandalf, onDaniel, onGhost])
+    }, [onKonami, onGandalf, onDaniel, onGhost, onMonkey])
 }

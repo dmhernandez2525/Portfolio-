@@ -1,46 +1,55 @@
-import type { TankType } from "./types"
+// Game constants for artillery-style tanks
+export const CANVAS_WIDTH = 800
+export const CANVAS_HEIGHT = 500
 
-export const VIEWPORT_WIDTH = 800
-export const VIEWPORT_HEIGHT = 600
+// Physics
+export const GRAVITY = 0.15
+export const MAX_POWER = 100
+export const MIN_POWER = 10
+export const POWER_STEP = 2
+export const ANGLE_STEP = 1
+export const WIND_MAX = 3
 
-export const TANK_RADIUS = 15
-export const BULLET_RADIUS = 4
-export const TANK_SPEED = 2
-export const BULLET_SPEED_NORMAL = 5
-export const BULLET_SPEED_FAST = 8
+// Tank properties
+export const TANK_WIDTH = 40
+export const TANK_HEIGHT = 20
+export const BARREL_LENGTH = 25
+export const MOVES_PER_TURN = 10
+export const MOVE_SPEED = 3
 
-export const COLORS = {
-  PLAYER: "#4287f5", // Blue
-  BROWN: "#8b4513",
-  GREY: "#808080",
-  TEAL: "#008080",
-  YELLOW: "#ffd700",
-  RED: "#ff0000",
-  GREEN: "#008000",
-  PURPLE: "#800080",
-  WHITE: "#f0f0f0", // Almost invisible on white, but distinct on dark bg
-  BLACK: "#1a1a1a",
-  WALL_STATIC: "#555",
-  WALL_BREAKABLE: "#a0522d",
+// Projectile
+export const PROJECTILE_RADIUS = 3
+export const EXPLOSION_RADIUS = 30
+
+// Fuel/Movement
+export const MAX_FUEL = 100
+export const FUEL_CONSUMPTION = 1.5
+
+// Weapons
+export const WEAPON_DATA: Record<string, { 
+    name: string, 
+    damage: number, 
+    radius: number, 
+    cost: number,
+    isFree: boolean 
+}> = {
+    small_shell: { name: "Small Shell", damage: 1, radius: 25, cost: 0, isFree: true },
+    large_shell: { name: "Large Shell", damage: 2, radius: 45, cost: 50, isFree: false },
+    mirv: { name: "MIRV", damage: 1, radius: 30, cost: 100, isFree: false },
+    atomic: { name: "Atomic", damage: 4, radius: 80, cost: 250, isFree: false }
 }
 
-export const TANK_STATS: Record<TankType, {
-  speed: number,
-  maxBullets: number,
-  bulletSpeed: number,
-  cooldown: number, // Frames
-  rockets: boolean,
-  hp: number,
-  maxBounces: number
-}> = {
-  PLAYER: { speed: 2.5, maxBullets: 5, bulletSpeed: 5, cooldown: 20, rockets: false, hp: 1, maxBounces: 1 },
-  BROWN: { speed: 0, maxBullets: 1, bulletSpeed: 4, cooldown: 100, rockets: false, hp: 1, maxBounces: 1 },
-  GREY: { speed: 1.5, maxBullets: 1, bulletSpeed: 5, cooldown: 80, rockets: false, hp: 1, maxBounces: 1 },
-  TEAL: { speed: 3, maxBullets: 1, bulletSpeed: 9, cooldown: 60, rockets: true, hp: 1, maxBounces: 0 },
-  YELLOW: { speed: 2, maxBullets: 2, bulletSpeed: 5, cooldown: 60, rockets: false, hp: 1, maxBounces: 1 },
-  RED: { speed: 2.5, maxBullets: 3, bulletSpeed: 5, cooldown: 40, rockets: false, hp: 1, maxBounces: 1 },
-  GREEN: { speed: 0, maxBullets: 2, bulletSpeed: 8, cooldown: 60, rockets: false, hp: 1, maxBounces: 2 },
-  PURPLE: { speed: 3, maxBullets: 5, bulletSpeed: 6, cooldown: 30, rockets: false, hp: 1, maxBounces: 1 },
-  WHITE: { speed: 2.5, maxBullets: 2, bulletSpeed: 5, cooldown: 60, rockets: false, hp: 1, maxBounces: 1 },
-  BLACK: { speed: 3.5, maxBullets: 3, bulletSpeed: 7, cooldown: 20, rockets: true, hp: 3, maxBounces: 1 },
+// Terrain
+export const TERRAIN_RESOLUTION = 2 // pixels per terrain point
+
+// Colors
+export const COLORS = {
+    sky: "#87CEEB",
+    terrain: "#8B4513",
+    terrainDark: "#654321",
+    player: "#2563EB",   // Blue
+    enemy: "#DC2626",    // Red
+    projectile: "#000000",
+    explosion: "#FF6600",
+    hud: "#FFFFFF"
 }
