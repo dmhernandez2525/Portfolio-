@@ -6,7 +6,6 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_CESIUM_ION_TOKEN
-        value: "UPDATE ME"
         sync: false
     headers:
       - path: /*
