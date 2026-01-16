@@ -127,7 +127,7 @@ export function TetrisGame() {
   }, [pieceBag])
 
   const spawnPiece = useCallback((forcedType?: PieceType) => {
-    let bag = getNextPieces()
+    const bag = getNextPieces()
     const type = forcedType || bag.shift()!
     if (!forcedType) {
       setPieceBag(bag.slice(0, bag.length))
@@ -196,6 +196,15 @@ export function TetrisGame() {
     }
   }, [activePiece, rotationState, checkCollision])
 
+  const handleGameOver = useCallback(() => {
+    setGameOver(true)
+    setIsPlaying(false)
+    if (score > highScore) {
+      setHighScore(score)
+      localStorage.setItem("tetris-highscore", score.toString())
+    }
+  }, [score, highScore])
+
   // Merge piece into board and check for line clears
   const mergePiece = useCallback(() => {
     if (!activePiece) return
@@ -260,16 +269,9 @@ export function TetrisGame() {
         setActivePiece(next)
       }
     }
-  }, [board, activePiece, level, spawnPiece, checkCollision])
+  }, [board, activePiece, level, spawnPiece, checkCollision, handleGameOver])
 
-  const handleGameOver = useCallback(() => {
-    setGameOver(true)
-    setIsPlaying(false)
-    if (score > highScore) {
-      setHighScore(score)
-      localStorage.setItem("tetris-highscore", score.toString())
-    }
-  }, [score, highScore])
+
 
   // Move piece down
   const drop = useCallback(() => {
@@ -542,7 +544,7 @@ export function TetrisGame() {
         >
           {board.map((row, y) => row.map((cell, x) => {
             let color = cell
-            let isClearing = clearingLines.includes(y)
+            const isClearing = clearingLines.includes(y)
 
             // Render ghost piece
             if (isPlaying && !gameOver && activePiece && !isClearing) {

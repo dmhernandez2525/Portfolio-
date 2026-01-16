@@ -101,8 +101,34 @@ export function TanksGame() {
     }, [player, round])
     
     useEffect(() => {
-        initGame()
-    }, [])
+        setTimeout(() => initGame(), 0)
+    }, [initGame])
+
+    const fireProjectile = useCallback(() => {
+        if (phase !== "aiming" || !player) return
+        const weapon = player.weapons[player.selectedWeapon]
+        if (weapon <= 0 && player.selectedWeapon !== "small_shell") return
+
+        const angleRad = player.angle * Math.PI / 180
+        const speed = (player.power * 0.12)
+        
+        projectilesRef.current.push({
+            x: player.x + Math.cos(angleRad) * BARREL_LENGTH,
+            y: player.y - TANK_HEIGHT/2 - Math.sin(angleRad) * BARREL_LENGTH,
+            vx: Math.cos(angleRad) * speed,
+            vy: -Math.sin(angleRad) * speed,
+            active: true,
+            ownerId: "player",
+            type: player.selectedWeapon
+        })
+
+        if (player.selectedWeapon !== "small_shell") {
+            setPlayer(p => p ? {...p, weapons: {...p.weapons, [p.selectedWeapon]: p.weapons[p.selectedWeapon] - 1}} : null)
+        }
+        
+        lastShotOwnerRef.current = "player"
+        setPhase("firing")
+    }, [phase, player])
 
     // Input Handling
     useEffect(() => {
@@ -138,33 +164,9 @@ export function TanksGame() {
         }
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [phase, player, terrain])
+    }, [phase, player, terrain, fireProjectile])
 
-    const fireProjectile = useCallback(() => {
-        if (phase !== "aiming" || !player) return
-        const weapon = player.weapons[player.selectedWeapon]
-        if (weapon <= 0 && player.selectedWeapon !== "small_shell") return
 
-        const angleRad = player.angle * Math.PI / 180
-        const speed = (player.power * 0.12)
-        
-        projectilesRef.current.push({
-            x: player.x + Math.cos(angleRad) * BARREL_LENGTH,
-            y: player.y - TANK_HEIGHT/2 - Math.sin(angleRad) * BARREL_LENGTH,
-            vx: Math.cos(angleRad) * speed,
-            vy: -Math.sin(angleRad) * speed,
-            active: true,
-            ownerId: "player",
-            type: player.selectedWeapon
-        })
-
-        if (player.selectedWeapon !== "small_shell") {
-            setPlayer(p => p ? {...p, weapons: {...p.weapons, [p.selectedWeapon]: p.weapons[p.selectedWeapon] - 1}} : null)
-        }
-        
-        lastShotOwnerRef.current = "player"
-        setPhase("firing")
-    }, [phase, player])
 
     const enemyTurn = useCallback(() => {
         if (!enemy || !player) return
@@ -349,7 +351,7 @@ export function TanksGame() {
         }
         animationRef.current = requestAnimationFrame(update)
         return () => { if (animationRef.current) cancelAnimationFrame(animationRef.current) }
-    }, [terrain, player, enemy, phase, wind, enemyTurn])
+    }, [terrain, player, enemy, phase, wind, enemyTurn, round])
 
     return (
         <div className="relative w-full min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-2 sm:p-4 gap-4 overflow-hidden font-sans">

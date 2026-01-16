@@ -30,14 +30,22 @@ export function Monkey({ id, x, y, onCatch }: MonkeyProps) {
     const [reaction, setReaction] = useState<typeof MONKEY_REACTIONS[0] | null>(null)
     const clickCountRef = useRef(0)
     
+    // Simulation state ref to avoid stale closures in interval
+    const stateRef = useRef({
+        x,
+        y,
+        rotation: 0,
+        facingRight: true
+    })
+
     // Main movement loop - like Bug's crawl
     useEffect(() => {
         let step = 0
         let phase: "swing" | "look" | "jump" | "land" = "swing"
-        let targetX = posX
-        let targetY = posY
-        let startX = posX
-        let startY = posY
+        let targetX = stateRef.current.x
+        let targetY = stateRef.current.y
+        let startX = stateRef.current.x
+        let startY = stateRef.current.y
         
         const moveInterval = setInterval(() => {
             step++
@@ -63,9 +71,13 @@ export function Monkey({ id, x, y, onCatch }: MonkeyProps) {
                     // Pick new target
                     targetX = 15 + Math.random() * 70
                     targetY = 10 + Math.random() * 40
-                    startX = posX
-                    startY = posY
-                    setFacingRight(targetX > posX)
+                    startX = stateRef.current.x
+                    startY = stateRef.current.y
+                    
+                    const newFacingRight = targetX > stateRef.current.x
+                    stateRef.current.facingRight = newFacingRight
+                    setFacingRight(newFacingRight)
+                    
                     phase = "jump"
                     step = 0
                 }
@@ -84,11 +96,16 @@ export function Monkey({ id, x, y, onCatch }: MonkeyProps) {
                 const newX = startX + (targetX - startX) * jumpProgress
                 const newY = startY + (targetY - startY) * jumpProgress - arcHeight
                 
+                stateRef.current.x = newX
+                stateRef.current.y = newY
                 setPosX(newX)
                 setPosY(newY)
                 
                 // Tumble rotation
-                setRotation(jumpProgress * 360 * (facingRight ? 1 : -1))
+                const newRotation = jumpProgress * 360 * (stateRef.current.facingRight ? 1 : -1)
+                stateRef.current.rotation = newRotation
+                setRotation(newRotation)
+                
                 setSwingAngle(0)
                 
                 if (step === 25) {
@@ -103,9 +120,16 @@ export function Monkey({ id, x, y, onCatch }: MonkeyProps) {
                 
                 // Damped bounce on landing
                 setSwingAngle(Math.sin(landProgress * Math.PI * 2) * 10 * (1 - landProgress))
-                setRotation(rotation * (1 - landProgress))
+                
+                const newRotation = stateRef.current.rotation * (1 - landProgress)
+                // Note: we don't update ref rotation here as we want it to settle to 0, 
+                // but for visual smoothness we decay it. 
+                // Actually, let's update it so next jump starts from 0ish
+                stateRef.current.rotation = newRotation
+                setRotation(newRotation)
                 
                 if (step === 10) {
+                    stateRef.current.rotation = 0
                     setRotation(0)
                     phase = "swing"
                     step = 0

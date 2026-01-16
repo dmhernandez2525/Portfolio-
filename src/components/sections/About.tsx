@@ -18,7 +18,7 @@ const journeyPhotos = [
   {
     src: "/photos/csharp-hello-world.png",
     alt: "First C# program Hello World",
-    year: "2018 · The Spark",
+    year: "2015 · The Spark",
     caption: "And the journey begins. My first C# program. That feeling when it finally compiles."
   },
   {
@@ -282,7 +282,7 @@ export function About() {
               </p>
             </div>
 
-             <div className="p-6 bg-muted/30 rounded-lg border border-border backdrop-blur-sm hover:border-primary/50 transition-colors">
+             {/* <div className="p-6 bg-muted/30 rounded-lg border border-border backdrop-blur-sm hover:border-primary/50 transition-colors">
                 <h4 className="font-bold mb-2">Why I'm Different</h4>
                 <ul className="space-y-2">
                     <li className="flex items-center gap-2">
@@ -295,7 +295,7 @@ export function About() {
                         <span className="text-primary">✓</span> I build solutions, not just features
                     </li>
                 </ul>
-            </div>
+            </div> */}
 
             {/* Resume CTA */}
             <motion.div
