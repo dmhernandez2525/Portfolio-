@@ -569,10 +569,10 @@ export function Inventions() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
                   <div>
-                    <p className="text-primary text-xs font-semibold mb-1">BIONIC FINGER</p>
-                    <p className="text-white font-medium mb-1">24-Hour Print</p>
+                    <p className="text-primary text-xs font-semibold mb-1">OPEN-SOURCE PROSTHETICS</p>
+                    <p className="text-white font-medium mb-1">Bionic Finger v2</p>
                     <p className="text-white/70 text-sm">
-                      "Redesigning prosthetic parts. 9 hours in on a 24-hour print."
+                      "Redesigning prosthetic parts for better articulation. 9 hours in on a 24-hour print."
                     </p>
                   </div>
                 </div>
@@ -587,10 +587,10 @@ export function Inventions() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
                   <div>
-                    <p className="text-primary text-xs font-semibold mb-1">PHONE REPAIR ERA</p>
-                    <p className="text-white font-medium mb-1">Water Damage Recovery</p>
+                    <p className="text-primary text-xs font-semibold mb-1">SIDE HUSTLE · 2016</p>
+                    <p className="text-white font-medium mb-1">iPhone Repair Business</p>
                     <p className="text-white/70 text-sm">
-                      "Side hustle: fixing iPhones. Bowl of isopropyl and patience."
+                      "Great quality work, great prices. Building the repair skills that still come in handy."
                     </p>
                   </div>
                 </div>
@@ -605,10 +605,10 @@ export function Inventions() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
                   <div>
-                    <p className="text-primary text-xs font-semibold mb-1">1AM INSPIRATION</p>
-                    <p className="text-white font-medium mb-1">Kickstarter Project</p>
+                    <p className="text-primary text-xs font-semibold mb-1">ALL NIGHT LONG</p>
+                    <p className="text-white font-medium mb-1">Kickstarter Prototype</p>
                     <p className="text-white/70 text-sm">
-                      "When inspiration hits at 1am, you don't ignore it."
+                      "Having fun working through the night. Innovation doesn't sleep. #AllNightLong"
                     </p>
                   </div>
                 </div>
@@ -623,10 +623,85 @@ export function Inventions() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
                   <div>
-                    <p className="text-primary text-xs font-semibold mb-1">PROSTHETICS</p>
-                    <p className="text-white font-medium mb-1">Robotic Hand</p>
+                    <p className="text-primary text-xs font-semibold mb-1">PROSTHETICS · 2018</p>
+                    <p className="text-white font-medium mb-1">Full Robotic Hand</p>
                     <p className="text-white/70 text-sm">
-                      "Robotic arm, here we come. Full prosthetic prototype."
+                      "Robotic arm, here we come!!! The culmination of months of iteration."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Row 3: Electronics & Programming */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+              {/* Arduino Hello World */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/arduino-hello-world.png" 
+                  alt="Arduino Hello World LCD display" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">ARDUINO · 2018</p>
+                    <p className="text-white font-medium mb-1">Hello, World!</p>
+                    <p className="text-white/70 text-sm">
+                      "My first microcontroller project. The magic of making hardware do what you want."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Shockeration */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/shockeration.png" 
+                  alt="Modified Operation game that shocks you" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">HARDWARE MOD · 2018</p>
+                    <p className="text-white font-medium mb-1">Shockeration</p>
+                    <p className="text-white/70 text-sm">
+                      "Operation that shocks you when you mess up. Modified with capacitors and relays!"
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mind Control Headset */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/mind-control-headset.png" 
+                  alt="EEG brain-sensing headset for VR" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">BRAIN-COMPUTER INTERFACE · 2018</p>
+                    <p className="text-white font-medium mb-1">Mind-Controlled VR Pong</p>
+                    <p className="text-white/70 text-sm">
+                      "Sensing alpha & beta waves. Using brain activity and facial movements as game inputs."
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Soldering 4am */}
+              <div className="group relative rounded-xl overflow-hidden bg-card/50 border border-border hover:border-primary/50 transition-colors">
+                <img 
+                  src="/photos/soldering-4am.png" 
+                  alt="Close-up of soldering work" 
+                  className="w-full aspect-square object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-4">
+                  <div>
+                    <p className="text-primary text-xs font-semibold mb-1">THE GRIND · 4AM</p>
+                    <p className="text-white font-medium mb-1">Late Night Soldering</p>
+                    <p className="text-white/70 text-sm">
+                      "Feeling good at 4am. When you're in flow state, time doesn't exist."
                     </p>
                   </div>
                 </div>
