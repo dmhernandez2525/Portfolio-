@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Wind, Fuel, Shield, ShoppingCart, Zap } from "lucide-react"
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react"
 
 import type { Tank, Projectile, Explosion, GamePhase, WeaponType } from "./types"
 import {
@@ -9,7 +9,7 @@ import {
     TANK_WIDTH, TANK_HEIGHT, BARREL_LENGTH,
     MAX_POWER, MIN_POWER, POWER_STEP, ANGLE_STEP,
     MOVE_SPEED, PROJECTILE_RADIUS,
-    EXPLOSION_RADIUS, TERRAIN_RESOLUTION, WIND_MAX,
+    TERRAIN_RESOLUTION, WIND_MAX,
     MAX_FUEL, FUEL_CONSUMPTION, WEAPON_DATA
 } from "./constants"
 import {
@@ -265,7 +265,7 @@ export function TanksGame() {
 
             // 4. PROJECTILES
             if (phase === "firing") {
-                projectilesRef.current.forEach((p, idx) => {
+                projectilesRef.current.forEach((p) => {
                     if (!p.active) return
                     const oldX = p.x, oldY = p.y
                     const updated = updateProjectile(p.x, p.y, p.vx, p.vy, wind)
@@ -323,8 +323,8 @@ export function TanksGame() {
 
                 if (explosionsRef.current.every(e => e.frame >= e.maxFrames)) {
                     // Turn switch
-                    if (player?.hp <= 0) setPhase("game_over")
-                    else if (enemy?.hp <= 0) setPhase("victory")
+                    if (player && player.hp <= 0) setPhase("game_over")
+                    else if (enemy && enemy.hp <= 0) setPhase("victory")
                     else {
                         if (lastShotOwnerRef.current === "player") enemyTurn()
                         else setPhase("aiming")
