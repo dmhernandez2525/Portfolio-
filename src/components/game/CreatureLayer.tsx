@@ -8,8 +8,9 @@ import { cn } from "@/lib/utils"
 import { Ghost } from "./creatures/Ghost"
 import { Wizard } from "./creatures/Wizard"
 import { Bug } from "./creatures/Bug"
+import { Monkey } from "./creatures/Monkey"
 
-type CreatureType = "ghost" | "bug" | "sparkle" | "zap" | "wizard" | "daniel" | "princess"
+type CreatureType = "ghost" | "bug" | "sparkle" | "zap" | "wizard" | "daniel" | "princess" | "monkey"
 
 interface Creature {
   id: number
@@ -105,19 +106,36 @@ export function CreatureLayer() {
       return BASE_SPAWN_INTERVAL - (maxScrollRef.current * range)
   }, [BASE_SPAWN_INTERVAL, MIN_SPAWN_INTERVAL])
   
+  // Prune creatures that have been around too long (cleanup)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCreatures(prev => prev.filter(c => {
+          // If creature is more than 30 seconds old, remove it (except special bosses like ghost)
+          if (c.type === "ghost") return true; 
+          return Date.now() - c.id < 30000;
+      }));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Spawn a random creature
   const spawnRandomCreature = useCallback(() => {
-      // Ghost is rare, others are common
+      // Limit total creatures
+      if (creatures.length >= 15) return;
+
+      // Ghost and monkey are rare, others are common
       const rand = Math.random()
       let type: CreatureType
       if (rand < 0.08) {
         type = "ghost" // 8% chance for ghost (boss)
-      } else if (rand < 0.38) {
+      } else if (rand < 0.10) {
+        type = "monkey" // 2% chance for monkey (reduced from 8%)
+      } else if (rand < 0.40) {
         type = "bug" // 30% chance for bug
-      } else if (rand < 0.68) {
+      } else if (rand < 0.70) {
         type = "zap" // 30% chance for zap
       } else {
-        type = "sparkle" // 32% chance for sparkle
+        type = "sparkle" // 30% chance for sparkle
       }
       
       const edgeX = Math.random() > 0.5 ? Math.random() * 20 : 80 + Math.random() * 20
@@ -352,6 +370,20 @@ export function CreatureLayer() {
                 delay: 0,
                 scale: 1.2
             }])
+      },
+      onMonkey: () => {
+           setCreatures(prev => [...prev, {
+                id: Date.now() + Math.floor(Math.random() * 10000),
+                type: "monkey",
+                x: Math.random() * 60 + 20, // Keep away from edges for vine
+                y: 20 + Math.random() * 30, // Keep higher up
+                delay: 0,
+                scale: 1,
+                fullData: undefined
+            }])
+           setWizardMessage("🐒 Ooh ooh! A wild monkey appears!")
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2500)
       }
   })
 
@@ -416,6 +448,19 @@ export function CreatureLayer() {
                     y={creature.y}
                     scale={creature.scale}
                     onCatch={() => handleCatch(creature)}
+                  />
+              )
+          }
+          
+          // Render Monkey with swinging animation
+          if (creature.type === 'monkey') {
+              return (
+                  <Monkey
+                    key={creature.id}
+                    id={creature.id}
+                    x={creature.x}
+                    y={Math.max(15, creature.y)} // Keep higher up for vine
+                    onCatch={removeCreature}
                   />
               )
           }

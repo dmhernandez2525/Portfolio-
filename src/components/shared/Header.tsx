@@ -4,7 +4,7 @@ import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightb
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utils"
-import { GameHub } from "@/components/game/GameHub"
+
 import { CreatureToggle } from "@/components/game/CreatureToggle"
 import { useGamification } from "@/hooks/use-gamification"
 import {
@@ -253,9 +253,6 @@ export function Header() {
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
-
-          {/* Game Hub */}
-          <GameHub />
 
           {/* Creature Toggle */}
           <CreatureToggle />
