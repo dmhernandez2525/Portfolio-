@@ -1,141 +1,139 @@
-import type { Entity, Wall, Bullet } from "./types"
+// Physics utilities for artillery tanks
+import { GRAVITY, CANVAS_WIDTH, CANVAS_HEIGHT, EXPLOSION_RADIUS } from "./constants"
+import type { WeaponType } from "./types"
 
-// Check intersection between Circle and AABB (Wall)
-export function checkWallCollision(entity: Entity, wall: Wall): boolean {
-  // Find point on box closest to circle center
-  const closestX = Math.max(wall.x, Math.min(entity.x, wall.x + wall.width))
-  const closestY = Math.max(wall.y, Math.min(entity.y, wall.y + wall.height))
-
-  const dx = entity.x - closestX
-  const dy = entity.y - closestY
-  const distSquared = dx * dx + dy * dy
-
-  return distSquared < (entity.radius * entity.radius)
-}
-
-// Resolve tank collision with simple sliding
-export function resolveWallCollision(entity: Entity, wall: Wall) {
-  const closestX = Math.max(wall.x, Math.min(entity.x, wall.x + wall.width))
-  const closestY = Math.max(wall.y, Math.min(entity.y, wall.y + wall.height))
-
-  const dx = entity.x - closestX
-  const dy = entity.y - closestY
-  
-  // Normalize
-  const dist = Math.sqrt(dx * dx + dy * dy)
-  if (dist === 0) return // Overlap center? Should not happen if speed < radius
-
-  const overlap = entity.radius - dist
-  
-  if (overlap > 0) {
-    const nx = dx / dist
-    const ny = dy / dist
-    entity.x += nx * overlap
-    entity.y += ny * overlap
-  }
-}
-
-// Bullet ricochet logic
-export function updateBulletPhysics(bullet: Bullet, walls: Wall[], viewportW: number, viewportH: number): boolean {
-  let bounced = false
-  
-  // 1. Move
-  bullet.x += bullet.vx
-  bullet.y += bullet.vy
-
-  // 2. Window Bounds Collision
-  if (bullet.x <= bullet.radius) {
-    bullet.x = bullet.radius
-    bullet.vx *= -1
-    bounced = true
-  }
-  if (bullet.x >= viewportW - bullet.radius) {
-    bullet.x = viewportW - bullet.radius
-    bullet.vx *= -1
-    bounced = true
-  }
-  if (bullet.y <= bullet.radius) {
-    bullet.y = bullet.radius
-    bullet.vy *= -1
-    bounced = true
-  }
-  if (bullet.y >= viewportH - bullet.radius) {
-    bullet.y = viewportH - bullet.radius
-    bullet.vy *= -1
-    bounced = true
-  }
-
-  if (bounced) {
-    handleBounce(bullet)
-    return true // Alive
-  }
-
-  // 3. Wall Collision
-  for (const wall of walls) {
-    if (checkWallCollision(bullet, wall)) {
-      // Determine side of collision for reflection
-      // Simple AABB logic: where was it previously?
-      const prevX = bullet.x - bullet.vx
-      const prevY = bullet.y - bullet.vy
-      
-      // Check X range overlap (horizontal collision?)
-      const inXRange = prevX >= wall.x - bullet.radius && prevX <= wall.x + wall.width + bullet.radius
-      const inYRange = prevY >= wall.y - bullet.radius && prevY <= wall.y + wall.height + bullet.radius
-      
-      let reflectX = false
-      let reflectY = false
-
-      if (inYRange) {
-        // Hit Left or right?
-        if (prevX < wall.x) { // Left hit
-             bullet.x = wall.x - bullet.radius - 1
-             reflectX = true
-        } else if (prevX > wall.x + wall.width) { // Right hit
-             bullet.x = wall.x + wall.width + bullet.radius + 1
-             reflectX = true
-        }
-      }
-      
-      if (inXRange && !reflectX) { // Only check Y if X didn't trigger (corner cases hard)
-        // Hit Top or Bottom?
-        if (prevY < wall.y) { // Top hit
-            bullet.y = wall.y - bullet.radius - 1
-            reflectY = true
-        } else if (prevY > wall.y + wall.height) { // Bottom hit
-            bullet.y = wall.y + wall.height + bullet.radius + 1
-            reflectY = true
-        }
-      }
-      
-      // Fallback for corner exact hits
-      if (!reflectX && !reflectY) {
-         bullet.vx *= -1
-         bullet.vy *= -1
-      } else {
-         if (reflectX) bullet.vx *= -1
-         if (reflectY) bullet.vy *= -1
-      }
-      
-      handleBounce(bullet)
-      if (bullet.bounces > bullet.maxBounces) return false // Destroyed
-      return true // Alive
+// Generate procedural terrain using sine waves
+export function generateTerrain(width: number, resolution: number): number[] {
+    const points: number[] = []
+    const numPoints = Math.floor(width / resolution)
+    
+    // Multiple sine waves for interesting terrain
+    const baseHeight = 350
+    const amplitude1 = 80
+    const amplitude2 = 40
+    const amplitude3 = 20
+    
+    for (let i = 0; i < numPoints; i++) {
+        const x = i / numPoints
+        const height = baseHeight
+            - Math.sin(x * Math.PI * 2) * amplitude1
+            - Math.sin(x * Math.PI * 5 + 1) * amplitude2
+            - Math.sin(x * Math.PI * 11 + 2) * amplitude3
+            + (Math.random() - 0.5) * 10 // Small noise
+        
+        points.push(Math.max(100, Math.min(CANVAS_HEIGHT - 50, height)))
     }
-  }
-
-  return true
+    
+    return points
 }
 
-function handleBounce(bullet: Bullet) {
-  if (bullet.isRocket) {
-    bullet.bounces = 999 // Rockets expire on first hit usually, or handled by caller
-  } else {
-    bullet.bounces++
-  }
+// Get terrain height at a given x position
+export function getTerrainHeight(terrain: number[], x: number, resolution: number): number {
+    const index = Math.floor(x / resolution)
+    if (index < 0) return terrain[0]
+    if (index >= terrain.length - 1) return terrain[terrain.length - 1]
+    
+    // Linear interpolation between points
+    const t = (x / resolution) - index
+    return terrain[index] * (1 - t) + terrain[index + 1] * t
 }
 
-export function checkCircleCollision(a: Entity, b: Entity): boolean {
-  const dx = a.x - b.x
-  const dy = a.y - b.y
-  const dist = Math.sqrt(dx * dx + dy * dy)
-  return dist < (a.radius + b.radius)
+// Update projectile with gravity and wind
+export function updateProjectile(
+    px: number, py: number, 
+    vx: number, vy: number,
+    wind: number
+): { x: number, y: number, vx: number, vy: number } {
+    return {
+        x: px + vx,
+        y: py + vy,
+        vx: vx + wind * 0.005, // Subtle wind effect
+        vy: vy + GRAVITY      // Gravity
+    }
+}
+
+// Robust collision detection using raycasting-style check
+export function checkTerrainCollision(
+    x1: number, y1: number,
+    x2: number, y2: number,
+    terrain: number[],
+    resolution: number
+): boolean {
+    // Basic check for current position
+    const terrainY = getTerrainHeight(terrain, x2, resolution)
+    if (y2 >= terrainY) return true
+
+    // Intermediate check for high-speed projectiles (interpolation)
+    const steps = 3
+    for (let i = 1; i < steps; i++) {
+        const tx = x1 + (x2 - x1) * (i / steps)
+        const ty = y1 + (y2 - y1) * (i / steps)
+        const tY = getTerrainHeight(terrain, tx, resolution)
+        if (ty >= tY) return true
+    }
+
+    return false
+}
+
+// Destroy terrain in a radius (create crater)
+export function destroyTerrain(
+    terrain: number[],
+    impactX: number,
+    resolution: number,
+    radius: number
+): number[] {
+    const newTerrain = [...terrain]
+    const centerIndex = Math.floor(impactX / resolution)
+    const radiusInPoints = Math.floor(radius / resolution)
+    
+    for (let i = centerIndex - radiusInPoints; i <= centerIndex + radiusInPoints; i++) {
+        if (i >= 0 && i < newTerrain.length) {
+            const distanceX = Math.abs(i - centerIndex) * resolution
+            if (distanceX < radius) {
+                const depth = Math.sqrt(radius * radius - distanceX * distanceX)
+                // Lower the terrain (make it deeper)
+                newTerrain[i] = Math.min(CANVAS_HEIGHT - 10, newTerrain[i] + depth * 0.8)
+            }
+        }
+    }
+    
+    return newTerrain
+}
+
+// Check if projectile hit a tank
+export function checkTankCollision(
+    px: number, py: number,
+    tankX: number, tankY: number,
+    tankWidth: number, tankHeight: number
+): boolean {
+    return px >= tankX - tankWidth/2 
+        && px <= tankX + tankWidth/2
+        && py >= tankY - tankHeight
+        && py <= tankY
+}
+
+// Simple AI: Calculate angle and power to hit target
+export function calculateAIShot(
+    fromX: number, fromY: number,
+    toX: number, toY: number,
+    wind: number
+): { angle: number, power: number } {
+    const dx = toX - fromX
+    const dy = toY - fromY
+    const distance = Math.abs(dx)
+    
+    // Power based on distance
+    let power = Math.min(95, Math.max(40, distance * 0.12 + Math.random() * 10))
+    
+    // Angle (mostly lobs)
+    let angle = dx > 0 ? 45 : 135
+    angle += (Math.random() - 0.5) * 20
+    
+    // Compensate for wind
+    angle -= wind * 2
+    
+    return { 
+        angle: Math.max(10, Math.min(170, angle)), 
+        power: Math.max(30, Math.min(95, power)) 
+    }
 }

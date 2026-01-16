@@ -105,7 +105,7 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
                 left: `${x}vw`, 
                 top: `${y}vh`, 
                 touchAction: "none",
-                cursor: isEnraged ? "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ff0000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M14.5 17.5L3 6V3h3l11.5 11.5%22/><path d=%22m13 19 6-6%22/><path d=%22M16 16l4 4%22/><path d=%22M19 21l2-2%22/></svg>') 16 16, crosshair" : "grab"
+                cursor: isEnraged ? "url('/sword-cursor.svg') 16 16, crosshair" : "grab"
             }}
             drag
             dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
