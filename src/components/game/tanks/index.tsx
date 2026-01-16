@@ -1,544 +1,450 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-
 import { Link } from "react-router-dom"
-import type { 
-  Tank, Bullet, Wall, Explosion 
-} from "./types"
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Wind, Fuel, Shield, ShoppingCart, Zap } from "lucide-react"
+
+import type { Tank, Projectile, Explosion, GamePhase, WeaponType } from "./types"
 import {
-  VIEWPORT_WIDTH, VIEWPORT_HEIGHT, COLORS, TANK_RADIUS, TANK_STATS,
-  BULLET_RADIUS
+    CANVAS_WIDTH, CANVAS_HEIGHT, COLORS,
+    TANK_WIDTH, TANK_HEIGHT, BARREL_LENGTH,
+    MAX_POWER, MIN_POWER, POWER_STEP, ANGLE_STEP,
+    MOVE_SPEED, PROJECTILE_RADIUS,
+    EXPLOSION_RADIUS, TERRAIN_RESOLUTION, WIND_MAX,
+    MAX_FUEL, FUEL_CONSUMPTION, WEAPON_DATA
 } from "./constants"
-import { updateBulletPhysics, resolveWallCollision, checkCircleCollision } from "./physics"
-
-function generateId(): string {
-  return Math.random().toString(36).substr(2, 9)
-}
-
-// Simple level layout 
-const LEVEL_1_WALLS: Wall[] = [
-  // Outer Box handled by viewport, but let's add some inner obstacles
-  { x: 200, y: 150, width: 400, height: 20, breakable: false }, // Top horiz
-  { x: 200, y: 450, width: 400, height: 20, breakable: false }, // Bottom horiz
-  { x: 390, y: 250, width: 20, height: 100, breakable: true, hp: 3 }, // Center vert breakable
-]
+import {
+    generateTerrain, getTerrainHeight, updateProjectile,
+    checkTerrainCollision, destroyTerrain, checkTankCollision,
+    calculateAIShot
+} from "./physics"
 
 export function TanksGame() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  
-  // Game State
-  const playerRef = useRef<Tank | null>(null)
-  const enemiesRef = useRef<Tank[]>([])
-  const bulletsRef = useRef<Bullet[]>([])
-
-  const explosionsRef = useRef<Explosion[]>([])
-  const wallsRef = useRef<Wall[]>([])
-  
-  // Inputs
-  const keysRef = useRef<Set<string>>(new Set())
-  const mouseRef = useRef({ x: 0, y: 0 })
-  
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [gameOver, setGameOver] = useState(false)
-  const [victory, setVictory] = useState(false)
-  const [mission, setMission] = useState(1)
-  
-  const gameLoopRef = useRef<number | null>(null)
-  const lastTimeRef = useRef<number>(0)
-
-  const initLevel = useCallback((levelNum: number) => {
-    bulletsRef.current = []
-    explosionsRef.current = []
+    const canvasRef = useRef<HTMLCanvasElement>(null)
     
-    // Walls & Enemies setup
-    let levelWalls: Wall[] = []
-    let levelEnemies: {type: any, x: number, y: number}[] = []
-
-    if (levelNum === 1) {
-        levelWalls = [...LEVEL_1_WALLS]
-        levelEnemies = [
-            { type: "BROWN", x: 700, y: 100 },
-            { type: "GREY", x: 700, y: 500 }
-        ]
-    } else if (levelNum === 2) {
-        levelWalls = [
-            { x: 300, y: 200, width: 200, height: 20, breakable: false },
-            { x: 300, y: 380, width: 200, height: 20, breakable: false }
-        ]
-        levelEnemies = [
-            { type: "GREY", x: 600, y: 300 },
-            { type: "TEAL", x: 700, y: 100 },
-            { type: "TEAL", x: 700, y: 500 }
-        ]
-    } else {
-        // Boss / Hard Level
-        levelWalls = [{ x: 390, y: 200, width: 20, height: 200, breakable: true, hp: 5 }]
-        levelEnemies = [
-            { type: "RED", x: 700, y: 300 },
-            { type: "GREEN", x: 700, y: 100 },
-            { type: "GREEN", x: 700, y: 500 },
-            { type: "BLACK", x: 750, y: 300 }
-        ]
-    }
-
-    wallsRef.current = levelWalls
+    // Game state
+    const [phase, setPhase] = useState<GamePhase>("aiming")
+    const [terrain, setTerrain] = useState<number[]>([])
+    const [wind, setWind] = useState(0)
+    const [round, setRound] = useState(1)
     
-    // Create Player
-    const pStats = TANK_STATS.PLAYER
-    playerRef.current = {
-      id: "player",
-      type: "PLAYER",
-      x: 100, 
-      y: 300,
-      radius: TANK_RADIUS,
-      color: COLORS.PLAYER,
-      angle: 0,
-      turretAngle: 0,
-      vx: 0, vy: 0,
-      cooldown: 0,
-      maxCooldown: pStats.cooldown,
-      bulletSpeed: pStats.bulletSpeed,
-      maxBullets: pStats.maxBullets,
-      bulletCount: 0,
-      rockets: pStats.rockets,
-      speed: pStats.speed,
-      hp: pStats.hp,
-      isPlayer: true
-    }
-
-    // Initialize Enemies using generic loader
-    enemiesRef.current = levelEnemies.map((e, i) => {
-        const stats = TANK_STATS[e.type as keyof typeof TANK_STATS]
-        return {
-            id: `enemy-${i}`,
-            type: e.type,
-            x: e.x,
-            y: e.y,
-            radius: TANK_RADIUS,
-            color: COLORS[e.type as keyof typeof COLORS],
-            angle: Math.PI,
-            turretAngle: Math.PI,
-            vx: 0, vy: 0,
-            cooldown: 50 + i * 20, // Stagger
-            maxCooldown: stats.cooldown,
-            bulletSpeed: stats.bulletSpeed,
-            maxBullets: stats.maxBullets,
-            bulletCount: 0,
-            rockets: stats.rockets,
-            speed: stats.speed,
-            hp: stats.hp
-        }
-    })
-  }, [])
-
-  const startGame = useCallback(() => {
-    initLevel(mission)
-    setIsPlaying(true)
-    setGameOver(false)
-    setVictory(false)
-  }, [initLevel, mission])
-
-  // Fire Bullet function
-  const fireBullet = useCallback((tank: Tank) => {
-    if (tank.cooldown > 0 || tank.bulletCount >= tank.maxBullets) return
-
-    // Offset bullet spawn to end of barrel (approx 25px)
-    const barrelLen = 25
-    const spawnX = tank.x + Math.cos(tank.turretAngle) * barrelLen
-    const spawnY = tank.y + Math.sin(tank.turretAngle) * barrelLen
-
-    const maxBounces = TANK_STATS[tank.type].maxBounces
-
-    bulletsRef.current.push({
-      id: generateId(),
-      x: spawnX,
-      y: spawnY,
-      radius: BULLET_RADIUS,
-      color: "#000", // Black bullets usually
-      angle: 0,
-      vx: Math.cos(tank.turretAngle) * tank.bulletSpeed,
-      vy: Math.sin(tank.turretAngle) * tank.bulletSpeed,
-      bounces: 0,
-      maxBounces: maxBounces,
-      ownerId: tank.id,
-      isRocket: tank.rockets
-    })
-
-    tank.cooldown = tank.maxCooldown
-    tank.bulletCount++
-  }, [])
-
-  // FIRE Input
-  const handleMouseDown = useCallback(() => {
-    if (!isPlaying || !playerRef.current) return
-    fireBullet(playerRef.current)
-  }, [isPlaying, fireBullet])
-  
-  // Main Loop
-  const gameLoop = useCallback((timestamp: number) => {
-    if (!lastTimeRef.current) lastTimeRef.current = timestamp
-    // const dt = (timestamp - lastTimeRef.current) / 1000 * 60 
-    lastTimeRef.current = timestamp
-
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext("2d")
-    if (!canvas || !ctx) return
-
-    // --- LOGIC ---
+    // Tank state
+    const [player, setPlayer] = useState<Tank | null>(null)
+    const [enemy, setEnemy] = useState<Tank | null>(null)
     
-    // 1. Player Movement
-    const player = playerRef.current
-    if (player) {
-      // WASD
-      let dx = 0
-      let dy = 0
-      if (keysRef.current.has('w')) dy -= 1
-      if (keysRef.current.has('s')) dy += 1
-      if (keysRef.current.has('a')) dx -= 1
-      if (keysRef.current.has('d')) dx += 1
-      
-      // Normalize vector
-      if (dx !== 0 || dy !== 0) {
-        const len = Math.sqrt(dx*dx + dy*dy)
-        dx /= len
-        dy /= len
+    // Projectile state
+    const projectilesRef = useRef<Projectile[]>([])
+    const explosionsRef = useRef<Explosion[]>([])
+    
+    // Refs for synchronization
+    const lastShotOwnerRef = useRef<string | null>(null)
+    const animationRef = useRef<number | null>(null)
+    
+    // Initialize game or next round
+    const initGame = useCallback((isNextRound: boolean = false) => {
+        const newTerrain = generateTerrain(CANVAS_WIDTH, TERRAIN_RESOLUTION)
+        setTerrain(newTerrain)
+        setWind((Math.random() - 0.5) * WIND_MAX * 2)
         
-        player.x += dx * player.speed
-        player.y += dy * player.speed
+        const playerX = 80 + Math.random() * 60
+        const enemyX = CANVAS_WIDTH - 80 - Math.random() * 60
         
-        // Body rotation follows movement
-        player.angle = Math.atan2(dy, dx)
-      }
-
-      // Turret rotation follows mouse
-      // Mouse is handled by listener updating mouseRef
-      const angleToMouse = Math.atan2(
-        mouseRef.current.y - player.y, 
-        mouseRef.current.x - player.x
-      )
-      player.turretAngle = angleToMouse
-
-      // Cooldown
-      if (player.cooldown > 0) player.cooldown--
-
-      // Wall Collisions
-      wallsRef.current.forEach(wall => resolveWallCollision(player, wall))
-      
-      // Clamp to screen
-      player.x = Math.max(player.radius, Math.min(VIEWPORT_WIDTH - player.radius, player.x))
-      player.y = Math.max(player.radius, Math.min(VIEWPORT_HEIGHT - player.radius, player.y))
-    }
-
-    // 2. Enemy AI
-    enemiesRef.current.forEach(enemy => {
-        if (!player) return
-
-        const dx = player.x - enemy.x
-        const dy = player.y - enemy.y
-        const dist = Math.sqrt(dx*dx + dy*dy)
-        let shouldFire = false
-
-        if (enemy.type === "BROWN" || enemy.type === "GREEN") {
-            // Stationary Aimers
-            enemy.turretAngle = Math.atan2(dy, dx)
-            shouldFire = true
+        if (!isNextRound || !player) {
+            setPlayer({
+                id: "player",
+                x: playerX,
+                y: getTerrainHeight(newTerrain, playerX, TERRAIN_RESOLUTION),
+                angle: 45,
+                power: 50,
+                hp: 10,
+                maxHp: 10,
+                fuel: MAX_FUEL,
+                maxFuel: MAX_FUEL,
+                weapons: { small_shell: 100, large_shell: 5, mirv: 3, atomic: 1 },
+                selectedWeapon: "small_shell",
+                isPlayer: true,
+                color: COLORS.player,
+                isFalling: false
+            })
+            setRound(1)
         } else {
-             // Movers (GREY, TEAL, RED, BLACK)
-             // Simple chase
-             if (dist > 150) {
-                 enemy.vx = (dx/dist) * enemy.speed
-                 enemy.vy = (dy/dist) * enemy.speed
-                 enemy.angle = Math.atan2(dy, dx) // Face move dir (tracks)
-             } else {
-                 enemy.vx = 0
-                 enemy.vy = 0
-             }
-             
-             // Update position
-             enemy.x += enemy.vx
-             enemy.y += enemy.vy
-             wallsRef.current.forEach(wall => resolveWallCollision(enemy, wall))
-             
-             enemy.turretAngle = Math.atan2(dy, dx)
-             
-             // Fire logic: GREY=Rare, TEAL=Frequent, RED=Burst
-             shouldFire = true 
+            // Persist player state between rounds
+            setPlayer(prev => prev ? {
+                ...prev,
+                x: playerX,
+                y: getTerrainHeight(newTerrain, playerX, TERRAIN_RESOLUTION),
+                fuel: Math.min(prev.maxFuel, prev.fuel + 50),
+                isFalling: false
+            } : null)
+            setRound(r => r + 1)
         }
-
-        // Fire Check (Randomized based on aggressiveness)
-        let fireChance = 0.01
-        if (enemy.type === "GREY") fireChance = 0.02
-        if (enemy.type === "TEAL") fireChance = 0.03
-        if (enemy.type === "RED" || enemy.type === "BLACK") fireChance = 0.05
         
-        if (shouldFire && Math.random() < fireChance) fireBullet(enemy)
-
-        if (enemy.cooldown > 0) enemy.cooldown--
-    })
-
-    // 3. Bullets
-    // Filter out dead bullets
-    bulletsRef.current = bulletsRef.current.filter(b => {
-      // Physics Update
-      const alive = updateBulletPhysics(b, wallsRef.current, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
-      
-      // Check Hit Tanks with Bullet
-      let hit = false
-      
-      // Hit Enemy?
-      if (b.ownerId === "player") {
-        enemiesRef.current.forEach(enemy => {
-           if (checkCircleCollision(b, enemy)) {
-             enemy.hp-- // Damage
-             hit = true
-           }
+        setEnemy({
+            id: "enemy",
+            x: enemyX,
+            y: getTerrainHeight(newTerrain, enemyX, TERRAIN_RESOLUTION),
+            angle: 135,
+            power: 50,
+            hp: 8 + round * 2,
+            maxHp: 8 + round * 2,
+            fuel: MAX_FUEL,
+            maxFuel: MAX_FUEL,
+            weapons: { small_shell: 100, large_shell: 10, mirv: 5, atomic: 2 },
+            selectedWeapon: "small_shell",
+            isPlayer: false,
+            color: COLORS.enemy,
+            isFalling: false
         })
-      }
-      
-      // Hit Player?
-      if (b.ownerId !== "player" && player) {
-          if (checkCircleCollision(b, player)) {
-              // Player Hit!
-              setGameOver(true)
-              setIsPlaying(false)
-              hit = true
-          }
-      }
-      
-      if (hit) return false // Destroy bullet
-      return alive
-    })
+        
+        setPhase("aiming")
+        projectilesRef.current = []
+        explosionsRef.current = []
+    }, [player, round])
     
-    // Remove dead Enemies
-    const prevCount = enemiesRef.current.length
-    enemiesRef.current = enemiesRef.current.filter(e => e.hp > 0)
-    
-    // If enemy died, we can decrement bullet counts (simple logic: bullet count resets when bullet dies, wait...)
-    // Actually standard Tanks logic: you have 5 active bullets. When one dies, you get one back.
-    // I need to track bullet death to decrement tank.bulletCount.
-    // Complexity: I need to map bullet owner to tank to decrement.
-    // Hack: Just recalculate bullet counts every frame? No, expensive.
-    // Better: when filter removes b, decrement owner.
-    
-    // Let's rely on a simpler check: 
-    // Just count bullets per owner every frame? Valid for < 100 bullets.
-    const counts = new Map<string, number>()
-    bulletsRef.current.forEach(b => {
-        counts.set(b.ownerId, (counts.get(b.ownerId) || 0) + 1)
-    })
-    
-    if (player) player.bulletCount = counts.get(player.id) || 0
-    enemiesRef.current.forEach(e => e.bulletCount = counts.get(e.id) || 0)
+    useEffect(() => {
+        initGame()
+    }, [])
 
-    // Check Victory
-    if (prevCount > 0 && enemiesRef.current.length === 0) {
-        if (mission < 3) {
-            // Next Mission
-            setMission(m => m + 1)
-            initLevel(mission + 1)
-        } else {
-            setVictory(true)
-            setIsPlaying(false)
+    // Input Handling
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (phase !== "aiming" || !player) return
+            const key = e.key.toLowerCase()
+
+            if (key === "arrowleft") setPlayer(p => p ? {...p, angle: Math.min(180, p.angle + ANGLE_STEP)} : null)
+            if (key === "arrowright") setPlayer(p => p ? {...p, angle: Math.max(0, p.angle - ANGLE_STEP)} : null)
+            if (key === "w") setPlayer(p => p ? {...p, power: Math.min(MAX_POWER, p.power + POWER_STEP)} : null)
+            if (key === "s") setPlayer(p => p ? {...p, power: Math.max(MIN_POWER, p.power - POWER_STEP)} : null)
+            
+            // Movement
+            if (key === "a" && player.fuel > 0) {
+                const newX = Math.max(TANK_WIDTH/2, player.x - MOVE_SPEED)
+                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+            }
+            if (key === "d" && player.fuel > 0) {
+                const newX = Math.min(CANVAS_WIDTH - TANK_WIDTH/2, player.x + MOVE_SPEED)
+                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+            }
+
+            // Weapon switching
+            if (key === "1") setPlayer(p => p ? {...p, selectedWeapon: "small_shell"} : null)
+            if (key === "2") setPlayer(p => p ? {...p, selectedWeapon: "large_shell"} : null)
+            if (key === "3") setPlayer(p => p ? {...p, selectedWeapon: "mirv"} : null)
+            if (key === "4") setPlayer(p => p ? {...p, selectedWeapon: "atomic"} : null)
+
+            if (key === " " || key === "enter") {
+                e.preventDefault()
+                fireProjectile()
+            }
         }
-    }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [phase, player, terrain])
 
-    // --- RENDER ---
-    // Clear
-    ctx.fillStyle = "#DEB887" // Burlywood / Cork board color background (Wii Tanks style)
-    ctx.fillRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
-    
-    // Grid (light)
-    ctx.strokeStyle = "rgba(0,0,0,0.1)"
-    ctx.lineWidth = 1
-    const gridSize = 50
-    for(let x=0; x<=VIEWPORT_WIDTH; x+=gridSize) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x, VIEWPORT_HEIGHT); ctx.stroke(); }
-    for(let y=0; y<=VIEWPORT_HEIGHT; y+=gridSize) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(VIEWPORT_WIDTH, y); ctx.stroke(); }
-    
-    // Draw Walls
-    wallsRef.current.forEach(w => {
-        ctx.shadowColor = "rgba(0,0,0,0.4)"
-        ctx.shadowBlur = 5
-        ctx.shadowOffsetY = 5
-        ctx.fillStyle = w.breakable ? COLORS.WALL_BREAKABLE : COLORS.WALL_STATIC
-        ctx.fillRect(w.x, w.y, w.width, w.height)
-        
-        // Top highlight
-        ctx.fillStyle = "rgba(255,255,255,0.2)";
-        ctx.fillRect(w.x, w.y, w.width, 4);
-        ctx.shadowBlur = 0
-        ctx.shadowOffsetY = 0
-    })
+    const fireProjectile = useCallback(() => {
+        if (phase !== "aiming" || !player) return
+        const weapon = player.weapons[player.selectedWeapon]
+        if (weapon <= 0 && player.selectedWeapon !== "small_shell") return
 
-    // Draw Tracks (static for now)
-    
-    // Draw Tank Function
-    const drawTank = (t: Tank) => {
-        ctx.save()
-        ctx.translate(t.x, t.y)
+        const angleRad = player.angle * Math.PI / 180
+        const speed = (player.power * 0.12)
         
-        // Shadow
-        ctx.fillStyle = "rgba(0,0,0,0.3)"
-        ctx.beginPath()
-        ctx.arc(4, 4, t.radius, 0, Math.PI*2)
-        ctx.fill()
-        
-        // Body (Base)
-        ctx.rotate(t.angle)
-        ctx.fillStyle = t.color
-        // Tread rectangles
-        ctx.fillRect(-t.radius, -t.radius, t.radius*2, t.radius*2) 
-        // Detail for threads
-        ctx.fillStyle = "#000"
-        ctx.fillRect(-t.radius -2, -t.radius, 4, t.radius*2) // Left tread
-        ctx.fillRect(t.radius - 2, -t.radius, 4, t.radius*2) // Right tread
-        
-        // Reset rotation for turret
-        ctx.rotate(-t.angle) 
-        
-        // Turret
-        ctx.rotate(t.turretAngle)
-        ctx.fillStyle = "#666" // Barrel
-        ctx.fillRect(0, -3, 25, 6)
-        
-        ctx.fillStyle = t.color // Turret Dome
-        ctx.beginPath()
-        ctx.arc(0, 0, 8, 0, Math.PI*2)
-        ctx.fill()
-        ctx.stroke()
-        
-        ctx.restore()
-    }
-    
-    // Draw Enemies
-    enemiesRef.current.forEach(drawTank)
-    
-    // Draw Player
-    if (player) drawTank(player)
-    
-    // Draw Bullets
-    bulletsRef.current.forEach(b => {
-        ctx.fillStyle = "#000"
-        ctx.beginPath()
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2)
-        ctx.fill()
-        // Shine
-        ctx.fillStyle = "#fff"
-        ctx.beginPath()
-        ctx.arc(b.x - 1, b.y - 1, 1, 0, Math.PI*2)
-        ctx.fill()
-    })
+        projectilesRef.current.push({
+            x: player.x + Math.cos(angleRad) * BARREL_LENGTH,
+            y: player.y - TANK_HEIGHT/2 - Math.sin(angleRad) * BARREL_LENGTH,
+            vx: Math.cos(angleRad) * speed,
+            vy: -Math.sin(angleRad) * speed,
+            active: true,
+            ownerId: "player",
+            type: player.selectedWeapon
+        })
 
-    gameLoopRef.current = requestAnimationFrame(() => gameLoop(Date.now()))
-  }, [isPlaying, fireBullet]) // Dependencies
-
-  // Effects
-  useEffect(() => {
-    if (isPlaying) {
-      gameLoopRef.current = requestAnimationFrame(() => gameLoop(Date.now()))
-    }
-    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current) }
-  }, [isPlaying, gameLoop])
-
-  // Mouse Listener
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-       const canvas = canvasRef.current
-       if (!canvas) return
-       const rect = canvas.getBoundingClientRect()
-       mouseRef.current = {
-           x: e.clientX - rect.left,
-           y: e.clientY - rect.top
-       }
-    }
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
-  
-  // Keyboard Listener
-  useEffect(() => {
-      const onDown = (e: KeyboardEvent) => keysRef.current.add(e.key.toLowerCase())
-      const onUp = (e: KeyboardEvent) => keysRef.current.delete(e.key.toLowerCase())
-      
-      window.addEventListener("keydown", onDown)
-      window.addEventListener("keyup", onUp)
-      return () => {
-          window.removeEventListener("keydown", onDown)
-          window.removeEventListener("keyup", onUp)
-      }
-  }, [])
-  
-  // Resize
-  useEffect(() => {
-      // Fixed viewport size for Tanks (800x600) to keep level consistent
-      // We can scale it with CSS
-      const canvas = canvasRef.current
-      if(canvas) {
-          canvas.width = VIEWPORT_WIDTH
-          canvas.height = VIEWPORT_HEIGHT
-      }
-  }, [])
-
-  return (
-    <div className="relative w-full h-screen bg-neutral-900 flex items-center justify-center p-4">
-      
-      <div 
-        ref={containerRef}
-        className="relative bg-[#DEB887] shadow-2xl rounded-sm overflow-hidden" 
-        style={{ width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT }}
-      >
-        <canvas ref={canvasRef} className="block cursor-crosshair" onClick={handleMouseDown} />
+        if (player.selectedWeapon !== "small_shell") {
+            setPlayer(p => p ? {...p, weapons: {...p.weapons, [p.selectedWeapon]: p.weapons[p.selectedWeapon] - 1}} : null)
+        }
         
-        {/* HUD */}
-        <div className="absolute top-4 left-4 text-black font-mono font-bold text-xl">
-           MISSION {mission}
-        </div>
-        <div className="absolute top-4 right-4 text-black font-mono font-bold text-xl">
-           x {playerRef.current ? TANK_STATS.PLAYER.hp : 0}
-        </div>
+        lastShotOwnerRef.current = "player"
+        setPhase("firing")
+    }, [phase, player])
 
-        {/* Back Button */}
-        <div className="absolute top-4 left-4 z-20 mt-8">
-            <Link to="/games">
-                <Button variant="outline" size="sm" className="bg-black/20 hover:bg-black/30 text-white border-none">
-                    Exit
-                </Button>
-            </Link>
-        </div>
+    const enemyTurn = useCallback(() => {
+        if (!enemy || !player) return
+        setPhase("enemy_turn")
+        
+        setTimeout(() => {
+            const shot = calculateAIShot(enemy.x, enemy.y, player.x, player.y, wind)
+            setEnemy(e => e ? {...e, angle: shot.angle, power: shot.power} : null)
+            
+            setTimeout(() => {
+                const angleRad = shot.angle * Math.PI / 180
+                const speed = shot.power * 0.12
+                projectilesRef.current.push({
+                    x: enemy.x - Math.cos(angleRad) * BARREL_LENGTH,
+                    y: enemy.y - TANK_HEIGHT/2 - Math.sin(angleRad) * BARREL_LENGTH,
+                    vx: -Math.cos(angleRad) * speed,
+                    vy: -Math.sin(angleRad) * speed,
+                    active: true,
+                    ownerId: "enemy",
+                    type: "small_shell"
+                })
+                lastShotOwnerRef.current = "enemy"
+                setPhase("firing")
+            }, 600)
+        }, 1000)
+    }, [enemy, player, wind])
 
-        {/* Overlay */}
-        {(!isPlaying || gameOver || victory) && (
-            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white backdrop-blur-sm">
-                <h1 className="text-6xl font-black mb-4 tracking-tighter shadow-black drop-shadow-lg">
-                    {victory ? "MISSION CLEAR!" : gameOver ? "FAILED" : "TANKS"}
-                </h1>
+    // Game Loop
+    useEffect(() => {
+        const canvas = canvasRef.current
+        const ctx = canvas?.getContext("2d")
+        if (!canvas || !ctx) return
+
+        const update = () => {
+            // 1. CLEAR & DRAW TERRAIN
+            ctx.fillStyle = "#87CEEB" // sky
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+            
+            if (terrain.length > 0) {
+                ctx.fillStyle = COLORS.terrain
+                ctx.beginPath()
+                ctx.moveTo(0, CANVAS_HEIGHT)
+                terrain.forEach((y, i) => ctx.lineTo(i * TERRAIN_RESOLUTION, y))
+                ctx.lineTo(CANVAS_WIDTH, CANVAS_HEIGHT)
+                ctx.fill()
+            }
+
+            // 2. TANK FALLING LOGIC
+            const updateTankFalling = (tank: Tank, setter: React.Dispatch<React.SetStateAction<Tank | null>>) => {
+                const tY = getTerrainHeight(terrain, tank.x, TERRAIN_RESOLUTION)
+                if (tank.y < tY - 1) {
+                    setter(t => t ? {...t, y: t.y + 2, isFalling: true} : null)
+                } else {
+                    setter(t => t ? {...t, y: tY, isFalling: false} : null)
+                }
+            }
+            if (player) updateTankFalling(player, setPlayer)
+            if (enemy) updateTankFalling(enemy, setEnemy)
+
+            // 3. DRAW TANKS
+            const drawTank = (tank: Tank) => {
+                ctx.save()
+                ctx.translate(tank.x, tank.y - TANK_HEIGHT / 2)
                 
-                {!isPlaying && !gameOver && !victory && (
-                    <div className="text-center"> 
-                        <p className="mb-6 opacity-80">
-                           WASD to Move • Mouse to Aim • Click to Fire<br/>
-                           Bullets Ricochet once!
-                        </p>
-                        <Button onClick={startGame} className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-6 text-xl font-bold rounded-none border-4 border-white/20">
-                            START MISSION
-                        </Button>
+                // Parachute
+                if (tank.isFalling) {
+                    ctx.strokeStyle = "#fff"
+                    ctx.beginPath()
+                    ctx.moveTo(0, -TANK_HEIGHT)
+                    ctx.lineTo(-20, -50); ctx.moveTo(0, -TANK_HEIGHT); ctx.lineTo(20, -50)
+                    ctx.stroke()
+                    ctx.fillStyle = "rgba(255,255,255,0.8)"
+                    ctx.beginPath(); ctx.arc(0, -55, 25, Math.PI, 0); ctx.fill()
+                }
+
+                ctx.fillStyle = tank.color
+                ctx.fillRect(-TANK_WIDTH / 2, -TANK_HEIGHT / 2, TANK_WIDTH, TANK_HEIGHT)
+                
+                // Barrel
+                const angleRad = tank.angle * Math.PI / 180
+                const dir = tank.isPlayer ? 1 : -1
+                ctx.strokeStyle = "#333"; ctx.lineWidth = 4
+                ctx.beginPath()
+                ctx.moveTo(0, -TANK_HEIGHT / 4)
+                ctx.lineTo(Math.cos(angleRad) * BARREL_LENGTH * dir, -TANK_HEIGHT/4 - Math.sin(angleRad) * BARREL_LENGTH)
+                ctx.stroke()
+                ctx.restore()
+
+                // HUD over tank
+                ctx.fillStyle = "#fff"; ctx.font = "10px Arial"; ctx.textAlign = "center"
+                ctx.fillText(`HP: ${tank.hp}/${tank.maxHp}`, tank.x, tank.y - TANK_HEIGHT - 10)
+                // HP Bar
+                ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(tank.x - 15, tank.y - TANK_HEIGHT - 8, 30, 4)
+                ctx.fillStyle = "#0f0"; ctx.fillRect(tank.x - 15, tank.y - TANK_HEIGHT - 8, (tank.hp/tank.maxHp) * 30, 4)
+            }
+            if (player) drawTank(player)
+            if (enemy) drawTank(enemy)
+
+            // 4. PROJECTILES
+            if (phase === "firing") {
+                projectilesRef.current.forEach((p, idx) => {
+                    if (!p.active) return
+                    const oldX = p.x, oldY = p.y
+                    const updated = updateProjectile(p.x, p.y, p.vx, p.vy, wind)
+                    p.x = updated.x; p.y = updated.y; p.vx = updated.vx; p.vy = updated.vy
+
+                    // MIRV Splitting
+                    if (p.type === "mirv" && !p.isChild && p.vy > 0 && p.y < 200) {
+                        p.active = false
+                        for (let i = -1; i <= 1; i++) {
+                            projectilesRef.current.push({
+                                ...p, vx: p.vx + i, vy: p.vy + 1, active: true, isChild: true
+                            })
+                        }
+                    }
+
+                    // Collision
+                    let hit = false
+                    if (checkTerrainCollision(oldX, oldY, p.x, p.y, terrain, TERRAIN_RESOLUTION)) hit = true
+                    if (player && checkTankCollision(p.x, p.y, player.x, player.y, TANK_WIDTH, TANK_HEIGHT)) {
+                        hit = true; setPlayer(t => t ? {...t, hp: Math.max(0, t.hp - WEAPON_DATA[p.type].damage)} : null)
+                    }
+                    if (enemy && checkTankCollision(p.x, p.y, enemy.x, enemy.y, TANK_WIDTH, TANK_HEIGHT)) {
+                        hit = true; setEnemy(t => t ? {...t, hp: Math.max(0, t.hp - WEAPON_DATA[p.type].damage)} : null)
+                    }
+                    if (p.x < 0 || p.x > CANVAS_WIDTH) hit = true
+
+                    if (hit) {
+                        p.active = false
+                        const data = WEAPON_DATA[p.type]
+                        explosionsRef.current.push({
+                            x: p.x, y: Math.min(p.y, getTerrainHeight(terrain, p.x, TERRAIN_RESOLUTION)),
+                            radius: 0, maxRadius: data.radius, frame: 0, maxFrames: 25
+                        })
+                        setTerrain(t => destroyTerrain(t, p.x, TERRAIN_RESOLUTION, data.radius))
+                    }
+
+                    // Draw
+                    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(p.x, p.y, PROJECTILE_RADIUS, 0, Math.PI*2); ctx.fill()
+                })
+
+                if (projectilesRef.current.every(p => !p.active)) {
+                    setPhase("explosion")
+                }
+            }
+
+            // 5. EXPLOSIONS
+            if (phase === "explosion") {
+                explosionsRef.current.forEach(exp => {
+                    if (exp.frame >= exp.maxFrames) return
+                    exp.frame++
+                    exp.radius = (exp.frame / exp.maxFrames) * exp.maxRadius
+                    const alpha = 1 - (exp.frame / exp.maxFrames)
+                    ctx.fillStyle = `rgba(255, 100, 0, ${alpha})`; ctx.beginPath(); ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI*2); ctx.fill()
+                })
+
+                if (explosionsRef.current.every(e => e.frame >= e.maxFrames)) {
+                    // Turn switch
+                    if (player?.hp <= 0) setPhase("game_over")
+                    else if (enemy?.hp <= 0) setPhase("victory")
+                    else {
+                        if (lastShotOwnerRef.current === "player") enemyTurn()
+                        else setPhase("aiming")
+                    }
+                    projectilesRef.current = []
+                    explosionsRef.current = []
+                }
+            }
+
+            // 6. HUD
+            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(10, 10, 150, 80)
+            ctx.fillStyle = "#fff"; ctx.font = "12px Arial"; ctx.textAlign = "left"
+            ctx.fillText(`Round: ${round}`, 20, 30)
+            ctx.fillText(`Wind: ${wind > 0 ? "→" : "←"} ${Math.abs(wind).toFixed(1)}`, 20, 50)
+            if (player) {
+                ctx.fillText(`Weapon: ${WEAPON_DATA[player.selectedWeapon].name}`, 20, 70)
+                ctx.fillStyle = "#444"; ctx.fillRect(20, 75, 100, 5)
+                ctx.fillStyle = "#0af"; ctx.fillRect(20, 75, (player.fuel/MAX_FUEL) * 100, 5)
+            }
+
+            animationRef.current = requestAnimationFrame(update)
+        }
+        animationRef.current = requestAnimationFrame(update)
+        return () => { if (animationRef.current) cancelAnimationFrame(animationRef.current) }
+    }, [terrain, player, enemy, phase, wind, enemyTurn])
+
+    return (
+        <div className="relative w-full min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-2 sm:p-4 gap-4 overflow-hidden font-sans">
+            <div className="relative w-full max-w-[900px] aspect-[16/9] bg-black rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border-4 border-neutral-800">
+                <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} className="w-full h-full block touch-none" style={{ imageRendering: 'pixelated' }} />
+                
+                {/* Overlays */}
+                {phase === "victory" && (
+                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+                        <h1 className="text-5xl font-black text-green-400 mb-2 drop-shadow-lg">VICTORY</h1>
+                        <p className="text-white mb-6">You destroyed the enemy tank!</p>
+                        <Button onClick={() => initGame(true)} size="lg" className="bg-green-600 hover:bg-green-500">Next Round</Button>
                     </div>
                 )}
                 
-                {gameOver && (
-                    <Button onClick={startGame} className="bg-red-600 hover:bg-red-500 text-white px-8 py-6 text-xl font-bold">
-                        RETRY
-                    </Button>
+                {phase === "game_over" && (
+                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-50 backdrop-blur-sm">
+                        <h1 className="text-5xl font-black text-red-500 mb-2 drop-shadow-lg">DEFEAT</h1>
+                        <p className="text-white mb-6">Your tank was destroyed.</p>
+                        <Button onClick={() => initGame(false)} size="lg" className="bg-red-600 hover:bg-red-500">Try Again</Button>
+                    </div>
                 )}
-                
-                {victory && (
-                    <Button onClick={startGame} className="bg-green-600 hover:bg-green-500 text-white px-8 py-6 text-xl font-bold">
-                        REPLAY
-                    </Button>
+
+                {phase === "enemy_turn" && (
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold animate-pulse shadow-lg z-40 border-2 border-white/20">
+                        ENEMY TURN
+                    </div>
                 )}
             </div>
-        )}
-      </div>
-    </div>
-  )
+
+            {/* Controls & UI */}
+            <div className="w-full max-w-[900px] grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Stats Panel */}
+                <div className="bg-neutral-900/50 p-4 rounded-xl border border-white/5 flex flex-col gap-2">
+                    <div className="flex justify-between items-center text-sm font-bold text-white/60 uppercase tracking-tighter">
+                        <span>Angle</span>
+                        <span className="text-white text-lg">{player?.angle}°</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-bold text-white/60 uppercase tracking-tighter">
+                        <span>Power</span>
+                        <span className="text-white text-lg">{player?.power}%</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-bold text-white/60 uppercase tracking-tighter">
+                        <span>Fuel</span>
+                        <div className="w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500" style={{width: `${(player?.fuel || 0)}%`}} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Controls */}
+                <div className="flex items-center justify-center gap-2">
+                    <div className="grid grid-cols-3 gap-2">
+                        <div />
+                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => setPlayer(p => p ? {...p, power: Math.min(100, p.power+5)} : null)}><ArrowUp /></Button>
+                        <div />
+                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => {
+                            if (phase !== "aiming" || !player || player.fuel <= 0) return
+                            const newX = Math.max(TANK_WIDTH/2, player.x - MOVE_SPEED)
+                            setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                        }}><ArrowLeft /></Button>
+                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => setPlayer(p => p ? {...p, power: Math.max(0, p.power-5)} : null)}><ArrowDown /></Button>
+                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => {
+                            if (phase !== "aiming" || !player || player.fuel <= 0) return
+                            const newX = Math.min(CANVAS_WIDTH - TANK_WIDTH/2, player.x + MOVE_SPEED)
+                            setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                        }}><ArrowRight /></Button>
+                    </div>
+                    <Button 
+                        size="lg" 
+                        className="h-24 w-24 rounded-full bg-red-600 hover:bg-red-500 active:scale-90 transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] border-4 border-white/20 font-black text-xl"
+                        onClick={fireProjectile}
+                        disabled={phase !== "aiming"}
+                    >FIRE</Button>
+                </div>
+
+                {/* Weapons Panel */}
+                <div className="bg-neutral-900/50 p-4 rounded-xl border border-white/5 grid grid-cols-2 gap-2">
+                    {(Object.keys(WEAPON_DATA) as WeaponType[]).map(w => (
+                        <Button 
+                            key={w}
+                            variant={player?.selectedWeapon === w ? "default" : "secondary"}
+                            className={`h-10 text-[10px] sm:text-xs flex justify-between items-center px-2 ${player?.selectedWeapon === w ? "bg-blue-600" : ""}`}
+                            onClick={() => setPlayer(p => p ? {...p, selectedWeapon: w} : null)}
+                        >
+                            <span className="truncate">{WEAPON_DATA[w].name}</span>
+                            <span className="opacity-50 font-mono ml-1">{player?.weapons[w] === 100 ? "∞" : player?.weapons[w]}</span>
+                        </Button>
+                    ))}
+                </div>
+            </div>
+
+            <Link to="/games" className="text-white/20 hover:text-white/60 text-xs transition-colors mt-4">
+                ← BACK TO GAMES PORTAL
+            </Link>
+        </div>
+    )
 }

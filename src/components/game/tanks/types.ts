@@ -1,75 +1,40 @@
-export type TankType = 
-  | "PLAYER" 
-  | "BROWN" // Static, shoots slow
-  | "GREY"  // Moves, shoots
-  | "TEAL"  // Fast, Rockets
-  | "YELLOW" // Mines
-  | "RED"   // Burst fire
-  | "GREEN" // Stationary, 2x Ricochet
-  | "PURPLE" // Fast burst
-  | "WHITE"  // Invisible
-  | "BLACK"  // Boss
+export type WeaponType = "small_shell" | "large_shell" | "mirv" | "atomic"
 
-export interface Point {
-  x: number
-  y: number
+export type GamePhase = "aiming" | "firing" | "explosion" | "enemy_turn" | "shop" | "victory" | "game_over"
+
+export interface Tank {
+    id: string
+    x: number
+    y: number
+    angle: number
+    power: number
+    hp: number
+    maxHp: number
+    fuel: number
+    maxFuel: number
+    weapons: Record<WeaponType, number>
+    selectedWeapon: WeaponType
+    isPlayer: boolean
+    color: string
+    isFalling: boolean
 }
 
-export interface Vector {
-  x: number
-  y: number
+export interface Projectile {
+    x: number
+    y: number
+    vx: number
+    vy: number
+    active: boolean
+    ownerId: string
+    type: WeaponType
+    isChild?: boolean // for MIRV shards
 }
 
-export interface Entity {
-  id: string
-  x: number
-  y: number
-  radius: number
-  color: string
-  angle: number // Rotation in radians
-}
-
-export interface Tank extends Entity {
-  type: TankType
-  turretAngle: number
-  vx: number
-  vy: number
-  cooldown: number
-  maxCooldown: number
-  bulletSpeed: number
-  maxBullets: number
-  bulletCount: number
-  rockets: boolean
-  isPlayer?: boolean
-  hp: number
-  speed: number
-}
-
-export interface Bullet extends Entity {
-  vx: number
-  vy: number
-  bounces: number
-  maxBounces: number
-  ownerId: string
-  isRocket?: boolean
-}
-
-export interface Mine extends Entity {
-  ownerId: string
-  timer: number
-}
-
-export interface Explosion extends Entity {
-  maxRadius: number
-  life: number
-  maxLife: number
-}
-
-export interface Wall {
-  x: number
-  y: number
-  width: number
-  height: number
-  breakable: boolean
-  hp?: number
+export interface Explosion {
+    x: number
+    y: number
+    radius: number
+    maxRadius: number
+    frame: number
+    maxFrames: number
 }
