@@ -387,7 +387,8 @@ export const projectsData: ProjectItem[] = [
       "Multi-user support"
     ],
     highlights: ["Stripe Terminal", "Weather Recommendations", "PWA Offline"],
-    status: "development",
+    link: "https://triple-a-lemonade.onrender.com",
+    status: "production",
     metrics: "Real lemonade stand POS"
   },
   {
