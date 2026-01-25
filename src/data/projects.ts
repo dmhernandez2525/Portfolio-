@@ -541,7 +541,7 @@ export const projectsData: ProjectItem[] = [
       "Live preview"
     ],
     highlights: ["Craft.js", "8 Style Categories", "Code Generation"],
-    link: "https://rocket-rollout-api.onrender.com",
+    link: "https://rocketrollout.com",
     status: "development"
   },
   {
