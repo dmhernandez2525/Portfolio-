@@ -33,7 +33,7 @@ export interface ProjectItem {
 
 export const projectsData: ProjectItem[] = [
   // ============================================
-  // TIER 1 - FLAGSHIP PROJECTS (6)
+  // TIER 1 - FLAGSHIP PROJECTS (7)
   // Enterprise-grade, production-ready systems
   // ============================================
   {
@@ -180,6 +180,56 @@ export const projectsData: ProjectItem[] = [
     featured: true,
     status: "active",
     metrics: "72B parameters, 96GB RAM"
+  },
+  {
+    id: "writeforge",
+    title: "WriteForge",
+    tagline: "Privacy-First AI Writing Assistant",
+    description: "Professional grammar checking, AI-powered suggestions, and tone detection that runs 100% locally. Unlike Grammarly which sends every keystroke to the cloud, WriteForge processes everything on-device using LanguageTool and local Qwen2.5 models. Available as browser extensions, native desktop apps (including Linux), and self-hostable for enterprise.",
+    category: "AI/ML Platform",
+    tier: "flagship",
+    tech: ["TypeScript", "WXT", "Preact", "Swift", "Rust", "GTK4", "LanguageTool", "Qwen2.5", "llama.cpp", "WebLLM", "WebGPU", "Tailwind CSS"],
+    features: [
+      "100% local processing—text never leaves your device",
+      "LanguageTool grammar engine (30+ languages)",
+      "Local AI suggestions via Qwen2.5 (0.5B browser, 1.5B desktop)",
+      "Tone detection and adjustment (formal/casual/confident)",
+      "Browser extensions: Chrome, Safari, Firefox",
+      "Native desktop: macOS (Swift), Windows (C#), Linux (Rust/GTK4)",
+      "Self-hostable for enterprise with Docker",
+      "Personal dictionary with import/export"
+    ],
+    highlights: ["100% Local", "30+ Languages", "Linux Desktop"],
+    link: "https://writeforge-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/writeforge",
+    featured: true,
+    status: "development",
+    metrics: "0 cloud dependency, 30+ languages"
+  },
+  {
+    id: "readforge",
+    title: "ReadForge",
+    tagline: "Cross-Platform Local Text-to-Speech Application",
+    description: "100% local text-to-speech with premium AI voices that never leave your device. Features Kokoro-82M (ranked #1 on TTS Arena), voice cloning from 10-second samples, and voice design from text descriptions. Available on browser extensions, desktop (including Linux), and mobile—all without cloud dependencies or word limits.",
+    category: "Native App",
+    tier: "flagship",
+    tech: ["Kokoro-82M", "ONNX Runtime", "WXT", "kokoro-js", "WebGPU", "Swift", "Tauri", "Rust", "Kotlin", "F5-TTS", "Qwen3-TTS", "React 18", "TypeScript"],
+    features: [
+      "100% local processing—text never leaves your device",
+      "Kokoro-82M voices (ranked #1 on TTS Arena)",
+      "No word limits (unlike Speechify's 150k/month)",
+      "Voice cloning from 10-second audio samples (F5-TTS)",
+      "Voice design from text descriptions (Qwen3-TTS)",
+      "Browser extensions: Chrome, Safari, Firefox",
+      "Desktop: macOS, Windows, Linux",
+      "Mobile: iOS, Android with background playback"
+    ],
+    highlights: ["#1 TTS Quality", "100% Local", "No Word Limits"],
+    link: "https://readforge-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/readforge",
+    featured: true,
+    status: "development",
+    metrics: "8 platforms, 0 cloud dependency"
   },
 
   // ============================================
