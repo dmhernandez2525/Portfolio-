@@ -512,6 +512,30 @@ export const projectsData: ProjectItem[] = [
     status: "development",
     metrics: "85% test coverage"
   },
+  {
+    id: "difflocal",
+    title: "DiffLocal",
+    tagline: "Privacy-First Diff Tool",
+    description: "Compare text, images, PDFs, folders, and Excel files entirely in your browser. Unlike competitors that upload files to servers, DiffLocal processes everything client-side using Web Workers. Your data never leaves your machine. URL fragment sharing enables collaboration without server storage.",
+    category: "Developer Tool",
+    tier: "strong",
+    tech: ["React 18", "TypeScript", "Vite", "Tailwind CSS", "Web Workers", "jsdiff", "Zustand", "Shiki", "PWA"],
+    features: [
+      "100% client-side processing in Web Workers",
+      "Text/code diff with syntax highlighting (15+ languages)",
+      "Image comparison with pixelmatch",
+      "PDF text extraction and comparison",
+      "Folder comparison with tree view",
+      "Excel cell-by-cell comparison",
+      "URL fragment sharing (no server storage)",
+      "PWA with offline support"
+    ],
+    highlights: ["100% Client-Side", "Zero Data Transmission", "URL Fragment Sharing"],
+    link: "https://difflocal-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/difflocal",
+    status: "development",
+    metrics: "0 bytes uploaded, 100% private"
+  },
 
   // ============================================
   // TIER 3 - SUPPORTING PROJECTS (6)
