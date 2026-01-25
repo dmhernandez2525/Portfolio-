@@ -233,9 +233,33 @@ export const projectsData: ProjectItem[] = [
   },
 
   // ============================================
-  // TIER 2 - STRONG PROJECTS (11)
+  // TIER 2 - STRONG PROJECTS (12)
   // Production-ready with significant functionality
   // ============================================
+  {
+    id: "chronoscribe",
+    title: "ChronoScribe",
+    tagline: "Local-First Document Digitization & Archive",
+    description: "Transform handwritten notes, sketches, and documents into searchable digital archives. Uses multi-provider AI transcription (Azure, Google, OpenAI, local Ollama) with a unique human-in-the-loop clarification system—when AI is uncertain, it asks you specific questions instead of guessing. Automatic date extraction organizes your life's documents chronologically.",
+    category: "AI/ML Platform",
+    tier: "strong",
+    tech: ["Python 3.11", "Click", "Rich", "SQLite", "FTS5", "Azure Vision", "Google Vision", "OpenAI GPT-4o", "Ollama", "Anthropic Claude", "OpenCV", "Pillow"],
+    features: [
+      "Multi-provider transcription: Azure, Google, OpenAI, Ollama",
+      "Human-in-the-loop clarification for uncertain text",
+      "Automatic date extraction and chronological timeline",
+      "6,000+ free API calls/month (Azure 5K + Google 1K)",
+      "Per-document folder with original, transcription, metadata",
+      "Full-text search with SQLite FTS5",
+      "100% local-first—cloud APIs optional",
+      "Smart category classification"
+    ],
+    highlights: ["Clarification System", "6K Free/Month", "Local-First"],
+    link: "https://chronoscribe-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/chronoscribe",
+    status: "development",
+    metrics: "6,000 free pages/month"
+  },
   {
     id: "baked-by-chrissy",
     title: "Baked by Chrissy",
@@ -487,6 +511,30 @@ export const projectsData: ProjectItem[] = [
     highlights: ["Trends + YouTube API", "Profitability Scoring", "Competition Analysis"],
     status: "development",
     metrics: "85% test coverage"
+  },
+  {
+    id: "difflocal",
+    title: "DiffLocal",
+    tagline: "Privacy-First Diff Tool",
+    description: "Compare text, images, PDFs, folders, and Excel files entirely in your browser. Unlike competitors that upload files to servers, DiffLocal processes everything client-side using Web Workers. Your data never leaves your machine. URL fragment sharing enables collaboration without server storage.",
+    category: "Developer Tool",
+    tier: "strong",
+    tech: ["React 18", "TypeScript", "Vite", "Tailwind CSS", "Web Workers", "jsdiff", "Zustand", "Shiki", "PWA"],
+    features: [
+      "100% client-side processing in Web Workers",
+      "Text/code diff with syntax highlighting (15+ languages)",
+      "Image comparison with pixelmatch",
+      "PDF text extraction and comparison",
+      "Folder comparison with tree view",
+      "Excel cell-by-cell comparison",
+      "URL fragment sharing (no server storage)",
+      "PWA with offline support"
+    ],
+    highlights: ["100% Client-Side", "Zero Data Transmission", "URL Fragment Sharing"],
+    link: "https://difflocal-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/difflocal",
+    status: "development",
+    metrics: "0 bytes uploaded, 100% private"
   },
 
   // ============================================
