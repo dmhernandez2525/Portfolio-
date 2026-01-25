@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: portfolio-v2
+    name: portfolio-site
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
