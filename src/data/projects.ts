@@ -104,8 +104,9 @@ export const projectsData: ProjectItem[] = [
       "717+ TypeScript files with test coverage"
     ],
     highlights: ["Multi-Provider AI", "Hierarchical Specs", "PM Tool Export"],
+    link: "https://spectree.dev",
     featured: true,
-    status: "active",
+    status: "production",
     metrics: "717+ TypeScript files"
   },
   {
