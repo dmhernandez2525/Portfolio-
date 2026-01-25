@@ -1,8 +1,8 @@
 # Gamification System: Exhaustive Design & Implementation Specification
 
-> **Document Type**: Canonical Specification  
-> **Version**: 3.0 (Definitive)  
-> **Last Updated**: January 14, 2026  
+> **Document Type**: Canonical Specification
+> **Version**: 3.1 (Definitive)
+> **Last Updated**: January 25, 2026  
 > **Maintainer**: Daniel Hernandez  
 > **Status**: Live / Active Development
 
@@ -207,53 +207,89 @@ interface Creature {
 ---
 
 ### 4.4 Ghost Component
-**File**: `src/components/game/creatures/Ghost.tsx`  
-**Lines**: 141
+**File**: `src/components/game/creatures/Ghost.tsx`
+**Lines**: 216
 
 #### Boss Fight Mechanics
 
 ##### Phase 1: Normal State
 - **Visual**: 8x8 Neon Cyan icon
 - **Behavior**: Floats up/down (y: [0, -15, 0] over 3s loop)
-- **Interaction**: 
+- **Interaction**:
   - Click → Caught instantly (if shake count ≤ 2)
   - Drag → Shake detection starts
+- **Hint**: "Shake me!" tooltip on hover
 
 ##### Phase 2: Shake Detection
-- **Detection Method**: Track horizontal drag position changes
+- **Detection Method**: Track horizontal drag position changes with debounce
 - **Direction Change Detection**:
   ```typescript
   // Direction: -1 (left), 1 (right)
-  if (currentDirection !== lastDirection && Math.abs(deltaX) > 2) {
+  // Debounce: 50ms between direction changes
+  // DeltaX threshold: 3px minimum movement
+  if (currentDirection !== lastDirection && Math.abs(deltaX) > 3 && timeDelta > 50) {
       shakeCount += 1
   }
   ```
-- **Visual Feedback**: Scale increases from 1.0 → 1.8 as shakeCount grows
-- **Enrage Threshold**: 6 direction changes
+- **Visual Feedback**:
+  - Scale increases from 1.0 → 1.8 as shakeCount grows
+  - **NEW**: Progress indicator (4 dots) shows shake progress
+- **Enrage Threshold**: 4 direction changes (reduced from 6)
 
 ##### Phase 3: Enraged State
-- **Trigger**: shakeCount > 6
+- **Trigger**: shakeCount >= 4
 - **Visual**:
   - Scale: 4x (400%)
   - Color: Red (#DC2626)
   - Icon: Sword emoji (⚔️) bouncing
   - Health Bar: Red bar showing remaining HP
-- **Cursor**: Custom SVG sword (red, 32x32px)
-- **Behavior**: 
+- **Cursor**: Custom SVG sword via BossContext (golden glow, 32x32px)
+- **Behavior**:
   - Pulses (scale: [3.8, 4.0, 3.8] loop)
   - Attacks site every 2000ms for 5 damage
+  - **NEW**: Shows taunt dialogue on enrage
+- **Taunt Pool**:
+  ```typescript
+  const BOSS_TAUNTS = [
+      "You dare challenge me?!",
+      "Feel my wrath!",
+      "This site belongs to me now!",
+      "You cannot defeat a ghost!"
+  ]
+  ```
 
 ##### Phase 4: Combat
 - **HP**: 5
 - **Damage Per Click**: 1
+- **Click Debounce**: 150ms to prevent rapid-fire exploits
 - **Hit Feedback**: Brief scale reduction (×0.9) then snap back
 - **Death Condition**: HP ≤ 0
+- **State Lock**: `isKilling` flag prevents actions during death sequence
 
 ##### Phase 5: Victory
-- **Ghost Removal**: Removed from creatures array
+- **Death Dialogue**: Shows random death quote for 1.5 seconds
+- **Death Quote Pool**:
+  ```typescript
+  const DEATH_QUOTES = [
+      "Impossible... defeated by a mortal...",
+      "I'll be back... someday...",
+      "Nooooooo!",
+      "You win this time..."
+  ]
+  ```
+- **Ghost Removal**: Removed from creatures array after dialogue
 - **Princess Spawn**: New creature at ghost's last position
 - **Site Heal**: `healSite()` called after 1 second delay
 - **Princess Quote**: "My Hero! Thank you! 💖"
+
+#### BossContext Integration
+**File**: `src/context/boss-context.tsx`
+
+The boss fight now uses a global context to communicate enraged state to other components:
+- `isBossEnraged`: Boolean state indicating if boss is active
+- `setBossEnraged`: Callback to update state
+- `useBoss()`: Hook with safe fallback for optional usage
+- **Consumers**: Ghost.tsx (sets state), CustomCursor.tsx (reads state for sword cursor)
 
 ---
 
@@ -412,6 +448,50 @@ Separate index-based tracker for arrow key sequence:
 - **File**: `CreatureLayer.tsx:306`
 - **Problem**: Princess could fail to despawn if animation interrupted
 - **Fix**: Added `onLayoutAnimationComplete` fallback timeout
+- **Status**: ✅ RESOLVED
+
+### Audit Date: January 25, 2026 (PR #16)
+
+#### Issue #9: Shake Detection Too Difficult
+- **Severity**: 🟡 Medium
+- **File**: `Ghost.tsx:75-110`
+- **Problem**: Shake threshold of 6 direction changes was too hard to trigger, deltaX threshold of 2px was too sensitive
+- **Fix**: Lowered threshold from 6 to 4, increased deltaX threshold to 3px, added 50ms debounce between direction changes
+- **Status**: ✅ RESOLVED
+
+#### Issue #10: Boss Click Race Condition
+- **Severity**: 🔴 Critical
+- **File**: `Ghost.tsx:112-141`
+- **Problem**: Rapid clicks during boss fight could cause double-removal or state corruption
+- **Fix**: Added `clickDebounceRef` (150ms) and `isKilling` state lock during kill sequence
+- **Status**: ✅ RESOLVED
+
+#### Issue #11: Princess Race Condition
+- **Severity**: 🔴 Critical
+- **File**: `CreatureLayer.tsx:67-122`
+- **Problem**: Princess component lifecycle caused race condition - could fail to appear or double-remove
+- **Fix**: Created dedicated `PrincessCreature` component with `hasRemovedRef` to prevent double-removal
+- **Status**: ✅ RESOLVED
+
+#### Issue #12: Cursor Not Changing for Boss
+- **Severity**: 🟡 Medium
+- **File**: `CustomCursor.tsx`
+- **Problem**: Custom cursor didn't show sword during boss fight, only inline CSS cursor worked
+- **Fix**: Created `BossContext` for global enraged state, `CustomCursor` now renders sword SVG when `isBossEnraged` is true
+- **Status**: ✅ RESOLVED
+
+#### Issue #13: No Visual Shake Feedback
+- **Severity**: 🟢 Low
+- **File**: `Ghost.tsx:188-197`
+- **Problem**: Users couldn't see progress toward enrage threshold
+- **Fix**: Added `shakeProgress` state (0-4) with visual indicator dots above ghost
+- **Status**: ✅ RESOLVED
+
+#### Issue #14: Missing Boss Dialogue
+- **Severity**: 🟢 Low
+- **File**: `Ghost.tsx:15-28, 49-54, 127-128, 200-212`
+- **Problem**: Boss fight lacked personality - no taunts or death quotes
+- **Fix**: Added `BOSS_TAUNTS` array (shown on enrage) and `DEATH_QUOTES` array (shown on death) with AnimatePresence dialogue bubble
 - **Status**: ✅ RESOLVED
 
 ---
@@ -728,14 +808,16 @@ const calculateDespawnInterval = (maxScroll: number): number => {
 |------|-------|---------|
 | `src/components/providers/GamificationProvider.tsx` | 44 | Global state provider |
 | `src/context/gamification-context.tsx` | 13 | Context definition |
+| `src/context/boss-context.tsx` | 31 | Boss fight state context |
 | `src/hooks/use-gamification.ts` | 10 | Consumer hook |
 | `src/hooks/use-easter-eggs.ts` | 73 | Keyboard Easter egg detection |
-| `src/components/game/CreatureLayer.tsx` | 397 | Main rendering + logic |
+| `src/components/game/CreatureLayer.tsx` | 471 | Main rendering + logic (incl. PrincessCreature) |
 | `src/components/game/CreatureToggle.tsx` | 63 | Header toggle control |
-| `src/components/game/creatures/Ghost.tsx` | 141 | Boss fight component |
+| `src/components/game/creatures/Ghost.tsx` | 216 | Boss fight component |
 | `src/components/game/creatures/Wizard.tsx` | 104 | Rare NPC with fireworks |
 | `src/components/game/GameHub.tsx` | 95 | Minigames hub (related) |
 | `src/components/shared/Header.tsx` | 165 | Score display + toggle host |
+| `src/components/ui/CustomCursor.tsx` | 180 | Custom cursor with boss sword |
 | `feature_checklist.md` | 167 | Feature verification checklist |
 
 ---
