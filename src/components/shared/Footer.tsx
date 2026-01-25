@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Instagram, Youtube } from "lucide-react"
+import { Github, Linkedin, Mail, Youtube } from "lucide-react"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -26,16 +26,7 @@ export function Footer() {
             <Linkedin className="h-5 w-5" />
           </a>
           <a
-            href="https://www.instagram.com/danielmhernandez/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 rounded-full bg-background border border-border hover:border-pink-500 hover:text-pink-500 transition-all"
-            aria-label="Instagram"
-          >
-            <Instagram className="h-5 w-5" />
-          </a>
-          <a
-            href="https://www.youtube.com/@danielmhernandez"
+            href="https://www.youtube.com/@danieldanger5539"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 rounded-full bg-background border border-border hover:border-red-500 hover:text-red-500 transition-all"
