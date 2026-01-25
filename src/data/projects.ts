@@ -366,6 +366,7 @@ export const projectsData: ProjectItem[] = [
       "Background jobs via BullMQ"
     ],
     highlights: ["7 Microservices", "Multi-Tenant", "Stripe Integration"],
+    link: "https://focusflow-web.onrender.com",
     status: "development",
     metrics: "7 microservices in TurboRepo"
   },
@@ -394,7 +395,7 @@ export const projectsData: ProjectItem[] = [
   },
   {
     id: "mfg-tracker",
-    title: "Manufacturing Tracker",
+    title: "Garage Inventory Tracker",
     tagline: "Enterprise Purchase Order & Inventory Management",
     description: "Manufacturing and procurement tracking system integrating with 62+ Odoo ERP modules via XMLRPC. Features passwordless authentication, advanced filtering, bulk operations, and 97%+ test coverage. Built for tracking orders from purchase through production.",
     category: "SaaS Platform",
@@ -411,7 +412,8 @@ export const projectsData: ProjectItem[] = [
       "97%+ test coverage"
     ],
     highlights: ["Odoo ERP Integration", "Passwordless Auth", "97% Test Coverage"],
-    status: "development",
+    link: "https://garage-inventory-tracker-site.onrender.com",
+    status: "production",
     metrics: "62+ Odoo modules, 97% coverage"
   },
   {
@@ -477,6 +479,7 @@ export const projectsData: ProjectItem[] = [
       "Cyberpunk UI aesthetic"
     ],
     highlights: ["AI Design", "Style Presets", "Canvas Visualization"],
+    link: "https://ink-synthesis-site.onrender.com",
     status: "beta"
   },
   {
@@ -518,6 +521,7 @@ export const projectsData: ProjectItem[] = [
       "In-app messaging system"
     ],
     highlights: ["Bias-Free Matching", "Swipe Interface", "Resume Builder"],
+    link: "https://job-harmony-site.onrender.com",
     status: "development"
   },
   {
@@ -537,6 +541,7 @@ export const projectsData: ProjectItem[] = [
       "Live preview"
     ],
     highlights: ["Craft.js", "8 Style Categories", "Code Generation"],
+    link: "https://rocket-rollout-api.onrender.com",
     status: "development"
   },
   {
