@@ -392,21 +392,21 @@ export const projectsData: ProjectItem[] = [
     metrics: "Real lemonade stand POS"
   },
   {
-    id: "novium",
-    title: "Novium",
-    tagline: "Enterprise Purchase Order Management",
-    description: "Enterprise PO management integrating with 62+ Odoo ERP modules via XMLRPC. Features Magic.link passwordless authentication, advanced filtering, bulk operations, and 97%+ test coverage with Vitest.",
+    id: "mfg-tracker",
+    title: "Manufacturing Tracker",
+    tagline: "Enterprise Purchase Order & Inventory Management",
+    description: "Manufacturing and procurement tracking system integrating with 62+ Odoo ERP modules via XMLRPC. Features passwordless authentication, advanced filtering, bulk operations, and 97%+ test coverage. Built for tracking orders from purchase through production.",
     category: "SaaS Platform",
     tier: "strong",
     tech: ["React 18", "Redux Toolkit", "Express", "Odoo XMLRPC", "Magic.link", "PostgreSQL", "Vitest", "React Testing Library"],
     features: [
       "62+ Odoo ERP module integration",
-      "Magic.link passwordless authentication",
+      "Passwordless authentication",
       "Advanced filtering and search",
-      "Bulk operations on POs",
+      "Bulk operations on purchase orders",
       "CSV export functionality",
       "Multi-vendor procurement tracking",
-      "Real-time status updates",
+      "Real-time inventory status updates",
       "97%+ test coverage"
     ],
     highlights: ["Odoo ERP Integration", "Passwordless Auth", "97% Test Coverage"],
