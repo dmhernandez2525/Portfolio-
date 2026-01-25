@@ -1,13 +1,12 @@
 import { motion } from "framer-motion"
 import { Link } from "react-router-dom"
-import { ArrowLeft, Instagram, Youtube, ExternalLink, Play } from "lucide-react"
+import { ArrowLeft, Youtube, ExternalLink, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 interface SocialContent {
   id: string
-  platform: "instagram" | "youtube"
-  type: "post" | "reel" | "video" | "short"
+  type: "video" | "short"
   title: string
   description: string
   thumbnail?: string
@@ -15,66 +14,35 @@ interface SocialContent {
   date: string
 }
 
-const socialContent: SocialContent[] = [
+const youtubeContent: SocialContent[] = [
   {
     id: "1",
-    platform: "youtube",
     type: "video",
     title: "Building a VR Game from Scratch",
     description: "Watch me develop a physics-based VR puzzle game using Unity and hand tracking.",
-    link: "https://youtube.com/@danielhernandez",
+    link: "https://youtube.com/@danieldanger5539",
     date: "2024-12-01"
   },
   {
     id: "2",
-    platform: "instagram",
-    type: "reel",
-    title: "Day in the Life: Software Engineer",
-    description: "From morning stand-ups to late-night debugging sessions.",
-    link: "https://instagram.com/danielhernandez",
-    date: "2024-11-28"
-  },
-  {
-    id: "3",
-    platform: "youtube",
     type: "video",
     title: "3D Printing Workshop Setup",
     description: "Building out my home workshop with multiple 3D printers and tools.",
-    link: "https://youtube.com/@danielhernandez",
+    link: "https://youtube.com/@danieldanger5539",
     date: "2024-11-15"
   },
   {
-    id: "4",
-    platform: "instagram",
-    type: "post",
-    title: "Latest 3D Print Project",
-    description: "Custom modular furniture design - from CAD to reality.",
-    link: "https://instagram.com/danielhernandez",
-    date: "2024-11-10"
-  },
-  {
-    id: "5",
-    platform: "youtube",
+    id: "3",
     type: "short",
     title: "Quick Tip: Debugging React",
     description: "My favorite debugging techniques in 60 seconds.",
-    link: "https://youtube.com/@danielhernandez",
+    link: "https://youtube.com/@danieldanger5539",
     date: "2024-11-05"
-  },
-  {
-    id: "6",
-    platform: "instagram",
-    type: "reel",
-    title: "Before/After: Code Refactor",
-    description: "Transforming spaghetti code into clean architecture.",
-    link: "https://instagram.com/danielhernandez",
-    date: "2024-10-28"
   }
 ]
 
 function ContentCard({ content }: { content: SocialContent }) {
-  const isYouTube = content.platform === "youtube"
-  const isVideo = content.type === "video" || content.type === "short" || content.type === "reel"
+  const isVideo = content.type === "video" || content.type === "short"
 
   return (
     <motion.a
@@ -90,12 +58,8 @@ function ContentCard({ content }: { content: SocialContent }) {
       <div className="overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-all">
         {/* Thumbnail Area */}
         <div className="relative aspect-video bg-muted overflow-hidden">
-          <div className={`absolute inset-0 flex items-center justify-center ${isYouTube ? "bg-red-500/20" : "bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20"}`}>
-            {isYouTube ? (
-              <Youtube className="w-16 h-16 text-red-500/60" />
-            ) : (
-              <Instagram className="w-16 h-16 text-pink-500/60" />
-            )}
+          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
+            <Youtube className="w-16 h-16 text-red-500/60" />
           </div>
 
           {/* Play button overlay for videos */}
@@ -108,17 +72,13 @@ function ContentCard({ content }: { content: SocialContent }) {
           )}
 
           {/* Type Badge */}
-          <Badge className={`absolute top-3 left-3 ${isYouTube ? "bg-red-500" : "bg-gradient-to-r from-purple-500 to-pink-500"}`}>
+          <Badge className="absolute top-3 left-3 bg-red-500">
             {content.type.charAt(0).toUpperCase() + content.type.slice(1)}
           </Badge>
 
           {/* Platform Icon */}
           <div className="absolute top-3 right-3">
-            {isYouTube ? (
-              <Youtube className="w-5 h-5 text-white drop-shadow-lg" />
-            ) : (
-              <Instagram className="w-5 h-5 text-white drop-shadow-lg" />
-            )}
+            <Youtube className="w-5 h-5 text-white drop-shadow-lg" />
           </div>
         </div>
 
@@ -146,9 +106,6 @@ function ContentCard({ content }: { content: SocialContent }) {
 }
 
 export function Social() {
-  const instagramContent = socialContent.filter(c => c.platform === "instagram")
-  const youtubeContent = socialContent.filter(c => c.platform === "youtube")
-
   return (
     <div className="min-h-screen bg-background">
       <main className="pt-24 pb-20">
@@ -163,19 +120,13 @@ export function Social() {
               Beyond the Code
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Follow my journey on social media
+              Follow my journey on YouTube
             </p>
 
             {/* Social Links */}
             <div className="flex items-center justify-center gap-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90">
-                <a href="https://instagram.com/danielhernandez" target="_blank" rel="noopener noreferrer">
-                  <Instagram className="mr-2 h-5 w-5" />
-                  Follow on Instagram
-                </a>
-              </Button>
               <Button asChild size="lg" variant="destructive">
-                <a href="https://youtube.com/@danielhernandez" target="_blank" rel="noopener noreferrer">
+                <a href="https://youtube.com/@danieldanger5539" target="_blank" rel="noopener noreferrer">
                   <Youtube className="mr-2 h-5 w-5" />
                   Subscribe on YouTube
                 </a>
@@ -200,28 +151,6 @@ export function Social() {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {youtubeContent.map(content => (
-                <ContentCard key={content.id} content={content} />
-              ))}
-            </div>
-          </motion.section>
-
-          {/* Instagram Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-16"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-orange-500/10">
-                <Instagram className="w-6 h-6 text-pink-500" />
-              </div>
-              <h2 className="text-2xl font-bold">Instagram</h2>
-              <Badge variant="secondary" className="ml-2">Posts & Reels</Badge>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {instagramContent.map(content => (
                 <ContentCard key={content.id} content={content} />
               ))}
             </div>
