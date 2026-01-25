@@ -65,6 +65,58 @@ const WIZARD_QUOTES = [
     "All we have to decide is what to do with the time that is given us."
 ]
 
+// Princess component with proper lifecycle management to fix race condition
+function PrincessCreature({ creature, onRemove }: { creature: Creature; onRemove: () => void }) {
+    const hasRemovedRef = useRef(false)
+
+    useEffect(() => {
+        // Auto-remove after 4 seconds - use ref to prevent double-removal
+        const timer = setTimeout(() => {
+            if (!hasRemovedRef.current) {
+                hasRemovedRef.current = true
+                onRemove()
+            }
+        }, 4000)
+
+        return () => clearTimeout(timer)
+    }, [onRemove])
+
+    const handleClick = () => {
+        if (!hasRemovedRef.current) {
+            hasRemovedRef.current = true
+            onRemove()
+        }
+    }
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0, y: 0 }}
+            animate={{ opacity: 1, scale: 1.5, y: -50 }}
+            exit={{ opacity: 0, scale: 2, transition: { duration: 0.5 } }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute flex flex-col items-center pointer-events-auto cursor-pointer z-50"
+            style={{ left: `${creature.x}vw`, top: `${creature.y}vh` }}
+            onClick={handleClick}
+        >
+            <motion.div
+                className="text-4xl filter drop-shadow-[0_0_15px_rgba(255,105,180,0.8)]"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            >
+                👸
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/90 text-pink-600 px-3 py-1 rounded-full text-xs font-bold mt-2 shadow-lg whitespace-nowrap"
+            >
+                {creature.fullData?.quote}
+            </motion.div>
+        </motion.div>
+    )
+}
+
 export function CreatureLayer() {
   const [creatures, setCreatures] = useState<Creature[]>([])
   const [wizardMessage, setWizardMessage] = useState<string | null>(null)
@@ -419,23 +471,11 @@ export function CreatureLayer() {
           }
            if (creature.type === 'princess') {
                return (
-                   <motion.div
+                   <PrincessCreature
                        key={creature.id}
-                       initial={{ opacity: 0, scale: 0, y: 0 }}
-                       animate={{ opacity: 1, scale: 1.5, y: -50 }}
-                       exit={{ opacity: 0, scale: 2 }}
-                       transition={{ duration: 3 }}
-                       className="absolute flex flex-col items-center pointer-events-auto cursor-pointer z-50"
-                       style={{ left: `${creature.x}vw`, top: `${creature.y}vh` }}
-                       onAnimationComplete={() => removeCreature(creature.id)}
-                       // Fallback cleanup (Issue #8)
-                       onLayoutAnimationComplete={() => setTimeout(() => removeCreature(creature.id), 3500)}
-                   >
-                       <div className="text-4xl filter drop-shadow-[0_0_15px_rgba(255,105,180,0.8)]">👸</div>
-                       <div className="bg-white/90 text-pink-600 px-3 py-1 rounded-full text-xs font-bold mt-2 shadow-lg whitespace-nowrap">
-                           {creature.fullData?.quote}
-                       </div>
-                   </motion.div>
+                       creature={creature}
+                       onRemove={() => removeCreature(creature.id)}
+                   />
                )
           }
           
