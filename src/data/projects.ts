@@ -233,9 +233,33 @@ export const projectsData: ProjectItem[] = [
   },
 
   // ============================================
-  // TIER 2 - STRONG PROJECTS (11)
+  // TIER 2 - STRONG PROJECTS (12)
   // Production-ready with significant functionality
   // ============================================
+  {
+    id: "chronoscribe",
+    title: "ChronoScribe",
+    tagline: "Local-First Document Digitization & Archive",
+    description: "Transform handwritten notes, sketches, and documents into searchable digital archives. Uses multi-provider AI transcription (Azure, Google, OpenAI, local Ollama) with a unique human-in-the-loop clarification system—when AI is uncertain, it asks you specific questions instead of guessing. Automatic date extraction organizes your life's documents chronologically.",
+    category: "AI/ML Platform",
+    tier: "strong",
+    tech: ["Python 3.11", "Click", "Rich", "SQLite", "FTS5", "Azure Vision", "Google Vision", "OpenAI GPT-4o", "Ollama", "Anthropic Claude", "OpenCV", "Pillow"],
+    features: [
+      "Multi-provider transcription: Azure, Google, OpenAI, Ollama",
+      "Human-in-the-loop clarification for uncertain text",
+      "Automatic date extraction and chronological timeline",
+      "6,000+ free API calls/month (Azure 5K + Google 1K)",
+      "Per-document folder with original, transcription, metadata",
+      "Full-text search with SQLite FTS5",
+      "100% local-first—cloud APIs optional",
+      "Smart category classification"
+    ],
+    highlights: ["Clarification System", "6K Free/Month", "Local-First"],
+    link: "https://chronoscribe-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/chronoscribe",
+    status: "development",
+    metrics: "6,000 free pages/month"
+  },
   {
     id: "baked-by-chrissy",
     title: "Baked by Chrissy",
