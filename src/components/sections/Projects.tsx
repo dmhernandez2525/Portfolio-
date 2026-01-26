@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Github, ExternalLink, Sparkles, Zap, Code2, Cpu, Globe, Gamepad2, Wrench, Package, CheckCircle, Clock, Beaker, Construction } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Github, ExternalLink, Sparkles, Zap, Code2, Cpu, Globe, Gamepad2, Wrench, Package, CheckCircle, Clock, Beaker, Construction, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
@@ -252,12 +253,19 @@ function ProjectCard({ project, index }: { project: ProjectItem; index: number }
 
 type FilterType = "all" | ProjectTier
 
+// Limit projects shown on homepage
+const PROJECTS_LIMIT = 8
+
 export function Projects() {
   const [filter, setFilter] = useState<FilterType>("all")
 
-  const filteredProjects = filter === "all"
+  const allFilteredProjects = filter === "all"
     ? projectsData
     : getProjectsByTier(filter)
+
+  // Only show limited projects on homepage
+  const filteredProjects = allFilteredProjects.slice(0, PROJECTS_LIMIT)
+  const hasMore = allFilteredProjects.length > PROJECTS_LIMIT
 
   const flagshipCount = getProjectsByTier("flagship").length
   const strongCount = getProjectsByTier("strong").length
@@ -352,12 +360,29 @@ export function Projects() {
           </AnimatePresence>
         </motion.div>
 
+        {/* See All Projects Button */}
+        {hasMore && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-8"
+          >
+            <Button asChild size="lg" className="group">
+              <Link to="/projects">
+                See All {projectsData.length} Projects
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </motion.div>
+        )}
+
         {/* Footer text */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-10"
+          className="text-center mt-6"
         >
           <p className="text-muted-foreground text-sm">
             Click any project to view full details, features, tech stack, and live demos.
