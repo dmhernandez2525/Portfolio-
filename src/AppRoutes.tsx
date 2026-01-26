@@ -8,6 +8,7 @@ import { Skills } from "@/components/sections/Skills"
 import { Projects } from "@/components/sections/Projects"
 import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
+import { AskAboutMe } from "@/components/voice-assistant"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -32,6 +33,7 @@ const Home = () => (
       <Experience />
       <Projects />
       <GlobeSection />
+      <AskAboutMe />
       <Contact />
     </div>
 )
