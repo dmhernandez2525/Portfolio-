@@ -273,7 +273,11 @@ export class GuidedTourService {
 
     // Notify callbacks
     for (const callback of this.onTourEndCallbacks) {
-      callback();
+      try {
+        callback();
+      } catch (error) {
+        console.error('[GuidedTour] Tour end callback error:', error);
+      }
     }
     this.notifyStepChange(null, -1);
   }
@@ -393,7 +397,11 @@ export class GuidedTourService {
     // Speak voice script
     if (step.voiceScript) {
       for (const callback of this.onSpeakCallbacks) {
-        callback(step.voiceScript);
+        try {
+          callback(step.voiceScript);
+        } catch (error) {
+          console.error('[GuidedTour] Speak callback error:', error);
+        }
       }
     }
 
@@ -448,18 +456,21 @@ export class GuidedTourService {
   }
 
   private getSelector(element: HTMLElement): string {
-    if (element.id) return `#${element.id}`;
+    // Use CSS.escape for IDs with special characters
+    if (element.id) return `#${CSS.escape(element.id)}`;
 
-    // Try data attributes
+    // Try data attributes (escape for special characters)
     const dataSection = element.getAttribute('data-section');
-    if (dataSection) return `[data-section="${dataSection}"]`;
+    if (dataSection) return `[data-section="${CSS.escape(dataSection)}"]`;
 
     // Build a selector based on tag and class
     const tag = element.tagName.toLowerCase();
-    const firstClass = element.className?.split(' ')[0];
+    // Handle SVG elements where className is SVGAnimatedString
+    const className = typeof element.className === 'string' ? element.className : '';
+    const firstClass = className.trim().split(/\s+/)[0];
 
     if (firstClass) {
-      return `${tag}.${firstClass}`;
+      return `${tag}.${CSS.escape(firstClass)}`;
     }
 
     // Fallback to nth-child
@@ -475,7 +486,11 @@ export class GuidedTourService {
 
   private notifyStepChange(step: TourStep | null, index: number): void {
     for (const callback of this.onStepChangeCallbacks) {
-      callback(step, index);
+      try {
+        callback(step, index);
+      } catch (error) {
+        console.error('[GuidedTour] Step change callback error:', error);
+      }
     }
   }
 

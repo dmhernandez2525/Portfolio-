@@ -50,7 +50,11 @@ export class VoiceCommandRouter {
       const match = normalizedTranscript.match(command.pattern);
       if (match) {
         try {
-          return await command.handler(match, fullContext);
+          const result = await command.handler(match, fullContext);
+          // Continue checking if handler deferred (handled: false, passToAI: false)
+          if (result.handled || result.passToAI) {
+            return result;
+          }
         } catch (error) {
           console.error(`[VoiceCommandRouter] Custom command error:`, error);
         }
@@ -62,7 +66,11 @@ export class VoiceCommandRouter {
       const match = normalizedTranscript.match(command.pattern);
       if (match) {
         try {
-          return await command.handler(match, fullContext);
+          const result = await command.handler(match, fullContext);
+          // Continue checking if handler deferred (handled: false, passToAI: false)
+          if (result.handled || result.passToAI) {
+            return result;
+          }
         } catch (error) {
           console.error(`[VoiceCommandRouter] Command error:`, error);
         }
@@ -334,7 +342,16 @@ export class VoiceCommandRouter {
     };
   }
 
-  private async handleGoBack(): Promise<CommandResult> {
+  private async handleGoBack(match: RegExpMatchArray): Promise<CommandResult> {
+    // If tour is active and user said "back" or "go back" (not "home"), defer to tour handler
+    const transcript = match[0].toLowerCase();
+    if (guidedTour.getState().isActive && (transcript === 'back' || transcript === 'go back')) {
+      return {
+        handled: false,
+        passToAI: false,
+      };
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     clearHighlights();
 
