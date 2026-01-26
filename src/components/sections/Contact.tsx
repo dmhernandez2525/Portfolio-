@@ -3,12 +3,17 @@ import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Send, CheckCircle, Loader2, Download } from "lucide-react"
+import { Send, CheckCircle, Loader2, Download, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+
+// Web3Forms API endpoint
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit"
+// Get access key from environment or use placeholder
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || ""
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -63,6 +68,7 @@ const createConfetti = () => {
 export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [showHireToast, setShowHireToast] = useState(false)
 
   const {
@@ -81,23 +87,63 @@ export function Contact() {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    console.log(data)
-    setIsSubmitting(false)
-    setIsSuccess(true)
+    setErrorMessage(null)
 
-    // Easter egg: confetti for hire-related messages
-    if (checkForHireKeywords(data.message)) {
-      createConfetti()
-      setShowHireToast(true)
-      setTimeout(() => setShowHireToast(false), 5000)
+    // Check if access key is configured
+    if (!WEB3FORMS_ACCESS_KEY) {
+      // Fallback: open mailto link
+      const subject = encodeURIComponent(`Website Inbox: Message from ${data.name}`)
+      const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)
+      window.location.href = `mailto:Danher2525@Gmail.com?subject=${subject}&body=${body}`
+      setIsSubmitting(false)
+      setIsSuccess(true)
+      reset()
+      setTimeout(() => setIsSuccess(false), 5000)
+      return
     }
 
-    reset()
+    try {
+      // Send via Web3Forms API
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `Website Inbox: Message from ${data.name}`,
+          from_name: data.name,
+          email: data.email,
+          message: data.message,
+          // Include reply-to for easy response
+          replyto: data.email,
+        }),
+      })
 
-    // Reset success message after a few seconds
-    setTimeout(() => setIsSuccess(false), 5000)
+      const result = await response.json()
+
+      if (result.success) {
+        setIsSuccess(true)
+
+        // Easter egg: confetti for hire-related messages
+        if (checkForHireKeywords(data.message)) {
+          createConfetti()
+          setShowHireToast(true)
+          setTimeout(() => setShowHireToast(false), 5000)
+        }
+
+        reset()
+        setTimeout(() => setIsSuccess(false), 5000)
+      } else {
+        throw new Error(result.message || "Failed to send message")
+      }
+    } catch (error) {
+      console.error("Contact form error:", error)
+      setErrorMessage(error instanceof Error ? error.message : "Failed to send message. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -173,6 +219,14 @@ export function Contact() {
                                 />
                                 {errors.message && <p className="text-sm text-red-500">{errors.message.message}</p>}
                             </div>
+
+                            {/* Error message */}
+                            {errorMessage && (
+                              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-sm">
+                                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                                <span>{errorMessage}</span>
+                              </div>
+                            )}
 
                             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
                                 {isSubmitting ? (

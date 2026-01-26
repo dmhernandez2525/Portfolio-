@@ -72,7 +72,7 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
         shakeStateRef.current.lastX = 0
     }
 
-    // Drag/Shake Logic - lower threshold from 6 to 4
+    // Drag/Shake Logic - improved detection
     const handleDrag = (_: unknown, info: PanInfo) => {
         const currentX = info.point.x
         const now = Date.now()
@@ -87,15 +87,26 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
         const timeDelta = now - shakeStateRef.current.lastTime
         const currentDirection = deltaX > 0 ? 1 : -1
 
-        if (currentDirection !== shakeStateRef.current.lastDirection && Math.abs(deltaX) > 3 && timeDelta > 50) {
+        // More lenient shake detection: lower deltaX threshold (2px), lower time threshold (30ms)
+        // This makes shake detection more responsive while still filtering out noise
+        if (currentDirection !== shakeStateRef.current.lastDirection && Math.abs(deltaX) > 2 && timeDelta > 30 && timeDelta < 500) {
              shakeStateRef.current.count += 1
              shakeStateRef.current.lastDirection = currentDirection
              shakeStateRef.current.lastTime = now
 
              if (!isEnraged) {
                  setShakeProgress(Math.min(4, shakeStateRef.current.count))
-                 setScale(prev => Math.min(1.8, prev + 0.15))
+                 setScale(prev => Math.min(1.8, prev + 0.2))
              }
+        }
+
+        // Reset shake count if user pauses too long (800ms) - prevents partial shakes from accumulating
+        if (timeDelta > 800 && shakeStateRef.current.count < 4) {
+            shakeStateRef.current.count = 0
+            if (!isEnraged) {
+                setShakeProgress(0)
+                setScale(1)
+            }
         }
 
         shakeStateRef.current.lastX = currentX
@@ -147,7 +158,7 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
                 left: `${x}vw`,
                 top: `${y}vh`,
                 touchAction: "none",
-                cursor: isEnraged ? "crosshair" : "grab"
+                cursor: isEnraged ? "url('/sword-cursor.svg') 2 2, crosshair" : "grab"
             }}
             drag
             dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
@@ -159,11 +170,23 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
             onClick={handleClick}
             initial={{ opacity: 0, scale: 0 }}
             animate={{
-                opacity: 1,
-                scale: isEnraged ? [3.8, 4.0, 3.8] : scale,
+                opacity: isKilling ? [1, 0.8, 0.5, 0] : 1,
+                scale: isKilling ? [4, 5, 6, 0] : (isEnraged ? [3.8, 4.0, 3.8] : scale),
+                rotate: isKilling ? [0, 180, 360, 720] : 0,
+                filter: isKilling ? "blur(8px)" : "blur(0px)",
+            }}
+            exit={{
+                opacity: 0,
+                scale: 0,
+                rotate: 720,
+                filter: "blur(10px)",
+                transition: { duration: 0.8 }
             }}
             transition={{
-                scale: { repeat: isEnraged ? Infinity : 0, duration: 0.5 }
+                scale: { repeat: isEnraged && !isKilling ? Infinity : 0, duration: isKilling ? 1.5 : 0.5 },
+                opacity: { duration: isKilling ? 1.5 : 0.3 },
+                rotate: { duration: isKilling ? 1.5 : 0.3 },
+                filter: { duration: isKilling ? 1.5 : 0.3 }
             }}
         >
             <motion.div
