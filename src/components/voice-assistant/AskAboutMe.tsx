@@ -33,6 +33,7 @@ export function AskAboutMe() {
     }
   ])
   const [input, setInput] = useState("")
+  const [interimTranscript, setInterimTranscript] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -48,56 +49,95 @@ export function AskAboutMe() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Initialize speech recognition
+  // Cleanup recognition on unmount
   useEffect(() => {
-    const SpeechRecognitionCtor = getSpeechRecognition()
-    if (SpeechRecognitionCtor) {
-      const recognition = new SpeechRecognitionCtor()
-      recognition.continuous = false
-      recognition.interimResults = false
-      recognition.lang = "en-US"
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript
-        setInput(transcript)
-        setIsListening(false)
-      }
-
-      recognition.onerror = () => {
-        setIsListening(false)
-      }
-
-      recognition.onend = () => {
-        setIsListening(false)
-      }
-
-      recognitionRef.current = recognition
-    }
-
     return () => {
-      recognitionRef.current?.abort()
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop() } catch { /* ignore */ }
+      }
     }
   }, [])
 
-  const toggleListening = useCallback(() => {
-    if (!recognitionRef.current) {
+  const startListening = useCallback(() => {
+    const SpeechRecognitionCtor = getSpeechRecognition()
+    if (!SpeechRecognitionCtor) {
       alert("Speech recognition is not supported in your browser.")
       return
     }
 
-    if (isListening) {
-      recognitionRef.current.stop()
-      setIsListening(false)
-    } else {
-      try {
-        recognitionRef.current.start()
-        setIsListening(true)
-      } catch {
-        setIsListening(false)
+    // Stop any existing recognition
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch { /* ignore */ }
+    }
+
+    // Create fresh instance each time
+    const recognition = new SpeechRecognitionCtor()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = "en-US"
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let interim = ""
+      let final = ""
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript
+        if (event.results[i].isFinal) {
+          final += transcript
+        } else {
+          interim += transcript
+        }
+      }
+
+      setInterimTranscript(interim)
+
+      if (final) {
+        setInput(prev => prev + final)
+        setInterimTranscript("")
       }
     }
-  }, [isListening])
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      console.warn("Speech recognition error:", event.error)
+      if (event.error !== "aborted") {
+        setIsListening(false)
+        setInterimTranscript("")
+      }
+    }
+
+    recognition.onend = () => {
+      setIsListening(false)
+      setInterimTranscript("")
+    }
+
+    recognitionRef.current = recognition
+
+    try {
+      recognition.start()
+      setIsListening(true)
+    } catch (e) {
+      console.error("Failed to start recognition:", e)
+      setIsListening(false)
+    }
+  }, [])
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch { /* ignore */ }
+    }
+    setIsListening(false)
+    setInterimTranscript("")
+  }, [])
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening()
+    } else {
+      startListening()
+    }
+  }, [isListening, startListening, stopListening])
 
   const speakResponse = useCallback((text: string) => {
     if (!speechEnabled || typeof window === "undefined" || !window.speechSynthesis) return
@@ -127,6 +167,9 @@ export function AskAboutMe() {
   const sendMessage = useCallback(async () => {
     const trimmedInput = input.trim()
     if (!trimmedInput || isProcessing) return
+
+    // Stop listening if active
+    if (isListening) stopListening()
 
     // Add user message
     const userMessage: Message = {
@@ -194,7 +237,7 @@ export function AskAboutMe() {
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, speakResponse])
+  }, [input, isProcessing, isListening, stopListening, speakResponse])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -209,6 +252,9 @@ export function AskAboutMe() {
     "What's his experience with AI?",
     "How can I contact him?"
   ]
+
+  // Combined display text for input
+  const displayText = input + (interimTranscript ? (input ? " " : "") + interimTranscript : "")
 
   return (
     <section id="ask-me" className="py-20 bg-gradient-to-b from-background to-muted/30">
@@ -337,12 +383,12 @@ export function AskAboutMe() {
                   {/* Text Input */}
                   <textarea
                     ref={inputRef}
-                    value={input}
+                    value={displayText}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={isListening ? "Listening..." : "Ask me anything about Daniel..."}
+                    placeholder={isListening ? "Listening... speak now" : "Ask me anything about Daniel..."}
                     className="flex-1 min-h-[44px] max-h-[120px] px-4 py-2 rounded-xl border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    disabled={isProcessing || isListening}
+                    disabled={isProcessing}
                     rows={1}
                   />
 
@@ -372,18 +418,24 @@ export function AskAboutMe() {
                   {/* Send Button */}
                   <Button
                     onClick={sendMessage}
-                    disabled={!input.trim() || isProcessing}
+                    disabled={!displayText.trim() || isProcessing}
                     className="flex-shrink-0"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
 
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  {speechRecognitionSupported
-                    ? "Click the mic to use voice input, or just type your question"
-                    : "Type your question and press Enter or click Send"}
-                </p>
+                {isListening ? (
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    🎤 Speak now... click mic or press Enter when done
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    {speechRecognitionSupported
+                      ? "Click the mic to use voice input, or just type your question"
+                      : "Type your question and press Enter or click Send"}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
