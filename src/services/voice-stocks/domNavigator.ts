@@ -380,13 +380,17 @@ export class VoiceStocksDOMNavigator {
     while (current && current !== document.body) {
       let selector = current.tagName.toLowerCase();
       if (current.id) {
-        selector = `#${current.id}`;
+        selector = `#${CSS.escape(current.id)}`;
         parts.unshift(selector);
         break;
       }
-      if (current.className) {
-        const className = current.className.split(' ')[0];
-        if (className) selector += `.${className}`;
+      // Handle SVG elements where className is SVGAnimatedString
+      const classAttr = typeof current.className === 'string'
+        ? current.className
+        : current.getAttribute('class');
+      if (classAttr) {
+        const className = classAttr.trim().split(/\s+/)[0];
+        if (className) selector += `.${CSS.escape(className)}`;
       }
       parts.unshift(selector);
       current = current.parentElement;
