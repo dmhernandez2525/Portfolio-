@@ -8,7 +8,7 @@ import { Skills } from "@/components/sections/Skills"
 import { Projects } from "@/components/sections/Projects"
 import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
-import { AskAboutMe } from "@/components/voice-assistant"
+import { AskAboutMe, ChatbotCTA } from "@/components/voice-assistant"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -28,6 +28,7 @@ import { NotFound } from "@/pages/NotFound"
 const Home = () => (
     <div className="min-h-screen">
       <Hero />
+      <ChatbotCTA />
       <About />
       <Skills />
       <Experience />
