@@ -265,7 +265,6 @@ export function Projects() {
 
   // Only show limited projects on homepage
   const filteredProjects = allFilteredProjects.slice(0, PROJECTS_LIMIT)
-  const hasMore = allFilteredProjects.length > PROJECTS_LIMIT
 
   const flagshipCount = getProjectsByTier("flagship").length
   const strongCount = getProjectsByTier("strong").length
@@ -288,6 +287,19 @@ export function Projects() {
             {projectsData.length} projects spanning AI/ML, SaaS platforms, native apps, and hardware.
             <span className="text-primary font-medium"> {liveCount} live demos available.</span>
           </p>
+
+          {/* See All + Helper text - right below header */}
+          <div className="mt-6 space-y-3">
+            <Button asChild size="lg" className="group">
+              <Link to="/projects">
+                See All {projectsData.length} Projects
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+            <p className="text-muted-foreground text-sm">
+              Click any project to view full details, features, tech stack, and live demos.
+            </p>
+          </div>
         </motion.div>
 
         {/* Filter Buttons */}
@@ -360,34 +372,6 @@ export function Projects() {
           </AnimatePresence>
         </motion.div>
 
-        {/* See All Projects Button */}
-        {hasMore && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mt-8"
-          >
-            <Button asChild size="lg" className="group">
-              <Link to="/projects">
-                See All {projectsData.length} Projects
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          </motion.div>
-        )}
-
-        {/* Footer text */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-6"
-        >
-          <p className="text-muted-foreground text-sm">
-            Click any project to view full details, features, tech stack, and live demos.
-          </p>
-        </motion.div>
       </div>
     </section>
   )
