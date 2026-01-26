@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, RotateCcw, RotateCw, Plus, Minus } from "lucide-react"
 
 import type { Tank, Projectile, Explosion, GamePhase, WeaponType } from "./types"
 import {
@@ -100,9 +100,14 @@ export function TanksGame() {
         explosionsRef.current = []
     }, [player, round])
     
+    // Initialize game once on mount
+    const hasInitializedRef = useRef(false)
     useEffect(() => {
-        setTimeout(() => initGame(), 0)
-    }, [initGame])
+        if (!hasInitializedRef.current) {
+            hasInitializedRef.current = true
+            initGame()
+        }
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     const fireProjectile = useCallback(() => {
         if (phase !== "aiming" || !player) return
@@ -403,26 +408,61 @@ export function TanksGame() {
                 </div>
 
                 {/* Main Controls */}
-                <div className="flex items-center justify-center gap-2">
-                    <div className="grid grid-cols-3 gap-2">
-                        <div />
-                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => setPlayer(p => p ? {...p, power: Math.min(100, p.power+5)} : null)}><ArrowUp /></Button>
-                        <div />
-                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => {
-                            if (phase !== "aiming" || !player || player.fuel <= 0) return
-                            const newX = Math.max(TANK_WIDTH/2, player.x - MOVE_SPEED)
-                            setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
-                        }}><ArrowLeft /></Button>
-                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => setPlayer(p => p ? {...p, power: Math.max(0, p.power-5)} : null)}><ArrowDown /></Button>
-                        <Button variant="secondary" className="h-12 w-12 rounded-lg" onTouchStart={() => {
-                            if (phase !== "aiming" || !player || player.fuel <= 0) return
-                            const newX = Math.min(CANVAS_WIDTH - TANK_WIDTH/2, player.x + MOVE_SPEED)
-                            setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
-                        }}><ArrowRight /></Button>
+                <div className="flex items-center justify-center gap-4">
+                    {/* Angle Controls */}
+                    <div className="flex flex-col gap-2 items-center">
+                        <span className="text-xs text-white/50 uppercase">Angle</span>
+                        <div className="flex gap-2">
+                            <Button variant="secondary" className="h-12 w-12 rounded-lg"
+                                onTouchStart={() => setPlayer(p => p ? {...p, angle: Math.min(180, p.angle + ANGLE_STEP * 3)} : null)}
+                                onClick={() => setPlayer(p => p ? {...p, angle: Math.min(180, p.angle + ANGLE_STEP * 3)} : null)}
+                            ><RotateCcw className="w-5 h-5" /></Button>
+                            <Button variant="secondary" className="h-12 w-12 rounded-lg"
+                                onTouchStart={() => setPlayer(p => p ? {...p, angle: Math.max(0, p.angle - ANGLE_STEP * 3)} : null)}
+                                onClick={() => setPlayer(p => p ? {...p, angle: Math.max(0, p.angle - ANGLE_STEP * 3)} : null)}
+                            ><RotateCw className="w-5 h-5" /></Button>
+                        </div>
                     </div>
-                    <Button 
-                        size="lg" 
-                        className="h-24 w-24 rounded-full bg-red-600 hover:bg-red-500 active:scale-90 transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] border-4 border-white/20 font-black text-xl"
+
+                    {/* Movement & Power */}
+                    <div className="flex flex-col gap-1 items-center">
+                        <span className="text-xs text-white/50 uppercase">Move/Power</span>
+                        <div className="grid grid-cols-3 gap-1">
+                            <div />
+                            <Button variant="secondary" className="h-10 w-10 rounded-lg"
+                                onTouchStart={() => setPlayer(p => p ? {...p, power: Math.min(100, p.power+5)} : null)}
+                                onClick={() => setPlayer(p => p ? {...p, power: Math.min(100, p.power+5)} : null)}
+                            ><Plus className="w-4 h-4" /></Button>
+                            <div />
+                            <Button variant="secondary" className="h-10 w-10 rounded-lg" onTouchStart={() => {
+                                if (phase !== "aiming" || !player || player.fuel <= 0) return
+                                const newX = Math.max(TANK_WIDTH/2, player.x - MOVE_SPEED)
+                                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                            }} onClick={() => {
+                                if (phase !== "aiming" || !player || player.fuel <= 0) return
+                                const newX = Math.max(TANK_WIDTH/2, player.x - MOVE_SPEED)
+                                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                            }}><ArrowLeft className="w-4 h-4" /></Button>
+                            <Button variant="secondary" className="h-10 w-10 rounded-lg"
+                                onTouchStart={() => setPlayer(p => p ? {...p, power: Math.max(0, p.power-5)} : null)}
+                                onClick={() => setPlayer(p => p ? {...p, power: Math.max(0, p.power-5)} : null)}
+                            ><Minus className="w-4 h-4" /></Button>
+                            <Button variant="secondary" className="h-10 w-10 rounded-lg" onTouchStart={() => {
+                                if (phase !== "aiming" || !player || player.fuel <= 0) return
+                                const newX = Math.min(CANVAS_WIDTH - TANK_WIDTH/2, player.x + MOVE_SPEED)
+                                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                            }} onClick={() => {
+                                if (phase !== "aiming" || !player || player.fuel <= 0) return
+                                const newX = Math.min(CANVAS_WIDTH - TANK_WIDTH/2, player.x + MOVE_SPEED)
+                                setPlayer(p => p ? {...p, x: newX, y: getTerrainHeight(terrain, newX, TERRAIN_RESOLUTION), fuel: Math.max(0, p.fuel - FUEL_CONSUMPTION)} : null)
+                            }}><ArrowRight className="w-4 h-4" /></Button>
+                        </div>
+                    </div>
+
+                    {/* Fire Button */}
+                    <Button
+                        size="lg"
+                        className="h-20 w-20 rounded-full bg-red-600 hover:bg-red-500 active:scale-90 transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] border-4 border-white/20 font-black text-lg"
                         onClick={fireProjectile}
                         disabled={phase !== "aiming"}
                     >FIRE</Button>

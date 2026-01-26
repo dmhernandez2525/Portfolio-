@@ -21,6 +21,7 @@ import { Inventions } from "@/pages/Inventions"
 import { Blog } from "@/pages/Blog"
 import { Social } from "@/pages/Social"
 import { Games } from "@/pages/Games"
+import { ProjectsPage } from "@/pages/ProjectsPage"
 import { NotFound } from "@/pages/NotFound"
 
 const Home = () => (
@@ -45,6 +46,7 @@ export function AppRoutes() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/social" element={<Social />} />
         <Route path="/games" element={<Games />} />
+        <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/game" element={<FallingBlocksGame />} />
         <Route path="/tetris" element={<TetrisGame />} />
         <Route path="/snake" element={<SnakeGame />} />
