@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Play, RotateCcw, Trophy, ArrowLeft } from "lucide-react"
+import { RotateCcw, Trophy, ArrowLeft, Users, Bot, Split, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
-import type { 
-  Cell, Food, Virus, EjectedMass, AIBehavior 
+import type {
+  Cell, Food, Virus, EjectedMass, AIBehavior
 } from "./types"
+
+type GameMode = "menu" | "single" | "local_2p"
 import {
   WORLD_SIZE, INITIAL_RADIUS, MAX_SPEED, FOOD_COUNT, AI_COUNT,
   FOOD_RADIUS, SPLIT_VELOCITY, MERGE_DELAY, MAX_CELLS, MIN_SPLIT_RADIUS,
@@ -44,14 +46,19 @@ export function AgarGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Game mode
+  const [gameMode, setGameMode] = useState<GameMode>("menu")
+
   // Game state refs for animation loop
   const playerCellsRef = useRef<Cell[]>([])
+  const player2CellsRef = useRef<Cell[]>([]) // For local 2P
   const aiCellsRef = useRef<Cell[]>([])
   const foodRef = useRef<Food[]>([])
   const virusesRef = useRef<Virus[]>([])
   const ejectedMassRef = useRef<EjectedMass[]>([])
   const aiBehaviorsRef = useRef<Map<string, AIBehavior>>(new Map())
   const mouseRef = useRef({ x: 0, y: 0 })
+  const player2InputRef = useRef({ up: false, down: false, left: false, right: false }) // WASD for P2
   const cameraRef = useRef({ x: 0, y: 0, scale: 1 })
   const gameLoopRef = useRef<number | null>(null)
   const lastSplitRef = useRef<Map<string, number>>(new Map())
@@ -59,11 +66,13 @@ export function AgarGame() {
   // React state for UI
   const [isPlaying, setIsPlaying] = useState(false)
   const [gameOver, setGameOver] = useState(false)
+  const [winner, setWinner] = useState<"player1" | "player2" | null>(null)
   const [score, setScore] = useState(0)
+  const [score2, setScore2] = useState(0) // Player 2 score
   const [highScore, setHighScore] = useState(() =>
     parseInt(localStorage.getItem("agar-highscore") || "0")
   )
-  const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([])
+  const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer?: boolean; isPlayer2?: boolean }[]>([])
 
   // Initialize food
   const initializeFood = useCallback(() => {
@@ -123,19 +132,38 @@ export function AgarGame() {
   }, [])
 
   // Start game
-  const startGame = useCallback(() => {
-    // Initialize player
+  const startGame = useCallback((mode: GameMode) => {
+    setGameMode(mode)
+
+    // Initialize player 1
     playerCellsRef.current = [{
       id: "player-main",
-      x: WORLD_SIZE / 2,
+      x: mode === "local_2p" ? WORLD_SIZE / 3 : WORLD_SIZE / 2,
       y: WORLD_SIZE / 2,
       radius: INITIAL_RADIUS,
       color: "#00D4FF",
       vx: 0,
       vy: 0,
       isPlayer: true,
-      name: "You"
+      name: "Player 1"
     }]
+
+    // Initialize player 2 for local 2P
+    if (mode === "local_2p") {
+      player2CellsRef.current = [{
+        id: "player2-main",
+        x: (WORLD_SIZE / 3) * 2,
+        y: WORLD_SIZE / 2,
+        radius: INITIAL_RADIUS,
+        color: "#FF6B6B",
+        vx: 0,
+        vy: 0,
+        isPlayer: true,
+        name: "Player 2"
+      }]
+    } else {
+      player2CellsRef.current = []
+    }
 
     lastSplitRef.current.clear()
     initializeFood()
@@ -145,52 +173,73 @@ export function AgarGame() {
 
     setIsPlaying(true)
     setGameOver(false)
+    setWinner(null)
     setScore(0)
+    setScore2(0)
   }, [initializeFood, initializeAI, initializeViruses])
 
   // End game
-  const endGame = useCallback(() => {
+  const endGame = useCallback((killedPlayer?: "player1" | "player2") => {
     setIsPlaying(false)
     setGameOver(true)
+
+    if (gameMode === "local_2p" && killedPlayer) {
+      setWinner(killedPlayer === "player1" ? "player2" : "player1")
+    } else {
+      setWinner(null)
+    }
 
     const finalScore = Math.floor(
       playerCellsRef.current.reduce((sum, cell) => sum + getMass(cell.radius), 0)
     )
 
-    if (finalScore > highScore) {
+    if (finalScore > highScore && gameMode === "single") {
       setHighScore(finalScore)
       localStorage.setItem("agar-highscore", finalScore.toString())
     }
-  }, [highScore])
+  }, [highScore, gameMode])
 
   // Split player cell
-  const splitPlayer = useCallback(() => {
+  const splitPlayer = useCallback((playerNum: 1 | 2 = 1) => {
     if (!isPlaying) return
 
     const now = Date.now()
     const newCells: Cell[] = []
+    const cellsRef = playerNum === 1 ? playerCellsRef : player2CellsRef
+    const playerName = playerNum === 1 ? "Player 1" : "Player 2"
 
-    playerCellsRef.current.forEach(cell => {
+    cellsRef.current.forEach(cell => {
       // Need minimum mass to split
       if (cell.radius < MIN_SPLIT_RADIUS) return
-      if (playerCellsRef.current.length >= MAX_CELLS) return // Max cells limit
+      if (cellsRef.current.length >= MAX_CELLS) return // Max cells limit
 
       const newRadius = getRadiusFromMass(getMass(cell.radius) / 2)
 
-      // Calculate direction toward mouse
-      const canvas = canvasRef.current
-      if (!canvas) return
+      // Calculate direction
+      let dirX = 1, dirY = 0
 
-      const camera = cameraRef.current
-      const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
-      const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
-
-      const dx = worldMouseX - cell.x
-      const dy = worldMouseY - cell.y
-      const dist = Math.sqrt(dx * dx + dy * dy)
-
-      const dirX = dist > 0 ? dx / dist : 1
-      const dirY = dist > 0 ? dy / dist : 0
+      if (playerNum === 1) {
+        // Player 1: toward mouse
+        const canvas = canvasRef.current
+        if (canvas) {
+          const camera = cameraRef.current
+          const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
+          const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
+          const dx = worldMouseX - cell.x
+          const dy = worldMouseY - cell.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          dirX = dist > 0 ? dx / dist : 1
+          dirY = dist > 0 ? dy / dist : 0
+        }
+      } else {
+        // Player 2: toward movement direction (WASD)
+        const input = player2InputRef.current
+        dirX = (input.right ? 1 : 0) - (input.left ? 1 : 0)
+        dirY = (input.down ? 1 : 0) - (input.up ? 1 : 0)
+        const dist = Math.sqrt(dirX * dirX + dirY * dirY)
+        if (dist > 0) { dirX /= dist; dirY /= dist }
+        else { dirX = 1; dirY = 0 }
+      }
 
       // Update original cell
       cell.radius = newRadius
@@ -206,7 +255,7 @@ export function AgarGame() {
         vx: dirX * SPLIT_VELOCITY,
         vy: dirY * SPLIT_VELOCITY,
         isPlayer: true,
-        name: "You"
+        name: playerName
       })
 
       // Track split time for merging
@@ -214,30 +263,45 @@ export function AgarGame() {
       lastSplitRef.current.set(newId, now)
     })
 
-    playerCellsRef.current = [...playerCellsRef.current, ...newCells]
+    cellsRef.current = [...cellsRef.current, ...newCells]
   }, [isPlaying])
 
   // Eject mass
-  const ejectMass = useCallback(() => {
+  const ejectMass = useCallback((playerNum: 1 | 2 = 1) => {
     if (!isPlaying) return
 
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const camera = cameraRef.current
-    const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
-    const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
+    const cellsRef = playerNum === 1 ? playerCellsRef : player2CellsRef
 
-    playerCellsRef.current.forEach(cell => {
+    cellsRef.current.forEach(cell => {
       // Must be large enough to eject
       if (cell.radius < 35) return
 
       const newRadius = getRadiusFromMass(getMass(cell.radius) - EJECT_MASS_COST)
-      
-      const dx = worldMouseX - cell.x
-      const dy = worldMouseY - cell.y
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      const dirX = dist > 0 ? dx / dist : 1
-      const dirY = dist > 0 ? dy / dist : 0
+
+      // Calculate direction
+      let dirX = 1, dirY = 0
+
+      if (playerNum === 1) {
+        const canvas = canvasRef.current
+        if (canvas) {
+          const camera = cameraRef.current
+          const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
+          const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
+          const dx = worldMouseX - cell.x
+          const dy = worldMouseY - cell.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          dirX = dist > 0 ? dx / dist : 1
+          dirY = dist > 0 ? dy / dist : 0
+        }
+      } else {
+        // Player 2: toward movement direction (WASD)
+        const input = player2InputRef.current
+        dirX = (input.right ? 1 : 0) - (input.left ? 1 : 0)
+        dirY = (input.down ? 1 : 0) - (input.up ? 1 : 0)
+        const dist = Math.sqrt(dirX * dirX + dirY * dirY)
+        if (dist > 0) { dirX /= dist; dirY /= dist }
+        else { dirX = 1; dirY = 0 }
+      }
 
       // Update cell size
       cell.radius = newRadius
@@ -267,8 +331,8 @@ export function AgarGame() {
 
     behavior.lastDecision = now
 
-    // Find all cells this AI can interact with
-    const allCells = [...playerCellsRef.current, ...aiCellsRef.current.filter(c => c.id !== ai.id)]
+    // Find all cells this AI can interact with (include player 2 in 2P mode)
+    const allCells = [...playerCellsRef.current, ...player2CellsRef.current, ...aiCellsRef.current.filter(c => c.id !== ai.id)]
 
     // Find threats (bigger cells nearby)
     const threats = allCells.filter(c =>
@@ -347,13 +411,20 @@ export function AgarGame() {
 
     // Update player cells
     const playerCells = playerCellsRef.current
+    const player2Cells = player2CellsRef.current
+    const isLocal2P = gameMode === "local_2p"
 
+    // Check for game over conditions
     if (playerCells.length === 0) {
-      endGame()
+      endGame(isLocal2P ? "player1" : undefined)
+      return
+    }
+    if (isLocal2P && player2Cells.length === 0) {
+      endGame("player2")
       return
     }
 
-    // Calculate player center of mass for camera
+    // Calculate player 1 center of mass for camera
     let totalMass = 0
     let centerX = 0
     let centerY = 0
@@ -365,19 +436,34 @@ export function AgarGame() {
       centerY += cell.y * mass
     })
 
-    centerX /= totalMass
-    centerY /= totalMass
+    // In 2P mode, also include player 2 in camera calculation
+    let totalMass2 = 0
+    if (isLocal2P) {
+      player2Cells.forEach(cell => {
+        const mass = getMass(cell.radius)
+        totalMass2 += mass
+        centerX += cell.x * mass
+        centerY += cell.y * mass
+      })
+    }
 
-    // Update score
+    const combinedMass = totalMass + totalMass2
+    centerX /= combinedMass || 1
+    centerY /= combinedMass || 1
+
+    // Update scores
     setScore(Math.floor(totalMass))
+    if (isLocal2P) setScore2(Math.floor(totalMass2))
 
-    // Update camera
-    const targetScale = Math.max(0.3, Math.min(1, 100 / Math.sqrt(totalMass / Math.PI)))
+    // Update camera (zoom out more in 2P mode)
+    const targetScale = isLocal2P
+      ? Math.max(0.2, Math.min(0.7, 80 / Math.sqrt(combinedMass / Math.PI)))
+      : Math.max(0.3, Math.min(1, 100 / Math.sqrt(totalMass / Math.PI)))
     cameraRef.current.scale += (targetScale - cameraRef.current.scale) * 0.05
     cameraRef.current.x += (centerX - cameraRef.current.x) * 0.1
     cameraRef.current.y += (centerY - cameraRef.current.y) * 0.1
 
-    // Move player cells toward mouse
+    // Move player 1 cells toward mouse
     const camera = cameraRef.current
     const worldMouseX = (mouseRef.current.x - canvas.width / 2) / camera.scale + camera.x
     const worldMouseY = (mouseRef.current.y - canvas.height / 2) / camera.scale + camera.y
@@ -410,7 +496,37 @@ export function AgarGame() {
       cell.y = Math.max(cell.radius, Math.min(WORLD_SIZE - cell.radius, cell.y))
     })
 
-    // Merge player cells
+    // Move player 2 cells based on WASD input (in 2P mode)
+    if (isLocal2P) {
+      const p2Input = player2InputRef.current
+      const p2DirX = (p2Input.right ? 1 : 0) - (p2Input.left ? 1 : 0)
+      const p2DirY = (p2Input.down ? 1 : 0) - (p2Input.up ? 1 : 0)
+
+      player2Cells.forEach(cell => {
+        if (p2DirX !== 0 || p2DirY !== 0) {
+          const dist = Math.sqrt(p2DirX * p2DirX + p2DirY * p2DirY)
+          const speed = MAX_SPEED * (INITIAL_RADIUS / cell.radius) * 2
+          cell.vx = (p2DirX / dist) * speed
+          cell.vy = (p2DirY / dist) * speed
+        } else {
+          cell.vx *= 0.9
+          cell.vy *= 0.9
+        }
+
+        if (Math.abs(cell.vx) > MAX_SPEED || Math.abs(cell.vy) > MAX_SPEED) {
+          cell.vx *= 0.95
+          cell.vy *= 0.95
+        }
+
+        cell.x += cell.vx
+        cell.y += cell.vy
+
+        cell.x = Math.max(cell.radius, Math.min(WORLD_SIZE - cell.radius, cell.x))
+        cell.y = Math.max(cell.radius, Math.min(WORLD_SIZE - cell.radius, cell.y))
+      })
+    }
+
+    // Merge player 1 cells
     for (let i = 0; i < playerCells.length; i++) {
       for (let j = i + 1; j < playerCells.length; j++) {
         const a = playerCells[i]
@@ -439,15 +555,42 @@ export function AgarGame() {
         }
       }
     }
-
     playerCellsRef.current = playerCells
 
-    // Check player eating ejected mass
+    // Merge player 2 cells (in 2P mode)
+    if (isLocal2P) {
+      for (let i = 0; i < player2Cells.length; i++) {
+        for (let j = i + 1; j < player2Cells.length; j++) {
+          const a = player2Cells[i]
+          const b = player2Cells[j]
+          const aTime = lastSplitRef.current.get(a.id) || 0
+          const bTime = lastSplitRef.current.get(b.id) || 0
+          if (now - aTime < MERGE_DELAY || now - bTime < MERGE_DELAY) continue
+          const dist = getDistance(a.x, a.y, b.x, b.y)
+          if (dist < Math.max(a.radius, b.radius)) {
+            const newMass = getMass(a.radius) + getMass(b.radius)
+            if (a.radius >= b.radius) {
+              a.radius = getRadiusFromMass(newMass)
+              player2Cells.splice(j, 1)
+              j--
+            } else {
+              b.radius = getRadiusFromMass(newMass)
+              player2Cells.splice(i, 1)
+              i--
+              break
+            }
+          }
+        }
+      }
+      player2CellsRef.current = player2Cells
+    }
+
+    // Check player 1 eating ejected mass
     playerCellsRef.current.forEach(cell => {
       ejectedMassRef.current = ejectedMassRef.current.filter(mass => {
         // Can't eat own mass immediately (simple check: if fast, ignore)
         if (mass.creatorId === cell.id && (Math.abs(mass.vx) > 5 || Math.abs(mass.vy) > 5)) return true
-        
+
         const dist = getDistance(cell.x, cell.y, mass.x, mass.y)
         if (cell.radius > mass.radius * 1.1 && dist < cell.radius - mass.radius * 0.5) {
           cell.radius = getRadiusFromMass(getMass(cell.radius) + EJECT_MASS_VALUE)
@@ -456,6 +599,21 @@ export function AgarGame() {
         return true
       })
     })
+
+    // Check player 2 eating ejected mass (in 2P mode)
+    if (isLocal2P) {
+      player2CellsRef.current.forEach(cell => {
+        ejectedMassRef.current = ejectedMassRef.current.filter(mass => {
+          if (mass.creatorId === cell.id && (Math.abs(mass.vx) > 5 || Math.abs(mass.vy) > 5)) return true
+          const dist = getDistance(cell.x, cell.y, mass.x, mass.y)
+          if (cell.radius > mass.radius * 1.1 && dist < cell.radius - mass.radius * 0.5) {
+            cell.radius = getRadiusFromMass(getMass(cell.radius) + EJECT_MASS_VALUE)
+            return false
+          }
+          return true
+        })
+      })
+    }
 
     // Check player hitting viruses
     const newVirusSplits: Cell[] = []
@@ -508,6 +666,51 @@ export function AgarGame() {
         playerCellsRef.current = [...playerCellsRef.current, ...newVirusSplits]
     }
 
+    // Check player 2 hitting viruses (in 2P mode)
+    if (isLocal2P) {
+      const newVirusSplits2: Cell[] = []
+
+      player2CellsRef.current.forEach((cell) => {
+        let exploded = false
+        virusesRef.current = virusesRef.current.filter(virus => {
+          const dist = getDistance(cell.x, cell.y, virus.x, virus.y)
+          if (dist < cell.radius + virus.radius * 0.5) {
+            if (cell.radius > virus.radius && !exploded) {
+              if (cell.radius >= 35) {
+                exploded = true
+                const spotsAvailable = MAX_CELLS - player2CellsRef.current.length - newVirusSplits2.length
+                const splitCount = Math.min(spotsAvailable, 8)
+                if (splitCount > 0) {
+                  const massPerPiece = getMass(cell.radius) / (splitCount + 1)
+                  cell.radius = getRadiusFromMass(massPerPiece)
+                  for(let i=0; i<splitCount; i++) {
+                    const angle = (Math.PI * 2 * i) / splitCount
+                    newVirusSplits2.push({
+                      id: generateId(),
+                      x: cell.x,
+                      y: cell.y,
+                      radius: getRadiusFromMass(massPerPiece),
+                      color: cell.color,
+                      vx: Math.cos(angle) * 15,
+                      vy: Math.sin(angle) * 15,
+                      isPlayer: true,
+                      name: "Player 2"
+                    })
+                  }
+                }
+                return false
+              }
+            }
+          }
+          return true
+        })
+      })
+
+      if (newVirusSplits2.length > 0) {
+        player2CellsRef.current = [...player2CellsRef.current, ...newVirusSplits2]
+      }
+    }
+
     // Update AI cells
     aiCellsRef.current.forEach(ai => {
       updateAIBehavior(ai, now)
@@ -535,7 +738,7 @@ export function AgarGame() {
       ai.y = Math.max(ai.radius, Math.min(WORLD_SIZE - ai.radius, ai.y))
     })
 
-    // Check player eating food
+    // Check player 1 eating food
     playerCells.forEach(cell => {
       foodRef.current = foodRef.current.filter(food => {
         if (canEat(cell, food)) {
@@ -545,6 +748,19 @@ export function AgarGame() {
         return true
       })
     })
+
+    // Check player 2 eating food (in 2P mode)
+    if (isLocal2P) {
+      player2CellsRef.current.forEach(cell => {
+        foodRef.current = foodRef.current.filter(food => {
+          if (canEat(cell, food)) {
+            cell.radius = getRadiusFromMass(getMass(cell.radius) + getMass(food.radius) * 2)
+            return false
+          }
+          return true
+        })
+      })
+    }
 
     // Check AI eating food
     aiCellsRef.current.forEach(ai => {
@@ -568,7 +784,7 @@ export function AgarGame() {
       })
     }
 
-    // Check player eating AI
+    // Check player 1 eating AI
     playerCells.forEach(playerCell => {
       aiCellsRef.current = aiCellsRef.current.filter(ai => {
         if (canEat(playerCell, ai)) {
@@ -579,7 +795,20 @@ export function AgarGame() {
       })
     })
 
-    // Check AI eating player
+    // Check player 2 eating AI (in 2P mode)
+    if (isLocal2P) {
+      player2CellsRef.current.forEach(p2Cell => {
+        aiCellsRef.current = aiCellsRef.current.filter(ai => {
+          if (canEat(p2Cell, ai)) {
+            p2Cell.radius = getRadiusFromMass(getMass(p2Cell.radius) + getMass(ai.radius))
+            return false
+          }
+          return true
+        })
+      })
+    }
+
+    // Check AI eating player 1
     aiCellsRef.current.forEach(ai => {
       playerCellsRef.current = playerCellsRef.current.filter(playerCell => {
         if (canEat(ai, playerCell)) {
@@ -589,6 +818,44 @@ export function AgarGame() {
         return true
       })
     })
+
+    // Check AI eating player 2 (in 2P mode)
+    if (isLocal2P) {
+      aiCellsRef.current.forEach(ai => {
+        player2CellsRef.current = player2CellsRef.current.filter(p2Cell => {
+          if (canEat(ai, p2Cell)) {
+            ai.radius = getRadiusFromMass(getMass(ai.radius) + getMass(p2Cell.radius))
+            return false
+          }
+          return true
+        })
+      })
+    }
+
+    // Check player vs player eating (in 2P mode)
+    if (isLocal2P) {
+      // Player 1 eating Player 2 cells
+      playerCellsRef.current.forEach(p1Cell => {
+        player2CellsRef.current = player2CellsRef.current.filter(p2Cell => {
+          if (canEat(p1Cell, p2Cell)) {
+            p1Cell.radius = getRadiusFromMass(getMass(p1Cell.radius) + getMass(p2Cell.radius))
+            return false
+          }
+          return true
+        })
+      })
+
+      // Player 2 eating Player 1 cells
+      player2CellsRef.current.forEach(p2Cell => {
+        playerCellsRef.current = playerCellsRef.current.filter(p1Cell => {
+          if (canEat(p2Cell, p1Cell)) {
+            p2Cell.radius = getRadiusFromMass(getMass(p2Cell.radius) + getMass(p1Cell.radius))
+            return false
+          }
+          return true
+        })
+      })
+    }
 
     // Check AI eating AI
     for (let i = 0; i < aiCellsRef.current.length; i++) {
@@ -637,8 +904,14 @@ export function AgarGame() {
       0
     )
 
-    const leaderboardData = [
-      { name: "You", score: playerScore },
+    const player2Score = isLocal2P ? player2CellsRef.current.reduce(
+      (sum, c) => sum + Math.floor(getMass(c.radius)),
+      0
+    ) : 0
+
+    const leaderboardData: { name: string; score: number; isPlayer?: boolean; isPlayer2?: boolean }[] = [
+      { name: isLocal2P ? "Player 1" : "You", score: playerScore, isPlayer: true },
+      ...(isLocal2P ? [{ name: "Player 2", score: player2Score, isPlayer2: true }] : []),
       ...aiCellsRef.current.map(c => ({
         name: c.name || "Bot",
         score: Math.floor(getMass(c.radius))
@@ -765,7 +1038,30 @@ export function AgarGame() {
       ctx.stroke()
     })
 
-    // Draw player cells (on top)
+    // Draw player 2 cells (in 2P mode, drawn before player 1)
+    if (isLocal2P) {
+      player2CellsRef.current.forEach(cell => {
+        ctx.shadowColor = cell.color
+        ctx.shadowBlur = 20
+        ctx.fillStyle = cell.color
+        ctx.beginPath()
+        ctx.arc(cell.x, cell.y, cell.radius, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.shadowBlur = 0
+
+        ctx.strokeStyle = "rgba(255,255,255,0.5)"
+        ctx.lineWidth = 3
+        ctx.stroke()
+
+        ctx.fillStyle = "#ffffff"
+        ctx.font = `bold ${Math.max(14, cell.radius / 3)}px Arial`
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText("P2", cell.x, cell.y)
+      })
+    }
+
+    // Draw player 1 cells (on top)
     playerCellsRef.current.forEach(cell => {
       // Cell body with glow
       ctx.shadowColor = cell.color
@@ -786,14 +1082,14 @@ export function AgarGame() {
       ctx.font = `bold ${Math.max(14, cell.radius / 3)}px Arial`
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
-      ctx.fillText("You", cell.x, cell.y)
+      ctx.fillText(isLocal2P ? "P1" : "You", cell.x, cell.y)
     })
 
     ctx.restore()
 
     // Continue loop
     gameLoopRef.current = requestAnimationFrame(loop)
-  }, [isPlaying, endGame, updateAIBehavior])
+  }, [isPlaying, endGame, updateAIBehavior, gameMode])
 
   // Start/stop game loop
   useEffect(() => {
@@ -842,22 +1138,51 @@ export function AgarGame() {
     }
   }, [])
 
-  // Handle keyboard
+  // Handle keyboard - Player 1: Space=split, E=eject | Player 2: WASD movement, Q=split, Tab=eject
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Player 1 controls
       if (e.code === "Space") {
         e.preventDefault()
-        splitPlayer()
+        splitPlayer(1)
       }
-      if (e.code === "KeyW") {
+      if (e.code === "KeyE") {
         e.preventDefault()
-        ejectMass()
+        ejectMass(1)
+      }
+
+      // Player 2 controls (only in 2P mode)
+      if (gameMode === "local_2p") {
+        if (e.code === "KeyW") player2InputRef.current.up = true
+        if (e.code === "KeyS") player2InputRef.current.down = true
+        if (e.code === "KeyA") player2InputRef.current.left = true
+        if (e.code === "KeyD") player2InputRef.current.right = true
+        if (e.code === "KeyQ") {
+          e.preventDefault()
+          splitPlayer(2)
+        }
+        if (e.code === "Tab") {
+          e.preventDefault()
+          ejectMass(2)
+        }
       }
     }
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      // Player 2 movement release
+      if (e.code === "KeyW") player2InputRef.current.up = false
+      if (e.code === "KeyS") player2InputRef.current.down = false
+      if (e.code === "KeyA") player2InputRef.current.left = false
+      if (e.code === "KeyD") player2InputRef.current.right = false
+    }
+
     window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [splitPlayer, ejectMass])
+    window.addEventListener("keyup", handleKeyUp)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener("keyup", handleKeyUp)
+    }
+  }, [splitPlayer, ejectMass, gameMode])
 
   // Resize canvas
   useEffect(() => {
@@ -902,11 +1227,27 @@ export function AgarGame() {
           <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-4 py-3 rounded-lg min-w-48 border border-white/10">
             {/* Score at top */}
             <div className="text-center mb-3 pb-3 border-b border-white/20">
-              <p className="text-gray-400 text-xs uppercase tracking-wider">Score</p>
-              <p className="text-white text-2xl font-bold">{score.toLocaleString()}</p>
-              <p className="text-gray-500 text-xs">Cells: {playerCellsRef.current.length}</p>
+              {gameMode === "local_2p" ? (
+                <div className="flex gap-4 justify-center">
+                  <div>
+                    <p className="text-cyan-400 text-xs uppercase tracking-wider">P1</p>
+                    <p className="text-cyan-400 text-xl font-bold">{score.toLocaleString()}</p>
+                  </div>
+                  <div className="border-l border-white/20" />
+                  <div>
+                    <p className="text-red-400 text-xs uppercase tracking-wider">P2</p>
+                    <p className="text-red-400 text-xl font-bold">{score2.toLocaleString()}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-xs uppercase tracking-wider">Score</p>
+                  <p className="text-white text-2xl font-bold">{score.toLocaleString()}</p>
+                  <p className="text-gray-500 text-xs">Cells: {playerCellsRef.current.length}</p>
+                </>
+              )}
             </div>
-            
+
             {/* Leaderboard */}
             <h3 className="text-white font-bold mb-2 text-center text-sm">Leaderboard</h3>
             <div className="space-y-1">
@@ -915,7 +1256,9 @@ export function AgarGame() {
                   key={i}
                   className={cn(
                     "flex justify-between text-sm",
-                    entry.name === "You" ? "text-cyan-400 font-bold" : "text-gray-300"
+                    entry.isPlayer ? "text-cyan-400 font-bold" : "",
+                    entry.isPlayer2 ? "text-red-400 font-bold" : "",
+                    !entry.isPlayer && !entry.isPlayer2 ? "text-gray-300" : ""
                   )}
                 >
                   <span>{i + 1}. {entry.name}</span>
@@ -926,56 +1269,98 @@ export function AgarGame() {
           </div>
 
           {/* Controls hint */}
-          <div className="absolute bottom-4 left-4 bg-black/50 px-4 py-2 rounded-lg">
-            <p className="text-gray-400 text-sm">Mouse to move • Space to split</p>
+          <div className="absolute bottom-4 left-4 bg-black/50 px-4 py-2 rounded-lg hidden md:block">
+            {gameMode === "local_2p" ? (
+              <div className="text-gray-400 text-xs">
+                <p className="text-cyan-400">P1: Mouse • Space split • E eject</p>
+                <p className="text-red-400">P2: WASD • Q split • Tab eject</p>
+              </div>
+            ) : (
+              <p className="text-gray-400 text-sm">Mouse to move • Space to split • E to eject</p>
+            )}
           </div>
 
-          {/* Split button for mobile */}
-          <Button
-            className="absolute bottom-4 right-4 md:hidden"
-            size="lg"
-            onClick={splitPlayer}
-          >
-            Split
-          </Button>
+          {/* Mobile buttons */}
+          <div className="absolute bottom-4 right-4 md:hidden flex gap-2">
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => ejectMass(1)}
+              className="h-14 w-14 rounded-full"
+            >
+              <Zap className="h-6 w-6" />
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => splitPlayer(1)}
+              className="h-14 w-14 rounded-full bg-cyan-600"
+            >
+              <Split className="h-6 w-6" />
+            </Button>
+          </div>
         </>
       )}
 
-      {/* Start/Game Over overlay */}
+      {/* Menu / Game Over overlay */}
       {(!isPlaying || gameOver) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm z-30">
           {gameOver ? (
             <>
-              <h1 className="text-4xl font-bold text-red-500 mb-4">Game Over</h1>
-              <p className="text-xl text-white mb-2">Final Score: {score.toLocaleString()}</p>
-              {score >= highScore && score > 0 && (
-                <p className="text-yellow-400 font-bold mb-4 animate-pulse">New High Score!</p>
+              {gameMode === "local_2p" && winner ? (
+                <>
+                  <h1 className={`text-5xl font-bold mb-4 ${winner === "player1" ? "text-cyan-400" : "text-red-400"}`}>
+                    {winner === "player1" ? "PLAYER 1 WINS!" : "PLAYER 2 WINS!"}
+                  </h1>
+                  <p className="text-xl text-white mb-4">
+                    Final Scores: <span className="text-cyan-400">{score.toLocaleString()}</span> vs <span className="text-red-400">{score2.toLocaleString()}</span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-4xl font-bold text-red-500 mb-4">Game Over</h1>
+                  <p className="text-xl text-white mb-2">Final Score: {score.toLocaleString()}</p>
+                  {score >= highScore && score > 0 && (
+                    <p className="text-yellow-400 font-bold mb-4 animate-pulse">New High Score!</p>
+                  )}
+                </>
               )}
-              <Button onClick={startGame} size="lg" className="gap-2">
-                <RotateCcw className="h-5 w-5" /> Play Again
-              </Button>
+              <div className="flex gap-3">
+                <Button onClick={() => startGame(gameMode)} size="lg" className="gap-2">
+                  <RotateCcw className="h-5 w-5" /> Play Again
+                </Button>
+                <Button onClick={() => { setGameOver(false); setGameMode("menu") }} size="lg" variant="outline" className="border-white/20">
+                  Main Menu
+                </Button>
+              </div>
             </>
-          ) : (
+          ) : gameMode === "menu" ? (
             <>
               <h1 className="text-5xl font-bold text-cyan-400 mb-6">Agar Clone</h1>
 
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-8">
                 <Trophy className="w-6 h-6 text-yellow-500" />
                 <span className="text-white text-lg">High Score: {highScore.toLocaleString()}</span>
               </div>
 
-              <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6">
-                <Play className="h-6 w-6" /> Start Game
-              </Button>
+              <div className="flex flex-col gap-4">
+                <Button onClick={() => startGame("single")} size="lg" className="gap-3 text-lg px-8 py-6 bg-cyan-600 hover:bg-cyan-500">
+                  <Bot className="h-6 w-6" /> Single Player
+                </Button>
+                <Button onClick={() => startGame("local_2p")} size="lg" className="gap-3 text-lg px-8 py-6 bg-green-600 hover:bg-green-500">
+                  <Users className="h-6 w-6" /> Local 2 Player
+                </Button>
+              </div>
 
               <div className="mt-8 text-gray-400 text-center max-w-md">
-                <p className="mb-2">Move your mouse to control your cell</p>
                 <p className="mb-2">Eat smaller cells and food to grow</p>
                 <p className="mb-2">Avoid larger cells or be eaten!</p>
-                <p className="text-sm text-gray-500 mt-4">Press SPACE to split • Tap split button on mobile</p>
+                <p className="text-sm text-gray-500 mt-4">
+                  <span className="text-cyan-400">P1:</span> Mouse • Space split • E eject<br />
+                  <span className="text-red-400">P2:</span> WASD • Q split • Tab eject
+                </p>
               </div>
             </>
-          )}
+          ) : null}
         </div>
       )}
     </div>
