@@ -4,7 +4,7 @@ import { Mic, MicOff, Send, Bot, User, Sparkles, Volume2, VolumeX, Loader2 } fro
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
-import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis"
+import { useSpeechController } from "@/context/speech-context"
 
 interface Message {
   id: string
@@ -38,14 +38,14 @@ export function AskAboutMe() {
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
-  // Text-to-Speech via shared hook (handles Chrome voice loading + autoplay policy)
+  // Text-to-Speech via shared speech controller
   const {
-    speak: speakResponse,
-    stop: stopSpeaking,
+    speakText: speakResponse,
+    stopSpeaking,
     isSpeaking,
-    enabled: speechEnabled,
-    setEnabled: setSpeechEnabled,
-  } = useSpeechSynthesis({ debug: false })
+    speechEnabled,
+    setSpeechEnabled,
+  } = useSpeechController()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,17 +73,15 @@ export function AskAboutMe() {
       return
     }
 
-    // Stop any existing recognition
     if (recognitionRef.current) {
       try { recognitionRef.current.abort() } catch { /* ignore */ }
       recognitionRef.current = null
     }
 
-    // Small delay to ensure cleanup
     setTimeout(() => {
       try {
         const recognition = new SpeechRecognitionCtor()
-        recognition.continuous = false // Single-shot mode for reliability
+        recognition.continuous = false
         recognition.interimResults = true
         recognition.lang = "en-US"
         recognition.maxAlternatives = 1
@@ -113,14 +111,11 @@ export function AskAboutMe() {
         }
 
         recognition.onstart = () => {
-          console.log('[AskAboutMe] Speech recognition started')
           setIsListening(true)
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onerror = (event: any) => {
-          console.error('[AskAboutMe] Speech recognition error:', event.error)
-          // Don't show error for no-speech or aborted
           if (event.error !== "aborted" && event.error !== "no-speech") {
             setIsListening(false)
             setInterimTranscript("")
@@ -128,7 +123,6 @@ export function AskAboutMe() {
         }
 
         recognition.onend = () => {
-          console.log('[AskAboutMe] Speech recognition ended')
           setIsListening(false)
           setInterimTranscript("")
           recognitionRef.current = null
@@ -136,8 +130,7 @@ export function AskAboutMe() {
 
         recognitionRef.current = recognition
         recognition.start()
-      } catch (e) {
-        console.error('[AskAboutMe] Failed to start recognition:', e)
+      } catch {
         setIsListening(false)
       }
     }, 150)
@@ -227,8 +220,7 @@ export function AskAboutMe() {
       }
       setMessages(prev => [...prev, assistantMessage])
 
-      // Speak the response
-      speakResponse(response)
+      speakResponse(response, undefined, { source: "ask" })
     } finally {
       setIsProcessing(false)
     }
@@ -422,7 +414,7 @@ export function AskAboutMe() {
 
                 {isListening ? (
                   <p className="text-xs text-center text-muted-foreground mt-2">
-                    🎤 Speak now... click mic or press Enter when done
+                    Speak now... click mic or press Enter when done
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
