@@ -38,13 +38,25 @@ export class VoiceCommandRouter {
     const normalizedTranscript = transcript.toLowerCase().trim();
     console.log('[VoiceCommandRouter] Processing:', normalizedTranscript);
 
-    // Build full context
-    const fullContext: CommandContext = {
-      transcript: normalizedTranscript,
-      conversationHistory: context.conversationHistory || [],
-      currentPage: context.currentPage || getVoiceStocksDOMNavigator().getVSPageMap(),
-      tourState: context.tourState || guidedTour.getState(),
-    };
+    // Build full context with safe defaults
+    let fullContext: CommandContext;
+    try {
+      fullContext = {
+        transcript: normalizedTranscript,
+        conversationHistory: context.conversationHistory || [],
+        currentPage: context.currentPage || getVoiceStocksDOMNavigator().getVSPageMap(),
+        tourState: context.tourState || guidedTour.getState(),
+      };
+    } catch (contextError) {
+      console.error('[VoiceCommandRouter] Error building context:', contextError);
+      // Use minimal context if page map generation fails
+      fullContext = {
+        transcript: normalizedTranscript,
+        conversationHistory: context.conversationHistory || [],
+        currentPage: { sections: [], navigation: [], buttons: [], forms: [], media: [], landmarks: [], lastUpdated: Date.now() },
+        tourState: { isActive: false, currentStepIndex: -1, tourConfig: null, completedSteps: [] },
+      };
+    }
 
     // Try custom commands first (higher priority)
     for (const command of this.customCommands) {
@@ -76,6 +88,12 @@ export class VoiceCommandRouter {
           }
         } catch (error) {
           console.error(`[VoiceCommandRouter] Command error:`, error);
+          // Return a handled response on error instead of falling through to AI
+          return {
+            handled: true,
+            response: "I understood your command but had trouble executing it. Please try again.",
+            shouldSpeak: true,
+          };
         }
       }
     }
@@ -379,15 +397,25 @@ export class VoiceCommandRouter {
       };
     }
 
-    console.log('[VoiceCommandRouter] Starting auto tour...');
-    await startAutoTour();
-    console.log('[VoiceCommandRouter] Auto tour started');
+    try {
+      console.log('[VoiceCommandRouter] Starting auto tour...');
+      await startAutoTour();
+      console.log('[VoiceCommandRouter] Auto tour started');
 
-    return {
-      handled: true,
-      response: "I'll give you a tour of this page. Say 'next' to continue or 'end tour' to stop at any time.",
-      shouldSpeak: true,
-    };
+      return {
+        handled: true,
+        response: "I'll give you a tour of this page. Say 'next' to continue or 'end tour' to stop at any time.",
+        shouldSpeak: true,
+      };
+    } catch (tourError) {
+      console.error('[VoiceCommandRouter] Tour start error:', tourError);
+      // Return a graceful response even if tour fails to start
+      return {
+        handled: true,
+        response: "I'd love to give you a tour, but I'm having trouble scanning the page right now. You can explore the sections above - there's info about Daniel's skills, projects, and experience!",
+        shouldSpeak: true,
+      };
+    }
   }
 
   private async handleTourNext(): Promise<CommandResult> {
