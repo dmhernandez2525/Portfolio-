@@ -36,6 +36,7 @@ export class VoiceCommandRouter {
    */
   async process(transcript: string, context: Partial<CommandContext> = {}): Promise<CommandResult> {
     const normalizedTranscript = transcript.toLowerCase().trim();
+    console.log('[VoiceCommandRouter] Processing:', normalizedTranscript);
 
     // Build full context
     const fullContext: CommandContext = {
@@ -65,8 +66,10 @@ export class VoiceCommandRouter {
     for (const command of this.commands) {
       const match = normalizedTranscript.match(command.pattern);
       if (match) {
+        console.log('[VoiceCommandRouter] Matched pattern:', command.pattern, 'for:', command.description);
         try {
           const result = await command.handler(match, fullContext);
+          console.log('[VoiceCommandRouter] Handler result:', result);
           // Continue checking if handler deferred (handled: false, passToAI: false)
           if (result.handled || result.passToAI) {
             return result;
@@ -367,6 +370,7 @@ export class VoiceCommandRouter {
   // ============================================================================
 
   private async handleStartTour(): Promise<CommandResult> {
+    console.log('[VoiceCommandRouter] handleStartTour called');
     if (guidedTour.getState().isActive) {
       return {
         handled: true,
@@ -375,7 +379,9 @@ export class VoiceCommandRouter {
       };
     }
 
+    console.log('[VoiceCommandRouter] Starting auto tour...');
     await startAutoTour();
+    console.log('[VoiceCommandRouter] Auto tour started');
 
     return {
       handled: true,
