@@ -5,6 +5,7 @@ import { ArrowRight, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { Timeline } from "@/components/ui/Timeline"
 import { SketchToBlueprint } from "@/components/ui/SketchToBlueprint"
 import { Button } from "@/components/ui/button"
+import { AskAIMini } from "@/components/voice-assistant"
 import { timelineData } from "@/data/timeline"
 
 // Photo data for the carousel - The Journey from waiter to senior engineer
@@ -341,6 +342,14 @@ export function About() {
           
           {/* Photo Carousel */}
           <PhotoCarousel />
+
+          {/* AI CTA */}
+          <div className="flex justify-center mt-8">
+            <AskAIMini
+              text="Want to know more about my journey?"
+              variant="accent"
+            />
+          </div>
         </motion.div>
       </div>
     </section>

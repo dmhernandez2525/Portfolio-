@@ -272,8 +272,9 @@ export class VoiceStocksDOMNavigator {
       forms.push({
         id: el.id || this.generateId('form'),
         element: el,
-        name: el.name || undefined,
-        action: el.action || undefined,
+        // Use getAttribute to avoid DOM quirk where el.name returns an element if there's an input named "name"
+        name: el.getAttribute('name') || undefined,
+        action: el.getAttribute('action') || undefined,
         fields,
       });
     });

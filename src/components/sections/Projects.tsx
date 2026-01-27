@@ -5,6 +5,7 @@ import { Github, ExternalLink, Sparkles, Zap, Code2, Cpu, Globe, Gamepad2, Wrenc
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
+import { AskAIMini } from "@/components/voice-assistant"
 import { projectsData, getProjectsByTier } from "@/data/projects"
 import type { ProjectItem, ProjectTier, ProjectCategory, ProjectStatus } from "@/data/projects"
 
@@ -370,6 +371,19 @@ export function Projects() {
               <ProjectCard key={project.id} project={project} index={index} />
             ))}
           </AnimatePresence>
+        </motion.div>
+
+        {/* AI CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-12"
+        >
+          <AskAIMini
+            text="Interested in a specific project?"
+            variant="default"
+          />
         </motion.div>
 
       </div>

@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom"
 import { Header } from "@/components/shared/Header"
 import { Footer } from "@/components/shared/Footer"
+import { AIAssistant } from "@/components/voice-assistant"
 
 export function RootLayout() {
   return (
@@ -10,6 +11,8 @@ export function RootLayout() {
         <Outlet />
       </main>
       <Footer />
+      {/* AI Assistant - TourPlayer and Dialog, persists across all pages */}
+      <AIAssistant />
     </div>
   )
 }

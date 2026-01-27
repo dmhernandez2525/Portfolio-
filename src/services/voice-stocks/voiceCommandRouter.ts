@@ -14,6 +14,7 @@ import type {
 import { getVoiceStocksDOMNavigator } from './domNavigator';
 import { scrollAndHighlight, clearHighlights } from './highlightSystem';
 import { guidedTour, startAutoTour, endTour, nextTourStep, previousTourStep } from './guidedTour';
+import { navigationService } from './navigationService';
 
 export class VoiceCommandRouter {
   private static instance: VoiceCommandRouter;
@@ -202,7 +203,31 @@ export class VoiceCommandRouter {
         category: 'tour',
       },
       {
-        pattern: /^(?:show me around|walk me through)$/i,
+        pattern: /^(?:can you |please |could you )?(?:start|begin|give me)\s*(?:a |the )?tour\s*(?:again|please)?$/i,
+        handler: this.handleStartTour.bind(this),
+        description: '"Can you start the tour" - Start guided tour',
+        category: 'tour',
+      },
+      {
+        pattern: /^(?:restart|redo)\s*(?:the\s+)?tour$/i,
+        handler: this.handleStartTour.bind(this),
+        description: '"Restart tour" - Restart guided tour',
+        category: 'tour',
+      },
+      {
+        pattern: /^(?:another|new)\s+tour$/i,
+        handler: this.handleStartTour.bind(this),
+        description: '"Another tour" - Start a new tour',
+        category: 'tour',
+      },
+      {
+        pattern: /^tour\s*(?:again|please)?$/i,
+        handler: this.handleStartTour.bind(this),
+        description: '"Tour" - Start guided tour',
+        category: 'tour',
+      },
+      {
+        pattern: /^(?:show me around|walk me through)(?:\s+(?:the\s+)?(?:site|page|portfolio))?$/i,
         handler: this.handleStartTour.bind(this),
         description: '"Show me around" - Start guided tour',
         category: 'tour',
@@ -226,9 +251,15 @@ export class VoiceCommandRouter {
         category: 'tour',
       },
       {
-        pattern: /^(?:end|stop|exit)\s*(?:the\s+)?tour$/i,
+        pattern: /^(?:end|stop|exit|finish|quit)\s*(?:the\s+)?tour$/i,
         handler: this.handleEndTour.bind(this),
         description: '"End tour" - Stop the guided tour',
+        category: 'tour',
+      },
+      {
+        pattern: /^(?:tell me more|more info|more details|explain)(?:\s+about)?(?:\s+(?:this|the|that))?\s*(?:section)?$/i,
+        handler: this.handleTellMeMore.bind(this),
+        description: '"Tell me more" - Get more details about current section',
         category: 'tour',
       }
     );
@@ -280,9 +311,29 @@ export class VoiceCommandRouter {
 
   private async handleNavigate(match: RegExpMatchArray): Promise<CommandResult> {
     const target = match[1].trim();
-    const navigator = getVoiceStocksDOMNavigator();
 
-    // Try to find the element
+    // First, try the navigation service (handles both routes and sections)
+    const navResult = await navigationService.navigateTo(target);
+
+    if (navResult.success) {
+      // If it was a section navigation, also highlight the element
+      if (navResult.type === 'section') {
+        const navigator = getVoiceStocksDOMNavigator();
+        const element = navigator.findElementByDescription(target);
+        if (element) {
+          await scrollAndHighlight(element, { position: 'center' }, { dimBackground: false, duration: 3000 });
+        }
+      }
+
+      return {
+        handled: true,
+        response: navResult.message,
+        shouldSpeak: true,
+      };
+    }
+
+    // Fall back to DOM-based search
+    const navigator = getVoiceStocksDOMNavigator();
     const element = navigator.findElementByDescription(target);
 
     if (element) {
@@ -489,6 +540,27 @@ export class VoiceCommandRouter {
       handled: true,
       response: 'Tour ended. Feel free to explore on your own or ask me anything.',
       shouldSpeak: true,
+    };
+  }
+
+  private handleTellMeMore(): CommandResult {
+    // If tour is active, provide more detail about current step
+    if (guidedTour.getState().isActive) {
+      const currentStep = guidedTour.getCurrentStep();
+      if (currentStep) {
+        // The voiceScript has detailed info, speak it again
+        return {
+          handled: true,
+          response: currentStep.voiceScript || currentStep.description,
+          shouldSpeak: true,
+        };
+      }
+    }
+
+    // If no tour or no current step, pass to AI
+    return {
+      handled: false,
+      passToAI: true,
     };
   }
 
