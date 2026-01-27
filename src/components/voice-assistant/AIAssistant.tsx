@@ -649,13 +649,40 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">Ask About Daniel</div>
-              {/* Voice status indicator */}
-              {speechEnabled && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Volume2 className="w-3 h-3" />
-                  <span>{voicesLoaded ? "Voice on" : "Loading..."}</span>
-                </div>
-              )}
+              {/* Voice status indicator with test button */}
+              <div className="flex items-center gap-2">
+                {speechEnabled && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Volume2 className="w-3 h-3" />
+                    <span>{voicesLoaded ? "Voice on" : "Loading..."}</span>
+                  </div>
+                )}
+                {/* Debug test button - click to test TTS directly */}
+                <button
+                  onClick={() => {
+                    console.log('[TTS TEST] Direct test button clicked')
+                    if (!window.speechSynthesis) {
+                      console.error('[TTS TEST] speechSynthesis not available!')
+                      alert('Speech synthesis not available in this browser')
+                      return
+                    }
+                    window.speechSynthesis.cancel()
+                    const testUtterance = new SpeechSynthesisUtterance('Hello! This is a test of the speech synthesis.')
+                    testUtterance.volume = 1
+                    testUtterance.rate = 1
+                    testUtterance.onstart = () => console.log('[TTS TEST] Started!')
+                    testUtterance.onend = () => console.log('[TTS TEST] Ended!')
+                    testUtterance.onerror = (e) => console.error('[TTS TEST] Error:', e)
+                    console.log('[TTS TEST] Calling speak()...')
+                    window.speechSynthesis.speak(testUtterance)
+                    console.log('[TTS TEST] speak() called')
+                  }}
+                  className="text-[10px] px-1.5 py-0.5 bg-muted rounded hover:bg-muted/80"
+                  title="Test TTS directly"
+                >
+                  Test
+                </button>
+              </div>
             </DialogTitle>
             <DialogDescription className="sr-only">
               Chat with Daniel's AI assistant to learn about his skills, projects, and experience.
