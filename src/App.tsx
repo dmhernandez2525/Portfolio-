@@ -41,6 +41,14 @@ function App() {
   useEffect(() => {
     logConsoleEasterEgg()
 
+    // Disable browser scroll restoration to prevent unwanted scroll on refresh
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    // Force scroll to top on initial load
+    window.scrollTo(0, 0)
+
     // Right-click easter egg
     const handleContextMenu = () => {
       // Don't prevent default - just show the toast briefly

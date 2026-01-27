@@ -14,13 +14,18 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       touchMultiplier: 2,
     })
 
-    // Animation frame loop
+    // Ensure scroll starts at top after Lenis initializes
+    lenisRef.current.scrollTo(0, { immediate: true })
+
+    // Animation frame loop - store ID for cleanup
+    let animationFrameId: number
+
     function raf(time: number) {
       lenisRef.current?.raf(time)
-      requestAnimationFrame(raf)
+      animationFrameId = requestAnimationFrame(raf)
     }
 
-    requestAnimationFrame(raf)
+    animationFrameId = requestAnimationFrame(raf)
 
     // Handle anchor link clicks for smooth scrolling to sections
     const handleAnchorClick = (e: MouseEvent) => {
@@ -44,6 +49,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     document.addEventListener("click", handleAnchorClick)
 
     return () => {
+      cancelAnimationFrame(animationFrameId)
       document.removeEventListener("click", handleAnchorClick)
       lenisRef.current?.destroy()
     }
