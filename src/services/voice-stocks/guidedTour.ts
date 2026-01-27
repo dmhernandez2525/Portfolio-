@@ -33,6 +33,7 @@ export class GuidedTourService {
   private static instance: GuidedTourService;
   private state: TourState;
   private stepTimeout: ReturnType<typeof setTimeout> | null = null;
+  private isTransitioning: boolean = false;
   private onStepChangeCallbacks: Set<(step: TourStep | null, index: number) => void> = new Set();
   private onTourEndCallbacks: Set<() => void> = new Set();
   private onSpeakCallbacks: Set<(text: string) => void> = new Set();
@@ -78,13 +79,27 @@ export class GuidedTourService {
           title: 'Navigation',
           description: 'Use the navigation menu to jump to different sections of the page.',
           action: 'highlight',
-          voiceScript: 'At the top you\'ll find the navigation menu. You can use these links to quickly jump to any section.',
+          voiceScript: 'Let\'s start at the top! Here\'s the navigation bar. Click any link to jump straight to that section, or just follow along with me.',
         });
       }
     }
 
-    // Section steps
-    for (const section of pageMap.sections) {
+    // Sort sections by their CURRENT vertical position (top to bottom)
+    // Get fresh bounding rects since cached values may be stale
+    const sortedSections = [...pageMap.sections].sort((a, b) => {
+      const rectA = a.element.getBoundingClientRect();
+      const rectB = b.element.getBoundingClientRect();
+      // Add scroll position to get absolute position on page
+      const topA = rectA.top + window.scrollY;
+      const topB = rectB.top + window.scrollY;
+      return topA - topB;
+    });
+
+    // Track seen content types to avoid duplicates (e.g., two "hero" sections)
+    const seenDescriptions = new Set<string>();
+
+    // Section steps (now in proper top-to-bottom order)
+    for (const section of sortedSections) {
       if (steps.length >= maxSteps) break;
 
       // Skip very small sections
@@ -92,6 +107,11 @@ export class GuidedTourService {
 
       const stepInfo = this.createStepFromSection(section);
       if (stepInfo) {
+        // Skip if we've already seen this type of content
+        if (seenDescriptions.has(stepInfo.description)) {
+          continue;
+        }
+        seenDescriptions.add(stepInfo.description);
         steps.push(stepInfo);
       }
     }
@@ -130,6 +150,7 @@ export class GuidedTourService {
       this.endTour();
     }
 
+    this.isTransitioning = false;
     this.state = {
       isActive: true,
       currentStepIndex: -1,
@@ -155,6 +176,10 @@ export class GuidedTourService {
   async nextStep(): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
 
+    // Prevent rapid transitions - debounce
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
     // Clear any pending timeout
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -164,6 +189,7 @@ export class GuidedTourService {
     const nextIndex = this.state.currentStepIndex + 1;
 
     if (nextIndex >= this.state.tourConfig.steps.length) {
+      this.isTransitioning = false;
       this.endTour();
       return;
     }
@@ -177,11 +203,18 @@ export class GuidedTourService {
     this.state.currentStepIndex = nextIndex;
     const step = this.state.tourConfig.steps[nextIndex];
 
-    // Execute step
-    await this.executeStep(step);
+    try {
+      // Execute step
+      await this.executeStep(step);
 
-    // Notify callbacks
-    this.notifyStepChange(step, nextIndex);
+      // Notify callbacks
+      this.notifyStepChange(step, nextIndex);
+    } finally {
+      // Allow next transition after a short delay
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
   /**
@@ -190,6 +223,10 @@ export class GuidedTourService {
   async previousStep(): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
 
+    // Prevent rapid transitions - debounce
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
       this.stepTimeout = null;
@@ -197,13 +234,23 @@ export class GuidedTourService {
 
     const prevIndex = this.state.currentStepIndex - 1;
 
-    if (prevIndex < 0) return;
+    if (prevIndex < 0) {
+      this.isTransitioning = false;
+      return;
+    }
 
     this.state.currentStepIndex = prevIndex;
     const step = this.state.tourConfig.steps[prevIndex];
 
-    await this.executeStep(step);
-    this.notifyStepChange(step, prevIndex);
+    try {
+      await this.executeStep(step);
+      this.notifyStepChange(step, prevIndex);
+    } finally {
+      // Allow next transition after a short delay
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
   /**
@@ -211,6 +258,10 @@ export class GuidedTourService {
    */
   async skipToStep(stepIdOrIndex: string | number): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
+
+    // Prevent rapid transitions - debounce
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
 
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -221,17 +272,30 @@ export class GuidedTourService {
 
     if (typeof stepIdOrIndex === 'string') {
       index = this.state.tourConfig.steps.findIndex(s => s.id === stepIdOrIndex);
-      if (index === -1) return;
+      if (index === -1) {
+        this.isTransitioning = false;
+        return;
+      }
     } else {
       index = stepIdOrIndex;
-      if (index < 0 || index >= this.state.tourConfig.steps.length) return;
+      if (index < 0 || index >= this.state.tourConfig.steps.length) {
+        this.isTransitioning = false;
+        return;
+      }
     }
 
     this.state.currentStepIndex = index;
     const step = this.state.tourConfig.steps[index];
 
-    await this.executeStep(step);
-    this.notifyStepChange(step, index);
+    try {
+      await this.executeStep(step);
+      this.notifyStepChange(step, index);
+    } finally {
+      // Allow next transition after a short delay
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
   /**
@@ -266,6 +330,7 @@ export class GuidedTourService {
     }
 
     clearHighlights();
+    this.isTransitioning = false;
 
     this.state = {
       isActive: false,
@@ -373,11 +438,11 @@ export class GuidedTourService {
       return;
     }
 
-    // Clear previous highlights
+    // Clear previous highlights first
     clearHighlights();
 
-    // Wait a moment for visual transition
-    await this.sleep(100);
+    // Wait for previous highlights to fully clear
+    await this.sleep(200);
 
     // Execute highlight action
     switch (step.action) {
@@ -389,6 +454,7 @@ export class GuidedTourService {
         break;
       case 'point':
         await highlightSystem.scrollTo(element, { position: 'center' });
+        await this.sleep(100); // Wait for scroll to settle
         highlightSystem.pointTo(element);
         break;
       case 'highlight':
@@ -421,46 +487,55 @@ export class GuidedTourService {
     if (!title || title === 'Untitled Section') return null;
 
     const titleLower = title.toLowerCase();
+    // Also check element ID and data attributes for more accurate matching
+    const elementId = section.element.id?.toLowerCase() || '';
+    const dataSection = section.element.getAttribute('data-section')?.toLowerCase() || '';
+    const combinedText = `${titleLower} ${elementId} ${dataSection}`;
+
     let description = '';
     let voiceScript = '';
 
-    // Generate rich, contextual descriptions with more detail
-    if (titleLower.includes('hero') || section.level === 1) {
-      description = 'The main introduction showcasing who Daniel is and what he does. This is where visitors get their first impression.';
-      voiceScript = `Welcome! This is Daniel's portfolio homepage. Here you'll see a brief introduction and can get a quick sense of his work as a Senior Software Engineer. Notice the call-to-action buttons that let you explore projects, learn more about his background, or get in touch directly. You can say "tell me more" to dive deeper into any topic.`;
-    } else if (titleLower.includes('unconventional') || titleLower.includes('path')) {
-      description = 'The unique journey from GED to Senior Engineer - a story of determination and self-teaching.';
-      voiceScript = `This is Daniel's story - "The Unconventional Path." He went from working as a waiter and getting his GED to becoming a Principal Software Engineer. This section highlights his journey through self-teaching, hustle, and determination. It's a testament to what's possible when you bet on yourself. Want to know more about his philosophy? Just ask!`;
-    } else if (titleLower.includes('about')) {
-      description = 'Learn about Daniel\'s background, journey from self-taught developer to Senior Engineer, and what drives him.';
-      voiceScript = `Here's the About section. Daniel's journey is unique - from starting a lawn care business as a teenager to becoming a Principal Engineer working on Department of Defense applications. He's self-taught, with no traditional CS degree, proving that passion and persistence can overcome any obstacle. Notice the photo carousel showing his journey - from coding at 2 AM to speaking at tech events. Feel free to ask me anything about his background!`;
-    } else if (titleLower.includes('journey')) {
-      description = 'A visual timeline showing the path from bootcamp grind to senior engineer through photos and milestones.';
-      voiceScript = `This is "The Journey" - a photo gallery documenting Daniel's evolution as a developer. From late-night coding sessions studying Python at Steak n Shake, to building mind-controlled VR applications, to his current role as a Senior Engineer. Each photo tells part of the story. You can click through to see more, or ask me about any specific moment!`;
-    } else if (titleLower.includes('project') || titleLower.includes('work') || titleLower.includes('portfolio')) {
-      description = 'A curated collection of projects showcasing full-stack development, AI integration, and creative problem-solving.';
-      voiceScript = `Welcome to the Projects section! Here you'll find Daniel's most impactful work - from enterprise applications to creative experiments. Each project demonstrates different skills: React and TypeScript for frontend, Node and Python for backend, and integration with AI services. Click any project card to see details, live demos, and the technology stack used. Want to hear about a specific project? Just ask!`;
-    } else if (titleLower.includes('skill') || titleLower.includes('technolog') || titleLower.includes('expertise')) {
-      description = 'A comprehensive overview of technical expertise including frontend, backend, DevOps, and emerging technologies.';
-      voiceScript = `This section breaks down Daniel's technical toolkit. On the frontend: React, TypeScript, Next.js, and modern CSS frameworks. Backend: Node.js, Python, Django, and various databases. Plus DevOps experience with Docker, AWS, and CI/CD pipelines. He's also been diving deep into AI and machine learning. The skill bars show proficiency levels based on years of experience and project complexity. Curious about his experience with any specific technology? Feel free to ask!`;
-    } else if (titleLower.includes('experience') || titleLower.includes('career') || titleLower.includes('professional')) {
-      description = 'Professional experience spanning startups, enterprise companies, and Department of Defense contractors.';
-      voiceScript = `Here's Daniel's professional timeline. Most recently at BrainGu, building software for Space Force, Air Force, and Navy applications. Before that, he co-founded Tailored Technologies, a custom software consultancy. He's also worked at enterprise companies like Mesirow Financial and First American. Each role expanded his skills - from early freelance work to leading engineering teams. Click any entry to see more details about technologies used and accomplishments!`;
-    } else if (titleLower.includes('contact')) {
-      description = 'Multiple ways to get in touch - whether for job opportunities, collaborations, or just to say hello.';
-      voiceScript = `Ready to connect? This is the contact section. You can send a direct message through the form, or reach out via LinkedIn, GitHub, or email. Daniel is currently open to new opportunities and always happy to discuss interesting projects. Whether you're hiring, want to collaborate, or just want to chat about tech - don't hesitate to reach out!`;
-    } else if (titleLower.includes('globe') || titleLower.includes('location')) {
-      description = 'An interactive 3D globe showing Daniel\'s location and reach.';
-      voiceScript = `This interactive globe shows Daniel's current location and the global reach of his work. He's based in the United States but has worked with clients and teams worldwide. The visualization is built with Three.js - one of the many creative technologies he enjoys working with!`;
-    } else if (titleLower.includes('invention') || titleLower.includes('maker') || titleLower.includes('hardware')) {
-      description = 'Hardware projects and inventions showcasing the maker side of engineering.';
-      voiceScript = `Beyond software, Daniel loves building physical things. This section showcases his inventions and hardware projects - from 3D printed solutions to Arduino-based gadgets. He applies the same systems thinking to hardware as he does to software. Want to hear about a specific project? Just ask!`;
-    } else if (titleLower.includes('game')) {
-      description = 'A collection of games built as learning projects and creative experiments.';
-      voiceScript = `Welcome to the games section! These aren't just for fun - each game was a learning opportunity to explore different programming concepts. From classic games like Tetris and Snake to more complex multiplayer experiences. You can actually play them right in your browser! Which one would you like to try?`;
+    // Generate engaging, conversational descriptions
+    // Order matters! More specific matches first, then general ones
+
+    // Check for globe/3D elements first (very specific)
+    if (combinedText.includes('globe') || combinedText.includes('3d') || combinedText.includes('three')) {
+      description = 'Interactive 3D globe - because why not?';
+      voiceScript = `Cool, right? This globe is built with Three.js. Daniel's based in the US but has worked with teams globally. Sometimes you just gotta add a spinning 3D globe to your portfolio.`;
+    } else if (combinedText.includes('hero') || combinedText.includes('intro') || combinedText.includes('welcome') || combinedText.includes('landing')) {
+      // Only match hero by explicit naming, not by level
+      description = 'The main introduction - first impressions matter!';
+      voiceScript = `Alright, here we go! This is the hero section - think of it as Daniel's digital handshake. Senior Software Engineer, self-taught, and obsessed with building cool stuff. See those buttons? They're your fast-pass to anything you want to explore.`;
+    } else if (combinedText.includes('unconventional') || (combinedText.includes('path') && !combinedText.includes('career'))) {
+      description = 'From GED to Senior Engineer - the real story.';
+      voiceScript = `Okay, this is the good stuff. Daniel didn't follow the typical path - no CS degree, started as a waiter. But here's the thing: he taught himself to code, hustled like crazy, and now builds software for the Department of Defense. Pretty wild, right?`;
+    } else if (combinedText.includes('about') && !combinedText.includes('experience')) {
+      description = 'The backstory - who is this guy anyway?';
+      voiceScript = `So who's Daniel? Started mowing lawns as a teenager, discovered coding, and fell in love with it. Now he's a Principal Engineer building serious applications. No fancy degree - just pure determination and a lot of late nights.`;
+    } else if (combinedText.includes('journey') || combinedText.includes('photo') || combinedText.includes('gallery')) {
+      description = 'Photos from the grind - the real moments.';
+      voiceScript = `Check out these photos - this is the journey in pictures. Late-night coding sessions, building weird experiments, leveling up year after year. It's not glamorous, but it's real.`;
+    } else if (combinedText.includes('project') || combinedText.includes('work') || combinedText.includes('portfolio')) {
+      description = 'The actual work - click around and explore.';
+      voiceScript = `Now we're talking! These are the projects - the actual stuff Daniel has built. Enterprise apps, AI experiments, creative side projects. Click any card to dive deeper.`;
+    } else if (combinedText.includes('skill') || combinedText.includes('tech') || combinedText.includes('expertise') || combinedText.includes('stack')) {
+      description = 'The technical toolkit - what he actually knows.';
+      voiceScript = `Here's the tech breakdown. React, TypeScript, Python, Node - the usual suspects. But also DevOps, AI, databases, the whole stack. These aren't just buzzwords - each one has real project hours behind it.`;
+    } else if (combinedText.includes('experience') || combinedText.includes('career') || combinedText.includes('professional') || combinedText.includes('employment')) {
+      description = 'Work history - from startups to defense contracts.';
+      voiceScript = `The career timeline! Most recent: BrainGu, building software for Space Force and Navy. Before that, co-founded his own consultancy. Started with freelance gigs and kept leveling up.`;
+    } else if (combinedText.includes('contact') || combinedText.includes('reach') || combinedText.includes('connect')) {
+      description = 'Get in touch - he actually responds.';
+      voiceScript = `Want to connect? Here's how. Drop a message, hit him up on LinkedIn, or check out the GitHub. Daniel's always down to chat about interesting projects or opportunities.`;
+    } else if (combinedText.includes('invention') || combinedText.includes('maker') || combinedText.includes('hardware') || combinedText.includes('build')) {
+      description = 'Hardware projects - the maker side.';
+      voiceScript = `Not just software! Daniel builds physical things too - 3D printing, Arduino projects, random inventions. Same problem-solving mindset, different medium.`;
+    } else if (combinedText.includes('game')) {
+      description = 'Games - playable right now.';
+      voiceScript = `Games! Tetris, Snake, even multiplayer stuff. Each one was a learning project, but they're actually fun too. Go ahead, take a break and play one.`;
     } else {
-      description = `The ${title} section - click or ask to learn more about what's here.`;
-      voiceScript = `Here's the ${title} section. Take a moment to explore what's here. If you have questions about anything you see, just ask me and I'll explain!`;
+      description = `The ${title} section.`;
+      voiceScript = `Here's ${title}. Take a look around - if anything catches your eye, just ask and I'll tell you more.`;
     }
 
     return {
