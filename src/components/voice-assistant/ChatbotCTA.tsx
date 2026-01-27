@@ -27,6 +27,11 @@ function getSpeechRecognition(): any {
   return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null
 }
 
+// Generate unique message ID
+function generateMessageId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+}
+
 const speechRecognitionSupported = typeof window !== "undefined" && getSpeechRecognition() !== null
 
 export function ChatbotCTA() {
@@ -47,11 +52,23 @@ export function ChatbotCTA() {
   const [speechEnabled, setSpeechEnabled] = useState(true)
   const [tourActive, setTourActive] = useState(false)
   const [tourProgress, setTourProgress] = useState({ current: 0, total: 0, percent: 0 })
+  const [speechError, setSpeechError] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const messagesRef = useRef<Message[]>(messages)
+  const speechEnabledRef = useRef(speechEnabled)
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
+
+  useEffect(() => {
+    speechEnabledRef.current = speechEnabled
+  }, [speechEnabled])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -95,11 +112,11 @@ export function ChatbotCTA() {
     window.speechSynthesis.speak(utterance)
   }, [])
 
-  // Connect to guided tour for TTS and state updates
+  // Connect to guided tour for TTS and state updates (runs once on mount)
   useEffect(() => {
     // Register speak callback for tour voice scripts
     const unsubscribeSpeak = guidedTour.onSpeak((text) => {
-      if (speechEnabled) {
+      if (speechEnabledRef.current) {
         speakText(text)
       }
     })
@@ -123,12 +140,13 @@ export function ChatbotCTA() {
       unsubscribeStep()
       unsubscribeEnd()
     }
-  }, [speechEnabled, speakText])
+  }, [speakText])
 
   const startListening = useCallback(() => {
     const SpeechRecognitionCtor = getSpeechRecognition()
     if (!SpeechRecognitionCtor) {
-      alert("Speech recognition is not supported in your browser.")
+      setSpeechError("Speech recognition is not supported in your browser.")
+      setTimeout(() => setSpeechError(null), 4000)
       return
     }
 
@@ -218,15 +236,22 @@ export function ChatbotCTA() {
     }
   }, [])
 
-  const sendMessage = useCallback(async () => {
-    const trimmedInput = input.trim()
+  // Helper to fully end tour and reset state
+  const handleEndTour = useCallback(() => {
+    endTour()
+    setTourActive(false)
+    setTourProgress({ current: 0, total: 0, percent: 0 })
+  }, [])
+
+  const sendMessage = useCallback(async (directMessage?: string) => {
+    const trimmedInput = (directMessage ?? input).trim()
     if (!trimmedInput || isProcessing) return
 
     // Stop listening if active
     if (isListening) stopListening()
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: generateMessageId(),
       role: "user",
       content: trimmedInput,
       timestamp: new Date()
@@ -236,13 +261,16 @@ export function ChatbotCTA() {
     setIsProcessing(true)
 
     try {
-      // Build command context with conversation history
-      const conversationHistory = messages.map(m => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        timestamp: m.timestamp.getTime()
-      }))
+      // Build command context with conversation history (including current message)
+      const conversationHistory = [
+        ...messagesRef.current.map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          timestamp: m.timestamp.getTime()
+        })),
+        { id: userMessage.id, role: 'user' as const, content: trimmedInput, timestamp: Date.now() }
+      ]
 
       const context: Partial<CommandContext> = {
         conversationHistory,
@@ -250,13 +278,20 @@ export function ChatbotCTA() {
       }
 
       // First, try the voice command router for navigation/tour commands
-      const commandResult = await processVoiceCommand(trimmedInput, context)
+      let commandResult
+      try {
+        commandResult = await processVoiceCommand(trimmedInput, context)
+      } catch (commandError) {
+        console.error('[ChatbotCTA] Command processing error:', commandError)
+        // Show error message to user and fall through to AI
+        commandResult = { handled: false, passToAI: true }
+      }
 
       if (commandResult.handled) {
         // Command was handled by the router (navigation, tour, etc.)
         if (commandResult.response) {
           const assistantMessage: Message = {
-            id: (Date.now() + 1).toString(),
+            id: generateMessageId(),
             role: "assistant",
             content: commandResult.response,
             timestamp: new Date(),
@@ -264,7 +299,7 @@ export function ChatbotCTA() {
           }
           setMessages(prev => [...prev, assistantMessage])
 
-          if (commandResult.shouldSpeak && speechEnabled) {
+          if (commandResult.shouldSpeak) {
             speakResponse(commandResult.response)
           }
         }
@@ -316,7 +351,7 @@ export function ChatbotCTA() {
       }
 
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateMessageId(),
         role: "assistant",
         content: response,
         timestamp: new Date()
@@ -326,7 +361,7 @@ export function ChatbotCTA() {
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, isListening, stopListening, speakResponse, messages, speechEnabled])
+  }, [input, isProcessing, isListening, stopListening, speakResponse])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -373,9 +408,7 @@ export function ChatbotCTA() {
         setIsOpen(open)
         // End tour if modal is closed while tour is active
         if (!open && tourActive) {
-          endTour()
-          setTourActive(false)
-          setTourProgress({ current: 0, total: 0, percent: 0 })
+          handleEndTour()
         }
       }}>
         <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
@@ -471,7 +504,8 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7"
-                    onClick={() => previousTourStep()}
+                    onClick={() => { previousTourStep().catch(console.error) }}
+                    aria-label="Go to previous tour step"
                   >
                     ← Previous
                   </Button>
@@ -479,7 +513,8 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7"
-                    onClick={() => nextTourStep()}
+                    onClick={() => { nextTourStep().catch(console.error) }}
+                    aria-label="Go to next tour step"
                   >
                     Next →
                   </Button>
@@ -487,11 +522,8 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7 text-red-500 hover:text-red-600"
-                    onClick={() => {
-                      endTour()
-                      setTourActive(false)
-                      setTourProgress({ current: 0, total: 0, percent: 0 })
-                    }}
+                    onClick={handleEndTour}
+                    aria-label="End the guided tour"
                   >
                     End
                   </Button>
@@ -510,10 +542,8 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7"
-                    onClick={() => {
-                      setInput(q)
-                      inputRef.current?.focus()
-                    }}
+                    onClick={() => sendMessage(q)}
+                    disabled={isProcessing}
                   >
                     {q}
                   </Button>
@@ -582,7 +612,7 @@ export function ChatbotCTA() {
               </Button>
 
               <Button
-                onClick={sendMessage}
+                onClick={() => sendMessage()}
                 disabled={!displayText.trim() || isProcessing}
                 size="icon"
                 className="flex-shrink-0 h-9 w-9"
@@ -596,6 +626,19 @@ export function ChatbotCTA() {
                 🎤 Speak now... click mic or press Enter when done
               </p>
             )}
+
+            <AnimatePresence>
+              {speechError && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs text-center"
+                >
+                  {speechError}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </DialogContent>
       </Dialog>
