@@ -3,6 +3,7 @@ import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { AskAIMini } from "@/components/voice-assistant"
 import { skillsData } from "@/data/skills"
 import type { SkillItem, SkillCategory } from "@/data/skills"
 import { cn } from "@/lib/utils"
@@ -102,6 +103,19 @@ export function Skills() {
             <SkillCard key={skill.name} skill={skill} index={index} />
           ))}
         </div>
+
+        {/* AI CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-10"
+        >
+          <AskAIMini
+            text="Ask about my experience with any skill"
+            variant="subtle"
+          />
+        </motion.div>
       </div>
     </section>
   )

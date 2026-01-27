@@ -90,6 +90,13 @@ export function ChatbotCTA() {
     }
   }, [isOpen])
 
+  // Listen for custom event from AskAIMini components
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true)
+    window.addEventListener('open-ai-chat', handleOpenChat)
+    return () => window.removeEventListener('open-ai-chat', handleOpenChat)
+  }, [])
+
   // Cleanup recognition and speech synthesis on unmount
   useEffect(() => {
     return () => {
@@ -445,26 +452,56 @@ Do not include any other text.` }]
 
   return (
     <>
-      {/* Subtle CTA Banner */}
-      <div className="py-4">
+      {/* Prominent CTA Banner */}
+      <div className="py-8">
         <div className="container">
           <motion.button
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             onClick={() => setIsOpen(true)}
             className="w-full group"
           >
-            <div className="flex items-center justify-center gap-3 py-2 px-4 rounded-full bg-primary/5 hover:bg-primary/10 border border-primary/10 hover:border-primary/20 transition-all duration-300 max-w-md mx-auto">
-              <Bot className="w-4 h-4 text-primary" />
-              <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                TL;DR? <span className="text-primary font-medium">Ask my AI instead</span>
-              </span>
-              <MessageCircle className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex items-center justify-center gap-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 hover:from-primary/30 hover:via-primary/20 hover:to-primary/30 border border-primary/30 hover:border-primary/50 transition-all duration-300 max-w-lg mx-auto shadow-lg shadow-primary/10 hover:shadow-primary/20">
+              {/* Animated glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-pulse" />
+
+              <div className="relative flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center">
+                  <Bot className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <span className="block text-base font-medium text-foreground">
+                    Got questions? <span className="text-primary">Ask my AI</span>
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Skills, projects, or take a guided tour
+                  </span>
+                </div>
+                <MessageCircle className="w-5 h-5 text-primary ml-2 group-hover:scale-110 transition-transform" />
+              </div>
             </div>
           </motion.button>
         </div>
       </div>
+
+      {/* Floating Action Button - Always visible */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 1, type: "spring" }}
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+        title="Ask AI Assistant"
+      >
+        <Bot className="w-6 h-6" />
+        {/* Pulse indicator */}
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+        {/* Tooltip on hover */}
+        <span className="absolute right-full mr-3 px-3 py-1.5 bg-background border border-border rounded-lg text-sm text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+          Ask AI anything
+        </span>
+      </motion.button>
 
       {/* Chat Modal */}
       <Dialog open={isOpen} onOpenChange={(open) => {
@@ -706,5 +743,46 @@ Do not include any other text.` }]
         </DialogContent>
       </Dialog>
     </>
+  )
+}
+
+/**
+ * Mini CTA component for embedding in sections
+ * Use this in About, Projects, or other sections
+ */
+export function AskAIMini({
+  variant = "default",
+  text = "Have questions about this?",
+  className = ""
+}: {
+  variant?: "default" | "subtle" | "accent"
+  text?: string
+  className?: string
+}) {
+  // This component triggers the main ChatbotCTA's modal via custom event
+  const handleClick = () => {
+    window.dispatchEvent(new CustomEvent('open-ai-chat'))
+  }
+
+  const variants = {
+    default: "bg-primary/10 hover:bg-primary/20 border-primary/20 hover:border-primary/40",
+    subtle: "bg-muted/50 hover:bg-muted border-border hover:border-primary/30",
+    accent: "bg-gradient-to-r from-primary/20 to-purple-500/20 hover:from-primary/30 hover:to-purple-500/30 border-primary/30"
+  }
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      onClick={handleClick}
+      className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${variants[variant]} ${className}`}
+    >
+      <Bot className="w-4 h-4 text-primary" />
+      <span className="text-sm">
+        {text} <span className="text-primary font-medium">Ask AI</span>
+      </span>
+      <MessageCircle className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+    </motion.button>
   )
 }
