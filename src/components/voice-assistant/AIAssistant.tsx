@@ -5,7 +5,7 @@
  * - TourPlayer: Speechify-style floating player (always visible as mini FAB or expanded)
  * - Chat Dialog: Full chat interface opened via FAB or custom events
  * - Speech Recognition: Voice input via Web Speech API
- * - Text-to-Speech: Voice output via Web Speech API (NEEDS FIXING - see requirements doc)
+ * - Text-to-Speech: Voice output via useSpeechSynthesis hook
  * - Voice Commands: Navigation and tour control via voiceCommandRouter
  *
  * Place this component in RootLayout so it persists across all pages.
@@ -24,6 +24,7 @@ import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
 import { processVoiceCommand, navigationService } from "@/services/voice-stocks"
 import { guidedTour } from "@/services/voice-stocks/guidedTour"
 import { TourPlayer } from "./TourPlayer"
+import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis"
 import type { CommandContext } from "@/types/voiceStocks"
 
 interface Message {
@@ -69,10 +70,17 @@ export function AIAssistant() {
   const [interimTranscript, setInterimTranscript] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [speechEnabled, setSpeechEnabled] = useState(true)
   const [tourActive, setTourActive] = useState(false)
   const [speechError, setSpeechError] = useState<string | null>(null)
+
+  // Text-to-Speech via shared hook (handles Chrome voice loading + autoplay policy)
+  const {
+    speak: speakText,
+    stop: stopSpeaking,
+    isSpeaking,
+    enabled: speechEnabled,
+    toggleEnabled: toggleSpeechEnabled,
+  } = useSpeechSynthesis({ debug: false })
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -80,16 +88,11 @@ export function AIAssistant() {
   const recognitionRef = useRef<any>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>(messages)
-  const speechEnabledRef = useRef(speechEnabled)
 
-  // Keep refs in sync with state
+  // Keep message ref in sync with state
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
-
-  useEffect(() => {
-    speechEnabledRef.current = speechEnabled
-  }, [speechEnabled])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -110,14 +113,11 @@ export function AIAssistant() {
     return () => window.removeEventListener('open-ai-chat', handleOpenChat)
   }, [])
 
-  // Cleanup speech resources on unmount
+  // Cleanup speech recognition on unmount (TTS cleanup handled by hook)
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         try { recognitionRef.current.stop() } catch { /* ignore */ }
-      }
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel()
       }
     }
   }, [])
@@ -140,51 +140,11 @@ export function AIAssistant() {
     }
   }, [])
 
-  /**
-   * Text-to-Speech function
-   * NOTE: TTS is currently not working properly. See requirements document for details.
-   * The issue is that speechSynthesis.speak() is called but onstart never fires.
-   */
-  const speakText = useCallback((text: string, rate?: number) => {
-    if (!speechEnabledRef.current) return
-    if (typeof window === "undefined" || !window.speechSynthesis) return
-
-    window.speechSynthesis.cancel()
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = rate ?? 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 1.0
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    window.speechSynthesis.speak(utterance)
-  }, [])
-
   // Callback for TourPlayer to trigger speech with custom rate
+  // Uses the speakText from useSpeechSynthesis hook
   const handleTourSpeak = useCallback((text: string, rate?: number) => {
     speakText(text, rate)
   }, [speakText])
-
-  const stopSpeaking = useCallback(() => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-    }
-  }, [])
-
-  const toggleSpeechEnabled = useCallback(() => {
-    setSpeechEnabled(prev => {
-      const newValue = !prev
-      if (!newValue && typeof window !== "undefined" && window.speechSynthesis) {
-        window.speechSynthesis.cancel()
-        setIsSpeaking(false)
-      }
-      return newValue
-    })
-  }, [])
 
   // Speech Recognition
   const startListening = useCallback(() => {
