@@ -15,8 +15,7 @@ import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User,
-  Volume2, VolumeX, Loader2, Sparkles, Navigation,
-  MessageCircle
+  Volume2, VolumeX, Loader2, Sparkles, Navigation
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -175,7 +174,7 @@ export function AIAssistant() {
   }, [])
 
   // Internal TTS function that actually speaks
-  const speakTextInternal = useCallback((text: string) => {
+  const speakTextInternal = useCallback((text: string, rate?: number) => {
     if (typeof window === "undefined" || !window.speechSynthesis) {
       console.log('[TTS] Speech synthesis not available')
       return
@@ -185,9 +184,11 @@ export function AIAssistant() {
     window.speechSynthesis.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = 1.0
+    utterance.rate = rate ?? 1.0
     utterance.pitch = 1.0
     utterance.volume = 0.9
+
+    console.log('[TTS] Using rate:', utterance.rate)
 
     // Try to select a good voice
     const voices = window.speechSynthesis.getVoices()
@@ -219,7 +220,7 @@ export function AIAssistant() {
   }, [])
 
   // Public TTS function that handles user interaction requirement
-  const speakText = useCallback((text: string) => {
+  const speakText = useCallback((text: string, rate?: number) => {
     if (!speechEnabledRef.current) {
       console.log('[TTS] Speech disabled by user')
       return
@@ -237,16 +238,11 @@ export function AIAssistant() {
       return
     }
 
-    speakTextInternal(text)
+    speakTextInternal(text, rate)
   }, [voicesLoaded, hasInteracted, speakTextInternal])
 
-  // Connect to guided tour
+  // Connect to guided tour state (TourPlayer handles the speaking)
   useEffect(() => {
-    const unsubscribeSpeak = guidedTour.onSpeak((text) => {
-      console.log('[GuidedTour] onSpeak callback received:', text.substring(0, 30) + '...')
-      speakText(text)
-    })
-
     const unsubscribeStep = guidedTour.onStepChange(() => {
       setTourActive(guidedTour.getState().isActive)
     })
@@ -259,11 +255,10 @@ export function AIAssistant() {
     setTourActive(guidedTour.getState().isActive)
 
     return () => {
-      unsubscribeSpeak()
       unsubscribeStep()
       unsubscribeEnd()
     }
-  }, [speakText])
+  }, [])
 
   const startListening = useCallback(() => {
     const SpeechRecognitionCtor = getSpeechRecognition()
@@ -558,13 +553,6 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
     }
   }, [input, isProcessing, isListening, stopListening, speakResponse])
 
-  const handleTourQuestion = useCallback((question: string) => {
-    setIsOpen(true)
-    setTimeout(() => {
-      sendMessage(question)
-    }, 100)
-  }, [sendMessage])
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -583,37 +571,15 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
   return (
     <>
-      {/* TourPlayer - Speechify-style sidebar for tours */}
+      {/* TourPlayer - Speechify-style player (always visible as mini FAB or expanded) */}
       <TourPlayer
         onOpenChat={() => setIsOpen(true)}
-        onAskQuestion={handleTourQuestion}
         speechEnabled={speechEnabled}
         onToggleSpeech={toggleSpeechEnabled}
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
+        onSpeak={(text, rate) => speakText(text, rate)}
       />
-
-      {/* Mini FAB - Always visible when dialog is closed and no tour active */}
-      <AnimatePresence>
-        {!isOpen && !tourActive && (
-          <motion.button
-            key="mini-fab"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center group"
-            title="Chat with AI Assistant"
-          >
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            {/* Notification dot for unread */}
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
 
       {/* Chat Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
