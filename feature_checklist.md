@@ -164,3 +164,49 @@ This document serves as the master record for all features, mechanics, and desig
     - [x] **Score Visibility**: Creature count visible in Header at all times.
     - [x] **Creature Toggle**: Loading bar toggle in Header for enabling/disabling creature layer.
     - [x] **Site Health Bar**: Appears in Header when site is under attack by enraged ghost.
+
+## 9. AI Voice Assistant
+
+- [x] **Core Components**
+  - [x] **AIAssistant.tsx**: Global assistant component in RootLayout (persists across pages).
+  - [x] **AskAboutMe.tsx**: Standalone chat section on homepage.
+  - [x] **TourPlayer.tsx**: Speechify-style floating player with speed controls.
+
+- [x] **Text-to-Speech (TTS)**
+  - [x] **useSpeechSynthesis Hook**: Shared hook for robust TTS across components.
+  - [x] **Chrome Voice Loading**: Waits for `voiceschanged` event before speaking.
+  - [x] **Autoplay Policy**: Tracks user interaction for browser compliance.
+  - [x] **Voice Selection**: Prefers local English voices for quality.
+  - [x] **Speed Control**: 0.75x, 1x, 1.25x, 1.5x, 2x playback rates.
+  - [x] **Chrome Stuck Speech Workaround**: Retry mechanism for failed speech attempts.
+
+- [x] **Speech Recognition**
+  - [x] **Web Speech API**: Browser-native speech-to-text.
+  - [x] **Interim Results**: Real-time transcription display.
+  - [x] **Error Handling**: User-friendly messages for permission/hardware issues.
+
+- [x] **Guided Tour System**
+  - [x] **Auto-Generation**: Tours generated from page DOM structure.
+  - [x] **Step Highlighting**: Visual spotlight on current tour element.
+  - [x] **Rich Narration**: Contextual voice scripts for each section.
+  - [x] **Navigation Controls**: Next, previous, skip, and end tour.
+  - [x] **Auto-Advance**: Configurable timing with speed multiplier.
+
+- [x] **Voice Commands**
+  - [x] **Navigation**: "go to [page]", "show me projects".
+  - [x] **Tour Control**: "give me a tour", "next", "end tour".
+  - [x] **Speed Control**: "faster", "slower", "normal speed".
+  - [x] **Section Skip**: "skip to [section name]".
+
+- [x] **AI Chat**
+  - [x] **Gemini Integration**: API-powered responses (when key available).
+  - [x] **Fallback Responses**: Local response generation without API.
+  - [x] **Context Awareness**: System prompt with Daniel's background info.
+  - [x] **Intent Detection**: Navigation requests parsed from natural language.
+
+- [x] **UI/UX**
+  - [x] **Floating FAB**: Always visible, transforms based on context.
+  - [x] **Progress Ring**: Visual tour progress indicator.
+  - [x] **Speaking Indicator**: Animated pulse when TTS is active.
+  - [x] **Quick Questions**: Preset questions for easy start.
+
