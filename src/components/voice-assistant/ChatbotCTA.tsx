@@ -280,7 +280,9 @@ export function ChatbotCTA() {
       // First, try the voice command router for navigation/tour commands
       let commandResult
       try {
+        console.log('[ChatbotCTA] Processing command:', trimmedInput)
         commandResult = await processVoiceCommand(trimmedInput, context)
+        console.log('[ChatbotCTA] Command result:', commandResult)
       } catch (commandError) {
         console.error('[ChatbotCTA] Command processing error:', commandError)
         // Show error message to user and fall through to AI
