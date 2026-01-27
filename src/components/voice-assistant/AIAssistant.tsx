@@ -198,18 +198,22 @@ export function AIAssistant() {
       return
     }
 
-    // DON'T call cancel() here - it was killing queued speech!
-    // The browser's speech synthesis has a built-in queue.
+    // Chrome/Safari bug workaround: speech queue can get "stuck"
+    // We need to cancel and restart fresh each time
+    const synth = window.speechSynthesis
+
+    console.log('[TTS] Current state - speaking:', synth.speaking, 'pending:', synth.pending, 'paused:', synth.paused)
+
+    // Always cancel first to clear any stuck state
+    synth.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.rate = rate ?? 1.0
     utterance.pitch = 1.0
     utterance.volume = 1.0
 
-    console.log('[TTS] Created utterance with rate:', utterance.rate)
-
     // Try to select a good voice
-    const voices = window.speechSynthesis.getVoices()
+    const voices = synth.getVoices()
     console.log('[TTS] Available voices:', voices.length)
 
     if (voices.length > 0) {
@@ -235,30 +239,40 @@ export function AIAssistant() {
       setIsSpeaking(false)
     }
     utterance.onerror = (e) => {
-      // Only log real errors, not 'canceled' which happens when we intentionally stop
       if (e.error !== 'canceled') {
         console.error('[TTS] ✗ Speech ERROR:', e.error)
       }
       setIsSpeaking(false)
     }
 
-    console.log('[TTS] Calling speechSynthesis.speak()...')
     console.log('[TTS] Text preview:', text.substring(0, 80) + (text.length > 80 ? '...' : ''))
 
-    try {
-      window.speechSynthesis.speak(utterance)
-      console.log('[TTS] speak() called successfully, queue length:', window.speechSynthesis.pending ? 'has pending' : 'empty')
+    // Use requestAnimationFrame to ensure we're in a fresh frame after cancel
+    requestAnimationFrame(() => {
+      try {
+        console.log('[TTS] Calling speak() in next frame...')
+        synth.speak(utterance)
+        console.log('[TTS] speak() called, speaking:', synth.speaking)
 
-      // Chrome bug workaround: speech sometimes gets stuck in paused state
-      setTimeout(() => {
-        if (window.speechSynthesis.paused) {
-          console.log('[TTS] Resuming paused speech')
-          window.speechSynthesis.resume()
+        // Chrome bug: sometimes speech gets paused immediately
+        // Poll and resume if needed
+        let checkCount = 0
+        const checkAndResume = () => {
+          checkCount++
+          if (synth.paused && !synth.speaking) {
+            console.log('[TTS] Speech paused, resuming...')
+            synth.resume()
+          }
+          // Keep checking for a bit
+          if (checkCount < 10 && !synth.speaking) {
+            setTimeout(checkAndResume, 100)
+          }
         }
-      }, 100)
-    } catch (err) {
-      console.error('[TTS] Error calling speak():', err)
-    }
+        setTimeout(checkAndResume, 50)
+      } catch (err) {
+        console.error('[TTS] Error calling speak():', err)
+      }
+    })
   }, [])
 
   // Public TTS function that handles user interaction requirement
@@ -659,16 +673,18 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 <button
                   onClick={() => {
                     console.log('[TTS TEST] Direct test button clicked')
-                    if (!window.speechSynthesis) {
-                      console.error('[TTS TEST] speechSynthesis not available!')
+                    const synth = window.speechSynthesis
+                    if (!synth) {
                       alert('Speech synthesis not available in this browser')
                       return
                     }
-                    // Don't call cancel() - just queue the speech
-                    const testUtterance = new SpeechSynthesisUtterance('Hello! This is a test of the speech synthesis.')
+                    // Cancel any stuck state first
+                    synth.cancel()
+
+                    const testUtterance = new SpeechSynthesisUtterance('Hello! This is a test.')
                     testUtterance.volume = 1
                     testUtterance.rate = 1
-                    const voices = window.speechSynthesis.getVoices()
+                    const voices = synth.getVoices()
                     const samantha = voices.find(v => v.name === 'Samantha') || voices.find(v => v.lang.startsWith('en'))
                     if (samantha) testUtterance.voice = samantha
                     testUtterance.onstart = () => console.log('[TTS TEST] ✓ Started!')
@@ -676,9 +692,20 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                     testUtterance.onerror = (e) => {
                       if (e.error !== 'canceled') console.error('[TTS TEST] Error:', e.error)
                     }
-                    console.log('[TTS TEST] Calling speak()...')
-                    window.speechSynthesis.speak(testUtterance)
-                    console.log('[TTS TEST] speak() queued')
+
+                    // Use requestAnimationFrame after cancel
+                    requestAnimationFrame(() => {
+                      console.log('[TTS TEST] Calling speak()...')
+                      synth.speak(testUtterance)
+                      console.log('[TTS TEST] speaking:', synth.speaking, 'pending:', synth.pending)
+                      // Resume if paused
+                      setTimeout(() => {
+                        if (synth.paused) {
+                          console.log('[TTS TEST] Resuming...')
+                          synth.resume()
+                        }
+                      }, 50)
+                    })
                   }}
                   className="text-[10px] px-1.5 py-0.5 bg-muted rounded hover:bg-muted/80"
                   title="Test TTS directly"
