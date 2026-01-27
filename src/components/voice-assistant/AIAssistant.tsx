@@ -1,8 +1,20 @@
+/**
+ * AIAssistant - Core AI assistant functionality
+ *
+ * This component provides:
+ * - TourPlayer (Speechify-style sidebar)
+ * - Chat Dialog (opened via custom events from CTAs)
+ * - Speech recognition and TTS
+ *
+ * Place this in RootLayout so it persists across all pages.
+ * CTAs (AICTABanner, AskAIMini) trigger this via 'open-ai-chat' events.
+ */
+
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Mic, MicOff, Send, Bot, User, MessageCircle,
+  Mic, MicOff, Send, Bot, User,
   Volume2, VolumeX, Loader2, Sparkles, Navigation
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -18,7 +30,7 @@ interface Message {
   role: "user" | "assistant"
   content: string
   timestamp: Date
-  isNavigation?: boolean // Flag for navigation/tour responses
+  isNavigation?: boolean
 }
 
 // Get Speech Recognition constructor
@@ -29,17 +41,14 @@ function getSpeechRecognition(): any {
   return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null
 }
 
-// Generate unique message ID
 function generateMessageId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
 const speechRecognitionSupported = typeof window !== "undefined" && getSpeechRecognition() !== null
 
-export function ChatbotCTA() {
+export function AIAssistant() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const isHomePage = location.pathname === '/'
 
   // Configure navigation service with React Router
   useEffect(() => {
@@ -51,7 +60,7 @@ export function ChatbotCTA() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. Or say \"give me a tour\" to explore the site! 🤖",
+      content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. Or say \"give me a tour\" to explore the site!",
       timestamp: new Date()
     }
   ])
@@ -71,7 +80,7 @@ export function ChatbotCTA() {
   const messagesRef = useRef<Message[]>(messages)
   const speechEnabledRef = useRef(speechEnabled)
 
-  // Keep refs in sync with state
+  // Keep refs in sync
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
@@ -92,27 +101,26 @@ export function ChatbotCTA() {
     }
   }, [isOpen])
 
-  // Listen for custom event from AskAIMini components
+  // Listen for custom event from CTAs
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true)
     window.addEventListener('open-ai-chat', handleOpenChat)
     return () => window.removeEventListener('open-ai-chat', handleOpenChat)
   }, [])
 
-  // Cleanup recognition and speech synthesis on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         try { recognitionRef.current.stop() } catch { /* ignore */ }
       }
-      // Cancel any ongoing speech
       if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel()
       }
     }
   }, [])
 
-  // Direct speak function (used by tour callbacks) - defined early for use in effects
+  // Text-to-speech function
   const speakText = useCallback((text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return
 
@@ -129,24 +137,24 @@ export function ChatbotCTA() {
     window.speechSynthesis.speak(utterance)
   }, [])
 
-  // Connect to guided tour for TTS and state updates (runs once on mount)
+  // Connect to guided tour
   useEffect(() => {
-    // Register speak callback for tour voice scripts
     const unsubscribeSpeak = guidedTour.onSpeak((text) => {
       if (speechEnabledRef.current) {
         speakText(text)
       }
     })
 
-    // Track tour state changes
     const unsubscribeStep = guidedTour.onStepChange(() => {
       setTourActive(guidedTour.getState().isActive)
     })
 
-    // Track tour end
     const unsubscribeEnd = guidedTour.onTourEnd(() => {
       setTourActive(false)
     })
+
+    // Check initial state
+    setTourActive(guidedTour.getState().isActive)
 
     return () => {
       unsubscribeSpeak()
@@ -163,18 +171,15 @@ export function ChatbotCTA() {
       return
     }
 
-    // Stop any existing recognition and wait for cleanup
     if (recognitionRef.current) {
       try {
-        recognitionRef.current.abort() // Use abort instead of stop for immediate cleanup
+        recognitionRef.current.abort()
       } catch { /* ignore */ }
       recognitionRef.current = null
     }
 
-    // Small delay to ensure previous instance is fully released
     setTimeout(() => {
       try {
-        // Create fresh instance each time
         const recognition = new SpeechRecognitionCtor()
         recognition.continuous = true
         recognition.interimResults = true
@@ -203,33 +208,18 @@ export function ChatbotCTA() {
           }
         }
 
-        recognition.onaudiostart = () => {
-          console.log('[SpeechRecognition] Audio capture started')
-        }
-
-        recognition.onspeechstart = () => {
-          console.log('[SpeechRecognition] Speech detected')
-        }
-
-        recognition.onspeechend = () => {
-          console.log('[SpeechRecognition] Speech ended')
-        }
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onerror = (event: any) => {
-          console.error('[SpeechRecognition] Error:', event.error, event.message)
+          console.error('[SpeechRecognition] Error:', event.error)
 
-          // Handle specific errors
           if (event.error === 'not-allowed') {
-            setSpeechError("Microphone access denied. Please allow microphone access and try again.")
+            setSpeechError("Microphone access denied. Please allow microphone access.")
           } else if (event.error === 'no-speech') {
-            setSpeechError("No speech detected. Please speak clearly and try again.")
+            setSpeechError("No speech detected. Please try again.")
           } else if (event.error === 'audio-capture') {
-            setSpeechError("No microphone found. Please check your microphone connection.")
-          } else if (event.error === 'network') {
-            setSpeechError("Network error. Please check your internet connection.")
+            setSpeechError("No microphone found.")
           } else if (event.error !== "aborted") {
-            setSpeechError(`Speech recognition error: ${event.error}`)
+            setSpeechError(`Error: ${event.error}`)
           }
 
           setIsListening(false)
@@ -238,7 +228,6 @@ export function ChatbotCTA() {
         }
 
         recognition.onend = () => {
-          console.log('[SpeechRecognition] Recognition ended')
           setIsListening(false)
           setInterimTranscript("")
         }
@@ -246,10 +235,9 @@ export function ChatbotCTA() {
         recognitionRef.current = recognition
         recognition.start()
         setIsListening(true)
-        console.log('[SpeechRecognition] Started listening')
       } catch (e) {
         console.error('[SpeechRecognition] Failed to start:', e)
-        setSpeechError("Failed to start speech recognition. Please try again.")
+        setSpeechError("Failed to start speech recognition.")
         setIsListening(false)
         setTimeout(() => setSpeechError(null), 4000)
       }
@@ -284,7 +272,6 @@ export function ChatbotCTA() {
     }
   }, [])
 
-  // Toggle speech enabled/disabled
   const toggleSpeechEnabled = useCallback(() => {
     setSpeechEnabled(prev => !prev)
   }, [])
@@ -293,7 +280,6 @@ export function ChatbotCTA() {
     const trimmedInput = (directMessage ?? input).trim()
     if (!trimmedInput || isProcessing) return
 
-    // Stop listening if active
     if (isListening) stopListening()
 
     const userMessage: Message = {
@@ -307,7 +293,6 @@ export function ChatbotCTA() {
     setIsProcessing(true)
 
     try {
-      // Build command context with conversation history (including current message)
       const conversationHistory = [
         ...messagesRef.current.map(m => ({
           id: m.id,
@@ -323,20 +308,15 @@ export function ChatbotCTA() {
         tourState: guidedTour.getState()
       }
 
-      // First, try the voice command router for navigation/tour commands
       let commandResult
       try {
-        console.log('[ChatbotCTA] Processing command:', trimmedInput)
         commandResult = await processVoiceCommand(trimmedInput, context)
-        console.log('[ChatbotCTA] Command result:', commandResult)
       } catch (commandError) {
-        console.error('[ChatbotCTA] Command processing error:', commandError)
-        // Show error message to user and fall through to AI
+        console.error('[AIAssistant] Command processing error:', commandError)
         commandResult = { handled: false, passToAI: true }
       }
 
       if (commandResult.handled) {
-        // Command was handled by the router (navigation, tour, etc.)
         if (commandResult.response) {
           const assistantMessage: Message = {
             id: generateMessageId(),
@@ -352,25 +332,22 @@ export function ChatbotCTA() {
           }
         }
 
-        // Execute any associated action (may be async)
         if (commandResult.action) {
           await Promise.resolve(commandResult.action())
         }
 
-        // Update tour state after action completes
         setTourActive(guidedTour.getState().isActive)
         return
       }
 
-      // Command not handled or passed to AI - try AI intent detection first
+      // AI response
       const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY
       let response: string = ''
       let isNavResponse = false
 
-      // Try AI-powered intent detection for navigation
       if (geminiApiKey) {
         try {
-          // First, ask Gemini to detect if this is a navigation request
+          // Intent detection for navigation
           const intentResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
             {
@@ -386,10 +363,7 @@ Available sections on home: hero, about, skills, experience, projects, contact
 User request: "${trimmedInput}"
 
 If this is a navigation request, respond with ONLY: NAV:target
-(where target is the page or section name, e.g., "NAV:games" or "NAV:projects")
-
-If this is NOT a navigation request, respond with ONLY: CHAT
-Do not include any other text.` }]
+If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 }],
                 generationConfig: { maxOutputTokens: 20, temperature: 0.1 }
               })
@@ -411,11 +385,10 @@ Do not include any other text.` }]
             }
           }
         } catch (intentError) {
-          console.log('[ChatbotCTA] Intent detection failed:', intentError)
+          console.log('[AIAssistant] Intent detection failed:', intentError)
         }
       }
 
-      // If not a navigation response, get regular AI response
       if (!isNavResponse) {
         if (geminiApiKey) {
           try {
@@ -463,10 +436,8 @@ Do not include any other text.` }]
     }
   }, [input, isProcessing, isListening, stopListening, speakResponse])
 
-  // Handle question from TourPlayer
   const handleTourQuestion = useCallback((question: string) => {
     setIsOpen(true)
-    // Add slight delay to ensure modal is open
     setTimeout(() => {
       sendMessage(question)
     }, 100)
@@ -486,12 +457,11 @@ Do not include any other text.` }]
     "What can Daniel do?"
   ]
 
-  // Combined display text for input
   const displayText = input + (interimTranscript ? (input ? " " : "") + interimTranscript : "")
 
   return (
     <>
-      {/* Tour Player Widget - Shows during tours instead of blocking modal */}
+      {/* TourPlayer - Speechify-style sidebar for tours */}
       <TourPlayer
         onOpenChat={() => setIsOpen(true)}
         onAskQuestion={handleTourQuestion}
@@ -501,65 +471,7 @@ Do not include any other text.` }]
         onStopSpeaking={stopSpeaking}
       />
 
-      {/* Prominent CTA Banner - Only on home page */}
-      {isHomePage && (
-        <div className="py-8">
-          <div className="container">
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              onClick={() => setIsOpen(true)}
-              className="w-full group"
-            >
-              <div className="relative flex items-center justify-center gap-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 hover:from-primary/30 hover:via-primary/20 hover:to-primary/30 border border-primary/30 hover:border-primary/50 transition-all duration-300 max-w-lg mx-auto shadow-lg shadow-primary/10 hover:shadow-primary/20">
-                {/* Animated glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-pulse" />
-
-                <div className="relative flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <span className="block text-base font-medium text-foreground">
-                      Got questions? <span className="text-primary">Ask my AI</span>
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    Skills, projects, or take a guided tour
-                  </span>
-                </div>
-                  <MessageCircle className="w-5 h-5 text-primary ml-2 group-hover:scale-110 transition-transform" />
-                </div>
-              </div>
-            </motion.button>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Action Button - Hide when tour is active (TourPlayer takes over) */}
-      <AnimatePresence>
-        {!tourActive && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring" }}
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-            title="Ask AI Assistant"
-          >
-            <Bot className="w-6 h-6" />
-            {/* Pulse indicator */}
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
-            {/* Tooltip on hover */}
-            <span className="absolute right-full mr-3 px-3 py-1.5 bg-background border border-border rounded-lg text-sm text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-              Ask AI anything
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Chat Modal - Separate from TourPlayer for clean UX */}
+      {/* Chat Dialog - opened via CTAs */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden" aria-describedby="chat-description">
           <DialogHeader className="p-4 pb-2 border-b bg-gradient-to-r from-primary/10 to-transparent">
@@ -574,7 +486,7 @@ Do not include any other text.` }]
             </DialogDescription>
           </DialogHeader>
 
-          {/* Messages Area */}
+          {/* Messages */}
           <div className="h-[350px] overflow-y-auto p-4 space-y-3">
             <AnimatePresence initial={false}>
               {messages.map((message) => (
@@ -630,11 +542,11 @@ Do not include any other text.` }]
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Tour active hint - controls are in TourPlayer widget */}
+          {/* Tour hint */}
           {tourActive && (
             <div className="px-4 pb-2 border-t pt-2">
               <p className="text-xs text-muted-foreground text-center">
-                Tour in progress - use the floating controls on the right →
+                Tour in progress - use the controls on the right →
               </p>
             </div>
           )}
@@ -684,19 +596,14 @@ Do not include any other text.` }]
                   onKeyDown={handleKeyDown}
                   placeholder={
                     isListening
-                      ? "Listening... speak now"
+                      ? "Listening..."
                       : tourActive
                       ? "Say 'next', 'previous', or 'end tour'..."
-                      : "Ask anything or say 'give me a tour'..."
+                      : "Ask anything..."
                   }
                   className="w-full h-9 px-3 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   disabled={isProcessing}
                 />
-                {interimTranscript && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                    ...
-                  </span>
-                )}
               </div>
 
               <Button
@@ -730,7 +637,7 @@ Do not include any other text.` }]
 
             {isListening && (
               <p className="text-xs text-center text-muted-foreground mt-2">
-                🎤 Speak now... click mic or press Enter when done
+                Speak now... press Enter when done
               </p>
             )}
 
@@ -750,46 +657,5 @@ Do not include any other text.` }]
         </DialogContent>
       </Dialog>
     </>
-  )
-}
-
-/**
- * Mini CTA component for embedding in sections
- * Use this in About, Projects, or other sections
- */
-export function AskAIMini({
-  variant = "default",
-  text = "Have questions about this?",
-  className = ""
-}: {
-  variant?: "default" | "subtle" | "accent"
-  text?: string
-  className?: string
-}) {
-  // This component triggers the main ChatbotCTA's modal via custom event
-  const handleClick = () => {
-    window.dispatchEvent(new CustomEvent('open-ai-chat'))
-  }
-
-  const variants = {
-    default: "bg-primary/10 hover:bg-primary/20 border-primary/20 hover:border-primary/40",
-    subtle: "bg-muted/50 hover:bg-muted border-border hover:border-primary/30",
-    accent: "bg-gradient-to-r from-primary/20 to-purple-500/20 hover:from-primary/30 hover:to-purple-500/30 border-primary/30"
-  }
-
-  return (
-    <motion.button
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      onClick={handleClick}
-      className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${variants[variant]} ${className}`}
-    >
-      <Bot className="w-4 h-4 text-primary" />
-      <span className="text-sm">
-        {text} <span className="text-primary font-medium">Ask AI</span>
-      </span>
-      <MessageCircle className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-    </motion.button>
   )
 }

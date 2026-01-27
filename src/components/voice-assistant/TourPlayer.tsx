@@ -55,7 +55,16 @@ export function TourPlayer({
 
   // Auto-advance after speech finishes
   useEffect(() => {
-    if (!isActive || isPaused) return
+    if (!isActive) return
+
+    // Clear any pending timeout when paused
+    if (isPaused) {
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current)
+        autoAdvanceTimeoutRef.current = null
+      }
+      return
+    }
 
     // When speech ends and we were waiting, schedule next step
     if (!isSpeaking && waitingForSpeechRef.current) {
@@ -175,17 +184,16 @@ export function TourPlayer({
     }
   }, [currentStep, onAskQuestion])
 
-  // Don't render if tour not active
-  if (!isActive) return null
-
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ x: 100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 100, opacity: 0 }}
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col items-center"
-      >
+      {isActive && (
+        <motion.div
+          key="tour-player"
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 100, opacity: 0 }}
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col items-center"
+        >
         {/* Main Player Widget */}
         <div className="bg-background/95 backdrop-blur-lg border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden w-16">
           {/* Expand/Collapse Toggle */}
@@ -252,10 +260,10 @@ export function TourPlayer({
                   {isPaused ? (
                     <Play className="w-5 h-5 ml-0.5" />
                   ) : isSpeaking ? (
-                    <div className="flex gap-0.5">
-                      <span className="w-1 h-4 bg-current rounded-full animate-pulse" />
-                      <span className="w-1 h-4 bg-current rounded-full animate-pulse delay-75" />
-                      <span className="w-1 h-4 bg-current rounded-full animate-pulse delay-150" />
+                    <div className="flex gap-0.5 items-center">
+                      <span className="w-1 h-3 bg-current rounded-full animate-pulse" />
+                      <span className="w-1 h-4 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.15s' }} />
+                      <span className="w-1 h-3 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
                     </div>
                   ) : (
                     <Pause className="w-5 h-5" />
@@ -387,6 +395,7 @@ export function TourPlayer({
           </motion.div>
         )}
       </motion.div>
+      )}
     </AnimatePresence>
   )
 }
