@@ -2,12 +2,12 @@
  * AIAssistant - Core AI assistant functionality
  *
  * This component provides:
- * - TourPlayer (Speechify-style sidebar)
- * - Chat Dialog (opened via custom events from CTAs)
+ * - Persistent mini FAB (always visible for quick access)
+ * - TourPlayer (Speechify-style sidebar during tours)
+ * - Chat Dialog (opened via FAB or custom events)
  * - Speech recognition and TTS
  *
  * Place this in RootLayout so it persists across all pages.
- * CTAs (AICTABanner, AskAIMini) trigger this via 'open-ai-chat' events.
  */
 
 import { useState, useRef, useEffect, useCallback } from "react"
@@ -15,7 +15,8 @@ import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User,
-  Volume2, VolumeX, Loader2, Sparkles, Navigation
+  Volume2, VolumeX, Loader2, Sparkles, Navigation,
+  MessageCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -72,6 +73,8 @@ export function AIAssistant() {
   const [speechEnabled, setSpeechEnabled] = useState(true)
   const [tourActive, setTourActive] = useState(false)
   const [speechError, setSpeechError] = useState<string | null>(null)
+  const [voicesLoaded, setVoicesLoaded] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +82,7 @@ export function AIAssistant() {
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>(messages)
   const speechEnabledRef = useRef(speechEnabled)
+  const pendingSpeechRef = useRef<string | null>(null)
 
   // Keep refs in sync
   useEffect(() => {
@@ -88,6 +92,56 @@ export function AIAssistant() {
   useEffect(() => {
     speechEnabledRef.current = speechEnabled
   }, [speechEnabled])
+
+  // Load voices for TTS
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return
+
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices()
+      if (voices.length > 0) {
+        setVoicesLoaded(true)
+        console.log('[TTS] Voices loaded:', voices.length)
+      }
+    }
+
+    // Try to load immediately
+    loadVoices()
+
+    // Also listen for voiceschanged event (needed for Chrome)
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
+    }
+  }, [])
+
+  // Track user interaction for autoplay policy
+  useEffect(() => {
+    const handleInteraction = () => {
+      if (!hasInteracted) {
+        setHasInteracted(true)
+        console.log('[TTS] User interaction detected, audio enabled')
+
+        // If there's pending speech, play it now
+        if (pendingSpeechRef.current && speechEnabledRef.current) {
+          speakTextInternal(pendingSpeechRef.current)
+          pendingSpeechRef.current = null
+        }
+      }
+    }
+
+    window.addEventListener('click', handleInteraction)
+    window.addEventListener('keydown', handleInteraction)
+    window.addEventListener('touchstart', handleInteraction)
+
+    return () => {
+      window.removeEventListener('click', handleInteraction)
+      window.removeEventListener('keydown', handleInteraction)
+      window.removeEventListener('touchstart', handleInteraction)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasInteracted])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -120,29 +174,77 @@ export function AIAssistant() {
     }
   }, [])
 
-  // Text-to-speech function
-  const speakText = useCallback((text: string) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return
+  // Internal TTS function that actually speaks
+  const speakTextInternal = useCallback((text: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      console.log('[TTS] Speech synthesis not available')
+      return
+    }
 
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel()
+
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.rate = 1.0
     utterance.pitch = 1.0
-    utterance.volume = 0.8
+    utterance.volume = 0.9
 
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
+    // Try to select a good voice
+    const voices = window.speechSynthesis.getVoices()
+    const preferredVoice = voices.find(v =>
+      v.name.includes('Samantha') ||
+      v.name.includes('Google') ||
+      v.name.includes('Microsoft') ||
+      v.lang.startsWith('en')
+    )
+    if (preferredVoice) {
+      utterance.voice = preferredVoice
+    }
 
+    utterance.onstart = () => {
+      console.log('[TTS] Started speaking')
+      setIsSpeaking(true)
+    }
+    utterance.onend = () => {
+      console.log('[TTS] Finished speaking')
+      setIsSpeaking(false)
+    }
+    utterance.onerror = (e) => {
+      console.error('[TTS] Error:', e.error)
+      setIsSpeaking(false)
+    }
+
+    console.log('[TTS] Speaking:', text.substring(0, 50) + '...')
     window.speechSynthesis.speak(utterance)
   }, [])
+
+  // Public TTS function that handles user interaction requirement
+  const speakText = useCallback((text: string) => {
+    if (!speechEnabledRef.current) {
+      console.log('[TTS] Speech disabled by user')
+      return
+    }
+
+    if (!voicesLoaded) {
+      console.log('[TTS] Voices not loaded yet, queueing speech')
+      pendingSpeechRef.current = text
+      return
+    }
+
+    if (!hasInteracted) {
+      console.log('[TTS] No user interaction yet, queueing speech')
+      pendingSpeechRef.current = text
+      return
+    }
+
+    speakTextInternal(text)
+  }, [voicesLoaded, hasInteracted, speakTextInternal])
 
   // Connect to guided tour
   useEffect(() => {
     const unsubscribeSpeak = guidedTour.onSpeak((text) => {
-      if (speechEnabledRef.current) {
-        speakText(text)
-      }
+      console.log('[GuidedTour] onSpeak callback received:', text.substring(0, 30) + '...')
+      speakText(text)
     })
 
     const unsubscribeStep = guidedTour.onStepChange(() => {
@@ -171,6 +273,7 @@ export function AIAssistant() {
       return
     }
 
+    // Clean up any existing recognition
     if (recognitionRef.current) {
       try {
         recognitionRef.current.abort()
@@ -178,23 +281,25 @@ export function AIAssistant() {
       recognitionRef.current = null
     }
 
+    // Small delay to ensure cleanup
     setTimeout(() => {
       try {
         const recognition = new SpeechRecognitionCtor()
-        recognition.continuous = true
+        recognition.continuous = false // Changed to false for better reliability
         recognition.interimResults = true
         recognition.lang = "en-US"
         recognition.maxAlternatives = 1
 
+        let finalTranscript = ""
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onresult = (event: any) => {
           let interim = ""
-          let final = ""
 
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript
             if (event.results[i].isFinal) {
-              final += transcript
+              finalTranscript += transcript
             } else {
               interim += transcript
             }
@@ -202,51 +307,62 @@ export function AIAssistant() {
 
           setInterimTranscript(interim)
 
-          if (final) {
-            setInput(prev => prev + final)
+          if (finalTranscript) {
+            setInput(prev => prev + finalTranscript)
+            finalTranscript = ""
             setInterimTranscript("")
           }
+        }
+
+        recognition.onstart = () => {
+          console.log('[SpeechRecognition] Started')
+          setIsListening(true)
+          setSpeechError(null)
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onerror = (event: any) => {
           console.error('[SpeechRecognition] Error:', event.error)
 
+          // Don't show error for 'no-speech' or 'aborted' as these are normal
           if (event.error === 'not-allowed') {
-            setSpeechError("Microphone access denied. Please allow microphone access.")
-          } else if (event.error === 'no-speech') {
-            setSpeechError("No speech detected. Please try again.")
+            setSpeechError("Microphone access denied. Please allow microphone access in your browser settings.")
           } else if (event.error === 'audio-capture') {
-            setSpeechError("No microphone found.")
-          } else if (event.error !== "aborted") {
-            setSpeechError(`Error: ${event.error}`)
+            setSpeechError("No microphone found. Please connect a microphone.")
+          } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
+            setSpeechError(`Speech recognition error: ${event.error}`)
           }
 
           setIsListening(false)
           setInterimTranscript("")
-          setTimeout(() => setSpeechError(null), 5000)
+          if (event.error !== 'aborted' && event.error !== 'no-speech') {
+            setTimeout(() => setSpeechError(null), 5000)
+          }
         }
 
         recognition.onend = () => {
+          console.log('[SpeechRecognition] Ended')
           setIsListening(false)
           setInterimTranscript("")
+          recognitionRef.current = null
         }
 
         recognitionRef.current = recognition
         recognition.start()
-        setIsListening(true)
       } catch (e) {
         console.error('[SpeechRecognition] Failed to start:', e)
-        setSpeechError("Failed to start speech recognition.")
+        setSpeechError("Failed to start speech recognition. Please try again.")
         setIsListening(false)
         setTimeout(() => setSpeechError(null), 4000)
       }
-    }, 100)
+    }, 150)
   }, [])
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop() } catch { /* ignore */ }
+      try {
+        recognitionRef.current.stop()
+      } catch { /* ignore */ }
     }
     setIsListening(false)
     setInterimTranscript("")
@@ -261,9 +377,8 @@ export function AIAssistant() {
   }, [isListening, startListening, stopListening])
 
   const speakResponse = useCallback((text: string) => {
-    if (!speechEnabled) return
     speakText(text)
-  }, [speechEnabled, speakText])
+  }, [speakText])
 
   const stopSpeaking = useCallback(() => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -273,7 +388,14 @@ export function AIAssistant() {
   }, [])
 
   const toggleSpeechEnabled = useCallback(() => {
-    setSpeechEnabled(prev => !prev)
+    setSpeechEnabled(prev => {
+      const newValue = !prev
+      if (!newValue && typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+        setIsSpeaking(false)
+      }
+      return newValue
+    })
   }, [])
 
   const sendMessage = useCallback(async (directMessage?: string) => {
@@ -471,17 +593,46 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         onStopSpeaking={stopSpeaking}
       />
 
-      {/* Chat Dialog - opened via CTAs */}
+      {/* Mini FAB - Always visible when dialog is closed and no tour active */}
+      <AnimatePresence>
+        {!isOpen && !tourActive && (
+          <motion.button
+            key="mini-fab"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center group"
+            title="Chat with AI Assistant"
+          >
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            {/* Notification dot for unread */}
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Chat Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden" aria-describedby="chat-description">
+        <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
           <DialogHeader className="p-4 pb-2 border-b bg-gradient-to-r from-primary/10 to-transparent">
             <DialogTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">Ask About Daniel</div>
+              {/* Voice status indicator */}
+              {speechEnabled && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Volume2 className="w-3 h-3" />
+                  <span>{voicesLoaded ? "Voice on" : "Loading..."}</span>
+                </div>
+              )}
             </DialogTitle>
-            <DialogDescription id="chat-description" className="sr-only">
+            <DialogDescription className="sr-only">
               Chat with Daniel's AI assistant to learn about his skills, projects, and experience.
             </DialogDescription>
           </DialogHeader>
@@ -544,9 +695,9 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
           {/* Tour hint */}
           {tourActive && (
-            <div className="px-4 pb-2 border-t pt-2">
+            <div className="px-4 pb-2 border-t pt-2 bg-primary/5">
               <p className="text-xs text-muted-foreground text-center">
-                Tour in progress - use the controls on the right →
+                Tour in progress — use the controls on the right side of the screen
               </p>
             </div>
           )}
@@ -611,17 +762,17 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 size="icon"
                 onClick={() => {
                   if (isSpeaking) stopSpeaking()
-                  else setSpeechEnabled(!speechEnabled)
+                  else toggleSpeechEnabled()
                 }}
                 className="flex-shrink-0 h-9 w-9"
-                title={isSpeaking ? "Stop speaking" : speechEnabled ? "Disable speech" : "Enable speech"}
+                title={isSpeaking ? "Stop speaking" : speechEnabled ? "Disable voice" : "Enable voice"}
               >
                 {isSpeaking ? (
                   <Volume2 className="h-4 w-4 animate-pulse text-primary" />
                 ) : speechEnabled ? (
                   <Volume2 className="h-4 w-4" />
                 ) : (
-                  <VolumeX className="h-4 w-4" />
+                  <VolumeX className="h-4 w-4 text-muted-foreground" />
                 )}
               </Button>
 
@@ -637,7 +788,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
             {isListening && (
               <p className="text-xs text-center text-muted-foreground mt-2">
-                Speak now... press Enter when done
+                Speak now... click the mic button again when done
               </p>
             )}
 
