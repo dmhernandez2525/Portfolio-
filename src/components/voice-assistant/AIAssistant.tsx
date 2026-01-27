@@ -198,69 +198,67 @@ export function AIAssistant() {
       return
     }
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel()
+    // DON'T call cancel() here - it was killing queued speech!
+    // The browser's speech synthesis has a built-in queue.
 
-    // Small delay after cancel to ensure clean state
-    setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = rate ?? 1.0
-      utterance.pitch = 1.0
-      utterance.volume = 1.0 // Max volume
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.rate = rate ?? 1.0
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
 
-      console.log('[TTS] Created utterance with rate:', utterance.rate)
+    console.log('[TTS] Created utterance with rate:', utterance.rate)
 
-      // Try to select a good voice
-      const voices = window.speechSynthesis.getVoices()
-      console.log('[TTS] Available voices:', voices.length)
+    // Try to select a good voice
+    const voices = window.speechSynthesis.getVoices()
+    console.log('[TTS] Available voices:', voices.length)
 
-      if (voices.length > 0) {
-        // Prefer English voices
-        const preferredVoice = voices.find(v =>
-          v.name.includes('Samantha') ||
-          v.name.includes('Google US') ||
-          v.name.includes('Microsoft') ||
-          (v.lang.startsWith('en') && v.localService)
-        ) || voices.find(v => v.lang.startsWith('en')) || voices[0]
+    if (voices.length > 0) {
+      // Prefer Samantha (macOS) or other English voices
+      const preferredVoice = voices.find(v => v.name === 'Samantha') ||
+        voices.find(v => v.name.includes('Google US')) ||
+        voices.find(v => v.lang.startsWith('en-US') && v.localService) ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        voices[0]
 
-        if (preferredVoice) {
-          utterance.voice = preferredVoice
-          console.log('[TTS] Selected voice:', preferredVoice.name)
-        }
+      if (preferredVoice) {
+        utterance.voice = preferredVoice
+        console.log('[TTS] Selected voice:', preferredVoice.name)
       }
+    }
 
-      utterance.onstart = () => {
-        console.log('[TTS] ✓ Speech STARTED')
-        setIsSpeaking(true)
-      }
-      utterance.onend = () => {
-        console.log('[TTS] ✓ Speech ENDED')
-        setIsSpeaking(false)
-      }
-      utterance.onerror = (e) => {
+    utterance.onstart = () => {
+      console.log('[TTS] ✓ Speech STARTED:', text.substring(0, 30) + '...')
+      setIsSpeaking(true)
+    }
+    utterance.onend = () => {
+      console.log('[TTS] ✓ Speech ENDED')
+      setIsSpeaking(false)
+    }
+    utterance.onerror = (e) => {
+      // Only log real errors, not 'canceled' which happens when we intentionally stop
+      if (e.error !== 'canceled') {
         console.error('[TTS] ✗ Speech ERROR:', e.error)
-        setIsSpeaking(false)
       }
+      setIsSpeaking(false)
+    }
 
-      console.log('[TTS] Calling speechSynthesis.speak()...')
-      console.log('[TTS] Text preview:', text.substring(0, 80) + (text.length > 80 ? '...' : ''))
+    console.log('[TTS] Calling speechSynthesis.speak()...')
+    console.log('[TTS] Text preview:', text.substring(0, 80) + (text.length > 80 ? '...' : ''))
 
-      try {
-        window.speechSynthesis.speak(utterance)
-        console.log('[TTS] speak() called successfully')
+    try {
+      window.speechSynthesis.speak(utterance)
+      console.log('[TTS] speak() called successfully, queue length:', window.speechSynthesis.pending ? 'has pending' : 'empty')
 
-        // Chrome bug workaround: speech sometimes gets stuck
-        // Resume if paused after a short delay
-        setTimeout(() => {
-          if (window.speechSynthesis.paused) {
-            console.log('[TTS] Resuming paused speech')
-            window.speechSynthesis.resume()
-          }
-        }, 100)
-      } catch (err) {
-        console.error('[TTS] Error calling speak():', err)
-      }
-    }, 50)
+      // Chrome bug workaround: speech sometimes gets stuck in paused state
+      setTimeout(() => {
+        if (window.speechSynthesis.paused) {
+          console.log('[TTS] Resuming paused speech')
+          window.speechSynthesis.resume()
+        }
+      }, 100)
+    } catch (err) {
+      console.error('[TTS] Error calling speak():', err)
+    }
   }, [])
 
   // Public TTS function that handles user interaction requirement
@@ -666,16 +664,21 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                       alert('Speech synthesis not available in this browser')
                       return
                     }
-                    window.speechSynthesis.cancel()
+                    // Don't call cancel() - just queue the speech
                     const testUtterance = new SpeechSynthesisUtterance('Hello! This is a test of the speech synthesis.')
                     testUtterance.volume = 1
                     testUtterance.rate = 1
-                    testUtterance.onstart = () => console.log('[TTS TEST] Started!')
-                    testUtterance.onend = () => console.log('[TTS TEST] Ended!')
-                    testUtterance.onerror = (e) => console.error('[TTS TEST] Error:', e)
+                    const voices = window.speechSynthesis.getVoices()
+                    const samantha = voices.find(v => v.name === 'Samantha') || voices.find(v => v.lang.startsWith('en'))
+                    if (samantha) testUtterance.voice = samantha
+                    testUtterance.onstart = () => console.log('[TTS TEST] ✓ Started!')
+                    testUtterance.onend = () => console.log('[TTS TEST] ✓ Ended!')
+                    testUtterance.onerror = (e) => {
+                      if (e.error !== 'canceled') console.error('[TTS TEST] Error:', e.error)
+                    }
                     console.log('[TTS TEST] Calling speak()...')
                     window.speechSynthesis.speak(testUtterance)
-                    console.log('[TTS TEST] speak() called')
+                    console.log('[TTS TEST] speak() queued')
                   }}
                   className="text-[10px] px-1.5 py-0.5 bg-muted rounded hover:bg-muted/80"
                   title="Test TTS directly"
