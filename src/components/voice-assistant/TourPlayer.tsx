@@ -129,7 +129,6 @@ export function TourPlayer({
     // Intercept speak callbacks to apply our speed setting
     const unsubscribeSpeak = guidedTour.onSpeak((text) => {
       if (onSpeak) {
-        console.log('[TourPlayer] Speaking with rate:', speedRef.current)
         onSpeak(text, speedRef.current)
       }
     })
@@ -202,10 +201,6 @@ export function TourPlayer({
   const handleSpeedChange = useCallback((newSpeed: SpeedOption) => {
     setSpeed(newSpeed)
     setShowSpeedMenu(false)
-
-    // If currently speaking, we could restart speech at new rate
-    // For now, the new rate will apply to the next speech
-    console.log('[TourPlayer] Speed changed to:', newSpeed)
   }, [])
 
   const handleFABClick = useCallback(() => {

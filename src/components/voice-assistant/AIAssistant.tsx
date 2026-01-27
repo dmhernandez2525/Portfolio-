@@ -1,13 +1,14 @@
 /**
- * AIAssistant - Core AI assistant functionality
+ * AIAssistant - Core AI assistant component
  *
- * This component provides:
- * - Persistent mini FAB (always visible for quick access)
- * - TourPlayer (Speechify-style sidebar during tours)
- * - Chat Dialog (opened via FAB or custom events)
- * - Speech recognition and TTS
+ * Features:
+ * - TourPlayer: Speechify-style floating player (always visible as mini FAB or expanded)
+ * - Chat Dialog: Full chat interface opened via FAB or custom events
+ * - Speech Recognition: Voice input via Web Speech API
+ * - Text-to-Speech: Voice output via Web Speech API (NEEDS FIXING - see requirements doc)
+ * - Voice Commands: Navigation and tour control via voiceCommandRouter
  *
- * Place this in RootLayout so it persists across all pages.
+ * Place this component in RootLayout so it persists across all pages.
  */
 
 import { useState, useRef, useEffect, useCallback } from "react"
@@ -33,7 +34,6 @@ interface Message {
   isNavigation?: boolean
 }
 
-// Get Speech Recognition constructor
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getSpeechRecognition(): any {
   if (typeof window === "undefined") return null
@@ -55,6 +55,7 @@ export function AIAssistant() {
     navigationService.setNavigate(navigate)
   }, [navigate])
 
+  // UI State
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -72,18 +73,16 @@ export function AIAssistant() {
   const [speechEnabled, setSpeechEnabled] = useState(true)
   const [tourActive, setTourActive] = useState(false)
   const [speechError, setSpeechError] = useState<string | null>(null)
-  const [voicesLoaded, setVoicesLoaded] = useState(false)
-  const [hasInteracted, setHasInteracted] = useState(false)
 
+  // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>(messages)
   const speechEnabledRef = useRef(speechEnabled)
-  const pendingSpeechRef = useRef<string | null>(null)
 
-  // Keep refs in sync
+  // Keep refs in sync with state
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
@@ -92,87 +91,26 @@ export function AIAssistant() {
     speechEnabledRef.current = speechEnabled
   }, [speechEnabled])
 
-  // Load voices for TTS
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      console.log('[TTS] Speech synthesis not available in this environment')
-      return
-    }
-
-    console.log('[TTS] Initializing speech synthesis...')
-
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices()
-      console.log('[TTS] getVoices() returned:', voices.length, 'voices')
-      if (voices.length > 0) {
-        setVoicesLoaded(true)
-        console.log('[TTS] Voices loaded successfully. Sample voices:',
-          voices.slice(0, 3).map(v => v.name).join(', '))
-      }
-    }
-
-    // Try to load immediately
-    loadVoices()
-
-    // Also listen for voiceschanged event (needed for Chrome)
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
-
-    // Chrome sometimes needs a kick to load voices
-    setTimeout(loadVoices, 100)
-    setTimeout(loadVoices, 500)
-
-    return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
-    }
-  }, [])
-
-  // Track user interaction for autoplay policy
-  useEffect(() => {
-    const handleInteraction = () => {
-      if (!hasInteracted) {
-        setHasInteracted(true)
-        console.log('[TTS] User interaction detected, audio enabled')
-
-        // If there's pending speech, play it now
-        if (pendingSpeechRef.current && speechEnabledRef.current) {
-          speakTextInternal(pendingSpeechRef.current)
-          pendingSpeechRef.current = null
-        }
-      }
-    }
-
-    window.addEventListener('click', handleInteraction)
-    window.addEventListener('keydown', handleInteraction)
-    window.addEventListener('touchstart', handleInteraction)
-
-    return () => {
-      window.removeEventListener('click', handleInteraction)
-      window.removeEventListener('keydown', handleInteraction)
-      window.removeEventListener('touchstart', handleInteraction)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInteracted])
-
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Focus input when modal opens
+  // Focus input when dialog opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [isOpen])
 
-  // Listen for custom event from CTAs
+  // Listen for custom 'open-ai-chat' event from CTAs
   useEffect(() => {
     const handleOpenChat = () => setIsOpen(true)
     window.addEventListener('open-ai-chat', handleOpenChat)
     return () => window.removeEventListener('open-ai-chat', handleOpenChat)
   }, [])
 
-  // Cleanup on unmount
+  // Cleanup speech resources on unmount
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -184,51 +122,7 @@ export function AIAssistant() {
     }
   }, [])
 
-  // Internal TTS function - simplified to match working AskAboutMe implementation
-  const speakTextInternal = useCallback((text: string, rate?: number) => {
-    console.log('[TTS] speakTextInternal called, text length:', text.length)
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      console.log('[TTS] speechSynthesis not available')
-      return
-    }
-
-    // Simple approach that works: cancel then speak immediately
-    window.speechSynthesis.cancel()
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = rate ?? 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 1.0
-
-    utterance.onstart = () => {
-      console.log('[TTS] ✓ STARTED speaking')
-      setIsSpeaking(true)
-    }
-    utterance.onend = () => {
-      console.log('[TTS] ✓ ENDED speaking')
-      setIsSpeaking(false)
-    }
-    utterance.onerror = (e) => {
-      console.log('[TTS] ✗ ERROR:', e.error)
-      setIsSpeaking(false)
-    }
-
-    console.log('[TTS] Calling speak()...')
-    window.speechSynthesis.speak(utterance)
-    console.log('[TTS] speak() called')
-  }, [])
-
-  // Public TTS function - simplified, just check if speech is enabled
-  const speakText = useCallback((text: string, rate?: number) => {
-    console.log('[TTS] speakText called, speechEnabled:', speechEnabledRef.current)
-    if (!speechEnabledRef.current) {
-      console.log('[TTS] Speech disabled, returning')
-      return
-    }
-    speakTextInternal(text, rate)
-  }, [speakTextInternal])
-
-  // Connect to guided tour state (TourPlayer handles the speaking)
+  // Connect to guided tour state
   useEffect(() => {
     const unsubscribeStep = guidedTour.onStepChange(() => {
       setTourActive(guidedTour.getState().isActive)
@@ -238,7 +132,6 @@ export function AIAssistant() {
       setTourActive(false)
     })
 
-    // Check initial state
     setTourActive(guidedTour.getState().isActive)
 
     return () => {
@@ -247,124 +140,31 @@ export function AIAssistant() {
     }
   }, [])
 
-  const startListening = useCallback(() => {
-    const SpeechRecognitionCtor = getSpeechRecognition()
-    if (!SpeechRecognitionCtor) {
-      setSpeechError("Speech recognition is not supported in your browser.")
-      setTimeout(() => setSpeechError(null), 4000)
-      return
-    }
+  /**
+   * Text-to-Speech function
+   * NOTE: TTS is currently not working properly. See requirements document for details.
+   * The issue is that speechSynthesis.speak() is called but onstart never fires.
+   */
+  const speakText = useCallback((text: string, rate?: number) => {
+    if (!speechEnabledRef.current) return
+    if (typeof window === "undefined" || !window.speechSynthesis) return
 
-    // Clean up any existing recognition
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.abort()
-      } catch { /* ignore */ }
-      recognitionRef.current = null
-    }
+    window.speechSynthesis.cancel()
 
-    // Small delay to ensure cleanup
-    setTimeout(() => {
-      try {
-        const recognition = new SpeechRecognitionCtor()
-        recognition.continuous = false // Changed to false for better reliability
-        recognition.interimResults = true
-        recognition.lang = "en-US"
-        recognition.maxAlternatives = 1
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.rate = rate ?? 1.0
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
 
-        let finalTranscript = ""
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onresult = (event: any) => {
-          let interim = ""
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript
-            } else {
-              interim += transcript
-            }
-          }
-
-          setInterimTranscript(interim)
-
-          if (finalTranscript) {
-            setInput(prev => prev + finalTranscript)
-            finalTranscript = ""
-            setInterimTranscript("")
-          }
-        }
-
-        recognition.onstart = () => {
-          console.log('[SpeechRecognition] Started')
-          setIsListening(true)
-          setSpeechError(null)
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onerror = (event: any) => {
-          console.error('[SpeechRecognition] Error:', event.error)
-
-          // Don't show error for 'no-speech' or 'aborted' as these are normal
-          if (event.error === 'not-allowed') {
-            setSpeechError("Microphone access denied. Please allow microphone access in your browser settings.")
-          } else if (event.error === 'audio-capture') {
-            setSpeechError("No microphone found. Please connect a microphone.")
-          } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
-            setSpeechError(`Speech recognition error: ${event.error}`)
-          }
-
-          setIsListening(false)
-          setInterimTranscript("")
-          if (event.error !== 'aborted' && event.error !== 'no-speech') {
-            setTimeout(() => setSpeechError(null), 5000)
-          }
-        }
-
-        recognition.onend = () => {
-          console.log('[SpeechRecognition] Ended')
-          setIsListening(false)
-          setInterimTranscript("")
-          recognitionRef.current = null
-        }
-
-        recognitionRef.current = recognition
-        recognition.start()
-      } catch (e) {
-        console.error('[SpeechRecognition] Failed to start:', e)
-        setSpeechError("Failed to start speech recognition. Please try again.")
-        setIsListening(false)
-        setTimeout(() => setSpeechError(null), 4000)
-      }
-    }, 150)
+    window.speechSynthesis.speak(utterance)
   }, [])
 
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop()
-      } catch { /* ignore */ }
-    }
-    setIsListening(false)
-    setInterimTranscript("")
-  }, [])
-
-  const toggleListening = useCallback(() => {
-    if (isListening) {
-      stopListening()
-    } else {
-      startListening()
-    }
-  }, [isListening, startListening, stopListening])
-
-  const speakResponse = useCallback((text: string) => {
-    speakText(text)
-  }, [speakText])
-
-  // Stable callback for TourPlayer to use
+  // Callback for TourPlayer to trigger speech with custom rate
   const handleTourSpeak = useCallback((text: string, rate?: number) => {
-    console.log('[AIAssistant] handleTourSpeak called with rate:', rate)
     speakText(text, rate)
   }, [speakText])
 
@@ -386,6 +186,103 @@ export function AIAssistant() {
     })
   }, [])
 
+  // Speech Recognition
+  const startListening = useCallback(() => {
+    const SpeechRecognitionCtor = getSpeechRecognition()
+    if (!SpeechRecognitionCtor) {
+      setSpeechError("Speech recognition is not supported in your browser.")
+      setTimeout(() => setSpeechError(null), 4000)
+      return
+    }
+
+    if (recognitionRef.current) {
+      try { recognitionRef.current.abort() } catch { /* ignore */ }
+      recognitionRef.current = null
+    }
+
+    setTimeout(() => {
+      try {
+        const recognition = new SpeechRecognitionCtor()
+        recognition.continuous = false
+        recognition.interimResults = true
+        recognition.lang = "en-US"
+        recognition.maxAlternatives = 1
+
+        let finalTranscript = ""
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onresult = (event: any) => {
+          let interim = ""
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript
+            } else {
+              interim += transcript
+            }
+          }
+          setInterimTranscript(interim)
+          if (finalTranscript) {
+            setInput(prev => prev + finalTranscript)
+            finalTranscript = ""
+            setInterimTranscript("")
+          }
+        }
+
+        recognition.onstart = () => {
+          setIsListening(true)
+          setSpeechError(null)
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          if (event.error === 'not-allowed') {
+            setSpeechError("Microphone access denied. Please allow microphone access.")
+          } else if (event.error === 'audio-capture') {
+            setSpeechError("No microphone found. Please connect a microphone.")
+          } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
+            setSpeechError(`Speech recognition error: ${event.error}`)
+          }
+          setIsListening(false)
+          setInterimTranscript("")
+          if (event.error !== 'aborted' && event.error !== 'no-speech') {
+            setTimeout(() => setSpeechError(null), 5000)
+          }
+        }
+
+        recognition.onend = () => {
+          setIsListening(false)
+          setInterimTranscript("")
+          recognitionRef.current = null
+        }
+
+        recognitionRef.current = recognition
+        recognition.start()
+      } catch {
+        setSpeechError("Failed to start speech recognition. Please try again.")
+        setIsListening(false)
+        setTimeout(() => setSpeechError(null), 4000)
+      }
+    }, 150)
+  }, [])
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch { /* ignore */ }
+    }
+    setIsListening(false)
+    setInterimTranscript("")
+  }, [])
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening()
+    } else {
+      startListening()
+    }
+  }, [isListening, startListening, stopListening])
+
+  // Send message to AI
   const sendMessage = useCallback(async (directMessage?: string) => {
     const trimmedInput = (directMessage ?? input).trim()
     if (!trimmedInput || isProcessing) return
@@ -403,6 +300,7 @@ export function AIAssistant() {
     setIsProcessing(true)
 
     try {
+      // Build conversation context
       const conversationHistory = [
         ...messagesRef.current.map(m => ({
           id: m.id,
@@ -418,11 +316,11 @@ export function AIAssistant() {
         tourState: guidedTour.getState()
       }
 
+      // Try voice command processing first
       let commandResult
       try {
         commandResult = await processVoiceCommand(trimmedInput, context)
-      } catch (commandError) {
-        console.error('[AIAssistant] Command processing error:', commandError)
+      } catch {
         commandResult = { handled: false, passToAI: true }
       }
 
@@ -438,7 +336,7 @@ export function AIAssistant() {
           setMessages(prev => [...prev, assistantMessage])
 
           if (commandResult.shouldSpeak) {
-            speakResponse(commandResult.response)
+            speakText(commandResult.response)
           }
         }
 
@@ -450,7 +348,7 @@ export function AIAssistant() {
         return
       }
 
-      // AI response
+      // Fall back to AI response
       const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY
       let response: string = ''
       let isNavResponse = false
@@ -494,8 +392,8 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
               }
             }
           }
-        } catch (intentError) {
-          console.log('[AIAssistant] Intent detection failed:', intentError)
+        } catch {
+          // Intent detection failed, continue to chat
         }
       }
 
@@ -540,11 +438,11 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         isNavigation: isNavResponse
       }
       setMessages(prev => [...prev, assistantMessage])
-      speakResponse(response)
+      speakText(response)
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, isListening, stopListening, speakResponse])
+  }, [input, isProcessing, isListening, stopListening, speakText])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -564,7 +462,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
   return (
     <>
-      {/* TourPlayer - Speechify-style player (always visible as mini FAB or expanded) */}
+      {/* TourPlayer - Always visible as mini FAB or expanded during tours */}
       <TourPlayer
         onOpenChat={() => setIsOpen(true)}
         speechEnabled={speechEnabled}
@@ -583,35 +481,12 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">Ask About Daniel</div>
-              {/* Voice status indicator with test button */}
-              <div className="flex items-center gap-2">
-                {speechEnabled && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Volume2 className="w-3 h-3" />
-                    <span>{voicesLoaded ? "Voice on" : "Loading..."}</span>
-                  </div>
-                )}
-                {/* Debug test button - simple direct TTS test */}
-                <button
-                  onClick={() => {
-                    if (!window.speechSynthesis) {
-                      alert('Speech synthesis not available')
-                      return
-                    }
-                    window.speechSynthesis.cancel()
-                    const u = new SpeechSynthesisUtterance('Hello! This is a test.')
-                    u.volume = 1
-                    u.rate = 1
-                    u.onstart = () => console.log('[TTS TEST] Started!')
-                    u.onend = () => console.log('[TTS TEST] Ended!')
-                    window.speechSynthesis.speak(u)
-                  }}
-                  className="text-[10px] px-1.5 py-0.5 bg-muted rounded hover:bg-muted/80"
-                  title="Test TTS"
-                >
-                  Test
-                </button>
-              </div>
+              {speechEnabled && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Volume2 className="w-3 h-3" />
+                  <span>Voice on</span>
+                </div>
+              )}
             </DialogTitle>
             <DialogDescription className="sr-only">
               Chat with Daniel's AI assistant to learn about his skills, projects, and experience.
