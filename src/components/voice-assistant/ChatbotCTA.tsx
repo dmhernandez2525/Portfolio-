@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
 import { processVoiceCommand } from "@/services/voice-stocks"
-import { guidedTour, getTourProgress } from "@/services/voice-stocks/guidedTour"
+import { guidedTour, getTourProgress, nextTourStep, previousTourStep, endTour } from "@/services/voice-stocks/guidedTour"
 import type { CommandContext } from "@/types/voiceStocks"
 
 interface Message {
@@ -65,11 +65,15 @@ export function ChatbotCTA() {
     }
   }, [isOpen])
 
-  // Cleanup recognition on unmount
+  // Cleanup recognition and speech synthesis on unmount
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         try { recognitionRef.current.stop() } catch { /* ignore */ }
+      }
+      // Cancel any ongoing speech
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel()
       }
     }
   }, [])
@@ -265,12 +269,12 @@ export function ChatbotCTA() {
           }
         }
 
-        // Execute any associated action
+        // Execute any associated action (may be async)
         if (commandResult.action) {
-          commandResult.action()
+          await Promise.resolve(commandResult.action())
         }
 
-        // Update tour state
+        // Update tour state after action completes
         setTourActive(guidedTour.getState().isActive)
         setTourProgress(getTourProgress())
         return
@@ -365,7 +369,15 @@ export function ChatbotCTA() {
       </div>
 
       {/* Chat Modal */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open)
+        // End tour if modal is closed while tour is active
+        if (!open && tourActive) {
+          endTour()
+          setTourActive(false)
+          setTourProgress({ current: 0, total: 0, percent: 0 })
+        }
+      }}>
         <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
           <DialogHeader className="p-4 pb-2 border-b bg-gradient-to-r from-primary/10 to-transparent">
             <DialogTitle className="flex items-center gap-2">
@@ -459,7 +471,7 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7"
-                    onClick={() => setInput("previous")}
+                    onClick={() => previousTourStep()}
                   >
                     ← Previous
                   </Button>
@@ -467,7 +479,7 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7"
-                    onClick={() => setInput("next")}
+                    onClick={() => nextTourStep()}
                   >
                     Next →
                   </Button>
@@ -475,7 +487,11 @@ export function ChatbotCTA() {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7 text-red-500 hover:text-red-600"
-                    onClick={() => setInput("end tour")}
+                    onClick={() => {
+                      endTour()
+                      setTourActive(false)
+                      setTourProgress({ current: 0, total: 0, percent: 0 })
+                    }}
                   >
                     End
                   </Button>
