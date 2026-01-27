@@ -25,8 +25,9 @@ import {
   clearHighlights,
 } from './highlightSystem';
 
-// Default tour configuration
-const DEFAULT_STEP_DURATION = 5000;
+// Default tour configuration - longer base duration for comprehensive tours
+// This can be adjusted by the TourPlayer's speed control
+const DEFAULT_STEP_DURATION = 8000;
 
 export class GuidedTourService {
   private static instance: GuidedTourService;
@@ -423,28 +424,43 @@ export class GuidedTourService {
     let description = '';
     let voiceScript = '';
 
-    // Generate contextual descriptions
+    // Generate rich, contextual descriptions with more detail
     if (titleLower.includes('hero') || section.level === 1) {
-      description = 'The main introduction to this page.';
-      voiceScript = `This is the main section. ${title}.`;
+      description = 'The main introduction showcasing who Daniel is and what he does. This is where visitors get their first impression.';
+      voiceScript = `Welcome! This is Daniel's portfolio homepage. Here you'll see a brief introduction and can get a quick sense of his work as a Senior Software Engineer. Notice the call-to-action buttons that let you explore projects, learn more about his background, or get in touch directly. You can say "tell me more" to dive deeper into any topic.`;
+    } else if (titleLower.includes('unconventional') || titleLower.includes('path')) {
+      description = 'The unique journey from GED to Senior Engineer - a story of determination and self-teaching.';
+      voiceScript = `This is Daniel's story - "The Unconventional Path." He went from working as a waiter and getting his GED to becoming a Principal Software Engineer. This section highlights his journey through self-teaching, hustle, and determination. It's a testament to what's possible when you bet on yourself. Want to know more about his philosophy? Just ask!`;
     } else if (titleLower.includes('about')) {
-      description = 'Learn more about the background and story.';
-      voiceScript = 'Here\'s the about section where you can learn more about the background and experience.';
+      description = 'Learn about Daniel\'s background, journey from self-taught developer to Senior Engineer, and what drives him.';
+      voiceScript = `Here's the About section. Daniel's journey is unique - from starting a lawn care business as a teenager to becoming a Principal Engineer working on Department of Defense applications. He's self-taught, with no traditional CS degree, proving that passion and persistence can overcome any obstacle. Notice the photo carousel showing his journey - from coding at 2 AM to speaking at tech events. Feel free to ask me anything about his background!`;
+    } else if (titleLower.includes('journey')) {
+      description = 'A visual timeline showing the path from bootcamp grind to senior engineer through photos and milestones.';
+      voiceScript = `This is "The Journey" - a photo gallery documenting Daniel's evolution as a developer. From late-night coding sessions studying Python at Steak n Shake, to building mind-controlled VR applications, to his current role as a Senior Engineer. Each photo tells part of the story. You can click through to see more, or ask me about any specific moment!`;
     } else if (titleLower.includes('project') || titleLower.includes('work') || titleLower.includes('portfolio')) {
-      description = 'Browse through the portfolio of work and projects.';
-      voiceScript = 'The projects section showcases the work. You can explore different projects here.';
+      description = 'A curated collection of projects showcasing full-stack development, AI integration, and creative problem-solving.';
+      voiceScript = `Welcome to the Projects section! Here you'll find Daniel's most impactful work - from enterprise applications to creative experiments. Each project demonstrates different skills: React and TypeScript for frontend, Node and Python for backend, and integration with AI services. Click any project card to see details, live demos, and the technology stack used. Want to hear about a specific project? Just ask!`;
     } else if (titleLower.includes('skill') || titleLower.includes('technolog') || titleLower.includes('expertise')) {
-      description = 'Technical skills and areas of expertise.';
-      voiceScript = 'This section covers the technical skills and technologies used.';
-    } else if (titleLower.includes('experience') || titleLower.includes('career')) {
-      description = 'Professional experience and career history.';
-      voiceScript = 'Here you can see the professional experience and career journey.';
+      description = 'A comprehensive overview of technical expertise including frontend, backend, DevOps, and emerging technologies.';
+      voiceScript = `This section breaks down Daniel's technical toolkit. On the frontend: React, TypeScript, Next.js, and modern CSS frameworks. Backend: Node.js, Python, Django, and various databases. Plus DevOps experience with Docker, AWS, and CI/CD pipelines. He's also been diving deep into AI and machine learning. The skill bars show proficiency levels based on years of experience and project complexity. Curious about his experience with any specific technology? Feel free to ask!`;
+    } else if (titleLower.includes('experience') || titleLower.includes('career') || titleLower.includes('professional')) {
+      description = 'Professional experience spanning startups, enterprise companies, and Department of Defense contractors.';
+      voiceScript = `Here's Daniel's professional timeline. Most recently at BrainGu, building software for Space Force, Air Force, and Navy applications. Before that, he co-founded Tailored Technologies, a custom software consultancy. He's also worked at enterprise companies like Mesirow Financial and First American. Each role expanded his skills - from early freelance work to leading engineering teams. Click any entry to see more details about technologies used and accomplishments!`;
     } else if (titleLower.includes('contact')) {
-      description = 'Get in touch or send a message.';
-      voiceScript = 'The contact section. You can reach out here.';
+      description = 'Multiple ways to get in touch - whether for job opportunities, collaborations, or just to say hello.';
+      voiceScript = `Ready to connect? This is the contact section. You can send a direct message through the form, or reach out via LinkedIn, GitHub, or email. Daniel is currently open to new opportunities and always happy to discuss interesting projects. Whether you're hiring, want to collaborate, or just want to chat about tech - don't hesitate to reach out!`;
+    } else if (titleLower.includes('globe') || titleLower.includes('location')) {
+      description = 'An interactive 3D globe showing Daniel\'s location and reach.';
+      voiceScript = `This interactive globe shows Daniel's current location and the global reach of his work. He's based in the United States but has worked with clients and teams worldwide. The visualization is built with Three.js - one of the many creative technologies he enjoys working with!`;
+    } else if (titleLower.includes('invention') || titleLower.includes('maker') || titleLower.includes('hardware')) {
+      description = 'Hardware projects and inventions showcasing the maker side of engineering.';
+      voiceScript = `Beyond software, Daniel loves building physical things. This section showcases his inventions and hardware projects - from 3D printed solutions to Arduino-based gadgets. He applies the same systems thinking to hardware as he does to software. Want to hear about a specific project? Just ask!`;
+    } else if (titleLower.includes('game')) {
+      description = 'A collection of games built as learning projects and creative experiments.';
+      voiceScript = `Welcome to the games section! These aren't just for fun - each game was a learning opportunity to explore different programming concepts. From classic games like Tetris and Snake to more complex multiplayer experiences. You can actually play them right in your browser! Which one would you like to try?`;
     } else {
-      description = `The ${title} section of this page.`;
-      voiceScript = `Here's the ${title} section.`;
+      description = `The ${title} section - click or ask to learn more about what's here.`;
+      voiceScript = `Here's the ${title} section. Take a moment to explore what's here. If you have questions about anything you see, just ask me and I'll explain!`;
     }
 
     return {
@@ -454,6 +470,7 @@ export class GuidedTourService {
       description,
       action: 'spotlight',
       voiceScript,
+      waitForInteraction: false, // TourPlayer manages timing now
     };
   }
 

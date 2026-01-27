@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User, MessageCircle,
-  Volume2, VolumeX, Loader2, Sparkles, Navigation, Map
+  Volume2, VolumeX, Loader2, Sparkles, Navigation
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
 import { processVoiceCommand, navigationService } from "@/services/voice-stocks"
-import { guidedTour, getTourProgress, nextTourStep, previousTourStep, endTour } from "@/services/voice-stocks/guidedTour"
+import { guidedTour } from "@/services/voice-stocks/guidedTour"
+import { TourPlayer } from "./TourPlayer"
 import type { CommandContext } from "@/types/voiceStocks"
 
 interface Message {
@@ -37,6 +38,8 @@ const speechRecognitionSupported = typeof window !== "undefined" && getSpeechRec
 
 export function ChatbotCTA() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isHomePage = location.pathname === '/'
 
   // Configure navigation service with React Router
   useEffect(() => {
@@ -59,7 +62,6 @@ export function ChatbotCTA() {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [speechEnabled, setSpeechEnabled] = useState(true)
   const [tourActive, setTourActive] = useState(false)
-  const [tourProgress, setTourProgress] = useState({ current: 0, total: 0, percent: 0 })
   const [speechError, setSpeechError] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -137,17 +139,13 @@ export function ChatbotCTA() {
     })
 
     // Track tour state changes
-    const unsubscribeStep = guidedTour.onStepChange((step) => {
+    const unsubscribeStep = guidedTour.onStepChange(() => {
       setTourActive(guidedTour.getState().isActive)
-      if (step) {
-        setTourProgress(getTourProgress())
-      }
     })
 
     // Track tour end
     const unsubscribeEnd = guidedTour.onTourEnd(() => {
       setTourActive(false)
-      setTourProgress({ current: 0, total: 0, percent: 0 })
     })
 
     return () => {
@@ -165,62 +163,97 @@ export function ChatbotCTA() {
       return
     }
 
-    // Stop any existing recognition
+    // Stop any existing recognition and wait for cleanup
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop() } catch { /* ignore */ }
+      try {
+        recognitionRef.current.abort() // Use abort instead of stop for immediate cleanup
+      } catch { /* ignore */ }
+      recognitionRef.current = null
     }
 
-    // Create fresh instance each time
-    const recognition = new SpeechRecognitionCtor()
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = "en-US"
+    // Small delay to ensure previous instance is fully released
+    setTimeout(() => {
+      try {
+        // Create fresh instance each time
+        const recognition = new SpeechRecognitionCtor()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.lang = "en-US"
+        recognition.maxAlternatives = 1
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onresult = (event: any) => {
-      let interim = ""
-      let final = ""
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onresult = (event: any) => {
+          let interim = ""
+          let final = ""
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript
-        if (event.results[i].isFinal) {
-          final += transcript
-        } else {
-          interim += transcript
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
+            if (event.results[i].isFinal) {
+              final += transcript
+            } else {
+              interim += transcript
+            }
+          }
+
+          setInterimTranscript(interim)
+
+          if (final) {
+            setInput(prev => prev + final)
+            setInterimTranscript("")
+          }
         }
-      }
 
-      setInterimTranscript(interim)
+        recognition.onaudiostart = () => {
+          console.log('[SpeechRecognition] Audio capture started')
+        }
 
-      if (final) {
-        setInput(prev => prev + final)
-        setInterimTranscript("")
-      }
-    }
+        recognition.onspeechstart = () => {
+          console.log('[SpeechRecognition] Speech detected')
+        }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onerror = (event: any) => {
-      console.warn("Speech recognition error:", event.error)
-      if (event.error !== "aborted") {
+        recognition.onspeechend = () => {
+          console.log('[SpeechRecognition] Speech ended')
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          console.error('[SpeechRecognition] Error:', event.error, event.message)
+
+          // Handle specific errors
+          if (event.error === 'not-allowed') {
+            setSpeechError("Microphone access denied. Please allow microphone access and try again.")
+          } else if (event.error === 'no-speech') {
+            setSpeechError("No speech detected. Please speak clearly and try again.")
+          } else if (event.error === 'audio-capture') {
+            setSpeechError("No microphone found. Please check your microphone connection.")
+          } else if (event.error === 'network') {
+            setSpeechError("Network error. Please check your internet connection.")
+          } else if (event.error !== "aborted") {
+            setSpeechError(`Speech recognition error: ${event.error}`)
+          }
+
+          setIsListening(false)
+          setInterimTranscript("")
+          setTimeout(() => setSpeechError(null), 5000)
+        }
+
+        recognition.onend = () => {
+          console.log('[SpeechRecognition] Recognition ended')
+          setIsListening(false)
+          setInterimTranscript("")
+        }
+
+        recognitionRef.current = recognition
+        recognition.start()
+        setIsListening(true)
+        console.log('[SpeechRecognition] Started listening')
+      } catch (e) {
+        console.error('[SpeechRecognition] Failed to start:', e)
+        setSpeechError("Failed to start speech recognition. Please try again.")
         setIsListening(false)
-        setInterimTranscript("")
+        setTimeout(() => setSpeechError(null), 4000)
       }
-    }
-
-    recognition.onend = () => {
-      setIsListening(false)
-      setInterimTranscript("")
-    }
-
-    recognitionRef.current = recognition
-
-    try {
-      recognition.start()
-      setIsListening(true)
-    } catch (e) {
-      console.error("Failed to start recognition:", e)
-      setIsListening(false)
-    }
+    }, 100)
   }, [])
 
   const stopListening = useCallback(() => {
@@ -251,11 +284,9 @@ export function ChatbotCTA() {
     }
   }, [])
 
-  // Helper to fully end tour and reset state
-  const handleEndTour = useCallback(() => {
-    endTour()
-    setTourActive(false)
-    setTourProgress({ current: 0, total: 0, percent: 0 })
+  // Toggle speech enabled/disabled
+  const toggleSpeechEnabled = useCallback(() => {
+    setSpeechEnabled(prev => !prev)
   }, [])
 
   const sendMessage = useCallback(async (directMessage?: string) => {
@@ -328,7 +359,6 @@ export function ChatbotCTA() {
 
         // Update tour state after action completes
         setTourActive(guidedTour.getState().isActive)
-        setTourProgress(getTourProgress())
         return
       }
 
@@ -433,6 +463,15 @@ Do not include any other text.` }]
     }
   }, [input, isProcessing, isListening, stopListening, speakResponse])
 
+  // Handle question from TourPlayer
+  const handleTourQuestion = useCallback((question: string) => {
+    setIsOpen(true)
+    // Add slight delay to ensure modal is open
+    setTimeout(() => {
+      sendMessage(question)
+    }, 100)
+  }, [sendMessage])
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -452,90 +491,87 @@ Do not include any other text.` }]
 
   return (
     <>
-      {/* Prominent CTA Banner */}
-      <div className="py-8">
-        <div className="container">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            onClick={() => setIsOpen(true)}
-            className="w-full group"
-          >
-            <div className="relative flex items-center justify-center gap-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 hover:from-primary/30 hover:via-primary/20 hover:to-primary/30 border border-primary/30 hover:border-primary/50 transition-all duration-300 max-w-lg mx-auto shadow-lg shadow-primary/10 hover:shadow-primary/20">
-              {/* Animated glow effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-pulse" />
+      {/* Tour Player Widget - Shows during tours instead of blocking modal */}
+      <TourPlayer
+        onOpenChat={() => setIsOpen(true)}
+        onAskQuestion={handleTourQuestion}
+        speechEnabled={speechEnabled}
+        onToggleSpeech={toggleSpeechEnabled}
+        isSpeaking={isSpeaking}
+        onStopSpeaking={stopSpeaking}
+      />
 
-              <div className="relative flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-primary" />
-                </div>
-                <div className="text-left">
-                  <span className="block text-base font-medium text-foreground">
-                    Got questions? <span className="text-primary">Ask my AI</span>
+      {/* Prominent CTA Banner - Only on home page */}
+      {isHomePage && (
+        <div className="py-8">
+          <div className="container">
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              onClick={() => setIsOpen(true)}
+              className="w-full group"
+            >
+              <div className="relative flex items-center justify-center gap-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 hover:from-primary/30 hover:via-primary/20 hover:to-primary/30 border border-primary/30 hover:border-primary/50 transition-all duration-300 max-w-lg mx-auto shadow-lg shadow-primary/10 hover:shadow-primary/20">
+                {/* Animated glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-pulse" />
+
+                <div className="relative flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-left">
+                    <span className="block text-base font-medium text-foreground">
+                      Got questions? <span className="text-primary">Ask my AI</span>
                   </span>
                   <span className="text-sm text-muted-foreground">
                     Skills, projects, or take a guided tour
                   </span>
                 </div>
-                <MessageCircle className="w-5 h-5 text-primary ml-2 group-hover:scale-110 transition-transform" />
+                  <MessageCircle className="w-5 h-5 text-primary ml-2 group-hover:scale-110 transition-transform" />
+                </div>
               </div>
-            </div>
-          </motion.button>
+            </motion.button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Floating Action Button - Always visible */}
-      <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 1, type: "spring" }}
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-        title="Ask AI Assistant"
-      >
-        <Bot className="w-6 h-6" />
-        {/* Pulse indicator */}
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
-        {/* Tooltip on hover */}
-        <span className="absolute right-full mr-3 px-3 py-1.5 bg-background border border-border rounded-lg text-sm text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-          Ask AI anything
-        </span>
-      </motion.button>
+      {/* Floating Action Button - Hide when tour is active (TourPlayer takes over) */}
+      <AnimatePresence>
+        {!tourActive && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring" }}
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+            title="Ask AI Assistant"
+          >
+            <Bot className="w-6 h-6" />
+            {/* Pulse indicator */}
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+            {/* Tooltip on hover */}
+            <span className="absolute right-full mr-3 px-3 py-1.5 bg-background border border-border rounded-lg text-sm text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+              Ask AI anything
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-      {/* Chat Modal */}
-      <Dialog open={isOpen} onOpenChange={(open) => {
-        setIsOpen(open)
-        // End tour if modal is closed while tour is active
-        if (!open && tourActive) {
-          handleEndTour()
-        }
-      }}>
-        <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
+      {/* Chat Modal - Separate from TourPlayer for clean UX */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden" aria-describedby="chat-description">
           <DialogHeader className="p-4 pb-2 border-b bg-gradient-to-r from-primary/10 to-transparent">
             <DialogTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                {tourActive ? (
-                  <Map className="w-4 h-4 text-primary" />
-                ) : (
-                  <Sparkles className="w-4 h-4 text-primary" />
-                )}
+                <Sparkles className="w-4 h-4 text-primary" />
               </div>
-              <div className="flex-1">
-                {tourActive ? "Guided Tour" : "Ask About Daniel"}
-              </div>
-              {tourActive && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{tourProgress.current}/{tourProgress.total}</span>
-                  <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${tourProgress.percent}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+              <div className="flex-1">Ask About Daniel</div>
             </DialogTitle>
+            <DialogDescription id="chat-description" className="sr-only">
+              Chat with Daniel's AI assistant to learn about his skills, projects, and experience.
+            </DialogDescription>
           </DialogHeader>
 
           {/* Messages Area */}
@@ -594,41 +630,12 @@ Do not include any other text.` }]
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Tour Controls */}
+          {/* Tour active hint - controls are in TourPlayer widget */}
           {tourActive && (
             <div className="px-4 pb-2 border-t pt-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-muted-foreground">Tour controls:</span>
-                <div className="flex gap-1.5">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7"
-                    onClick={() => { previousTourStep().catch(console.error) }}
-                    aria-label="Go to previous tour step"
-                  >
-                    ← Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7"
-                    onClick={() => { nextTourStep().catch(console.error) }}
-                    aria-label="Go to next tour step"
-                  >
-                    Next →
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 text-red-500 hover:text-red-600"
-                    onClick={handleEndTour}
-                    aria-label="End the guided tour"
-                  >
-                    End
-                  </Button>
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Tour in progress - use the floating controls on the right →
+              </p>
             </div>
           )}
 
