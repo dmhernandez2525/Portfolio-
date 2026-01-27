@@ -67,60 +67,72 @@ export function AskAboutMe() {
 
     // Stop any existing recognition
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop() } catch { /* ignore */ }
+      try { recognitionRef.current.abort() } catch { /* ignore */ }
+      recognitionRef.current = null
     }
 
-    // Create fresh instance each time
-    const recognition = new SpeechRecognitionCtor()
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = "en-US"
+    // Small delay to ensure cleanup
+    setTimeout(() => {
+      try {
+        const recognition = new SpeechRecognitionCtor()
+        recognition.continuous = false // Single-shot mode for reliability
+        recognition.interimResults = true
+        recognition.lang = "en-US"
+        recognition.maxAlternatives = 1
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onresult = (event: any) => {
-      let interim = ""
-      let final = ""
+        let finalTranscript = ""
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript
-        if (event.results[i].isFinal) {
-          final += transcript
-        } else {
-          interim += transcript
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onresult = (event: any) => {
+          let interim = ""
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript
+            } else {
+              interim += transcript
+            }
+          }
+
+          setInterimTranscript(interim)
+
+          if (finalTranscript) {
+            setInput(prev => prev + finalTranscript)
+            finalTranscript = ""
+            setInterimTranscript("")
+          }
         }
-      }
 
-      setInterimTranscript(interim)
+        recognition.onstart = () => {
+          console.log('[AskAboutMe] Speech recognition started')
+          setIsListening(true)
+        }
 
-      if (final) {
-        setInput(prev => prev + final)
-        setInterimTranscript("")
-      }
-    }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          console.error('[AskAboutMe] Speech recognition error:', event.error)
+          // Don't show error for no-speech or aborted
+          if (event.error !== "aborted" && event.error !== "no-speech") {
+            setIsListening(false)
+            setInterimTranscript("")
+          }
+        }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onerror = (event: any) => {
-      console.warn("Speech recognition error:", event.error)
-      if (event.error !== "aborted") {
+        recognition.onend = () => {
+          console.log('[AskAboutMe] Speech recognition ended')
+          setIsListening(false)
+          setInterimTranscript("")
+          recognitionRef.current = null
+        }
+
+        recognitionRef.current = recognition
+        recognition.start()
+      } catch (e) {
+        console.error('[AskAboutMe] Failed to start recognition:', e)
         setIsListening(false)
-        setInterimTranscript("")
       }
-    }
-
-    recognition.onend = () => {
-      setIsListening(false)
-      setInterimTranscript("")
-    }
-
-    recognitionRef.current = recognition
-
-    try {
-      recognition.start()
-      setIsListening(true)
-    } catch (e) {
-      console.error("Failed to start recognition:", e)
-      setIsListening(false)
-    }
+    }, 150)
   }, [])
 
   const stopListening = useCallback(() => {
