@@ -4,6 +4,7 @@ import { Mic, MicOff, Send, Bot, User, Sparkles, Volume2, VolumeX, Loader2 } fro
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
+import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis"
 
 interface Message {
   id: string
@@ -36,8 +37,15 @@ export function AskAboutMe() {
   const [interimTranscript, setInterimTranscript] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [speechEnabled, setSpeechEnabled] = useState(true)
+
+  // Text-to-Speech via shared hook (handles Chrome voice loading + autoplay policy)
+  const {
+    speak: speakResponse,
+    stop: stopSpeaking,
+    isSpeaking,
+    enabled: speechEnabled,
+    setEnabled: setSpeechEnabled,
+  } = useSpeechSynthesis({ debug: false })
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,7 +57,7 @@ export function AskAboutMe() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  // Cleanup recognition on unmount
+  // Cleanup recognition on unmount (TTS cleanup handled by hook)
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -150,31 +158,6 @@ export function AskAboutMe() {
       startListening()
     }
   }, [isListening, startListening, stopListening])
-
-  const speakResponse = useCallback((text: string) => {
-    if (!speechEnabled || typeof window === "undefined" || !window.speechSynthesis) return
-
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel()
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 0.8
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    window.speechSynthesis.speak(utterance)
-  }, [speechEnabled])
-
-  const stopSpeaking = useCallback(() => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-    }
-  }, [])
 
   const sendMessage = useCallback(async () => {
     const trimmedInput = input.trim()
