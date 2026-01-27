@@ -186,7 +186,11 @@ export function AIAssistant() {
 
   // Internal TTS function - simplified to match working AskAboutMe implementation
   const speakTextInternal = useCallback((text: string, rate?: number) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return
+    console.log('[TTS] speakTextInternal called, text length:', text.length)
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      console.log('[TTS] speechSynthesis not available')
+      return
+    }
 
     // Simple approach that works: cancel then speak immediately
     window.speechSynthesis.cancel()
@@ -196,16 +200,31 @@ export function AIAssistant() {
     utterance.pitch = 1.0
     utterance.volume = 1.0
 
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
+    utterance.onstart = () => {
+      console.log('[TTS] ✓ STARTED speaking')
+      setIsSpeaking(true)
+    }
+    utterance.onend = () => {
+      console.log('[TTS] ✓ ENDED speaking')
+      setIsSpeaking(false)
+    }
+    utterance.onerror = (e) => {
+      console.log('[TTS] ✗ ERROR:', e.error)
+      setIsSpeaking(false)
+    }
 
+    console.log('[TTS] Calling speak()...')
     window.speechSynthesis.speak(utterance)
+    console.log('[TTS] speak() called')
   }, [])
 
   // Public TTS function - simplified, just check if speech is enabled
   const speakText = useCallback((text: string, rate?: number) => {
-    if (!speechEnabledRef.current) return
+    console.log('[TTS] speakText called, speechEnabled:', speechEnabledRef.current)
+    if (!speechEnabledRef.current) {
+      console.log('[TTS] Speech disabled, returning')
+      return
+    }
     speakTextInternal(text, rate)
   }, [speakTextInternal])
 
