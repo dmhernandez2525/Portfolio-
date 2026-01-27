@@ -94,13 +94,20 @@ export function AIAssistant() {
 
   // Load voices for TTS
   useEffect(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      console.log('[TTS] Speech synthesis not available in this environment')
+      return
+    }
+
+    console.log('[TTS] Initializing speech synthesis...')
 
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices()
+      console.log('[TTS] getVoices() returned:', voices.length, 'voices')
       if (voices.length > 0) {
         setVoicesLoaded(true)
-        console.log('[TTS] Voices loaded:', voices.length)
+        console.log('[TTS] Voices loaded successfully. Sample voices:',
+          voices.slice(0, 3).map(v => v.name).join(', '))
       }
     }
 
@@ -109,6 +116,10 @@ export function AIAssistant() {
 
     // Also listen for voiceschanged event (needed for Chrome)
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+
+    // Chrome sometimes needs a kick to load voices
+    setTimeout(loadVoices, 100)
+    setTimeout(loadVoices, 500)
 
     return () => {
       window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
@@ -175,69 +186,111 @@ export function AIAssistant() {
 
   // Internal TTS function that actually speaks
   const speakTextInternal = useCallback((text: string, rate?: number) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      console.log('[TTS] Speech synthesis not available')
+    console.log('[TTS] speakTextInternal called with text length:', text.length)
+
+    if (typeof window === "undefined") {
+      console.log('[TTS] Window not available (SSR)')
+      return
+    }
+
+    if (!window.speechSynthesis) {
+      console.log('[TTS] speechSynthesis not available')
       return
     }
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel()
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = rate ?? 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 0.9
+    // Small delay after cancel to ensure clean state
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.rate = rate ?? 1.0
+      utterance.pitch = 1.0
+      utterance.volume = 1.0 // Max volume
 
-    console.log('[TTS] Using rate:', utterance.rate)
+      console.log('[TTS] Created utterance with rate:', utterance.rate)
 
-    // Try to select a good voice
-    const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v =>
-      v.name.includes('Samantha') ||
-      v.name.includes('Google') ||
-      v.name.includes('Microsoft') ||
-      v.lang.startsWith('en')
-    )
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
-    }
+      // Try to select a good voice
+      const voices = window.speechSynthesis.getVoices()
+      console.log('[TTS] Available voices:', voices.length)
 
-    utterance.onstart = () => {
-      console.log('[TTS] Started speaking')
-      setIsSpeaking(true)
-    }
-    utterance.onend = () => {
-      console.log('[TTS] Finished speaking')
-      setIsSpeaking(false)
-    }
-    utterance.onerror = (e) => {
-      console.error('[TTS] Error:', e.error)
-      setIsSpeaking(false)
-    }
+      if (voices.length > 0) {
+        // Prefer English voices
+        const preferredVoice = voices.find(v =>
+          v.name.includes('Samantha') ||
+          v.name.includes('Google US') ||
+          v.name.includes('Microsoft') ||
+          (v.lang.startsWith('en') && v.localService)
+        ) || voices.find(v => v.lang.startsWith('en')) || voices[0]
 
-    console.log('[TTS] Speaking:', text.substring(0, 50) + '...')
-    window.speechSynthesis.speak(utterance)
+        if (preferredVoice) {
+          utterance.voice = preferredVoice
+          console.log('[TTS] Selected voice:', preferredVoice.name)
+        }
+      }
+
+      utterance.onstart = () => {
+        console.log('[TTS] ✓ Speech STARTED')
+        setIsSpeaking(true)
+      }
+      utterance.onend = () => {
+        console.log('[TTS] ✓ Speech ENDED')
+        setIsSpeaking(false)
+      }
+      utterance.onerror = (e) => {
+        console.error('[TTS] ✗ Speech ERROR:', e.error)
+        setIsSpeaking(false)
+      }
+
+      console.log('[TTS] Calling speechSynthesis.speak()...')
+      console.log('[TTS] Text preview:', text.substring(0, 80) + (text.length > 80 ? '...' : ''))
+
+      try {
+        window.speechSynthesis.speak(utterance)
+        console.log('[TTS] speak() called successfully')
+
+        // Chrome bug workaround: speech sometimes gets stuck
+        // Resume if paused after a short delay
+        setTimeout(() => {
+          if (window.speechSynthesis.paused) {
+            console.log('[TTS] Resuming paused speech')
+            window.speechSynthesis.resume()
+          }
+        }, 100)
+      } catch (err) {
+        console.error('[TTS] Error calling speak():', err)
+      }
+    }, 50)
   }, [])
 
   // Public TTS function that handles user interaction requirement
   const speakText = useCallback((text: string, rate?: number) => {
+    console.log('[TTS] speakText called. State:', {
+      speechEnabled: speechEnabledRef.current,
+      voicesLoaded,
+      hasInteracted,
+      textLength: text.length,
+      rate
+    })
+
     if (!speechEnabledRef.current) {
-      console.log('[TTS] Speech disabled by user')
+      console.log('[TTS] ⚠ Speech disabled by user setting')
       return
     }
 
     if (!voicesLoaded) {
-      console.log('[TTS] Voices not loaded yet, queueing speech')
+      console.log('[TTS] ⚠ Voices not loaded yet, queueing speech')
       pendingSpeechRef.current = text
       return
     }
 
     if (!hasInteracted) {
-      console.log('[TTS] No user interaction yet, queueing speech')
+      console.log('[TTS] ⚠ No user interaction yet, queueing speech')
       pendingSpeechRef.current = text
       return
     }
 
+    console.log('[TTS] All checks passed, calling speakTextInternal')
     speakTextInternal(text, rate)
   }, [voicesLoaded, hasInteracted, speakTextInternal])
 
@@ -373,6 +426,12 @@ export function AIAssistant() {
 
   const speakResponse = useCallback((text: string) => {
     speakText(text)
+  }, [speakText])
+
+  // Stable callback for TourPlayer to use
+  const handleTourSpeak = useCallback((text: string, rate?: number) => {
+    console.log('[AIAssistant] handleTourSpeak called with rate:', rate)
+    speakText(text, rate)
   }, [speakText])
 
   const stopSpeaking = useCallback(() => {
@@ -578,7 +637,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         onToggleSpeech={toggleSpeechEnabled}
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
-        onSpeak={(text, rate) => speakText(text, rate)}
+        onSpeak={handleTourSpeak}
       />
 
       {/* Chat Dialog */}
