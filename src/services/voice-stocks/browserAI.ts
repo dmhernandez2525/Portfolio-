@@ -258,6 +258,93 @@ The target field should contain the destination for navigation or tour_skip inte
     }
   }
 
+  async generateActionResponse(
+    action: ActionType,
+    context: ActionContext
+  ): Promise<string> {
+    const prompt = this.buildActionPrompt(action, context);
+
+    // Try browser AI first
+    if (this.session) {
+      try {
+        const response = await this.session.prompt(prompt);
+        if (response && response.trim()) {
+          return response.trim();
+        }
+      } catch {
+        // Fall through to fallback
+      }
+    }
+
+    // Fallback to contextual defaults
+    return this.getFallbackResponse(action, context);
+  }
+
+  private buildActionPrompt(action: ActionType, context: ActionContext): string {
+    const baseContext = `You are a friendly AI assistant for Daniel's portfolio website.
+Keep responses concise (1-2 sentences max) and conversational.
+Daniel is a Senior Software Engineer with experience in React, TypeScript, and full-stack development.`;
+
+    switch (action) {
+      case 'navigate':
+        return `${baseContext}
+The user just navigated to "${context.target}".
+Generate a brief, friendly confirmation. Don't be robotic.`;
+
+      case 'tour_start':
+        return `${baseContext}
+The user is starting a guided tour of the portfolio.
+Generate an enthusiastic but brief welcome. Mention they can say "next" or "stop".`;
+
+      case 'tour_step':
+        return `${baseContext}
+The user is on tour step about "${context.section}".
+Section content: ${context.description || 'A section of the portfolio'}
+Generate engaging narration for this section (2-3 sentences). Be informative and personable.`;
+
+      case 'tour_end':
+        return `${baseContext}
+The user just ended the tour.
+Generate a friendly goodbye that encourages them to explore or ask questions.`;
+
+      case 'error':
+        return `${baseContext}
+Something went wrong: ${context.error}
+Generate a helpful, apologetic response with a suggestion.`;
+
+      case 'help':
+        return `${baseContext}
+The user asked for help with voice commands.
+List the main things you can do: navigate, give tours, answer questions about Daniel.
+Keep it conversational, not a boring list.`;
+
+      default:
+        return `${baseContext}
+Action: ${action}
+Context: ${JSON.stringify(context)}
+Generate an appropriate brief response.`;
+    }
+  }
+
+  private getFallbackResponse(action: ActionType, context: ActionContext): string {
+    switch (action) {
+      case 'navigate':
+        return `Here's ${context.target}.`;
+      case 'tour_start':
+        return "Let me show you around! Say 'next' to continue or 'stop' anytime.";
+      case 'tour_step':
+        return context.description || `This is the ${context.section} section.`;
+      case 'tour_end':
+        return "Tour complete! Feel free to explore or ask me anything.";
+      case 'error':
+        return "Sorry, I ran into an issue. Try that again?";
+      case 'help':
+        return "I can help you navigate, give tours, or answer questions about Daniel. What would you like?";
+      default:
+        return "How can I help you?";
+    }
+  }
+
   async streamResponse(prompt: string, onChunk: (chunk: string) => void): Promise<void> {
     if (!this.session) {
       await this.initialize();
@@ -284,10 +371,37 @@ The target field should contain the destination for navigation or tour_skip inte
   }
 }
 
+export type ActionType =
+  | 'navigate'
+  | 'tour_start'
+  | 'tour_step'
+  | 'tour_end'
+  | 'tour_next'
+  | 'tour_previous'
+  | 'error'
+  | 'help'
+  | 'stop'
+  | 'clear';
+
+export interface ActionContext {
+  target?: string;
+  section?: string;
+  description?: string;
+  error?: string;
+  [key: string]: unknown;
+}
+
 export const browserAI = BrowserAIService.getInstance();
 
 export async function detectIntent(text: string): Promise<IntentResult> {
   return browserAI.detectIntent(text);
+}
+
+export async function generateActionResponse(
+  action: ActionType,
+  context: ActionContext
+): Promise<string> {
+  return browserAI.generateActionResponse(action, context);
 }
 
 export async function isBrowserAIAvailable(): Promise<boolean> {

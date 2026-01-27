@@ -10,7 +10,7 @@ import { getVoiceStocksDOMNavigator } from './domNavigator';
 import { scrollAndHighlight, clearHighlights } from './highlightSystem';
 import { guidedTour, startAutoTour, endTour, nextTourStep, previousTourStep } from './guidedTour';
 import { navigationService } from './navigationService';
-import { browserAI, detectIntent, type IntentType } from './browserAI';
+import { browserAI, detectIntent, generateActionResponse, type IntentType } from './browserAI';
 
 export class VoiceCommandRouter {
   private static instance: VoiceCommandRouter;
@@ -123,7 +123,6 @@ export class VoiceCommandRouter {
 Or just ask me anything about Daniel!`;
   }
 
-  // Navigation handler
   private async handleNavigate(target: string): Promise<CommandResult> {
     if (!target) {
       return { handled: false, passToAI: true };
@@ -140,51 +139,42 @@ Or just ask me anything about Daniel!`;
         }
       }
 
-      return { handled: true, response: navResult.message, shouldSpeak: true };
+      const response = await generateActionResponse('navigate', { target });
+      return { handled: true, response, shouldSpeak: true };
     }
 
-    // Try DOM-based search
     const navigator = getVoiceStocksDOMNavigator();
     const element = navigator.findElementByDescription(target);
 
     if (element) {
       await scrollAndHighlight(element, { position: 'center' }, { dimBackground: false, duration: 3000 });
-      return { handled: true, response: `I've navigated to ${target}.`, shouldSpeak: true };
+      const response = await generateActionResponse('navigate', { target });
+      return { handled: true, response, shouldSpeak: true };
     }
 
-    // Try capability-based search
     const elements = navigator.findElementsForCapability(target);
     if (elements.length > 0) {
       await scrollAndHighlight(elements[0], { position: 'center' }, { dimBackground: false, duration: 3000 });
-      return { handled: true, response: `Here's the ${target} section.`, shouldSpeak: true };
+      const response = await generateActionResponse('navigate', { target });
+      return { handled: true, response, shouldSpeak: true };
     }
 
     return { handled: false, passToAI: true };
   }
 
-  // Tour handlers
   private async handleStartTour(): Promise<CommandResult> {
     if (guidedTour.getState().isActive) {
-      return {
-        handled: true,
-        response: 'A tour is already in progress. Say "next" to continue or "end tour" to stop.',
-        shouldSpeak: true,
-      };
+      const response = await generateActionResponse('tour_start', { alreadyActive: true });
+      return { handled: true, response, shouldSpeak: true };
     }
 
     try {
       await startAutoTour();
-      return {
-        handled: true,
-        response: "I'll give you a tour of this page. Say 'next' to continue or 'end tour' to stop at any time.",
-        shouldSpeak: false,
-      };
+      // Tour handles its own speaking via TourPlayer
+      return { handled: true, shouldSpeak: false };
     } catch {
-      return {
-        handled: true,
-        response: "I'd love to give you a tour, but I'm having trouble scanning the page. Try exploring the sections above!",
-        shouldSpeak: true,
-      };
+      const response = await generateActionResponse('error', { error: 'Could not start tour' });
+      return { handled: true, response, shouldSpeak: true };
     }
   }
 
@@ -212,31 +202,33 @@ Or just ask me anything about Daniel!`;
     const found = await guidedTour.skipToSection(section);
 
     if (found) {
-      return { handled: true, response: `Skipping to ${section}.`, shouldSpeak: false };
+      return { handled: true, shouldSpeak: false };
     }
 
-    return { handled: true, response: `I couldn't find a "${section}" section in the tour.`, shouldSpeak: true };
+    const response = await generateActionResponse('error', { error: `Section "${section}" not found` });
+    return { handled: true, response, shouldSpeak: true };
   }
 
-  private handleEndTour(): CommandResult {
+  private async handleEndTour(): Promise<CommandResult> {
     if (!guidedTour.getState().isActive) {
-      return { handled: true, response: "There's no tour in progress.", shouldSpeak: true };
+      return { handled: false, passToAI: true };
     }
     endTour();
-    return { handled: true, response: 'Tour ended. Feel free to explore or ask me anything.', shouldSpeak: true };
+    const response = await generateActionResponse('tour_end', {});
+    return { handled: true, response, shouldSpeak: true };
   }
 
-  // System handlers
-  private handleStop(): CommandResult {
+  private async handleStop(): Promise<CommandResult> {
     clearHighlights();
     if (guidedTour.getState().isActive) {
       endTour();
     }
-    return { handled: true, response: 'Stopping.', shouldSpeak: false };
+    return { handled: true, shouldSpeak: false };
   }
 
-  private handleHelp(): CommandResult {
-    return { handled: true, response: this.getHelpText(), shouldSpeak: true };
+  private async handleHelp(): Promise<CommandResult> {
+    const response = await generateActionResponse('help', {});
+    return { handled: true, response, shouldSpeak: true };
   }
 
   private handleRepeat(context: CommandContext): CommandResult {
@@ -248,12 +240,12 @@ Or just ask me anything about Daniel!`;
       return { handled: true, response: lastAssistantMessage.content, shouldSpeak: true };
     }
 
-    return { handled: true, response: "I haven't said anything yet. How can I help you?", shouldSpeak: true };
+    return { handled: false, passToAI: true };
   }
 
-  private handleClear(): CommandResult {
+  private async handleClear(): Promise<CommandResult> {
     clearHighlights();
-    return { handled: true, response: 'Cleared.', shouldSpeak: false };
+    return { handled: true, shouldSpeak: false };
   }
 }
 
