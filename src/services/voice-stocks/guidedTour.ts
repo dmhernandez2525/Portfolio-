@@ -96,10 +96,12 @@ export class GuidedTourService {
     }
 
     // Contact/form step (if present)
-    const contactForm = pageMap.forms.find(f =>
-      f.name?.toLowerCase().includes('contact') ||
-      f.element.id.toLowerCase().includes('contact')
-    );
+    const contactForm = pageMap.forms.find(f => {
+      // Safety check: ensure name is a string before calling toLowerCase
+      const formName = typeof f.name === 'string' ? f.name.toLowerCase() : '';
+      const formId = f.element.id?.toLowerCase() || '';
+      return formName.includes('contact') || formId.includes('contact');
+    });
     if (contactForm && steps.length < maxSteps) {
       steps.push({
         id: 'tour-contact',
