@@ -414,7 +414,7 @@ export function AskAboutMe() {
 
                 {isListening ? (
                   <p className="text-xs text-center text-muted-foreground mt-2">
-                    🎤 Speak now... click mic or press Enter when done
+                    Speak now... click mic or press Enter when done
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-2 text-center">

@@ -1,3 +1,16 @@
+/**
+ * AIAssistant - Core AI assistant component
+ *
+ * Features:
+ * - TourPlayer: Speechify-style floating player (always visible as mini FAB or expanded)
+ * - Chat Dialog: Full chat interface opened via FAB or custom events
+ * - Speech Recognition: Voice input via Web Speech API
+ * - Text-to-Speech: Voice output via useSpeechSynthesis hook
+ * - Voice Commands: Navigation and tour control via voiceCommandRouter
+ *
+ * Place this component in RootLayout so it persists across all pages.
+ */
+
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
@@ -171,7 +184,6 @@ export function AIAssistant() {
     const SpeechRecognitionCtor = getSpeechRecognition()
     if (!SpeechRecognitionCtor) {
       setSpeechError("Speech recognition is not supported in your browser.")
-      console.warn('[AIAssistant] SpeechRecognition not supported')
       setTimeout(() => setSpeechError(null), 4000)
       return
     }
@@ -450,7 +462,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, isListening, stopListening, speakText])
+  }, [input, isProcessing, isListening, stopListening, speakText, isSpeaking])
 
   useEffect(() => {
     const handleTalkModeSend = (event: CustomEvent<{ transcript: string }>) => {
