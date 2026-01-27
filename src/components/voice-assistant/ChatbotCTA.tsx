@@ -2,17 +2,21 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User, MessageCircle,
-  Volume2, VolumeX, Loader2, Sparkles
+  Volume2, VolumeX, Loader2, Sparkles, Navigation, Map
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
+import { processVoiceCommand } from "@/services/voice-stocks"
+import { guidedTour, getTourProgress } from "@/services/voice-stocks/guidedTour"
+import type { CommandContext } from "@/types/voiceStocks"
 
 interface Message {
   id: string
   role: "user" | "assistant"
   content: string
   timestamp: Date
+  isNavigation?: boolean // Flag for navigation/tour responses
 }
 
 // Get Speech Recognition constructor
@@ -31,7 +35,7 @@ export function ChatbotCTA() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. I won't judge. 🤖",
+      content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. Or say \"give me a tour\" to explore the site! 🤖",
       timestamp: new Date()
     }
   ])
@@ -41,6 +45,8 @@ export function ChatbotCTA() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [speechEnabled, setSpeechEnabled] = useState(true)
+  const [tourActive, setTourActive] = useState(false)
+  const [tourProgress, setTourProgress] = useState({ current: 0, total: 0, percent: 0 })
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,6 +73,53 @@ export function ChatbotCTA() {
       }
     }
   }, [])
+
+  // Direct speak function (used by tour callbacks) - defined early for use in effects
+  const speakText = useCallback((text: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return
+
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.rate = 1.0
+    utterance.pitch = 1.0
+    utterance.volume = 0.8
+
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+
+    window.speechSynthesis.speak(utterance)
+  }, [])
+
+  // Connect to guided tour for TTS and state updates
+  useEffect(() => {
+    // Register speak callback for tour voice scripts
+    const unsubscribeSpeak = guidedTour.onSpeak((text) => {
+      if (speechEnabled) {
+        speakText(text)
+      }
+    })
+
+    // Track tour state changes
+    const unsubscribeStep = guidedTour.onStepChange((step) => {
+      setTourActive(guidedTour.getState().isActive)
+      if (step) {
+        setTourProgress(getTourProgress())
+      }
+    })
+
+    // Track tour end
+    const unsubscribeEnd = guidedTour.onTourEnd(() => {
+      setTourActive(false)
+      setTourProgress({ current: 0, total: 0, percent: 0 })
+    })
+
+    return () => {
+      unsubscribeSpeak()
+      unsubscribeStep()
+      unsubscribeEnd()
+    }
+  }, [speechEnabled, speakText])
 
   const startListening = useCallback(() => {
     const SpeechRecognitionCtor = getSpeechRecognition()
@@ -108,6 +161,7 @@ export function ChatbotCTA() {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (event: any) => {
       console.warn("Speech recognition error:", event.error)
       if (event.error !== "aborted") {
@@ -149,20 +203,9 @@ export function ChatbotCTA() {
   }, [isListening, startListening, stopListening])
 
   const speakResponse = useCallback((text: string) => {
-    if (!speechEnabled || typeof window === "undefined" || !window.speechSynthesis) return
-
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 0.8
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    window.speechSynthesis.speak(utterance)
-  }, [speechEnabled])
+    if (!speechEnabled) return
+    speakText(text)
+  }, [speechEnabled, speakText])
 
   const stopSpeaking = useCallback(() => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -189,6 +232,51 @@ export function ChatbotCTA() {
     setIsProcessing(true)
 
     try {
+      // Build command context with conversation history
+      const conversationHistory = messages.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp.getTime()
+      }))
+
+      const context: Partial<CommandContext> = {
+        conversationHistory,
+        tourState: guidedTour.getState()
+      }
+
+      // First, try the voice command router for navigation/tour commands
+      const commandResult = await processVoiceCommand(trimmedInput, context)
+
+      if (commandResult.handled) {
+        // Command was handled by the router (navigation, tour, etc.)
+        if (commandResult.response) {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: commandResult.response,
+            timestamp: new Date(),
+            isNavigation: true
+          }
+          setMessages(prev => [...prev, assistantMessage])
+
+          if (commandResult.shouldSpeak && speechEnabled) {
+            speakResponse(commandResult.response)
+          }
+        }
+
+        // Execute any associated action
+        if (commandResult.action) {
+          commandResult.action()
+        }
+
+        // Update tour state
+        setTourActive(guidedTour.getState().isActive)
+        setTourProgress(getTourProgress())
+        return
+      }
+
+      // Command not handled or passed to AI - use Gemini/fallback
       let response: string
 
       const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY
@@ -234,7 +322,7 @@ export function ChatbotCTA() {
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, isListening, stopListening, speakResponse])
+  }, [input, isProcessing, isListening, stopListening, speakResponse, messages, speechEnabled])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -244,8 +332,9 @@ export function ChatbotCTA() {
   }
 
   const quickQuestions = [
-    "What does Daniel build?",
-    "Top 3 skills?",
+    "Give me a tour",
+    "Go to projects",
+    "What are Daniel's skills?",
     "Tell me something fun"
   ]
 
@@ -281,9 +370,26 @@ export function ChatbotCTA() {
           <DialogHeader className="p-4 pb-2 border-b bg-gradient-to-r from-primary/10 to-transparent">
             <DialogTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary" />
+                {tourActive ? (
+                  <Map className="w-4 h-4 text-primary" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-primary" />
+                )}
               </div>
-              Ask About Daniel
+              <div className="flex-1">
+                {tourActive ? "Guided Tour" : "Ask About Daniel"}
+              </div>
+              {tourActive && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{tourProgress.current}/{tourProgress.total}</span>
+                  <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${tourProgress.percent}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </DialogTitle>
           </DialogHeader>
 
@@ -299,14 +405,22 @@ export function ChatbotCTA() {
                   className={`flex gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {message.role === "assistant" && (
-                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Bot className="w-3.5 h-3.5 text-primary" />
+                    <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
+                      message.isNavigation ? "bg-green-500/20" : "bg-primary/20"
+                    }`}>
+                      {message.isNavigation ? (
+                        <Navigation className="w-3.5 h-3.5 text-green-500" />
+                      ) : (
+                        <Bot className="w-3.5 h-3.5 text-primary" />
+                      )}
                     </div>
                   )}
                   <div
                     className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                       message.role === "user"
                         ? "bg-primary text-primary-foreground"
+                        : message.isNavigation
+                        ? "bg-green-500/10 border border-green-500/20"
                         : "bg-muted"
                     }`}
                   >
@@ -335,8 +449,43 @@ export function ChatbotCTA() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Tour Controls */}
+          {tourActive && (
+            <div className="px-4 pb-2 border-t pt-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">Tour controls:</span>
+                <div className="flex gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => setInput("previous")}
+                  >
+                    ← Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => setInput("next")}
+                  >
+                    Next →
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7 text-red-500 hover:text-red-600"
+                    onClick={() => setInput("end tour")}
+                  >
+                    End
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Quick Questions */}
-          {messages.length === 1 && (
+          {messages.length === 1 && !tourActive && (
             <div className="px-4 pb-2">
               <div className="flex flex-wrap gap-1.5">
                 {quickQuestions.map((q) => (
@@ -380,7 +529,13 @@ export function ChatbotCTA() {
                   value={displayText}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={isListening ? "Listening... speak now" : "Ask anything..."}
+                  placeholder={
+                    isListening
+                      ? "Listening... speak now"
+                      : tourActive
+                      ? "Say 'next', 'previous', or 'end tour'..."
+                      : "Ask anything or say 'give me a tour'..."
+                  }
                   className="w-full h-9 px-3 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   disabled={isProcessing}
                 />

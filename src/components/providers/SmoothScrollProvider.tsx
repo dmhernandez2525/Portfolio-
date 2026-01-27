@@ -14,6 +14,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       touchMultiplier: 2,
     })
 
+    // Ensure scroll starts at top after Lenis initializes
+    lenisRef.current.scrollTo(0, { immediate: true })
+
     // Animation frame loop
     function raf(time: number) {
       lenisRef.current?.raf(time)
