@@ -1,10 +1,3 @@
-/**
- * Guided Tour Service
- *
- * Manages guided tours through a webpage, combining DOM Navigator
- * and Highlight System to walk users through content.
- */
-
 import type {
   TourConfig,
   TourStep,
@@ -36,6 +29,7 @@ export class GuidedTourService {
   private onStepChangeCallbacks: Set<(step: TourStep | null, index: number) => void> = new Set();
   private onTourEndCallbacks: Set<() => void> = new Set();
   private onSpeakCallbacks: Set<(text: string) => void> = new Set();
+  private isTransitioning: boolean = false; // Debounce flag to prevent rapid transitions
 
   private constructor() {
     this.state = {
@@ -83,8 +77,15 @@ export class GuidedTourService {
       }
     }
 
-    // Section steps
-    for (const section of pageMap.sections) {
+    // Section steps - sort by visual position (top to bottom)
+    const sortedSections = [...pageMap.sections].sort((a, b) => {
+      // Sort by vertical position first, then horizontal
+      const topDiff = a.boundingRect.top - b.boundingRect.top;
+      if (Math.abs(topDiff) > 50) return topDiff; // Significant vertical difference
+      return a.boundingRect.left - b.boundingRect.left;
+    });
+
+    for (const section of sortedSections) {
       if (steps.length >= maxSteps) break;
 
       // Skip very small sections
@@ -137,7 +138,6 @@ export class GuidedTourService {
       completedSteps: [],
     };
 
-    // Start first step
     await this.nextStep();
   }
 
@@ -154,6 +154,8 @@ export class GuidedTourService {
    */
   async nextStep(): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
+
+    if (this.isTransitioning) return;
 
     // Clear any pending timeout
     if (this.stepTimeout) {
@@ -177,11 +179,17 @@ export class GuidedTourService {
     this.state.currentStepIndex = nextIndex;
     const step = this.state.tourConfig.steps[nextIndex];
 
-    // Execute step
-    await this.executeStep(step);
+    // Set transitioning flag
+    this.isTransitioning = true;
 
-    // Notify callbacks
-    this.notifyStepChange(step, nextIndex);
+    try {
+      await this.executeStep(step);
+      this.notifyStepChange(step, nextIndex);
+    } finally {
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
   /**
@@ -189,6 +197,8 @@ export class GuidedTourService {
    */
   async previousStep(): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
+
+    if (this.isTransitioning) return;
 
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -202,15 +212,22 @@ export class GuidedTourService {
     this.state.currentStepIndex = prevIndex;
     const step = this.state.tourConfig.steps[prevIndex];
 
-    await this.executeStep(step);
-    this.notifyStepChange(step, prevIndex);
+    // Set transitioning flag
+    this.isTransitioning = true;
+
+    try {
+      await this.executeStep(step);
+      this.notifyStepChange(step, prevIndex);
+    } finally {
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
-  /**
-   * Skip to a specific step by ID or index
-   */
   async skipToStep(stepIdOrIndex: string | number): Promise<void> {
     if (!this.state.tourConfig || !this.state.isActive) return;
+    if (this.isTransitioning) return;
 
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -230,19 +247,23 @@ export class GuidedTourService {
     this.state.currentStepIndex = index;
     const step = this.state.tourConfig.steps[index];
 
-    await this.executeStep(step);
-    this.notifyStepChange(step, index);
+    // Set transitioning flag
+    this.isTransitioning = true;
+
+    try {
+      await this.executeStep(step);
+      this.notifyStepChange(step, index);
+    } finally {
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, 600);
+    }
   }
 
-  /**
-   * Skip to a section by name (fuzzy match)
-   */
   async skipToSection(sectionName: string): Promise<boolean> {
     if (!this.state.tourConfig) return false;
 
     const nameLower = sectionName.toLowerCase();
-
-    // Find matching step
     const matchIndex = this.state.tourConfig.steps.findIndex(step =>
       step.title.toLowerCase().includes(nameLower) ||
       step.id.toLowerCase().includes(nameLower)
@@ -256,9 +277,6 @@ export class GuidedTourService {
     return false;
   }
 
-  /**
-   * End the current tour
-   */
   endTour(): void {
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -274,20 +292,14 @@ export class GuidedTourService {
       completedSteps: [],
     };
 
-    // Notify callbacks
     for (const callback of this.onTourEndCallbacks) {
       try {
         callback();
-      } catch (error) {
-        console.error('[GuidedTour] Tour end callback error:', error);
-      }
+      } catch { /* ignore callback errors */ }
     }
     this.notifyStepChange(null, -1);
   }
 
-  /**
-   * Pause the tour (stop auto-advance)
-   */
   pause(): void {
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -295,14 +307,13 @@ export class GuidedTourService {
     }
   }
 
-  /**
-   * Resume the tour (restart auto-advance timer)
-   */
   resume(duration?: number): void {
     if (!this.state.isActive || !this.state.tourConfig) return;
 
     const effectiveDuration = duration ?? DEFAULT_STEP_DURATION;
-    this.stepTimeout = setTimeout(() => this.nextStep(), effectiveDuration);
+    this.stepTimeout = setTimeout(() => {
+      this.nextStep();
+    }, effectiveDuration);
   }
 
   /**
@@ -353,33 +364,18 @@ export class GuidedTourService {
     return () => this.onTourEndCallbacks.delete(callback);
   }
 
-  /**
-   * Register callback for voice scripts (TTS integration)
-   */
   onSpeak(callback: (text: string) => void): () => void {
     this.onSpeakCallbacks.add(callback);
     return () => this.onSpeakCallbacks.delete(callback);
   }
 
-  // ============================================================================
-  // Private Methods
-  // ============================================================================
-
   private async executeStep(step: TourStep): Promise<void> {
-    // Find target element
     const element = document.querySelector(step.target);
-    if (!(element instanceof HTMLElement)) {
-      console.warn(`[GuidedTour] Target not found: ${step.target}`);
-      return;
-    }
+    if (!(element instanceof HTMLElement)) return;
 
-    // Clear previous highlights
     clearHighlights();
+    await this.sleep(200);
 
-    // Wait a moment for visual transition
-    await this.sleep(100);
-
-    // Execute highlight action
     switch (step.action) {
       case 'spotlight':
         await scrollAndHighlight(element, { position: 'center' }, { dimBackground: true });
@@ -397,20 +393,18 @@ export class GuidedTourService {
         break;
     }
 
-    // Speak voice script
     if (step.voiceScript) {
       for (const callback of this.onSpeakCallbacks) {
         try {
           callback(step.voiceScript);
-        } catch (error) {
-          console.error('[GuidedTour] Speak callback error:', error);
-        }
+        } catch { /* ignore callback errors */ }
       }
     }
 
-    // Set auto-advance timer (if not waiting for interaction)
     if (!step.waitForInteraction) {
-      this.stepTimeout = setTimeout(() => this.nextStep(), DEFAULT_STEP_DURATION);
+      this.stepTimeout = setTimeout(() => {
+        this.nextStep();
+      }, DEFAULT_STEP_DURATION);
     }
   }
 
@@ -507,9 +501,7 @@ export class GuidedTourService {
     for (const callback of this.onStepChangeCallbacks) {
       try {
         callback(step, index);
-      } catch (error) {
-        console.error('[GuidedTour] Step change callback error:', error);
-      }
+      } catch { /* ignore callback errors */ }
     }
   }
 

@@ -37,7 +37,6 @@ export class VoiceCommandRouter {
    */
   async process(transcript: string, context: Partial<CommandContext> = {}): Promise<CommandResult> {
     const normalizedTranscript = transcript.toLowerCase().trim();
-    console.log('[VoiceCommandRouter] Processing:', normalizedTranscript);
 
     // Build full context with safe defaults
     let fullContext: CommandContext;
@@ -48,9 +47,7 @@ export class VoiceCommandRouter {
         currentPage: context.currentPage || getVoiceStocksDOMNavigator().getVSPageMap(),
         tourState: context.tourState || guidedTour.getState(),
       };
-    } catch (contextError) {
-      console.error('[VoiceCommandRouter] Error building context:', contextError);
-      // Use minimal context if page map generation fails
+    } catch {
       fullContext = {
         transcript: normalizedTranscript,
         conversationHistory: context.conversationHistory || [],
@@ -59,37 +56,27 @@ export class VoiceCommandRouter {
       };
     }
 
-    // Try custom commands first (higher priority)
     for (const command of this.customCommands) {
       const match = normalizedTranscript.match(command.pattern);
       if (match) {
         try {
           const result = await command.handler(match, fullContext);
-          // Continue checking if handler deferred (handled: false, passToAI: false)
           if (result.handled || result.passToAI) {
             return result;
           }
-        } catch (error) {
-          console.error(`[VoiceCommandRouter] Custom command error:`, error);
-        }
+        } catch { /* ignore custom command errors */ }
       }
     }
 
-    // Try built-in commands
     for (const command of this.commands) {
       const match = normalizedTranscript.match(command.pattern);
       if (match) {
-        console.log('[VoiceCommandRouter] Matched pattern:', command.pattern, 'for:', command.description);
         try {
           const result = await command.handler(match, fullContext);
-          console.log('[VoiceCommandRouter] Handler result:', result);
-          // Continue checking if handler deferred (handled: false, passToAI: false)
           if (result.handled || result.passToAI) {
             return result;
           }
-        } catch (error) {
-          console.error(`[VoiceCommandRouter] Command error:`, error);
-          // Return a handled response on error instead of falling through to AI
+        } catch {
           return {
             handled: true,
             response: "I understood your command but had trouble executing it. Please try again.",
@@ -197,7 +184,7 @@ export class VoiceCommandRouter {
     // Tour commands
     this.commands.push(
       {
-        pattern: /^(?:give me a|start a?|begin a?)\s*tour$/i,
+        pattern: /^(?:give me a|start a?|begin a?|take me on a)\s*tour$/i,
         handler: this.handleStartTour.bind(this),
         description: '"Give me a tour" - Start guided tour',
         category: 'tour',
@@ -439,7 +426,6 @@ export class VoiceCommandRouter {
   // ============================================================================
 
   private async handleStartTour(): Promise<CommandResult> {
-    console.log('[VoiceCommandRouter] handleStartTour called');
     if (guidedTour.getState().isActive) {
       return {
         handled: true,
@@ -449,18 +435,13 @@ export class VoiceCommandRouter {
     }
 
     try {
-      console.log('[VoiceCommandRouter] Starting auto tour...');
       await startAutoTour();
-      console.log('[VoiceCommandRouter] Auto tour started');
-
       return {
         handled: true,
         response: "I'll give you a tour of this page. Say 'next' to continue or 'end tour' to stop at any time.",
-        shouldSpeak: true,
+        shouldSpeak: false,
       };
-    } catch (tourError) {
-      console.error('[VoiceCommandRouter] Tour start error:', tourError);
-      // Return a graceful response even if tour fails to start
+    } catch {
       return {
         handled: true,
         response: "I'd love to give you a tour, but I'm having trouble scanning the page right now. You can explore the sections above - there's info about Daniel's skills, projects, and experience!",
@@ -471,39 +452,24 @@ export class VoiceCommandRouter {
 
   private async handleTourNext(): Promise<CommandResult> {
     if (!guidedTour.getState().isActive) {
-      return {
-        handled: false,
-        passToAI: true,
-      };
+      return { handled: false, passToAI: true };
     }
 
     await nextTourStep();
-
-    return {
-      handled: true,
-      shouldSpeak: false, // Tour has its own voice scripts
-    };
+    return { handled: true, shouldSpeak: false };
   }
 
   private async handleTourPrevious(): Promise<CommandResult> {
     if (!guidedTour.getState().isActive) {
-      return {
-        handled: false,
-        passToAI: true,
-      };
+      return { handled: false, passToAI: true };
     }
 
     await previousTourStep();
-
-    return {
-      handled: true,
-      shouldSpeak: false,
-    };
+    return { handled: true, shouldSpeak: false };
   }
 
   private async handleTourSkip(match: RegExpMatchArray): Promise<CommandResult> {
     if (!guidedTour.getState().isActive) {
-      // Start tour and skip to section
       await startAutoTour();
     }
 
@@ -511,18 +477,10 @@ export class VoiceCommandRouter {
     const found = await guidedTour.skipToSection(section);
 
     if (found) {
-      return {
-        handled: true,
-        response: `Skipping to ${section}.`,
-        shouldSpeak: true,
-      };
+      return { handled: true, response: `Skipping to ${section}.`, shouldSpeak: false };
     }
 
-    return {
-      handled: true,
-      response: `I couldn't find a "${section}" section in the tour.`,
-      shouldSpeak: true,
-    };
+    return { handled: true, response: `I couldn't find a "${section}" section in the tour.`, shouldSpeak: true };
   }
 
   private handleEndTour(): CommandResult {

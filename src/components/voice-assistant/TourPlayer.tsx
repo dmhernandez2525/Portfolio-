@@ -104,7 +104,7 @@ export function TourPlayer({
 
   // Subscribe to tour state changes
   useEffect(() => {
-    const unsubscribeStep = guidedTour.onStepChange((step, _index) => {
+    const unsubscribeStep = guidedTour.onStepChange((step) => {
       setCurrentStep(step)
       setProgress(getTourProgress())
       const active = guidedTour.getState().isActive
@@ -213,60 +213,66 @@ export function TourPlayer({
     }
   }, [tourActive, onOpenChat])
 
-  // Render collapsed mini FAB
+  // Render collapsed mini state - same position as expanded (middle of page)
   if (!isExpanded) {
     return (
-      <motion.button
+      <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        onClick={handleFABClick}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center group"
-        title={tourActive ? "Expand tour player" : "Chat with AI Assistant"}
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50"
       >
-        {tourActive ? (
-          <>
-            {/* Show progress ring when tour is active */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
-              <circle
-                cx="28"
-                cy="28"
-                r="24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                className="text-primary-foreground/30"
-              />
-              <circle
-                cx="28"
-                cy="28"
-                r="24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeDasharray={`${2 * Math.PI * 24}`}
-                strokeDashoffset={`${2 * Math.PI * 24 * (1 - progress.percent / 100)}`}
-                className="text-primary-foreground transition-all duration-500"
-                strokeLinecap="round"
-              />
-            </svg>
-            <Sparkles className="w-5 h-5 relative z-10" />
-            {isSpeaking && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-                <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
+        <motion.button
+          onClick={handleFABClick}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-14 h-14 rounded-2xl bg-background/95 backdrop-blur-lg border border-border shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center group relative"
+          title={tourActive ? "Expand tour player" : "Chat with AI Assistant"}
+        >
+          {tourActive ? (
+            <>
+              {/* Show progress ring when tour is active */}
+              <svg className="absolute inset-1 w-12 h-12 -rotate-90">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="text-muted"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray={`${2 * Math.PI * 20}`}
+                  strokeDashoffset={`${2 * Math.PI * 20 * (1 - progress.percent / 100)}`}
+                  className="text-primary transition-all duration-500"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <Sparkles className="w-5 h-5 text-primary relative z-10" />
+              {isSpeaking && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse" />
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <MessageCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
+                <span className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse" />
               </span>
-            )}
-          </>
-        ) : (
-          <>
-            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
-            </span>
-          </>
-        )}
-      </motion.button>
+            </>
+          )}
+        </motion.button>
+      </motion.div>
     )
   }
 

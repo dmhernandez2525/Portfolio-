@@ -26,17 +26,17 @@ import { ProjectsPage } from "@/pages/ProjectsPage"
 import { NotFound } from "@/pages/NotFound"
 
 const Home = () => (
-    <div className="min-h-screen">
-      <Hero />
-      <AICTABanner />
-      <About />
-      <Skills />
-      <Experience />
-      <Projects />
-      <GlobeSection />
-      <AskAboutMe />
-      <Contact />
-    </div>
+  <div className="min-h-screen">
+    <Hero />
+    <AICTABanner />
+    <About />
+    <Skills />
+    <Experience />
+    <Projects />
+    <GlobeSection />
+    <AskAboutMe />
+    <Contact />
+  </div>
 )
 
 export function AppRoutes() {
