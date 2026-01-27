@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User, MessageCircle,
@@ -7,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { getFallbackResponse, generateSystemPrompt } from "./danielContext"
-import { processVoiceCommand } from "@/services/voice-stocks"
+import { processVoiceCommand, navigationService } from "@/services/voice-stocks"
 import { guidedTour, getTourProgress, nextTourStep, previousTourStep, endTour } from "@/services/voice-stocks/guidedTour"
 import type { CommandContext } from "@/types/voiceStocks"
 
@@ -35,6 +36,13 @@ function generateMessageId(): string {
 const speechRecognitionSupported = typeof window !== "undefined" && getSpeechRecognition() !== null
 
 export function ChatbotCTA() {
+  const navigate = useNavigate()
+
+  // Configure navigation service with React Router
+  useEffect(() => {
+    navigationService.setNavigate(navigate)
+  }, [navigate])
+
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -317,13 +325,16 @@ export function ChatbotCTA() {
         return
       }
 
-      // Command not handled or passed to AI - use Gemini/fallback
-      let response: string
-
+      // Command not handled or passed to AI - try AI intent detection first
       const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY
+      let response: string = ''
+      let isNavResponse = false
+
+      // Try AI-powered intent detection for navigation
       if (geminiApiKey) {
         try {
-          const apiResponse = await fetch(
+          // First, ask Gemini to detect if this is a navigation request
+          const intentResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
             {
               method: "POST",
@@ -331,32 +342,82 @@ export function ChatbotCTA() {
               body: JSON.stringify({
                 contents: [{
                   role: "user",
-                  parts: [{ text: generateSystemPrompt() + "\n\nUser question: " + trimmedInput }]
+                  parts: [{ text: `Analyze this user request and determine if they want to navigate somewhere.
+Available pages: games, projects, philosophy, inventions, blog, social, tetris, snake, tanks, cookie-clicker, chess, agar, home
+Available sections on home: hero, about, skills, experience, projects, contact
+
+User request: "${trimmedInput}"
+
+If this is a navigation request, respond with ONLY: NAV:target
+(where target is the page or section name, e.g., "NAV:games" or "NAV:projects")
+
+If this is NOT a navigation request, respond with ONLY: CHAT
+Do not include any other text.` }]
                 }],
-                generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
+                generationConfig: { maxOutputTokens: 20, temperature: 0.1 }
               })
             }
           )
 
-          if (apiResponse.ok) {
-            const data = await apiResponse.json()
-            response = data.candidates?.[0]?.content?.parts?.[0]?.text || getFallbackResponse(trimmedInput)
-          } else {
+          if (intentResponse.ok) {
+            const intentData = await intentResponse.json()
+            const intentResult = intentData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || ''
+
+            if (intentResult.startsWith('NAV:')) {
+              const navTarget = intentResult.substring(4).trim()
+              const navResult = await navigationService.navigateTo(navTarget)
+
+              if (navResult.success) {
+                response = navResult.message
+                isNavResponse = true
+              }
+            }
+          }
+        } catch (intentError) {
+          console.log('[ChatbotCTA] Intent detection failed:', intentError)
+        }
+      }
+
+      // If not a navigation response, get regular AI response
+      if (!isNavResponse) {
+        if (geminiApiKey) {
+          try {
+            const apiResponse = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{
+                    role: "user",
+                    parts: [{ text: generateSystemPrompt() + "\n\nUser question: " + trimmedInput }]
+                  }],
+                  generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
+                })
+              }
+            )
+
+            if (apiResponse.ok) {
+              const data = await apiResponse.json()
+              response = data.candidates?.[0]?.content?.parts?.[0]?.text || getFallbackResponse(trimmedInput)
+            } else {
+              response = getFallbackResponse(trimmedInput)
+            }
+          } catch {
             response = getFallbackResponse(trimmedInput)
           }
-        } catch {
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 800))
           response = getFallbackResponse(trimmedInput)
         }
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 800))
-        response = getFallbackResponse(trimmedInput)
       }
 
       const assistantMessage: Message = {
         id: generateMessageId(),
         role: "assistant",
         content: response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        isNavigation: isNavResponse
       }
       setMessages(prev => [...prev, assistantMessage])
       speakResponse(response)
@@ -374,9 +435,9 @@ export function ChatbotCTA() {
 
   const quickQuestions = [
     "Give me a tour",
-    "Go to projects",
-    "What are Daniel's skills?",
-    "Tell me something fun"
+    "Go to games",
+    "Show me projects",
+    "What can Daniel do?"
   ]
 
   // Combined display text for input

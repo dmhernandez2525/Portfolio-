@@ -14,6 +14,7 @@ import type {
 import { getVoiceStocksDOMNavigator } from './domNavigator';
 import { scrollAndHighlight, clearHighlights } from './highlightSystem';
 import { guidedTour, startAutoTour, endTour, nextTourStep, previousTourStep } from './guidedTour';
+import { navigationService } from './navigationService';
 
 export class VoiceCommandRouter {
   private static instance: VoiceCommandRouter;
@@ -280,9 +281,29 @@ export class VoiceCommandRouter {
 
   private async handleNavigate(match: RegExpMatchArray): Promise<CommandResult> {
     const target = match[1].trim();
-    const navigator = getVoiceStocksDOMNavigator();
 
-    // Try to find the element
+    // First, try the navigation service (handles both routes and sections)
+    const navResult = await navigationService.navigateTo(target);
+
+    if (navResult.success) {
+      // If it was a section navigation, also highlight the element
+      if (navResult.type === 'section') {
+        const navigator = getVoiceStocksDOMNavigator();
+        const element = navigator.findElementByDescription(target);
+        if (element) {
+          await scrollAndHighlight(element, { position: 'center' }, { dimBackground: false, duration: 3000 });
+        }
+      }
+
+      return {
+        handled: true,
+        response: navResult.message,
+        shouldSpeak: true,
+      };
+    }
+
+    // Fall back to DOM-based search
+    const navigator = getVoiceStocksDOMNavigator();
     const element = navigator.findElementByDescription(target);
 
     if (element) {
