@@ -1,54 +1,112 @@
 /**
  * useSpeechSynthesis Hook
  *
- * A robust Text-to-Speech hook that handles:
+ * A robust, feature-rich Text-to-Speech hook that handles:
  * - Chrome's async voice loading
- * - Browser autoplay policy (user interaction tracking)
- * - Consistent error handling
- * - Speech state management
+ * - Promise-based speak() for async control (Talk Mode integration)
+ * - Configurable enabled toggle for UI controls
+ * - Voice selection with preference for local/English voices
+ * - Pause/resume support
+ * - Debug logging (optional)
  *
- * This hook is shared between AIAssistant and AskAboutMe components.
+ * This hook is copied from voice-docs-app (source of truth).
+ *
+ * IMPORTANT: This hook does NOT block on "user interaction" state.
+ * Browser autoplay policies handle this naturally - if the user hasn't
+ * interacted yet, the browser simply won't play audio. We don't need
+ * to track this ourselves (and doing so caused bugs).
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react';
 
-interface UseSpeechSynthesisOptions {
-  /** Initial enabled state */
-  initialEnabled?: boolean
-  /** Default speech rate (0.1 to 10) */
-  defaultRate?: number
-  /** Default pitch (0 to 2) */
-  defaultPitch?: number
-  /** Default volume (0 to 1) */
-  defaultVolume?: number
-  /** Enable debug logging */
-  debug?: boolean
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface SpeechSynthesisOptions {
+  /** Voice object or voice name string */
+  voice?: SpeechSynthesisVoice | string | null;
+  /** Speech rate (0.1 to 10, default: 1.0) */
+  rate?: number;
+  /** Speech pitch (0 to 2, default: 1.0) */
+  pitch?: number;
+  /** Volume (0 to 1, default: 0.8) */
+  volume?: number;
+  /** Language code (default: 'en-US') */
+  lang?: string;
 }
 
-interface UseSpeechSynthesisReturn {
-  /** Speak the given text */
-  speak: (text: string, rate?: number) => void
-  /** Stop any current speech */
-  stop: () => void
-  /** Whether speech is currently playing */
-  isSpeaking: boolean
-  /** Whether the TTS system is ready (voices loaded + user has interacted) */
-  isReady: boolean
+export interface UseSpeechSynthesisOptions {
+  /** Initial enabled state (default: true) */
+  initialEnabled?: boolean;
+  /** Default speech rate (default: 1.0) */
+  defaultRate?: number;
+  /** Default pitch (default: 1.0) */
+  defaultPitch?: number;
+  /** Default volume (default: 0.8) */
+  defaultVolume?: number;
+  /** Default language (default: 'en-US') */
+  defaultLang?: string;
+  /** Prefer local voices over network voices (default: true) */
+  preferLocalVoice?: boolean;
+  /** Enable debug logging (default: false) */
+  debug?: boolean;
+  /** Callback when speech starts */
+  onStart?: () => void;
+  /** Callback when speech ends */
+  onEnd?: () => void;
+  /** Callback when speech is paused */
+  onPause?: () => void;
+  /** Callback when speech is resumed */
+  onResume?: () => void;
+  /** Callback on error */
+  onError?: (error: Error) => void;
+  /** Callback on word boundary */
+  onBoundary?: (charIndex: number, charLength: number) => void;
+}
+
+export interface UseSpeechSynthesisReturn {
+  // Core functions
+  /** Speak text. Returns a Promise that resolves when speech ends. */
+  speak: (text: string, options?: SpeechSynthesisOptions) => Promise<void>;
+  /** Stop all speech */
+  stop: () => void;
+  /** Pause current speech */
+  pause: () => void;
+  /** Resume paused speech */
+  resume: () => void;
+
+  // State
+  /** Whether speech synthesis is supported in this browser */
+  isSupported: boolean;
+  /** Whether currently speaking */
+  isSpeaking: boolean;
+  /** Whether speech is paused */
+  isPaused: boolean;
+  /** Whether voices have loaded (ready to speak) */
+  isReady: boolean;
+
+  // Enabled control (for UI toggle)
   /** Whether TTS is enabled by the user */
-  enabled: boolean
-  /** Toggle or set enabled state */
-  setEnabled: (enabled: boolean | ((prev: boolean) => boolean)) => void
+  enabled: boolean;
+  /** Set enabled state */
+  setEnabled: (enabled: boolean | ((prev: boolean) => boolean)) => void;
   /** Toggle enabled state */
-  toggleEnabled: () => void
-  /** Whether voices have been loaded */
-  voicesLoaded: boolean
-  /** Whether user has interacted with the page */
-  hasUserInteracted: boolean
+  toggleEnabled: () => void;
+
+  // Voice selection
+  /** Available voices */
+  voices: SpeechSynthesisVoice[];
+  /** Currently selected voice */
+  selectedVoice: SpeechSynthesisVoice | null;
+  /** Set the voice by object or name */
+  setVoice: (voice: SpeechSynthesisVoice | string | null) => void;
 }
 
-/**
- * Speech synthesis hook with robust browser compatibility
- */
+// ============================================================================
+// Hook Implementation
+// ============================================================================
+
 export function useSpeechSynthesis(
   options: UseSpeechSynthesisOptions = {}
 ): UseSpeechSynthesisReturn {
@@ -57,260 +115,514 @@ export function useSpeechSynthesis(
     defaultRate = 1.0,
     defaultPitch = 1.0,
     defaultVolume = 0.8,
+    defaultLang = 'en-US',
+    preferLocalVoice = true,
     debug = false,
-  } = options
+    onStart,
+    onEnd,
+    onPause,
+    onResume,
+    onError,
+    onBoundary,
+  } = options;
 
   // State
-  const [enabled, setEnabled] = useState(initialEnabled)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [voicesLoaded, setVoicesLoaded] = useState(false)
-  const [hasUserInteracted, setHasUserInteracted] = useState(false)
+  const [enabled, setEnabledState] = useState(initialEnabled);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
 
-  // Refs for stable callbacks
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
-  const pendingSpeakRef = useRef<{ text: string; rate: number } | null>(null)
+  // Refs for stable callbacks and current utterance tracking
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const resolveRef = useRef<(() => void) | null>(null);
+  const rejectRef = useRef<((error: Error) => void) | null>(null);
+  const manualStopRef = useRef(false);
 
+  // Check if speech synthesis is available
+  const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const isReady = voices.length > 0;
+
+  // Debug logging helper
   const log = useCallback(
     (message: string, data?: Record<string, unknown>) => {
       if (debug) {
-        console.log(`[TTS] ${message}`, data ?? '')
+        console.log(`[TTS] ${message}`, data ?? '');
       }
     },
     [debug]
-  )
+  );
 
-  // Check if speech synthesis is available
-  const isAvailable =
-    typeof window !== 'undefined' && 'speechSynthesis' in window
+  // ============================================================================
+  // Voice Loading
+  // ============================================================================
 
-  // Handle voice loading (Chrome loads voices async)
   useEffect(() => {
-    if (!isAvailable) return
+    if (!isSupported) return;
 
-    const checkVoices = () => {
-      const voices = window.speechSynthesis.getVoices()
-      if (voices.length > 0) {
-        setVoicesLoaded(true)
-        log('Voices loaded', { count: voices.length })
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      if (availableVoices.length === 0) return;
 
-        // If we had a pending speak, execute it now
-        if (pendingSpeakRef.current) {
-          const { text, rate } = pendingSpeakRef.current
-          pendingSpeakRef.current = null
-          // Use setTimeout to avoid calling during the event handler
-          setTimeout(() => executeSpeech(text, rate), 0)
+      setVoices(availableVoices);
+      log('Voices loaded', { count: availableVoices.length });
+
+      // Auto-select a good default voice if none selected
+      if (!selectedVoice) {
+        const defaultVoice = selectDefaultVoice(availableVoices, defaultLang, preferLocalVoice);
+        if (defaultVoice) {
+          setSelectedVoice(defaultVoice);
+          log('Auto-selected voice', { name: defaultVoice.name, lang: defaultVoice.lang });
         }
       }
-    }
+    };
 
-    // Check immediately (Firefox has voices ready synchronously)
-    checkVoices()
+    // Load voices immediately (Firefox has them ready synchronously)
+    loadVoices();
 
-    // Also listen for voiceschanged (Chrome)
-    window.speechSynthesis.addEventListener('voiceschanged', checkVoices)
+    // Chrome loads voices asynchronously
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
 
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', checkVoices)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAvailable])
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    };
+  }, [isSupported, defaultLang, preferLocalVoice, selectedVoice, log]);
 
-  // Track user interaction for autoplay policy
+  // ============================================================================
+  // Cleanup on Unmount and Page Refresh
+  // ============================================================================
+
   useEffect(() => {
-    if (!isAvailable) return
+    if (!isSupported) return;
 
-    const markInteracted = () => {
-      if (!hasUserInteracted) {
-        setHasUserInteracted(true)
-        log('User interaction detected')
-
-        // If we had a pending speak, execute it now
-        if (pendingSpeakRef.current && voicesLoaded) {
-          const { text, rate } = pendingSpeakRef.current
-          pendingSpeakRef.current = null
-          setTimeout(() => executeSpeech(text, rate), 0)
-        }
-      }
-    }
-
-    // Listen for any user interaction
-    document.addEventListener('click', markInteracted, { once: false })
-    document.addEventListener('keydown', markInteracted, { once: false })
-    document.addEventListener('touchstart', markInteracted, { once: false })
+    // Stop speech on page refresh/close
+    const handleBeforeUnload = () => {
+      window.speechSynthesis.cancel();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      document.removeEventListener('click', markInteracted)
-      document.removeEventListener('keydown', markInteracted)
-      document.removeEventListener('touchstart', markInteracted)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAvailable, hasUserInteracted, voicesLoaded])
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      manualStopRef.current = true;
+      window.speechSynthesis.cancel();
+    };
+  }, [isSupported]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (isAvailable) {
-        window.speechSynthesis.cancel()
-      }
-    }
-  }, [isAvailable])
+  // ============================================================================
+  // Core Functions
+  // ============================================================================
 
-  // Core speech execution (internal)
-  const executeSpeech = useCallback(
-    (text: string, rate: number) => {
-      if (!isAvailable) return
-
-      log('Executing speech', { textLength: text.length, rate })
-
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel()
-
-      // Create utterance
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = rate
-      utterance.pitch = defaultPitch
-      utterance.volume = defaultVolume
-
-      // Try to select a good voice (prefer English)
-      const voices = window.speechSynthesis.getVoices()
-      const englishVoice = voices.find(
-        (v) => v.lang.startsWith('en') && v.localService
-      )
-      if (englishVoice) {
-        utterance.voice = englishVoice
-      }
-
-      utterance.onstart = () => {
-        log('Speech started')
-        setIsSpeaking(true)
-      }
-
-      utterance.onend = () => {
-        log('Speech ended')
-        setIsSpeaking(false)
-        utteranceRef.current = null
-      }
-
-      utterance.onerror = (event) => {
-        log('Speech error', { error: event.error })
-        setIsSpeaking(false)
-        utteranceRef.current = null
-      }
-
-      utteranceRef.current = utterance
-
-      // Chrome bug workaround: pause and resume if speech gets stuck
-      // This happens when speak() is called too quickly after cancel()
-      window.speechSynthesis.speak(utterance)
-
-      // Check if speech actually started after a short delay
-      setTimeout(() => {
-        if (
-          utteranceRef.current === utterance &&
-          !window.speechSynthesis.speaking &&
-          !window.speechSynthesis.pending
-        ) {
-          log('Speech may be stuck, attempting retry')
-          window.speechSynthesis.cancel()
-          window.speechSynthesis.speak(utterance)
-        }
-      }, 100)
-    },
-    [isAvailable, defaultPitch, defaultVolume, log]
-  )
-
-  // Public speak function
+  /**
+   * Speak text with optional options override.
+   * Returns a Promise that resolves when speech ends, or rejects on error.
+   */
   const speak = useCallback(
-    (text: string, rate?: number) => {
-      if (!enabled) {
-        log('Speech disabled, ignoring')
-        return
-      }
+    (text: string, speakOptions: SpeechSynthesisOptions = {}): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        // Check if enabled
+        if (!enabled) {
+          log('TTS disabled, ignoring speak request');
+          resolve();
+          return;
+        }
 
-      if (!isAvailable) {
-        log('Speech synthesis not available')
-        return
-      }
+        // Check browser support
+        if (!isSupported) {
+          const error = new Error('Speech synthesis not supported');
+          log('Speech synthesis not supported');
+          onError?.(error);
+          reject(error);
+          return;
+        }
 
-      const effectiveRate = rate ?? defaultRate
+        // Check if voices are loaded
+        if (!isReady) {
+          log('Voices not loaded yet, waiting...');
+          // Wait for voices to load, then try again
+          const checkVoices = setInterval(() => {
+            if (window.speechSynthesis.getVoices().length > 0) {
+              clearInterval(checkVoices);
+              speak(text, speakOptions).then(resolve).catch(reject);
+            }
+          }, 100);
 
-      log('Speak requested', {
-        textLength: text.length,
-        rate: effectiveRate,
-        voicesLoaded,
-        hasUserInteracted,
-      })
+          // Timeout after 3 seconds
+          setTimeout(() => {
+            clearInterval(checkVoices);
+            if (window.speechSynthesis.getVoices().length === 0) {
+              const error = new Error('Voices failed to load');
+              onError?.(error);
+              reject(error);
+            }
+          }, 3000);
+          return;
+        }
 
-      // If not ready yet, queue the speech for later
-      if (!voicesLoaded || !hasUserInteracted) {
-        log('Not ready, queuing speech')
-        pendingSpeakRef.current = { text, rate: effectiveRate }
-        return
-      }
+        log('Speaking', { textLength: text.length, options: speakOptions });
 
-      executeSpeech(text, effectiveRate)
+        // Set isSpeaking IMMEDIATELY so other callers know we're about to speak
+        // (onstart may take 100-200ms to fire, causing race conditions)
+        setIsSpeaking(true);
+        manualStopRef.current = false;
+
+        const finishPendingPromise = (reason?: string) => {
+          if (resolveRef.current) {
+            log('Resolving pending promise before new utterance', { reason });
+            resolveRef.current();
+            resolveRef.current = null;
+            rejectRef.current = null;
+          }
+        };
+
+        const startNewUtterance = (attempt = 0) => {
+          const maxRetries = 2;
+          let hasStarted = false;
+
+          // Create utterance
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = speakOptions.rate ?? defaultRate;
+          utterance.pitch = speakOptions.pitch ?? defaultPitch;
+          utterance.volume = speakOptions.volume ?? defaultVolume;
+          utterance.lang = speakOptions.lang ?? defaultLang;
+
+          // Set voice
+          const voiceToUse = resolveVoice(speakOptions.voice, selectedVoice, voices);
+          if (voiceToUse) {
+            utterance.voice = voiceToUse;
+          }
+
+          // Event handlers
+          utterance.onstart = () => {
+            hasStarted = true;
+            log('Speech started');
+            setIsSpeaking(true);
+            setIsPaused(false);
+            onStart?.();
+          };
+
+          utterance.onend = () => {
+            hasStarted = false;
+            log('Speech ended');
+            setIsSpeaking(false);
+            setIsPaused(false);
+            utteranceRef.current = null;
+            onEnd?.();
+            resolveRef.current?.();
+            resolveRef.current = null;
+            rejectRef.current = null;
+          };
+
+          utterance.onpause = () => {
+            log('Speech paused');
+            setIsPaused(true);
+            onPause?.();
+          };
+
+          utterance.onresume = () => {
+            log('Speech resumed');
+            setIsPaused(false);
+            onResume?.();
+          };
+
+          utterance.onerror = (event) => {
+            // 'interrupted' and 'cancelled' are not real errors
+            if (event.error === 'interrupted' || event.error === 'canceled') {
+              if (!manualStopRef.current && !hasStarted && attempt < maxRetries) {
+                log('Speech cancelled before audio started, retrying...', { attempt: attempt + 1 });
+                utteranceRef.current = null;
+                setTimeout(() => startNewUtterance(attempt + 1), 200);
+                return;
+              }
+
+              log('Speech interrupted/cancelled');
+              setIsSpeaking(false);
+              setIsPaused(false);
+              utteranceRef.current = null;
+              resolveRef.current?.();
+              resolveRef.current = null;
+              rejectRef.current = null;
+              return;
+            }
+
+            log('Speech error', { error: event.error });
+            setIsSpeaking(false);
+            setIsPaused(false);
+            utteranceRef.current = null;
+            const error = new Error(`Speech synthesis error: ${event.error}`);
+            onError?.(error);
+            rejectRef.current?.(error);
+            resolveRef.current = null;
+            rejectRef.current = null;
+          };
+
+          utterance.onboundary = (event) => {
+            if (event.name === 'word') {
+              onBoundary?.(event.charIndex, event.charLength ?? 0);
+            }
+          };
+
+          // Store utterance reference and start speaking
+          utteranceRef.current = utterance;
+
+          if (window.speechSynthesis.paused) {
+            log('speechSynthesis was paused, resuming before speak');
+            try {
+              window.speechSynthesis.resume();
+            } catch (resumeError) {
+              console.warn('[TTS] Failed to resume speech synthesis:', resumeError);
+            }
+          }
+
+          window.speechSynthesis.speak(utterance);
+
+          // Chrome workaround: A pause/resume cycle can help "kick" stuck utterances
+          // This is safe because if speech hasn't started, pause/resume are no-ops
+          setTimeout(() => {
+            if (utteranceRef.current === utterance && !hasStarted) {
+              log('Chrome workaround: pause/resume to kick stuck utterance');
+              try {
+                window.speechSynthesis.pause();
+                window.speechSynthesis.resume();
+              } catch {
+                // Ignore errors - some browsers don't support pause/resume
+              }
+            }
+          }, 100);
+        };
+
+        const cancelIfNeeded = () => {
+          // ALWAYS cancel before speaking - Chrome can have stuck utterances that
+          // don't show in speaking/pending state. This clears any zombie state.
+          log('Clearing speech queue before new utterance');
+          window.speechSynthesis.cancel();
+
+          const synth = window.speechSynthesis as SpeechSynthesis & { pending?: boolean };
+          if (synth.speaking || synth.pending) {
+            log('Speech still active after cancel, waiting...', {
+              speaking: synth.speaking,
+              pending: synth.pending ?? false,
+            });
+
+            const waitForCancel = (attempt = 0) => {
+              const maxAttempts = 20; // ~1s
+              const synthState = window.speechSynthesis as SpeechSynthesis & { pending?: boolean };
+              if (!synthState.speaking && !(synthState.pending ?? false)) {
+                log('Cancel complete, starting new utterance', { attempts: attempt });
+                startNewUtterance();
+                return;
+              }
+              if (attempt >= maxAttempts) {
+                log('Speech still active after cancel; forcing new utterance');
+                startNewUtterance();
+                return;
+              }
+              setTimeout(() => waitForCancel(attempt + 1), 50);
+            };
+
+            waitForCancel();
+          } else {
+            // Small delay after cancel to let Chrome fully process it
+            setTimeout(() => startNewUtterance(), 50);
+          }
+        };
+
+        // Resolve any existing promises before storing the new ones
+        finishPendingPromise('before storing handlers');
+        resolveRef.current = resolve;
+        rejectRef.current = reject;
+
+        cancelIfNeeded();
+      });
     },
     [
       enabled,
-      isAvailable,
+      isSupported,
+      isReady,
       defaultRate,
-      voicesLoaded,
-      hasUserInteracted,
-      executeSpeech,
+      defaultPitch,
+      defaultVolume,
+      defaultLang,
+      selectedVoice,
+      voices,
       log,
+      onStart,
+      onEnd,
+      onPause,
+      onResume,
+      onError,
+      onBoundary,
     ]
-  )
+  );
 
-  // Stop speech
+  /**
+   * Stop all speech
+   */
   const stop = useCallback(() => {
-    if (isAvailable) {
-      window.speechSynthesis.cancel()
-      setIsSpeaking(false)
-      utteranceRef.current = null
-      log('Speech stopped')
-    }
-  }, [isAvailable, log])
+    if (!isSupported) return;
 
-  // Toggle enabled
-  const toggleEnabled = useCallback(() => {
-    setEnabled((prev) => {
-      const newValue = !prev
-      if (!newValue && isAvailable) {
-        window.speechSynthesis.cancel()
-        setIsSpeaking(false)
-      }
-      return newValue
-    })
-  }, [isAvailable])
+    log('Stopping speech (manual)');
+    manualStopRef.current = true;
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    setIsPaused(false);
+    utteranceRef.current = null;
 
-  // Enhanced setEnabled that also stops speech when disabling
-  const handleSetEnabled = useCallback(
+    // Resolve pending promise
+    resolveRef.current?.();
+    resolveRef.current = null;
+    rejectRef.current = null;
+  }, [isSupported, log]);
+
+  /**
+   * Pause current speech
+   */
+  const pause = useCallback(() => {
+    if (!isSupported || !isSpeaking) return;
+
+    log('Pausing speech');
+    window.speechSynthesis.pause();
+  }, [isSupported, isSpeaking, log]);
+
+  /**
+   * Resume paused speech
+   */
+  const resume = useCallback(() => {
+    if (!isSupported || !isPaused) return;
+
+    log('Resuming speech');
+    window.speechSynthesis.resume();
+  }, [isSupported, isPaused, log]);
+
+  // ============================================================================
+  // Enabled Control
+  // ============================================================================
+
+  const setEnabled = useCallback(
     (value: boolean | ((prev: boolean) => boolean)) => {
-      setEnabled((prev) => {
-        const newValue = typeof value === 'function' ? value(prev) : value
-        if (!newValue && isAvailable) {
-          window.speechSynthesis.cancel()
-          setIsSpeaking(false)
-        }
-        return newValue
-      })
-    },
-    [isAvailable]
-  )
+      setEnabledState((prev) => {
+        const newValue = typeof value === 'function' ? value(prev) : value;
 
-  const isReady = voicesLoaded && hasUserInteracted
+        // Stop any ongoing speech when disabling
+        if (!newValue && isSupported) {
+          manualStopRef.current = true;
+          window.speechSynthesis.cancel();
+          setIsSpeaking(false);
+          setIsPaused(false);
+        }
+
+        log('TTS enabled changed', { enabled: newValue });
+        return newValue;
+      });
+    },
+    [isSupported, log]
+  );
+
+  const toggleEnabled = useCallback(() => {
+    setEnabled((prev) => !prev);
+  }, [setEnabled]);
+
+  // ============================================================================
+  // Voice Selection
+  // ============================================================================
+
+  const setVoice = useCallback(
+    (voice: SpeechSynthesisVoice | string | null) => {
+      if (voice === null) {
+        setSelectedVoice(null);
+        log('Voice cleared');
+        return;
+      }
+
+      if (typeof voice === 'string') {
+        const found = voices.find((v) => v.name === voice || v.voiceURI === voice);
+        if (found) {
+          setSelectedVoice(found);
+          log('Voice set by name', { name: found.name });
+        } else {
+          log('Voice not found', { name: voice });
+        }
+        return;
+      }
+
+      setSelectedVoice(voice);
+      log('Voice set', { name: voice.name });
+    },
+    [voices, log]
+  );
+
+  // ============================================================================
+  // Return Value
+  // ============================================================================
 
   return {
     speak,
     stop,
+    pause,
+    resume,
+    isSupported,
     isSpeaking,
+    isPaused,
     isReady,
     enabled,
-    setEnabled: handleSetEnabled,
+    setEnabled,
     toggleEnabled,
-    voicesLoaded,
-    hasUserInteracted,
-  }
+    voices,
+    selectedVoice,
+    setVoice,
+  };
 }
 
-export type { UseSpeechSynthesisOptions, UseSpeechSynthesisReturn }
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Select a default voice based on preferences
+ */
+function selectDefaultVoice(
+  voices: SpeechSynthesisVoice[],
+  lang: string,
+  preferLocal: boolean
+): SpeechSynthesisVoice | null {
+  if (voices.length === 0) return null;
+
+  const langPrefix = lang.split('-')[0]; // 'en' from 'en-US'
+
+  // Strategy: find the best match based on preferences
+  const candidates = voices.filter((v) => v.lang.startsWith(langPrefix));
+
+  if (candidates.length === 0) {
+    // Fall back to any available voice
+    return voices[0];
+  }
+
+  if (preferLocal) {
+    // Prefer local voices (faster, work offline)
+    const localVoice = candidates.find((v) => v.localService);
+    if (localVoice) return localVoice;
+  }
+
+  // Return first matching language voice
+  return candidates[0];
+}
+
+/**
+ * Resolve a voice option to an actual SpeechSynthesisVoice
+ */
+function resolveVoice(
+  voiceOption: SpeechSynthesisVoice | string | null | undefined,
+  selectedVoice: SpeechSynthesisVoice | null,
+  voices: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice | null {
+  if (!voiceOption) {
+    return selectedVoice;
+  }
+
+  if (typeof voiceOption === 'string') {
+    return voices.find((v) => v.name === voiceOption || v.voiceURI === voiceOption) ?? selectedVoice;
+  }
+
+  return voiceOption;
+}
+
+export default useSpeechSynthesis;
