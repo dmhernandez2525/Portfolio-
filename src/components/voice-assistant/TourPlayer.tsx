@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Play, Pause, SkipBack, SkipForward,
-  Volume2, VolumeX, ChevronDown,
+  Volume2, VolumeX, ChevronDown, X, Info,
   MessageCircle, Sparkles
 } from "lucide-react"
 import { guidedTour, getTourProgress, nextTourStep, previousTourStep, endTour } from "@/services/voice-stocks/guidedTour"
@@ -24,11 +24,13 @@ interface TourPlayerProps {
   isSpeaking: boolean
   onStopSpeaking: () => void
   onSpeak?: (text: string, rate?: number) => void
+  onCancelSpeech?: () => void
 }
 
 // Speed options for TTS
-const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5, 2] as const
+const SPEED_OPTIONS = [1, 1.25, 1.5, 1.75, 2] as const
 type SpeedOption = typeof SPEED_OPTIONS[number]
+const DEFAULT_SPEED: SpeedOption = 1.5
 
 export function TourPlayer({
   onOpenChat,
@@ -36,15 +38,17 @@ export function TourPlayer({
   onToggleSpeech,
   isSpeaking,
   onStopSpeaking,
-  onSpeak
+  onSpeak,
+  onCancelSpeech
 }: TourPlayerProps) {
   const [tourActive, setTourActive] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [currentStep, setCurrentStep] = useState<TourStep | null>(null)
   const [progress, setProgress] = useState({ current: 0, total: 0, percent: 0 })
-  const [speed, setSpeed] = useState<SpeedOption>(1)
+  const [speed, setSpeed] = useState<SpeedOption>(DEFAULT_SPEED)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showSpeedMenu, setShowSpeedMenu] = useState(false)
+  const [showStepInfo, setShowStepInfo] = useState(true)
 
   // Track if we're waiting for speech to finish before advancing
   const waitingForSpeechRef = useRef(false)
@@ -113,6 +117,7 @@ export function TourPlayer({
       // Auto-expand when tour starts
       if (active && step) {
         setIsExpanded(true)
+        setShowStepInfo(true) // Show step info for each new step
         guidedTour.pause() // We manage timing ourselves
       }
     })
@@ -169,16 +174,24 @@ export function TourPlayer({
       clearTimeout(autoAdvanceTimeoutRef.current)
       autoAdvanceTimeoutRef.current = null
     }
+    // Stop current speech before moving to next step
+    if (isSpeaking && onCancelSpeech) {
+      onCancelSpeech()
+    }
     nextTourStep().catch(console.error)
-  }, [])
+  }, [isSpeaking, onCancelSpeech])
 
   const handlePrevious = useCallback(() => {
     if (autoAdvanceTimeoutRef.current) {
       clearTimeout(autoAdvanceTimeoutRef.current)
       autoAdvanceTimeoutRef.current = null
     }
+    // Stop current speech before moving to previous step
+    if (isSpeaking && onCancelSpeech) {
+      onCancelSpeech()
+    }
     previousTourStep().catch(console.error)
-  }, [])
+  }, [isSpeaking, onCancelSpeech])
 
   const handleCollapse = useCallback(() => {
     // If tour is active, just collapse the UI (don't end tour)
@@ -221,7 +234,7 @@ export function TourPlayer({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50"
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-[10001] pointer-events-auto"
       >
         <motion.button
           onClick={handleFABClick}
@@ -283,7 +296,7 @@ export function TourPlayer({
       initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 100, opacity: 0 }}
-      className="fixed right-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col items-center"
+      className="fixed right-4 top-1/2 -translate-y-1/2 z-[10001] flex flex-col items-center pointer-events-auto"
     >
       {/* Main Player Widget */}
       <div className="bg-background/95 backdrop-blur-lg border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden w-16">
@@ -328,6 +341,17 @@ export function TourPlayer({
                   {progress.current}/{progress.total}
                 </span>
               </div>
+
+              {/* Show step info button (when hidden) */}
+              {!showStepInfo && currentStep && (
+                <button
+                  onClick={() => setShowStepInfo(true)}
+                  className="p-1.5 rounded-lg hover:bg-muted transition-colors mb-2"
+                  title="Show step info"
+                >
+                  <Info className="w-4 h-4 text-muted-foreground" />
+                </button>
+              )}
 
               {/* Play/Pause Button */}
               <button
@@ -388,16 +412,16 @@ export function TourPlayer({
                 <AnimatePresence>
                   {showSpeedMenu && (
                     <motion.div
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      className="absolute right-full mr-2 top-0 bg-background border border-border rounded-lg shadow-lg py-1 min-w-[60px]"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-background border border-border rounded-lg shadow-lg py-1 min-w-[60px] z-[10002]"
                     >
                       {SPEED_OPTIONS.map((s) => (
                         <button
                           key={s}
                           onClick={() => handleSpeedChange(s)}
-                          className={`w-full px-3 py-1 text-xs text-left hover:bg-muted transition-colors ${
+                          className={`w-full px-3 py-1.5 text-xs text-center hover:bg-muted transition-colors ${
                             speed === s ? "text-primary font-medium" : ""
                           }`}
                         >
@@ -468,21 +492,31 @@ export function TourPlayer({
       </div>
 
       {/* Current Step Info Tooltip */}
-      {currentStep && tourActive && (
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="absolute right-full mr-3 top-1/2 -translate-y-1/2 w-64 bg-background/95 backdrop-blur-lg border border-border rounded-xl p-4 shadow-xl pointer-events-none"
-        >
-          <h4 className="font-semibold text-sm mb-1">{currentStep.title}</h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {currentStep.description}
-          </p>
-          <div className="mt-2 text-[10px] text-muted-foreground/60">
-            Step {progress.current} of {progress.total}
-          </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {currentStep && tourActive && showStepInfo && (
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            className="absolute right-full mr-3 top-1/2 -translate-y-1/2 w-64 bg-background/95 backdrop-blur-lg border border-border rounded-xl p-4 shadow-xl z-[10002] pointer-events-auto"
+          >
+            <button
+              onClick={() => setShowStepInfo(false)}
+              className="absolute top-2 right-2 p-1 rounded-md hover:bg-muted transition-colors"
+              title="Hide step info"
+            >
+              <X className="w-3 h-3 text-muted-foreground" />
+            </button>
+            <h4 className="font-semibold text-sm mb-1 pr-6">{currentStep.title}</h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {currentStep.description}
+            </p>
+            <div className="mt-2 text-[10px] text-muted-foreground/60">
+              Step {progress.current} of {progress.total}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

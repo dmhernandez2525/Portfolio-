@@ -153,9 +153,12 @@ export function AIAssistant() {
       const isActive = guidedTour.getState().isActive
       setTourActive(isActive)
 
-      // Auto-enable Talk Mode when tour starts for hands-free navigation
+      // When tour starts: close the chat modal so content is visible
+      // Auto-enable Talk Mode for hands-free navigation via TourPlayer
       if (isActive && !talkModeRef.current) {
         setTalkMode(true)
+        // Close the chat modal so the tour overlay doesn't block content
+        setIsOpen(false)
       }
     })
 
@@ -515,6 +518,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
         onSpeak={handleTourSpeak}
+        onCancelSpeech={stopSpeaking}
       />
 
       {/* Chat Dialog */}
