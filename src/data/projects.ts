@@ -231,11 +231,79 @@ export const projectsData: ProjectItem[] = [
     status: "development",
     metrics: "8 platforms, 0 cloud dependency"
   },
+  {
+    id: "genomeforge",
+    title: "GenomeForge",
+    tagline: "Privacy-First Genetic Analysis Platform",
+    description: "Analyze your DNA locally—your genetic data never leaves your device. Unlike 23andMe (6.9M breach), GenomeForge enforces privacy through architecture. Parse raw DNA from any provider, match against clinical databases (ClinVar, PharmGKB), generate health reports, and chat with AI—all 100% on-device.",
+    category: "AI/ML Platform",
+    tier: "flagship",
+    tech: ["TypeScript", "TurboRepo", "React 19", "Vite 6", "Zustand", "IndexedDB", "Dexie.js", "Web Crypto API", "AES-256-GCM", "Expo SDK 52", "Tauri 2.0", "Swift", "Ollama", "BioMistral-7B"],
+    features: [
+      "100% local processing—DNA never leaves device",
+      "Parse 6 providers: 23andMe, AncestryDNA, MyHeritage, etc.",
+      "ClinVar database: 341K+ clinical variants",
+      "PharmGKB: 715+ drug-gene interactions",
+      "AI genetic counselor (BYOK or Ollama offline)",
+      "AES-256-GCM encryption with PBKDF2",
+      "PDF health reports generation",
+      "Cross-platform: web, iOS, Android, desktop"
+    ],
+    highlights: ["Zero-Knowledge Privacy", "Clinical Databases", "Cross-Platform"],
+    link: "https://genomeforge-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/genomeforge",
+    featured: true,
+    status: "development",
+    metrics: "341K+ variants, 0 data transmitted"
+  },
 
   // ============================================
   // TIER 2 - STRONG PROJECTS (12)
   // Production-ready with significant functionality
   // ============================================
+  {
+    id: "chorechamp",
+    title: "ChoreChamp",
+    tagline: "Gamified Family Chore Management",
+    description: "Transform household tasks into engaging challenges for kids. Earn points, unlock badges, maintain streaks, and compete on family leaderboards. ADHD-friendly features include visual timers, task chunking, and sensory customization. Built as a pnpm monorepo with 5 shared packages.",
+    category: "SaaS Platform",
+    tier: "strong",
+    tech: ["React 19", "Vite 7", "Fastify 5", "PostgreSQL", "Drizzle ORM", "better-auth", "Socket.io", "Zustand", "TanStack Query", "pnpm"],
+    features: [
+      "Gamification: points, 15 badges, streaks",
+      "70 pre-built age-appropriate chore templates",
+      "ADHD-friendly: visual timers, task chunking",
+      "Family leaderboards and challenges",
+      "Real-time updates via Socket.io",
+      "5 shared monorepo packages",
+      "Type-safe API client with React Query hooks"
+    ],
+    highlights: ["70 Chore Templates", "ADHD-Friendly", "Real-Time Sync"],
+    link: "https://chorechamp-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/ChoreChamp",
+    status: "production",
+    metrics: "70 templates, 15 badges"
+  },
+  {
+    id: "interesting-beyond",
+    title: "Interesting & Beyond",
+    tagline: "AI-Powered 3D Print E-Commerce",
+    description: "Premium e-commerce for custom 3D-printed products. Upload an image of your pet, logo, or design and AI generates a 3D-printable cookie cutter. Features interactive Three.js preview and TurboRepo monorepo architecture.",
+    category: "AI/ML Platform",
+    tier: "strong",
+    tech: ["React 19", "Vite 6", "TurboRepo", "Hono", "Three.js", "React Three Fiber", "Redux Toolkit", "Google Gemini", "Tailwind CSS v4"],
+    features: [
+      "AI image-to-SVG-to-3D generation",
+      "Interactive Three.js model preview",
+      "3 style options: Stamp, Outline, Detailed",
+      "Full e-commerce: catalog, cart, checkout",
+      "Admin dashboard for orders",
+      "TurboRepo with 3 services"
+    ],
+    highlights: ["AI Design Generation", "3D Preview", "E-Commerce"],
+    status: "development",
+    metrics: "Image → 3D model pipeline"
+  },
   {
     id: "chronoscribe",
     title: "ChronoScribe",
@@ -536,7 +604,6 @@ export const projectsData: ProjectItem[] = [
     status: "development",
     metrics: "0 bytes uploaded, 100% private"
   },
-
   // ============================================
   // TIER 3 - SUPPORTING PROJECTS (6)
   // Useful tools and experiments
