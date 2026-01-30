@@ -352,6 +352,30 @@ export const projectsData: ProjectItem[] = [
     metrics: "6-step order wizard"
   },
   {
+    id: "made-with-love",
+    title: "Made with Love",
+    tagline: "Custom Wedding Cake Business Platform",
+    description: "Full-stack bakery website for a custom cake artist specializing in wedding cakes. Portfolio-focused design showcasing hundreds of cake creations, with direct contact integration for personalized quotes. Features 6-step order wizard, Stripe payments, and admin dashboard for order management.",
+    category: "SaaS Platform",
+    tier: "strong",
+    tech: ["Next.js 14", "React 18", "Prisma", "PostgreSQL", "Stripe", "Clerk", "Resend", "Tailwind CSS", "Zod"],
+    features: [
+      "Portfolio gallery for wedding cake showcase",
+      "6-step guided custom order wizard",
+      "Stripe payment processing with deposits",
+      "Customer accounts with Clerk authentication",
+      "Admin dashboard for order management",
+      "Capacity/availability management",
+      "Transactional emails via Resend",
+      "Travel availability for destination cakes"
+    ],
+    highlights: ["Wedding Cakes Focus", "Portfolio Gallery", "Clerk Auth"],
+    link: "https://made-with-love-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/made-with-love",
+    status: "production",
+    metrics: "Wedding cake specialist platform"
+  },
+  {
     id: "rapidbooth",
     title: "RapidBooth",
     tagline: "AI-Powered Website Generation for Small Businesses",
