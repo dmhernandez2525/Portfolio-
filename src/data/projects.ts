@@ -256,6 +256,31 @@ export const projectsData: ProjectItem[] = [
     status: "development",
     metrics: "341K+ variants, 0 data transmitted"
   },
+  {
+    id: "treasuretrail",
+    title: "TreasureTrail",
+    tagline: "Estate & Yard Sale Finder with Route Optimization",
+    description: "Mobile-first platform for discovering estate sales and yard sales with intelligent route optimization. Solves the #1 unmet need in the $2-4B market—while competitors like EstateSales.NET (7.1M monthly visitors) dominate discovery, no one offers traffic-aware route planning. Built for power users visiting 8-15 sales per weekend.",
+    category: "SaaS Platform",
+    tier: "flagship",
+    tech: ["Flutter", "Riverpod", "GoRouter", "flutter_map", "Supabase", "PostgreSQL", "PostGIS", "VROOM", "Mapbox", "Next.js 14", "TypeScript", "Tailwind CSS"],
+    features: [
+      "Map-based discovery with marker clustering",
+      "Multi-stop route planning (10+ sales)",
+      "Traffic-aware route optimization via VROOM",
+      "Unified estate + yard sale listings",
+      "Offline map tiles via flutter_map_tile_caching",
+      "Cross-device sync with Supabase Realtime",
+      "B2B portal for estate sale companies",
+      "Apple/Google Sign In + guest mode"
+    ],
+    highlights: ["Route Optimization", "Offline Maps", "B2B + Consumer"],
+    link: "https://treasuretrail-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/treasuretrail",
+    featured: true,
+    status: "development",
+    metrics: "$2-4B market, #1 unmet need"
+  },
 
   // ============================================
   // TIER 2 - STRONG PROJECTS (12)
