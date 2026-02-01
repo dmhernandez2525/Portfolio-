@@ -24,6 +24,9 @@ import { Social } from "@/pages/Social"
 import { Games } from "@/pages/Games"
 import { ProjectsPage } from "@/pages/ProjectsPage"
 import { NotFound } from "@/pages/NotFound"
+import { Login } from "@/pages/Login"
+import { Admin } from "@/pages/Admin"
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 
 const Home = () => (
     <div className="min-h-screen">
@@ -59,6 +62,17 @@ export function AppRoutes() {
         <Route path="/agar" element={<AgarGame />} />
         <Route path="*" element={<NotFound />} />
       </Route>
+
+      {/* Auth routes - outside RootLayout for clean login/admin experience */}
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <Admin />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   )
 }
