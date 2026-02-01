@@ -281,6 +281,31 @@ export const projectsData: ProjectItem[] = [
     status: "development",
     metrics: "$2-4B market, #1 unmet need"
   },
+  {
+    id: "rave-collective",
+    title: "Rave Collective",
+    tagline: "Multi-Vendor Marketplace for Festival Fashion",
+    description: "Multi-vendor marketplace built specifically for the rave and festival fashion community, targeting a $2.3B market growing at 8.4% CAGR. The platform differentiates through 50-60% lower fees (10% vs Etsy's 20-25%), an industry-first UV/blacklight preview feature, and dark-mode-first design aligned with 82.7% user preference.",
+    category: "SaaS Platform",
+    tier: "flagship",
+    tech: ["Next.js 14", "tRPC", "Prisma", "PostgreSQL", "Stripe Connect", "Clerk", "Meilisearch", "Cloudflare R2", "Tailwind CSS", "TypeScript"],
+    features: [
+      "10% platform fee (vs Etsy's 20-25%)",
+      "UV/blacklight preview (industry first)",
+      "Dark-mode-first design system",
+      "Made-to-order support without penalty",
+      "Multi-vendor cart with order splitting",
+      "Stripe Connect Express for vendor payouts",
+      "3D/AR product visualization",
+      "Customer data portability"
+    ],
+    highlights: ["50% Lower Fees", "UV Preview", "Made-to-Order Support"],
+    link: "https://rave-collective-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/rave-collective",
+    featured: true,
+    status: "development",
+    metrics: "$2.3B market, 147 tx break-even"
+  },
 
   // ============================================
   // TIER 2 - STRONG PROJECTS (12)
