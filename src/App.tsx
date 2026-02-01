@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { GamificationProvider } from "@/components/providers/GamificationProvider"
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider"
 import { BossProvider } from "@/context/boss-context"
+import { AuthProvider } from "@/context/auth-context"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
 import { CustomCursor } from "@/components/ui/CustomCursor"
 import { ScrollToTop } from "@/components/shared/ScrollToTop"
@@ -64,12 +65,13 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <GamificationProvider>
         <BossProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <SmoothScrollProvider>
-              <CustomCursor />
-              <CreatureLayer />
-              <AppRoutes />
+          <AuthProvider>
+            <BrowserRouter>
+              <ScrollToTop />
+              <SmoothScrollProvider>
+                <CustomCursor />
+                <CreatureLayer />
+                <AppRoutes />
 
               {/* Right-click easter egg toast */}
               <AnimatePresence>
@@ -80,12 +82,13 @@ function App() {
                     exit={{ opacity: 0, y: -20 }}
                     className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-background/95 backdrop-blur-md px-6 py-3 rounded-lg border border-primary/50 shadow-lg pointer-events-none"
                   >
-                    <p className="text-sm text-foreground">Inspecting my work? I respect that. 🔍</p>
+                    <p className="text-sm text-foreground">Inspecting my work? I respect that.</p>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </SmoothScrollProvider>
-          </BrowserRouter>
+              </SmoothScrollProvider>
+            </BrowserRouter>
+          </AuthProvider>
         </BossProvider>
       </GamificationProvider>
     </ThemeProvider>
