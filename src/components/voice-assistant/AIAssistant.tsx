@@ -159,6 +159,19 @@ export function AIAssistant() {
   }, [stopSpeaking])
 
   useEffect(() => {
+    const handleStopListening = () => {
+      setTalkMode(false)
+      if (recognitionRef.current || isListeningRef.current) {
+        suppressTranscriptCommitRef.current = true
+        stopListening()
+        setInterimTranscript("")
+      }
+    }
+    window.addEventListener('assistant-stop-listening', handleStopListening)
+    return () => window.removeEventListener('assistant-stop-listening', handleStopListening)
+  }, [stopListening])
+
+  useEffect(() => {
     const handleCancelTourSpeech = () => cancelSource("tour")
     window.addEventListener('assistant-cancel-tour-speech', handleCancelTourSpeech)
     return () => window.removeEventListener('assistant-cancel-tour-speech', handleCancelTourSpeech)
@@ -525,7 +538,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
     if (wasSpeaking && !isSpeaking && talkMode && !isProcessing) {
       setTimeout(() => {
-        if (talkMode && !isProcessing) {
+        if (talkMode && !isProcessing && !isListeningRef.current) {
           startListening()
         }
       }, 300)
@@ -712,7 +725,15 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                   ref={inputRef}
                   type="text"
                   value={displayText}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (interimTranscript && value.endsWith(interimTranscript)) {
+                      const trimmed = value.slice(0, -interimTranscript.length)
+                      setInput(trimmed.endsWith(" ") ? trimmed.slice(0, -1) : trimmed)
+                    } else {
+                      setInput(value)
+                    }
+                  }}
                   onKeyDown={handleKeyDown}
                   placeholder={
                     isListening

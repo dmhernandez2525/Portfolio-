@@ -315,6 +315,7 @@ Or just ask me anything about Daniel!`;
     }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('assistant-stop-speech'));
+      window.dispatchEvent(new CustomEvent('assistant-stop-listening'));
     }
     return { handled: true, shouldSpeak: false };
   }
