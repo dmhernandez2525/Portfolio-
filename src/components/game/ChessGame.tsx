@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react"
+import { useState, useCallback, useMemo, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { RotateCcw, Trophy, Undo2, Lightbulb } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -658,6 +658,7 @@ export function ChessGame() {
   const [playerColor] = useState<PieceColor>("white")
   const [aiDifficulty, setAiDifficulty] = useState<1 | 2 | 3>(2)
   const [isThinking, setIsThinking] = useState(false)
+  const thinkingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [hint, setHint] = useState<{ from: Position; to: Position } | null>(null)
   const [wins, setWins] = useState(() => parseInt(localStorage.getItem("chess-wins") || "0"))
@@ -787,7 +788,11 @@ export function ChessGame() {
   // AI move
   useEffect(() => {
     if (gameState.turn !== playerColor && !gameState.isCheckmate && !gameState.isStalemate) {
-      setTimeout(() => setIsThinking(true), 0)
+      if (thinkingTimeoutRef.current) {
+        clearTimeout(thinkingTimeoutRef.current)
+        thinkingTimeoutRef.current = null
+      }
+      thinkingTimeoutRef.current = setTimeout(() => setIsThinking(true), 0)
 
       // Delay to show "thinking"
       const timer = setTimeout(() => {
@@ -856,12 +861,23 @@ export function ChessGame() {
         setIsThinking(false)
       }, 500)
 
-      return () => clearTimeout(timer)
+      return () => {
+        if (thinkingTimeoutRef.current) {
+          clearTimeout(thinkingTimeoutRef.current)
+          thinkingTimeoutRef.current = null
+        }
+        clearTimeout(timer)
+        setIsThinking(false)
+      }
     }
   }, [gameState.turn, gameState.isCheckmate, gameState.isStalemate, playerColor, gameState.board, gameState.enPassantTarget, aiDifficulty, checkGameEnd])
 
   // Reset game
   const resetGame = useCallback(() => {
+    if (thinkingTimeoutRef.current) {
+      clearTimeout(thinkingTimeoutRef.current)
+      thinkingTimeoutRef.current = null
+    }
     setGameState({
       board: cloneBoard(INITIAL_BOARD),
       turn: "white",
@@ -874,6 +890,7 @@ export function ChessGame() {
       legalMoves: [],
       lastMove: null
     })
+    setIsThinking(false)
     setShowHint(false)
     setHint(null)
   }, [])

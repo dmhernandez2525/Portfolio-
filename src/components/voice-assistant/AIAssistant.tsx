@@ -83,6 +83,7 @@ export function AIAssistant() {
   const {
     speakText,
     stopSpeaking,
+    cancelSource,
     isSpeaking,
     speechEnabled,
     toggleSpeechEnabled,
@@ -108,6 +109,9 @@ export function AIAssistant() {
   const talkModeRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>(messages)
+  const isSpeakingRef = useRef(isSpeaking)
+  const isListeningRef = useRef(isListening)
+  const suppressTranscriptCommitRef = useRef(false)
 
   // Keep talkModeRef in sync with state for access in callbacks
   useEffect(() => {
@@ -118,6 +122,15 @@ export function AIAssistant() {
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  useEffect(() => {
+    isSpeakingRef.current = isSpeaking
+  }, [isSpeaking])
+
+  useEffect(() => {
+    isListeningRef.current = isListening
+  }, [isListening])
+
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -137,6 +150,19 @@ export function AIAssistant() {
     window.addEventListener('open-ai-chat', handleOpenChat)
     return () => window.removeEventListener('open-ai-chat', handleOpenChat)
   }, [])
+
+  // Listen for voice command stop events
+  useEffect(() => {
+    const handleStopSpeech = () => stopSpeaking()
+    window.addEventListener('assistant-stop-speech', handleStopSpeech)
+    return () => window.removeEventListener('assistant-stop-speech', handleStopSpeech)
+  }, [stopSpeaking])
+
+  useEffect(() => {
+    const handleCancelTourSpeech = () => cancelSource("tour")
+    window.addEventListener('assistant-cancel-tour-speech', handleCancelTourSpeech)
+    return () => window.removeEventListener('assistant-cancel-tour-speech', handleCancelTourSpeech)
+  }, [cancelSource])
 
   // Cleanup speech recognition on unmount (TTS cleanup handled by hook)
   useEffect(() => {
@@ -236,6 +262,7 @@ export function AIAssistant() {
         recognition.onstart = () => {
           setIsListening(true)
           setSpeechError(null)
+          suppressTranscriptCommitRef.current = false
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -264,9 +291,10 @@ export function AIAssistant() {
           setInterimTranscript("")
           recognitionRef.current = null
 
-          if (leftoverTranscript && !talkModeRef.current) {
+          if (leftoverTranscript && !talkModeRef.current && !suppressTranscriptCommitRef.current) {
             setInput(prev => prev + leftoverTranscript)
           }
+          suppressTranscriptCommitRef.current = false
 
           if (talkModeRef.current) {
             const fullTranscript = accumulatedForSession.trim()
@@ -305,10 +333,14 @@ export function AIAssistant() {
   }, [isListening, startListening, stopListening])
 
   const sendMessage = useCallback(async (directMessage?: string) => {
-    const trimmedInput = (directMessage ?? input).trim()
+    const combinedInput = directMessage ?? (input + (interimTranscript ? (input ? " " : "") + interimTranscript : ""))
+    const trimmedInput = combinedInput.trim()
     if (!trimmedInput || isProcessing) return
 
-    if (isListening) stopListening()
+    if (isListening) {
+      suppressTranscriptCommitRef.current = true
+      stopListening()
+    }
 
     const userMessage: Message = {
       id: generateMessageId(),
@@ -319,6 +351,7 @@ export function AIAssistant() {
     setMessages(prev => [...prev, userMessage])
     if (!directMessage) {
       setInput("")
+      setInterimTranscript("")
     }
     setIsProcessing(true)
 
@@ -358,7 +391,7 @@ export function AIAssistant() {
           }
           setMessages(prev => [...prev, assistantMessage])
 
-          if (commandResult.shouldSpeak && !isSpeaking) {
+          if (commandResult.shouldSpeak) {
             speakText(commandResult.response, undefined, { source: "assistant" }).catch(() => {})
           }
         }
@@ -464,8 +497,15 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
       speakText(response, undefined, { source: "assistant" }).catch(() => {})
     } finally {
       setIsProcessing(false)
+      if (talkModeRef.current) {
+        setTimeout(() => {
+          if (talkModeRef.current && !isListeningRef.current && !isSpeakingRef.current) {
+            startListening()
+          }
+        }, 700)
+      }
     }
-  }, [input, isProcessing, isListening, stopListening, speakText, isSpeaking])
+  }, [input, interimTranscript, isProcessing, isListening, stopListening, speakText, startListening])
 
   useEffect(() => {
     const handleTalkModeSend = (event: CustomEvent<{ transcript: string }>) => {
@@ -518,7 +558,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         isSpeaking={isSpeaking}
         onStopSpeaking={stopSpeaking}
         onSpeak={handleTourSpeak}
-        onCancelSpeech={stopSpeaking}
+        onCancelSpeech={() => cancelSource("tour")}
       />
 
       {/* Chat Dialog */}
@@ -648,8 +688,14 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                     onClick={() => {
                       const newTalkMode = !talkMode
                       setTalkMode(newTalkMode)
-                      if (newTalkMode && !isListening && !isSpeaking) {
-                        startListening()
+                      if (newTalkMode) {
+                        if (!isListening && !isSpeaking) {
+                          startListening()
+                        }
+                      } else if (isListening) {
+                        suppressTranscriptCommitRef.current = true
+                        stopListening()
+                        setInterimTranscript("")
                       }
                     }}
                     disabled={isProcessing}

@@ -66,7 +66,9 @@ export function FallingBlocksGame() {
   const [combo, setCombo] = useState(0)
   const [maxCombo, setMaxCombo] = useState(0)
   const [slowMoActive, setSlowMoActive] = useState(false)
+  const [isNewHighScore, setIsNewHighScore] = useState(false)
   const [showComboText, setShowComboText] = useState(false)
+  const slowMoActiveRef = useRef(false)
 
   // Game state refs (for animation loop)
   const gameState = useRef({
@@ -92,7 +94,9 @@ export function FallingBlocksGame() {
     setIsPlaying(false)
     setGameOver(true)
 
-    if (gameState.current.score > highScore) {
+    const didBeatHighScore = gameState.current.score > highScore
+    setIsNewHighScore(didBeatHighScore)
+    if (didBeatHighScore) {
       setHighScore(gameState.current.score)
       localStorage.setItem("falling-blocks-highscore", gameState.current.score.toString())
     }
@@ -157,6 +161,8 @@ export function FallingBlocksGame() {
     setIsPaused(false)
     setIsPlaying(true)
     setSlowMoActive(false)
+    slowMoActiveRef.current = false
+    setIsNewHighScore(false)
   }, [])
 
   // Toggle pause
@@ -179,9 +185,10 @@ export function FallingBlocksGame() {
 
     // Resize handler
     const handleResize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = canvas.offsetWidth * dpr
+      canvas.height = canvas.offsetHeight * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
     handleResize()
@@ -226,7 +233,10 @@ export function FallingBlocksGame() {
       // Check slow-mo
       const isSlowMo = timestamp < gameState.current.slowMoEndTime
       const timeMultiplier = isSlowMo ? 0.3 : 1
-      setSlowMoActive(isSlowMo)
+      if (slowMoActiveRef.current !== isSlowMo) {
+        slowMoActiveRef.current = isSlowMo
+        setSlowMoActive(isSlowMo)
+      }
 
       // Check combo timeout
       if (gameState.current.combo > 0 && timestamp - gameState.current.lastHitTime > COMBO_TIMEOUT) {
@@ -632,7 +642,7 @@ export function FallingBlocksGame() {
                   <div className="space-y-2">
                     <p className="text-2xl text-white font-mono">Score: {score.toLocaleString()}</p>
                     <p className="text-sm text-gray-400">Max Combo: {maxCombo}x</p>
-                    {score >= highScore && score > 0 && (
+                    {isNewHighScore && (
                       <p className="text-yellow-400 font-bold animate-pulse">NEW HIGH SCORE!</p>
                     )}
                   </div>

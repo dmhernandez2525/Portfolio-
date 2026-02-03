@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
 import { useSpeechSynthesis, type SpeechSynthesisOptions } from "@/hooks/useSpeechSynthesis"
 
@@ -153,6 +154,7 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
 
   const currentRequestIdRef = useRef<string | null>(null)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (currentRequest || queue.length === 0) return
 
@@ -173,6 +175,7 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
         setCurrentSource(null)
       })
   }, [queue, currentRequest, speak])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const speakText = useCallback(
     (text: string, options?: SpeechSynthesisOptions, meta?: SpeechQueueMeta) => {
@@ -209,7 +212,7 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
         }
       })
     },
-    [stop, currentRequest?.id, currentSource, speechRate, speechPitch, speechVolume]
+    [stop, speechRate, speechPitch, speechVolume]
   )
 
   const stopSpeaking = useCallback(() => {

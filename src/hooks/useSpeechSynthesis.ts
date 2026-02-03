@@ -217,7 +217,7 @@ export function useSpeechSynthesis(
    * Returns a Promise that resolves when speech ends, or rejects on error.
    */
   const speak = useCallback(
-    (text: string, speakOptions: SpeechSynthesisOptions = {}): Promise<void> => {
+    function speak(text: string, speakOptions: SpeechSynthesisOptions = {}): Promise<void> {
       return new Promise((resolve, reject) => {
         // Check if enabled
         if (!enabled) {

@@ -32,6 +32,7 @@ export function SnakeGame() {
   const [highScore, setHighScore] = useState(() =>
     parseInt(localStorage.getItem("snake-highscore") || "0")
   )
+  const [isNewHighScore, setIsNewHighScore] = useState(false)
   const [speed, setSpeed] = useState(INITIAL_SPEED)
 
   const gameLoopRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -72,13 +73,16 @@ export function SnakeGame() {
     setGameOver(false)
     setIsPaused(false)
     setIsPlaying(true)
+    setIsNewHighScore(false)
   }, [spawnFood])
 
   // End game and save high score
   const endGame = useCallback(() => {
     setIsPlaying(false)
     setGameOver(true)
-    if (score > highScore) {
+    const didBeatHighScore = score > highScore
+    setIsNewHighScore(didBeatHighScore)
+    if (didBeatHighScore) {
       setHighScore(score)
       localStorage.setItem("snake-highscore", score.toString())
     }
@@ -340,7 +344,7 @@ export function SnakeGame() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Length: {snake.length} | Speed: {speedPercentage}%
                 </p>
-                {score >= highScore && score > 0 && (
+                {isNewHighScore && (
                   <p className="text-yellow-500 font-bold mb-4 animate-pulse">NEW HIGH SCORE!</p>
                 )}
                 <Button onClick={resetGame} size="lg" className="gap-2">

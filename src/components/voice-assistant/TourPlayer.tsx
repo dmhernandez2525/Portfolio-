@@ -41,12 +41,18 @@ export function TourPlayer({
   onSpeak,
   onCancelSpeech
 }: TourPlayerProps) {
-  const [tourActive, setTourActive] = useState(false)
+  const [tourActive, setTourActive] = useState(() => guidedTour.getState().isActive)
   const [isPaused, setIsPaused] = useState(false)
-  const [currentStep, setCurrentStep] = useState<TourStep | null>(null)
-  const [progress, setProgress] = useState({ current: 0, total: 0, percent: 0 })
+  const [currentStep, setCurrentStep] = useState<TourStep | null>(() => {
+    const state = guidedTour.getState()
+    return state.isActive ? guidedTour.getCurrentStep() : null
+  })
+  const [progress, setProgress] = useState(() => {
+    const state = guidedTour.getState()
+    return state.isActive ? getTourProgress() : { current: 0, total: 0, percent: 0 }
+  })
   const [speed, setSpeed] = useState<SpeedOption>(DEFAULT_SPEED)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(() => guidedTour.getState().isActive)
   const [showSpeedMenu, setShowSpeedMenu] = useState(false)
   const [showStepInfo, setShowStepInfo] = useState(true)
 
@@ -54,15 +60,63 @@ export function TourPlayer({
   const waitingForSpeechRef = useRef(false)
   const autoAdvanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const speedRef = useRef(speed)
+  const isPausedRef = useRef(isPaused)
+  const tourActiveRef = useRef(tourActive)
 
   // Keep speed ref in sync
   useEffect(() => {
     speedRef.current = speed
   }, [speed])
 
+  useEffect(() => {
+    isPausedRef.current = isPaused
+  }, [isPaused])
+
+  useEffect(() => {
+    tourActiveRef.current = tourActive
+  }, [tourActive])
+
+  // Listen for voice speed commands
+  useEffect(() => {
+    const handleSpeedCommand = (event: Event) => {
+      const detail = (event as CustomEvent<{ action?: "faster" | "slower" | "normal" }>).detail
+      const action = detail?.action
+      if (!action) return
+
+      if (action === "normal") {
+        setSpeed(DEFAULT_SPEED)
+        return
+      }
+
+      setSpeed((prev) => {
+        const idx = SPEED_OPTIONS.indexOf(prev)
+        if (idx === -1) return DEFAULT_SPEED
+        if (action === "faster") {
+          return SPEED_OPTIONS[Math.min(SPEED_OPTIONS.length - 1, idx + 1)]
+        }
+        return SPEED_OPTIONS[Math.max(0, idx - 1)]
+      })
+    }
+
+    window.addEventListener("tour-speed", handleSpeedCommand as EventListener)
+    return () => window.removeEventListener("tour-speed", handleSpeedCommand as EventListener)
+  }, [])
+
   // Calculate delay based on speed
   const getDelayForSpeed = useCallback((baseDelay: number = 3000) => {
     return Math.round(baseDelay / speedRef.current)
+  }, [])
+
+  const scheduleAutoAdvance = useCallback((delayMs: number) => {
+    if (autoAdvanceTimeoutRef.current) {
+      clearTimeout(autoAdvanceTimeoutRef.current)
+      autoAdvanceTimeoutRef.current = null
+    }
+    autoAdvanceTimeoutRef.current = setTimeout(() => {
+      if (!isPausedRef.current && tourActiveRef.current) {
+        nextTourStep().catch(console.error)
+      }
+    }, delayMs)
   }, [])
 
   // Auto-advance after speech finishes
@@ -120,6 +174,11 @@ export function TourPlayer({
         setShowStepInfo(true) // Show step info for each new step
         guidedTour.pause() // We manage timing ourselves
       }
+
+      // Always set a fallback auto-advance timer; it will be cleared if speech starts
+      if (active && step && !isPaused) {
+        scheduleAutoAdvance(getDelayForSpeed(8000))
+      }
     })
 
     const unsubscribeEnd = guidedTour.onTourEnd(() => {
@@ -138,25 +197,19 @@ export function TourPlayer({
       }
     })
 
-    // Check initial state
-    const state = guidedTour.getState()
-    setTourActive(state.isActive)
-    if (state.isActive) {
-      setCurrentStep(guidedTour.getCurrentStep())
-      setProgress(getTourProgress())
-      setIsExpanded(true)
-    }
-
     return () => {
       unsubscribeStep()
       unsubscribeEnd()
       unsubscribeSpeak()
     }
-  }, [onSpeak])
+  }, [onSpeak, isPaused, scheduleAutoAdvance, getDelayForSpeed])
 
   const handlePlayPause = useCallback(() => {
     if (isPaused) {
       setIsPaused(false)
+      if (tourActive && !isSpeaking) {
+        scheduleAutoAdvance(getDelayForSpeed(3000))
+      }
     } else {
       setIsPaused(true)
       if (autoAdvanceTimeoutRef.current) {
@@ -167,7 +220,7 @@ export function TourPlayer({
         onStopSpeaking()
       }
     }
-  }, [isPaused, isSpeaking, onStopSpeaking])
+  }, [isPaused, isSpeaking, onStopSpeaking, tourActive, scheduleAutoAdvance, getDelayForSpeed])
 
   const handleNext = useCallback(() => {
     if (autoAdvanceTimeoutRef.current) {
@@ -207,9 +260,12 @@ export function TourPlayer({
     if (autoAdvanceTimeoutRef.current) {
       clearTimeout(autoAdvanceTimeoutRef.current)
     }
+    if (isSpeaking && onCancelSpeech) {
+      onCancelSpeech()
+    }
     endTour()
     setIsExpanded(false)
-  }, [])
+  }, [isSpeaking, onCancelSpeech])
 
   const handleSpeedChange = useCallback((newSpeed: SpeedOption) => {
     setSpeed(newSpeed)

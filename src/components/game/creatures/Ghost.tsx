@@ -57,15 +57,13 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
     useEffect(() => {
         if (!isEnraged) return;
 
-        showTaunt()
-
         const interval = setInterval(() => {
             damageSite(5)
             setScale(prev => prev === 4 ? 3.8 : 4)
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [isEnraged, damageSite, showTaunt])
+    }, [isEnraged, damageSite])
 
     // Reset drag state when drag ends
     const handleDragEnd = () => {
@@ -117,6 +115,7 @@ export function Ghost({ id, x, y, onCatch }: GhostProps) {
             setScale(4)
             setShakeProgress(0)
             shakeStateRef.current.count = 0
+            showTaunt()
         }
     }
 

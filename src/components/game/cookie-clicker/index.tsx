@@ -43,6 +43,8 @@ export function CookieClickerGame() {
   const [clickMultiplier] = useState(1) // Keep state if needed for future features or remove entirely
   
   const cookieRef = useRef<HTMLDivElement>(null)
+  const gameStateRef = useRef<GameState | null>(null)
+  const saveDataRef = useRef<SavedGameData | null>(null)
   
   // --- CALCULATORS ---
   const cps = useMemo(() => {
@@ -83,8 +85,12 @@ export function CookieClickerGame() {
   const gameState: GameState = useMemo(() => ({
     cookies, totalCookies, totalClicks, cookiesPerClick: clickPower, cookiesPerSecond: cps,
     clickMultiplier, cpsMultiplier, buildings, upgrades, achievements,
-    grandmapocalypseLevel: grandmaLevel, wrinklers, heavenlyChips: 0, ascensionLevel: 0
-  }), [cookies, totalCookies, totalClicks, clickPower, cps, clickMultiplier, cpsMultiplier, buildings, upgrades, achievements, grandmaLevel, wrinklers])
+    grandmapocalypseLevel: grandmaLevel, wrinklers, heavenlyChips, ascensionLevel: 0
+  }), [cookies, totalCookies, totalClicks, clickPower, cps, clickMultiplier, cpsMultiplier, buildings, upgrades, achievements, grandmaLevel, wrinklers, heavenlyChips])
+
+  useEffect(() => {
+    gameStateRef.current = gameState
+  }, [gameState])
 
   // --- GAME LOOP ---
   useEffect(() => {
@@ -102,18 +108,21 @@ export function CookieClickerGame() {
         }
         
         // Check Achievements
-        setAchievements(prev => {
-            let changed = false
-            const next = prev.map(a => {
-                if (!a.unlocked && a.check(gameState)) {
-                    changed = true
-                    // Unlock notification could go here
-                    return { ...a, unlocked: true }
-                }
-                return a
+        const currentState = gameStateRef.current
+        if (currentState) {
+            setAchievements(prev => {
+                let changed = false
+                const next = prev.map(a => {
+                    if (!a.unlocked && a.check(currentState)) {
+                        changed = true
+                        // Unlock notification could go here
+                        return { ...a, unlocked: true }
+                    }
+                    return a
+                })
+                return changed ? next : prev
             })
-            return changed ? next : prev
-        })
+        }
         
         // Wrinkler Spawning (if Grandmapocalypse)
         if (grandmaLevel >= 1 && wrinklers.length < 10 && Math.random() < 0.001 * grandmaLevel) {
@@ -129,7 +138,7 @@ export function CookieClickerGame() {
         }
     }, tickRate)
     return () => clearInterval(interval)
-  }, [cps, wrinklers.length, grandmaLevel, gameState]) 
+  }, [cps, wrinklers.length, grandmaLevel]) 
 
 
 
@@ -146,19 +155,19 @@ export function CookieClickerGame() {
               const data = JSON.parse(saved) as SavedGameData
               
               setTimeout(() => {
-                if(data.cookies) setCookies(data.cookies)
-                if(data.totalCookies) setTotalCookies(data.totalCookies)
-                if(data.buildings) {
+                if (typeof data.cookies === "number") setCookies(data.cookies)
+                if (typeof data.totalCookies === "number") setTotalCookies(data.totalCookies)
+                if (Array.isArray(data.buildings)) {
                     setBuildings(prev => prev.map(b => {
                         const s = data.buildings.find(sb => sb.id === b.id)
                         return s ? {...b, owned: s.owned} : b
                     }))
                 }
-                if(data.upgrades) {
+                if (Array.isArray(data.upgrades)) {
                     setUpgrades(prev => prev.map(u => ({...u, purchased: data.upgrades.includes(u.id)})))
                 }
-                if(data.grandmaLevel) setGrandmaLevel(data.grandmaLevel)
-                if(data.heavenlyChips) setHeavenlyChips(data.heavenlyChips)
+                if (typeof data.grandmaLevel === "number") setGrandmaLevel(data.grandmaLevel)
+                if (typeof data.heavenlyChips === "number") setHeavenlyChips(data.heavenlyChips)
               }, 0)
           } catch(e) { console.error(e) }
       }
@@ -166,17 +175,21 @@ export function CookieClickerGame() {
 
   // Save
   useEffect(() => {
+      saveDataRef.current = {
+          cookies, totalCookies, grandmaLevel, heavenlyChips,
+          buildings: buildings.map(b => ({id: b.id, owned: b.owned})),
+          upgrades: upgrades.filter(u => u.purchased).map(u => u.id)
+      }
+  }, [cookies, totalCookies, buildings, upgrades, grandmaLevel, heavenlyChips])
+
+  useEffect(() => {
       const save = () => {
-          const data = {
-              cookies, totalCookies, grandmaLevel, heavenlyChips,
-              buildings: buildings.map(b => ({id: b.id, owned: b.owned})),
-              upgrades: upgrades.filter(u => u.purchased).map(u => u.id)
-          }
-          localStorage.setItem(SAVE_KEY, JSON.stringify(data))
+          if (!saveDataRef.current) return
+          localStorage.setItem(SAVE_KEY, JSON.stringify(saveDataRef.current))
       }
       const i = setInterval(save, 30000)
       return () => clearInterval(i)
-  }, [cookies, totalCookies, buildings, upgrades, grandmaLevel, heavenlyChips])
+  }, [])
 
   // Golden Cookie Spawner
   useEffect(() => {
