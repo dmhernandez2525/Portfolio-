@@ -72,7 +72,6 @@ export function AgarGame() {
   const [highScore, setHighScore] = useState(() =>
     parseInt(localStorage.getItem("agar-highscore") || "0", 10)
   )
-  const [isNewHighScore, setIsNewHighScore] = useState(false)
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer?: boolean; isPlayer2?: boolean }[]>([])
 
   // Initialize food
