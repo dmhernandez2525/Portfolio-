@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 
 // Demo users for showcasing the admin dashboard
@@ -50,8 +51,19 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null)
   const isDemoMode = isDemoModeEnabled()
+  const [user, setUser] = useState<User | null>(() => {
+    if (!isDemoMode) return null
+    if (typeof window === 'undefined') return null
+    const stored = sessionStorage.getItem('demo-user')
+    if (!stored) return null
+    try {
+      return JSON.parse(stored) as User
+    } catch {
+      sessionStorage.removeItem('demo-user')
+      return null
+    }
+  })
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     // In demo mode, we don't use real authentication
@@ -84,21 +96,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null)
     sessionStorage.removeItem('demo-user')
   }, [])
-
-  // Restore demo user from session on mount
-  useState(() => {
-    if (isDemoMode) {
-      const stored = sessionStorage.getItem('demo-user')
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored) as User
-          setUser(parsed)
-        } catch {
-          sessionStorage.removeItem('demo-user')
-        }
-      }
-    }
-  })
 
   const value: AuthContextType = {
     user,

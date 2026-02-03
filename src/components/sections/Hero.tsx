@@ -69,7 +69,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-20">
+    <section id="hero" className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-20">
       <ParticleBackground />
       <HeroBackground />
       

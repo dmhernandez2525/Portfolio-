@@ -51,6 +51,19 @@ export function TanksGame() {
     // Refs for synchronization
     const lastShotOwnerRef = useRef<string | null>(null)
     const animationRef = useRef<number | null>(null)
+    const aiPrepTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const aiFireTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    const clearAITimers = useCallback(() => {
+        if (aiPrepTimeoutRef.current) {
+            clearTimeout(aiPrepTimeoutRef.current)
+            aiPrepTimeoutRef.current = null
+        }
+        if (aiFireTimeoutRef.current) {
+            clearTimeout(aiFireTimeoutRef.current)
+            aiFireTimeoutRef.current = null
+        }
+    }, [])
     
     // Initialize game or next round
     const initGame = useCallback((isNextRound: boolean = false, mode: GameMode = gameMode) => {
@@ -62,6 +75,8 @@ export function TanksGame() {
         const enemyX = CANVAS_WIDTH - 80 - Math.random() * 60
 
         const isMultiplayer = mode === "vs_player"
+
+        const nextRound = (isNextRound && player) ? round + 1 : 1
 
         if (!isNextRound || !player) {
             setPlayer({
@@ -93,11 +108,11 @@ export function TanksGame() {
                 fuel: Math.min(prev.maxFuel, prev.fuel + 50),
                 isFalling: false
             } : null)
-            setRound(r => r + 1)
+            setRound(nextRound)
         }
 
         // Player 2 or AI enemy
-        const enemyHp = isMultiplayer ? 10 : 8 + round * 2
+        const enemyHp = isMultiplayer ? 10 : 8 + nextRound * 2
         setEnemy({
             id: "enemy",
             x: enemyX,
@@ -255,11 +270,12 @@ export function TanksGame() {
         // AI mode - enemy takes automated shot
         setPhase("enemy_turn")
 
-        setTimeout(() => {
+        clearAITimers()
+        aiPrepTimeoutRef.current = setTimeout(() => {
             const shot = calculateAIShot(enemy.x, enemy.y, player.x, player.y, wind)
             setEnemy(e => e ? {...e, angle: shot.angle, power: shot.power} : null)
 
-            setTimeout(() => {
+            aiFireTimeoutRef.current = setTimeout(() => {
                 const angleRad = shot.angle * Math.PI / 180
                 const speed = shot.power * 0.12
                 projectilesRef.current.push({
@@ -275,7 +291,25 @@ export function TanksGame() {
                 setPhase("firing")
             }, 600)
         }, 1000)
-    }, [enemy, player, wind, gameMode])
+    }, [enemy, player, wind, gameMode, clearAITimers])
+
+    useEffect(() => {
+        if (phase !== "enemy_turn") {
+            clearAITimers()
+        }
+    }, [phase, clearAITimers])
+
+    useEffect(() => {
+        if (gameMode === "menu") {
+            clearAITimers()
+        }
+    }, [gameMode, clearAITimers])
+
+    useEffect(() => {
+        return () => {
+            clearAITimers()
+        }
+    }, [clearAITimers])
 
 
     // Game Loop
@@ -509,7 +543,7 @@ export function TanksGame() {
                             {gameMode === "vs_player" ? "Player 2's tank was destroyed!" : "You destroyed the enemy tank!"}
                         </p>
                         {gameMode === "vs_player" && (
-                            <p className="text-neutral-400 mb-4">Score: P1 {scores.player1 + 1} - P2 {scores.player2}</p>
+                            <p className="text-neutral-400 mb-4">Score: P1 {scores.player1} - P2 {scores.player2}</p>
                         )}
                         <div className="flex gap-3">
                             <Button onClick={() => initGame(true)} size="lg" className="bg-green-600 hover:bg-green-500">Next Round</Button>
@@ -527,7 +561,7 @@ export function TanksGame() {
                             {gameMode === "vs_player" ? "Player 1's tank was destroyed!" : "Your tank was destroyed."}
                         </p>
                         {gameMode === "vs_player" && (
-                            <p className="text-neutral-400 mb-4">Score: P1 {scores.player1} - P2 {scores.player2 + 1}</p>
+                            <p className="text-neutral-400 mb-4">Score: P1 {scores.player1} - P2 {scores.player2}</p>
                         )}
                         <div className="flex gap-3">
                             <Button onClick={() => initGame(false)} size="lg" className="bg-red-600 hover:bg-red-500">

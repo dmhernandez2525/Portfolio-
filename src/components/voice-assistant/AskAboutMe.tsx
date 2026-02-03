@@ -51,6 +51,7 @@ export function AskAboutMe() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const suppressTranscriptCommitRef = useRef(false)
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -87,6 +88,8 @@ export function AskAboutMe() {
         recognition.maxAlternatives = 1
 
         let finalTranscript = ""
+        let lastInterimTranscript = ""
+        let hadFinalResult = false
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onresult = (event: any) => {
@@ -101,17 +104,21 @@ export function AskAboutMe() {
             }
           }
 
+          lastInterimTranscript = interim
           setInterimTranscript(interim)
 
           if (finalTranscript) {
             setInput(prev => prev + finalTranscript)
             finalTranscript = ""
+            lastInterimTranscript = ""
+            hadFinalResult = true
             setInterimTranscript("")
           }
         }
 
         recognition.onstart = () => {
           setIsListening(true)
+          suppressTranscriptCommitRef.current = false
         }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,9 +130,13 @@ export function AskAboutMe() {
         }
 
         recognition.onend = () => {
+          if (!hadFinalResult && lastInterimTranscript && !suppressTranscriptCommitRef.current) {
+            setInput(prev => prev + lastInterimTranscript)
+          }
           setIsListening(false)
           setInterimTranscript("")
           recognitionRef.current = null
+          suppressTranscriptCommitRef.current = false
         }
 
         recognitionRef.current = recognition
@@ -153,11 +164,15 @@ export function AskAboutMe() {
   }, [isListening, startListening, stopListening])
 
   const sendMessage = useCallback(async () => {
-    const trimmedInput = input.trim()
+    const combinedInput = input + (interimTranscript ? (input ? " " : "") + interimTranscript : "")
+    const trimmedInput = combinedInput.trim()
     if (!trimmedInput || isProcessing) return
 
     // Stop listening if active
-    if (isListening) stopListening()
+    if (isListening) {
+      suppressTranscriptCommitRef.current = true
+      stopListening()
+    }
 
     // Add user message
     const userMessage: Message = {
@@ -168,6 +183,7 @@ export function AskAboutMe() {
     }
     setMessages(prev => [...prev, userMessage])
     setInput("")
+    setInterimTranscript("")
     setIsProcessing(true)
 
     try {
@@ -224,7 +240,7 @@ export function AskAboutMe() {
     } finally {
       setIsProcessing(false)
     }
-  }, [input, isProcessing, isListening, stopListening, speakResponse])
+  }, [input, interimTranscript, isProcessing, isListening, stopListening, speakResponse])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -360,7 +376,7 @@ export function AskAboutMe() {
                     variant={isListening ? "default" : "outline"}
                     size="icon"
                     onClick={toggleListening}
-                    disabled={isProcessing}
+                    disabled={!speechRecognitionSupported || isProcessing}
                     className={`flex-shrink-0 ${isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : ""}`}
                     title={isListening ? "Stop listening" : "Start voice input"}
                   >

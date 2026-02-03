@@ -189,15 +189,17 @@ export function AgarGame() {
       setWinner(null)
     }
 
-    const finalScore = Math.floor(
-      playerCellsRef.current.reduce((sum, cell) => sum + getMass(cell.radius), 0)
-    )
+    const finalScore = gameMode === "single"
+      ? score
+      : Math.floor(
+          playerCellsRef.current.reduce((sum, cell) => sum + getMass(cell.radius), 0)
+        )
 
     if (finalScore > highScore && gameMode === "single") {
       setHighScore(finalScore)
       localStorage.setItem("agar-highscore", finalScore.toString())
     }
-  }, [highScore, gameMode])
+  }, [highScore, gameMode, score])
 
   // Split player cell
   const splitPlayer = useCallback((playerNum: 1 | 2 = 1) => {

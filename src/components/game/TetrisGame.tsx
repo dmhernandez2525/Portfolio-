@@ -102,6 +102,7 @@ export function TetrisGame() {
   const [heldPiece, setHeldPiece] = useState<PieceType | null>(null)
   const [canHold, setCanHold] = useState(true)
   const [pieceBag, setPieceBag] = useState<PieceType[]>([])
+  const pieceBagRef = useRef<PieceType[]>([])
   const [score, setScore] = useState(0)
   const [level, setLevel] = useState(1)
   const [linesCleared, setLinesCleared] = useState(0)
@@ -111,26 +112,39 @@ export function TetrisGame() {
   const [highScore, setHighScore] = useState(() =>
     parseInt(localStorage.getItem("tetris-highscore") || "0")
   )
+  const [isNewHighScore, setIsNewHighScore] = useState(false)
   const [clearingLines, setClearingLines] = useState<number[]>([])
   const [rotationState, setRotationState] = useState(0) // 0, 1, 2, 3 for SRS
 
   const gameLoopRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lockDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Get next pieces from bag
-  const getNextPieces = useCallback((): PieceType[] => {
-    let bag = [...pieceBag]
-    while (bag.length < 7) {
-      bag = [...bag, ...shuffleBag()]
-    }
-    return bag
+  // Keep ref in sync with state (used for deterministic draws)
+  useEffect(() => {
+    pieceBagRef.current = pieceBag
   }, [pieceBag])
 
+  const ensureBagSize = useCallback((bag: PieceType[]): PieceType[] => {
+    if (bag.length >= 7) return bag
+    return [...bag, ...shuffleBag()]
+  }, [])
+
+  // Ensure bag is always topped up for accurate previews
+  useEffect(() => {
+    if (pieceBag.length < 7) {
+      setPieceBag(prev => (prev.length < 7 ? ensureBagSize(prev) : prev))
+    }
+  }, [pieceBag.length, ensureBagSize])
+
   const spawnPiece = useCallback((forcedType?: PieceType) => {
-    const bag = getNextPieces()
-    const type = forcedType || bag.shift()!
-    if (!forcedType) {
-      setPieceBag(bag.slice(0, bag.length))
+    let type = forcedType
+    if (!type) {
+      let bag = pieceBagRef.current
+      if (bag.length === 0) {
+        bag = ensureBagSize(bag)
+      }
+      type = bag[0]
+      setPieceBag(bag.slice(1))
     }
 
     const piece = getPiece(type)
@@ -143,7 +157,7 @@ export function TetrisGame() {
     setRotationState(0)
     setCanHold(true)
     return newPiece
-  }, [getNextPieces])
+  }, [ensureBagSize])
 
   // Check collision
   const checkCollision = useCallback((pieceX: number, pieceY: number, shape: number[][], boardState?: Board) => {
@@ -199,7 +213,9 @@ export function TetrisGame() {
   const handleGameOver = useCallback(() => {
     setGameOver(true)
     setIsPlaying(false)
-    if (score > highScore) {
+    const didBeatHighScore = score > highScore
+    setIsNewHighScore(didBeatHighScore)
+    if (didBeatHighScore) {
       setHighScore(score)
       localStorage.setItem("tetris-highscore", score.toString())
     }
@@ -351,17 +367,25 @@ export function TetrisGame() {
     if (heldPiece) {
       // Swap with held piece
       const newPiece = spawnPiece(heldPiece)
+      if (checkCollision(newPiece.x, newPiece.y, newPiece.shape)) {
+        handleGameOver()
+        return
+      }
       setActivePiece(newPiece)
     } else {
       // Just hold, spawn next
       const newPiece = spawnPiece()
+      if (checkCollision(newPiece.x, newPiece.y, newPiece.shape)) {
+        handleGameOver()
+        return
+      }
       setActivePiece(newPiece)
     }
 
     setHeldPiece(currentType)
     setCanHold(false)
     setRotationState(0)
-  }, [activePiece, heldPiece, canHold, spawnPiece, clearingLines])
+  }, [activePiece, heldPiece, canHold, spawnPiece, clearingLines, checkCollision, handleGameOver])
 
   // Calculate ghost piece position
   const getGhostY = useCallback(() => {
@@ -384,6 +408,16 @@ export function TetrisGame() {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current)
     }
   }, [isPlaying, isPaused, gameOver, level, drop, clearingLines])
+
+  // Clear lock delay when pausing or stopping
+  useEffect(() => {
+    if (!isPlaying || isPaused || gameOver) {
+      if (lockDelayRef.current) {
+        clearTimeout(lockDelayRef.current)
+        lockDelayRef.current = null
+      }
+    }
+  }, [isPlaying, isPaused, gameOver])
 
   // Keyboard input
   useEffect(() => {
@@ -455,6 +489,7 @@ export function TetrisGame() {
     setCanHold(true)
     setClearingLines([])
     setRotationState(0)
+    setIsNewHighScore(false)
 
     const newBag = shuffleBag()
     setPieceBag(newBag.slice(1))
@@ -468,7 +503,7 @@ export function TetrisGame() {
   }
 
   // Get next 3 pieces for preview
-  const nextPieces = getNextPieces().slice(0, 3)
+  const nextPieces = pieceBag.slice(0, 3)
   const ghostY = getGhostY()
 
   // Render a piece preview (for hold and next)
@@ -582,7 +617,7 @@ export function TetrisGame() {
                 <h2 className="text-2xl font-bold text-red-500 mb-2">GAME OVER</h2>
                 <p className="text-lg mb-1 text-foreground">Score: {score.toLocaleString()}</p>
                 <p className="text-sm text-muted-foreground mb-4">Lines: {linesCleared} | Level: {level}</p>
-                {score >= highScore && score > 0 && (
+                {isNewHighScore && (
                   <p className="text-yellow-500 font-bold mb-4">NEW HIGH SCORE!</p>
                 )}
                 <Button onClick={resetGame} size="lg">

@@ -13,6 +13,7 @@ const ROUTE_MAPPINGS: Record<string, { route: string; aliases: string[] }> = {
   inventions: { route: '/inventions', aliases: ['invention', 'create', 'maker', 'hardware'] },
   blog: { route: '/blog', aliases: ['posts', 'articles', 'writing', 'thoughts'] },
   social: { route: '/social', aliases: ['connect', 'links', 'socials', 'contact me'] },
+  'falling-blocks': { route: '/game', aliases: ['falling blocks', 'falling block', 'blocks', 'block game', 'tap blocks'] },
   tetris: { route: '/tetris', aliases: ['tetris game'] },
   snake: { route: '/snake', aliases: ['snake game'] },
   tanks: { route: '/tanks', aliases: ['tank', 'tanks game'] },
@@ -60,22 +61,49 @@ class NavigationService {
    */
   findRouteMatch(target: string): { route: string; name: string } | null {
     const targetLower = target.toLowerCase().trim();
+    let bestMatchRoute: string | null = null;
+    let bestMatchName: string | null = null;
+    let bestScore = -Infinity;
+
+    const considerMatch = (name: string, config: { route: string }, score: number) => {
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatchRoute = config.route;
+        bestMatchName = name;
+      }
+    };
 
     for (const [name, config] of Object.entries(ROUTE_MAPPINGS)) {
-      // Direct match
-      if (targetLower === name || targetLower === name + 's' || targetLower === name.replace('-', ' ')) {
-        return { route: config.route, name };
+      const normalizedName = name.replace('-', ' ');
+
+      // Direct match (strongest)
+      if (
+        targetLower === name ||
+        targetLower === name + 's' ||
+        targetLower === normalizedName
+      ) {
+        considerMatch(name, config, 1000 + normalizedName.length);
+        continue;
       }
 
-      // Alias match
+      // Name included in target (strong)
+      if (targetLower.includes(normalizedName)) {
+        considerMatch(name, config, 200 + normalizedName.length);
+      }
+
+      // Alias match (strong if target includes alias)
       for (const alias of config.aliases) {
-        if (targetLower.includes(alias) || alias.includes(targetLower)) {
-          return { route: config.route, name };
+        if (targetLower.includes(alias)) {
+          considerMatch(name, config, 150 + alias.length);
+        } else if (alias.includes(targetLower) && targetLower.length > 3) {
+          // Weaker reverse match to avoid generic targets hijacking specific routes
+          considerMatch(name, config, alias.length - 100);
         }
       }
     }
 
-    return null;
+    if (!bestMatchRoute || !bestMatchName) return null;
+    return { route: bestMatchRoute, name: bestMatchName };
   }
 
   /**

@@ -51,6 +51,11 @@ export class VoiceCommandRouter {
       };
     }
 
+    const speedCommand = this.detectSpeedCommand(fullContext.transcript);
+    if (speedCommand) {
+      return this.handleSpeedCommand(speedCommand);
+    }
+
     // Use AI-based intent detection
     const intentResult = await detectIntent(transcript);
 
@@ -108,6 +113,34 @@ export class VoiceCommandRouter {
     }
   }
 
+  private detectSpeedCommand(transcript: string): 'faster' | 'slower' | 'normal' | null {
+    if (!transcript) return null;
+    const isTourActive = guidedTour.getState().isActive;
+    const hasSpeedContext = this.containsAny(transcript, ['speed', 'tour', 'talk']);
+    if (!isTourActive && !hasSpeedContext) return null;
+    if (this.containsAny(transcript, ['faster', 'speed up', 'quicker', 'talk faster'])) return 'faster';
+    if (this.containsAny(transcript, ['slower', 'slow down', 'too fast', 'talk slower'])) return 'slower';
+    if (this.containsAny(transcript, ['normal speed', 'default speed', 'reset speed'])) return 'normal';
+    return null;
+  }
+
+  private containsAny(text: string, keywords: string[]): boolean {
+    return keywords.some(keyword => text.includes(keyword));
+  }
+
+  private async handleSpeedCommand(action: 'faster' | 'slower' | 'normal'): Promise<CommandResult> {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('tour-speed', { detail: { action } }));
+    }
+    const isTourActive = guidedTour.getState().isActive;
+    const response = action === 'normal'
+      ? (isTourActive ? 'Back to normal speed.' : 'Okay, I’ll use normal speed for the tour.')
+      : action === 'faster'
+        ? (isTourActive ? 'Speeding it up.' : 'Got it. I’ll use a faster speed for the tour.')
+        : (isTourActive ? 'Slowing it down.' : 'Got it. I’ll use a slower speed for the tour.');
+    return { handled: true, response, shouldSpeak: true };
+  }
+
   getHelpText(): string {
     return `I can help you with:
 
@@ -120,6 +153,7 @@ export class VoiceCommandRouter {
 **Tour:**
 - "Give me a tour" - Start a guided tour
 - "Next" / "Previous" - Navigate tour steps
+- "Faster" / "Slower" / "Normal speed" - Adjust tour speed
 - "End tour" - Stop the tour
 
 **System:**
@@ -226,6 +260,9 @@ Or just ask me anything about Daniel!`;
     if (!guidedTour.getState().isActive) {
       return { handled: false, passToAI: true };
     }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('assistant-cancel-tour-speech'));
+    }
     await nextTourStep();
     return { handled: true, shouldSpeak: false };
   }
@@ -233,6 +270,9 @@ Or just ask me anything about Daniel!`;
   private async handleTourPrevious(): Promise<CommandResult> {
     if (!guidedTour.getState().isActive) {
       return { handled: false, passToAI: true };
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('assistant-cancel-tour-speech'));
     }
     await previousTourStep();
     return { handled: true, shouldSpeak: false };
@@ -246,6 +286,9 @@ Or just ask me anything about Daniel!`;
     const found = await guidedTour.skipToSection(section);
 
     if (found) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('assistant-cancel-tour-speech'));
+      }
       return { handled: true, shouldSpeak: false };
     }
 
@@ -258,6 +301,9 @@ Or just ask me anything about Daniel!`;
       return { handled: false, passToAI: true };
     }
     endTour();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('assistant-cancel-tour-speech'));
+    }
     const response = await generateActionResponse('tour_end', {});
     return { handled: true, response, shouldSpeak: true };
   }
@@ -266,6 +312,9 @@ Or just ask me anything about Daniel!`;
     clearHighlights();
     if (guidedTour.getState().isActive) {
       endTour();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('assistant-stop-speech'));
     }
     return { handled: true, shouldSpeak: false };
   }
