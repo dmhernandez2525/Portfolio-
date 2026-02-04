@@ -2,17 +2,28 @@ services:
   - type: web
     name: portfolio-site
     runtime: static
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: VITE_CESIUM_ION_TOKEN
         sync: false
       - key: VITE_DEMO_MODE
         value: "true"
     headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
       - path: /*
         name: Cache-Control
         value: no-cache
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
     routes:
       - type: rewrite
         source: /*
