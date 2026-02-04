@@ -131,6 +131,14 @@ export function AIAssistant() {
     isListeningRef.current = isListening
   }, [isListening])
 
+  // Stop listening - defined early since it's used in event handlers below
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop() } catch { /* ignore */ }
+    }
+    setIsListening(false)
+    setInterimTranscript("")
+  }, [])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -327,14 +335,6 @@ export function AIAssistant() {
         setTimeout(() => setSpeechError(null), 4000)
       }
     }, 150)
-  }, [])
-
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop() } catch { /* ignore */ }
-    }
-    setIsListening(false)
-    setInterimTranscript("")
   }, [])
 
   const toggleListening = useCallback(() => {
