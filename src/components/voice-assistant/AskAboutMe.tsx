@@ -387,7 +387,15 @@ export function AskAboutMe() {
                   <textarea
                     ref={inputRef}
                     value={displayText}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (interimTranscript && value.endsWith(interimTranscript)) {
+                        const trimmed = value.slice(0, -interimTranscript.length)
+                        setInput(trimmed.endsWith(" ") ? trimmed.slice(0, -1) : trimmed)
+                      } else {
+                        setInput(value)
+                      }
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder={isListening ? "Listening... speak now" : "Ask me anything about Daniel..."}
                     className="flex-1 min-h-[44px] max-h-[120px] px-4 py-2 rounded-xl border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"

@@ -70,7 +70,7 @@ export function AgarGame() {
   const [score, setScore] = useState(0)
   const [score2, setScore2] = useState(0) // Player 2 score
   const [highScore, setHighScore] = useState(() =>
-    parseInt(localStorage.getItem("agar-highscore") || "0")
+    parseInt(localStorage.getItem("agar-highscore") || "0", 10)
   )
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer?: boolean; isPlayer2?: boolean }[]>([])
 
