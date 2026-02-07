@@ -277,3 +277,25 @@
     padding-bottom: 4rem; /* Height of bottom nav */
   }
 }
+
+/* Techie mode: hacker mode easter egg */
+.hacker-mode {
+  --hacker-green: #00ff00;
+  --hacker-bg: #000000;
+}
+
+.hacker-mode,
+.hacker-mode * {
+  color: var(--hacker-green) !important;
+  background-color: var(--hacker-bg) !important;
+  border-color: #003300 !important;
+}
+
+.hacker-mode input,
+.hacker-mode textarea {
+  caret-color: var(--hacker-green) !important;
+}
+
+.hacker-mode .bg-\[\#007acc\] {
+  background-color: #003300 !important;
+}
