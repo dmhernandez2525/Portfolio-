@@ -17,7 +17,7 @@ export function Footer() {
             <Github className="h-5 w-5" />
           </a>
           <a
-            href="https://www.linkedin.com/in/daniel-hernandez-01a15a150/"
+            href="https://www.linkedin.com/in/dh25/"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 rounded-full bg-background border border-border hover:border-primary hover:text-primary transition-all"
