@@ -5,9 +5,11 @@ import { GamificationProvider } from "@/components/providers/GamificationProvide
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider"
 import { BossProvider } from "@/context/boss-context"
 import { AuthProvider } from "@/context/auth-context"
+import { ModeProvider, useMode } from "@/context/mode-context"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
 import { CustomCursor } from "@/components/ui/CustomCursor"
 import { ScrollToTop } from "@/components/shared/ScrollToTop"
+import { ModeSwitcher } from "@/components/shared/ModeSwitcher"
 import { AppRoutes } from "./AppRoutes"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -36,23 +38,36 @@ const logConsoleEasterEgg = () => {
   )
 }
 
-function App() {
+function CreativeExtras() {
+  return (
+    <>
+      <SmoothScrollProvider>
+        <CustomCursor />
+        <CreatureLayer />
+        <AppRoutes />
+      </SmoothScrollProvider>
+    </>
+  )
+}
+
+function NonCreativeShell() {
+  return <AppRoutes />
+}
+
+function AppShell() {
+  const { mode } = useMode()
   const [rightClickToast, setRightClickToast] = useState(false)
 
   useEffect(() => {
     logConsoleEasterEgg()
 
-    // Disable browser scroll restoration to prevent unwanted scroll on refresh
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual'
     }
 
-    // Force scroll to top on initial load
     window.scrollTo(0, 0)
 
-    // Right-click easter egg
     const handleContextMenu = () => {
-      // Don't prevent default - just show the toast briefly
       setRightClickToast(true)
       setTimeout(() => setRightClickToast(false), 2000)
     }
@@ -62,31 +77,38 @@ function App() {
   }, [])
 
   return (
+    <>
+      <ScrollToTop />
+      {mode === 'creative' ? <CreativeExtras /> : <NonCreativeShell />}
+      {mode && <ModeSwitcher />}
+
+      {/* Right-click easter egg toast */}
+      <AnimatePresence>
+        {rightClickToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-background/95 backdrop-blur-md px-6 py-3 rounded-lg border border-primary/50 shadow-lg pointer-events-none"
+          >
+            <p className="text-sm text-foreground">Inspecting my work? I respect that.</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
+function App() {
+  return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <GamificationProvider>
         <BossProvider>
           <AuthProvider>
             <BrowserRouter>
-              <ScrollToTop />
-              <SmoothScrollProvider>
-                <CustomCursor />
-                <CreatureLayer />
-                <AppRoutes />
-
-              {/* Right-click easter egg toast */}
-              <AnimatePresence>
-                {rightClickToast && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-background/95 backdrop-blur-md px-6 py-3 rounded-lg border border-primary/50 shadow-lg pointer-events-none"
-                  >
-                    <p className="text-sm text-foreground">Inspecting my work? I respect that.</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              </SmoothScrollProvider>
+              <ModeProvider>
+                <AppShell />
+              </ModeProvider>
             </BrowserRouter>
           </AuthProvider>
         </BossProvider>
