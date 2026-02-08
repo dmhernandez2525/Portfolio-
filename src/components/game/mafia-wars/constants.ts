@@ -74,7 +74,7 @@ export const CHARACTER_CLASSES: ClassDefinition[] = [
     description: 'Aggressive and relentless. More energy regeneration and bonus job XP.',
     icon: '💀',
     bonuses: {
-      energyRegenBonus: 2,
+      energyRegenBonus: 5,
       staminaRegenBonus: 0,
       jobXpMultiplier: 1.2,
       propertyIncomeMultiplier: 1.0,
@@ -103,7 +103,7 @@ export const CHARACTER_CLASSES: ClassDefinition[] = [
     icon: '⚔️',
     bonuses: {
       energyRegenBonus: 0,
-      staminaRegenBonus: 2,
+      staminaRegenBonus: 3,
       jobXpMultiplier: 1.0,
       propertyIncomeMultiplier: 1.0,
       bankFeeReduction: 0,
