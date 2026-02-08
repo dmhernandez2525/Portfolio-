@@ -207,6 +207,80 @@ function BlogContent() {
   )
 }
 
+function HiddenEnvContent() {
+  return (
+    <div className="space-y-2">
+      <div className="text-[#608b4e]">{`# .env — Environment Variables`}</div>
+      <div className="text-[#858585] text-xs mb-4">You found a hidden file!</div>
+      <div className="bg-[#1a1a1a] p-4 rounded space-y-1 text-sm">
+        <div><span className="text-[#569cd6]">HIRE_ME</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">true</span></div>
+        <div><span className="text-[#569cd6]">COFFEE_LEVEL</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">critical</span></div>
+        <div><span className="text-[#569cd6]">BUGS</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">0</span></div>
+        <div><span className="text-[#569cd6]">MOTIVATION</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">infinite</span></div>
+        <div><span className="text-[#569cd6]">DARK_MODE</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">always</span></div>
+        <div><span className="text-[#569cd6]">TABS_VS_SPACES</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">tabs</span></div>
+        <div><span className="text-[#569cd6]">FAVORITE_EDITOR</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">the one that doesn't crash</span></div>
+        <div className="text-[#608b4e] pt-2"># Don't tell anyone about these</div>
+        <div><span className="text-[#569cd6]">SECRET_POWER</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">turning caffeine into code</span></div>
+        <div><span className="text-[#569cd6]">STACKOVERFLOW_VISITS_TODAY</span><span className="text-[#d4d4d4]">=</span><span className="text-[#ce9178]">42</span></div>
+      </div>
+    </div>
+  )
+}
+
+function HiddenSecretContent() {
+  return (
+    <div className="space-y-4">
+      <div className="text-[#608b4e]">{`# .secret — You found the secret file!`}</div>
+      <div className="bg-[#1a1a1a] p-4 rounded font-mono text-[#4ec9b0] text-xs leading-relaxed whitespace-pre">
+{`    ___       ___       ___       ___
+   /\\  \\     /\\__\\     /\\  \\     /\\  \\
+  /::\\  \\   /:/__/_   _\\:\\  \\   /::\\  \\
+ /:/\\:\\__\\ /::\\/\\__\\ /\\/::\\__\\ /:/\\:\\__\\
+ \\:\\/:/  / \\/\\::/  / \\::/\\/__/ \\:\\ \\/__/
+  \\::/  /    /:/  /   \\:\\__\\    \\:\\__\\
+   \\/__/     \\/__/     \\/__/     \\/__/  `}
+      </div>
+      <div className="text-[#ce9178] text-sm">
+        Congratulations, you found the secret file! You must be the curious type.
+      </div>
+      <div className="text-[#d7ba7d] text-sm">
+        Fun fact: This portfolio has {">"}25 easter eggs hidden throughout.
+        How many can you find?
+      </div>
+      <div className="mt-4 text-xs text-[#858585] space-y-1">
+        <div>Hints:</div>
+        <div className="text-[#608b4e]">+ Try typing certain words while on this page...</div>
+        <div className="text-[#608b4e]">+ The Konami code still works in 2026</div>
+        <div className="text-[#608b4e]">+ The terminal knows more than it lets on</div>
+        <div className="text-[#608b4e]">+ Some commands are... not in the help menu</div>
+      </div>
+    </div>
+  )
+}
+
+function HiddenGitignoreContent() {
+  return (
+    <div className="space-y-2">
+      <div className="text-[#608b4e]">{`# .gitignore`}</div>
+      <div className="bg-[#1a1a1a] p-4 rounded space-y-1 text-sm">
+        <div className="text-[#d4d4d4]">node_modules/</div>
+        <div className="text-[#d4d4d4]">dist/</div>
+        <div className="text-[#d4d4d4]">.env</div>
+        <div className="text-[#d4d4d4]">.DS_Store</div>
+        <div className="text-[#d4d4d4]">*.log</div>
+        <div className="text-[#d4d4d4]">coverage/</div>
+        <div className="text-[#608b4e]"># The important stuff</div>
+        <div className="text-[#d4d4d4]">my-hopes-and-dreams/</div>
+        <div className="text-[#d4d4d4]">passwords-definitely-not-here.txt</div>
+        <div className="text-[#d4d4d4]">evidence/</div>
+        <div className="text-[#d4d4d4]">todo-learn-vim.md</div>
+        <div className="text-[#d4d4d4]">*.tears</div>
+      </div>
+    </div>
+  )
+}
+
 function ContactContent() {
   return (
     <div className="space-y-4">
@@ -319,6 +393,9 @@ export function TechieContentViewer({ tab, onEditorChange }: TechieContentViewer
     projects: <ProjectsContent />,
     blog: <BlogContent />,
     contact: <ContactContent />,
+    "hidden-env": <HiddenEnvContent />,
+    "hidden-secret": <HiddenSecretContent />,
+    "hidden-gitignore": <HiddenGitignoreContent />,
   }
 
   const content = contentMap[contentKey]

@@ -1,15 +1,14 @@
-import { type FileNode, getFileIcon } from "../techie-data"
+import { getFileIcon } from "../techie-data"
 import {
   resolvePath,
   listDirectory,
   buildTreeString,
-  displayPath,
   HOME_PATH,
   normalizePath,
 } from "./terminal-filesystem"
 
 export interface OutputLine {
-  text: string
+  text?: string
   color?: string
   bold?: boolean
   parts?: { text: string; color?: string }[]
