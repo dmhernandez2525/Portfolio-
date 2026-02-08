@@ -187,9 +187,9 @@ export function Contact() {
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="contact-name">Name</Label>
                                     <Input
-                                        id="name"
+                                        id="contact-name"
                                         placeholder="Your name"
                                         {...register("name")}
                                         className={errors.name ? "border-red-500" : ""}
@@ -197,9 +197,9 @@ export function Contact() {
                                     {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="contact-email">Email</Label>
                                     <Input
-                                        id="email"
+                                        id="contact-email"
                                         type="email"
                                         placeholder="your@email.com"
                                         {...register("email")}
@@ -208,11 +208,11 @@ export function Contact() {
                                     {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-2">
-                                <Label htmlFor="message">Message</Label>
+                                <Label htmlFor="contact-message">Message</Label>
                                 <Textarea
-                                    id="message"
+                                    id="contact-message"
                                     placeholder="Tell me about your project, opportunity, or just say hi..."
                                     className={`min-h-[150px] ${errors.message ? "border-red-500" : ""}`}
                                     {...register("message")}
