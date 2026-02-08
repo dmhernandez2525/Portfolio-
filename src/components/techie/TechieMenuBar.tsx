@@ -24,6 +24,8 @@ const menus: MenuGroup[] = [
       { label: "separator" },
       { label: "Save", shortcut: "\u2318S", action: "save" },
       { label: "separator" },
+      { label: "Settings...", shortcut: "\u2318,", action: "open-settings" },
+      { label: "separator" },
       { label: "Print...", shortcut: "\u2318P", action: "print" },
       { label: "separator" },
       { label: "Exit to Gateway", shortcut: "\u2318Q", action: "exit" },
@@ -41,6 +43,8 @@ const menus: MenuGroup[] = [
       { label: "separator" },
       { label: "Select All", shortcut: "\u2318A" },
       { label: "Find", shortcut: "\u2318F" },
+      { label: "separator" },
+      { label: "Toggle Vim Mode", action: "toggle-vim" },
     ],
   },
   {
@@ -49,12 +53,14 @@ const menus: MenuGroup[] = [
       { label: "Toggle Sidebar", shortcut: "\u2318B", action: "toggle-sidebar" },
       { label: "Toggle Terminal", shortcut: "\u2318`", action: "toggle-terminal" },
       { label: "Toggle Status Bar", action: "toggle-statusbar" },
+      { label: "Toggle Minimap", action: "toggle-minimap" },
+      { label: "Toggle Word Wrap", action: "toggle-wordwrap" },
       { label: "separator" },
       { label: "Full Screen", shortcut: "F11", action: "fullscreen" },
       { label: "Zen Mode", shortcut: "\u2318K Z", action: "zen-mode" },
       { label: "separator" },
-      { label: "Zoom In", shortcut: "\u2318=" },
-      { label: "Zoom Out", shortcut: "\u2318-" },
+      { label: "Zoom In", shortcut: "\u2318=", action: "font-size-up" },
+      { label: "Zoom Out", shortcut: "\u2318-", action: "font-size-down" },
     ],
   },
   {
@@ -75,6 +81,8 @@ const menus: MenuGroup[] = [
     label: "Window",
     items: [
       { label: "Toggle Zen Mode", shortcut: "\u2318K Z", action: "zen-mode" },
+      { label: "separator" },
+      { label: "Extensions", action: "open-extensions" },
     ],
   },
   {

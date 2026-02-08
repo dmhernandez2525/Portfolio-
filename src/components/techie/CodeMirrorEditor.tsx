@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from "react"
-import CodeMirror, { type Extension } from "@uiw/react-codemirror"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
+import CodeMirror, { type Extension, type ReactCodeMirrorRef } from "@uiw/react-codemirror"
 import { EditorView } from "@codemirror/view"
 import { javascript } from "@codemirror/lang-javascript"
 import { python } from "@codemirror/lang-python"
@@ -14,8 +14,17 @@ import { php } from "@codemirror/lang-php"
 import { rust } from "@codemirror/lang-rust"
 import { sql } from "@codemirror/lang-sql"
 import { bracketMatching } from "@codemirror/language"
+import { oneDark } from "@codemirror/theme-one-dark"
+import { monokai } from "@uiw/codemirror-theme-monokai"
+import { githubDark } from "@uiw/codemirror-theme-github"
+import { solarizedDark } from "@uiw/codemirror-theme-solarized"
+import { dracula } from "@uiw/codemirror-theme-dracula"
+import { vscodeDark } from "@uiw/codemirror-theme-vscode"
+import { vim } from "@replit/codemirror-vim"
 import { Play, X, Trash2 } from "lucide-react"
 import { executeSandboxedJS } from "./sandbox"
+import type { EditorSettings, CursorPosition, ThemeName } from "./editor-settings"
+import { DEFAULT_EDITOR_SETTINGS } from "./editor-settings"
 
 const LANG_MAP: Record<string, () => Extension> = {
   js: () => javascript(),
@@ -47,7 +56,7 @@ function getExtension(fileName: string): string {
   return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : ""
 }
 
-function getLangLabel(ext: string): string {
+export function getLangLabel(ext: string): string {
   const labels: Record<string, string> = {
     js: "JavaScript",
     jsx: "JavaScript (JSX)",
@@ -73,61 +82,18 @@ function getLangLabel(ext: string): string {
   return labels[ext] ?? "Plain Text"
 }
 
-const vscodeDarkTheme = EditorView.theme({
-  "&": {
-    backgroundColor: "#1e1e1e",
-    color: "#d4d4d4",
-    fontSize: "13px",
-    height: "100%",
-  },
-  ".cm-content": {
-    caretColor: "#aeafad",
-    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
-    padding: "8px 0",
-  },
-  ".cm-cursor, .cm-dropCursor": {
-    borderLeftColor: "#aeafad",
-  },
-  "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
-    backgroundColor: "#264f78",
-  },
-  ".cm-activeLine": {
-    backgroundColor: "#2a2d2e",
-  },
-  ".cm-gutters": {
-    backgroundColor: "#1e1e1e",
-    color: "#858585",
-    borderRight: "1px solid #3c3c3c",
-    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
-  },
-  ".cm-activeLineGutter": {
-    backgroundColor: "#2a2d2e",
-    color: "#cccccc",
-  },
-  ".cm-foldPlaceholder": {
-    backgroundColor: "#3c3c3c",
-    color: "#858585",
-    border: "none",
-  },
-  ".cm-matchingBracket": {
-    backgroundColor: "#3c3c3c",
-    color: "#dcdcaa !important",
-    outline: "1px solid #888",
-  },
-  ".cm-nonmatchingBracket": {
-    color: "#f44747 !important",
-  },
-  ".cm-tooltip": {
-    backgroundColor: "#252526",
-    border: "1px solid #454545",
-    color: "#d4d4d4",
-  },
-  ".cm-tooltip-autocomplete": {
-    "& > ul > li[aria-selected]": {
-      backgroundColor: "#094771",
-    },
-  },
-}, { dark: true })
+export function getLangLabelFromFile(fileName: string): string {
+  return getLangLabel(getExtension(fileName))
+}
+
+const THEME_MAP: Record<ThemeName, Extension> = {
+  "vs-dark": vscodeDark,
+  "one-dark": oneDark,
+  "monokai": monokai,
+  "github-dark": githubDark,
+  "solarized-dark": solarizedDark,
+  "dracula": dracula,
+}
 
 interface OutputEntry {
   text: string
@@ -139,31 +105,79 @@ interface CodeMirrorEditorProps {
   content: string
   onChange: (value: string) => void
   onRun: (code: string, lang: string) => void
+  settings?: EditorSettings
+  onCursorChange?: (pos: CursorPosition) => void
 }
 
-export function CodeMirrorEditor({ fileName, content, onChange }: CodeMirrorEditorProps) {
+export function CodeMirrorEditor({
+  fileName,
+  content,
+  onChange,
+  settings = DEFAULT_EDITOR_SETTINGS,
+  onCursorChange,
+}: CodeMirrorEditorProps) {
   const ext = getExtension(fileName)
-  const langLabel = getLangLabel(ext)
   const isRunnable = RUNNABLE_LANGS.has(ext)
   const [output, setOutput] = useState<OutputEntry[]>([])
   const [showOutput, setShowOutput] = useState(false)
+  const editorRef = useRef<ReactCodeMirrorRef>(null)
+  const minimapRef = useRef<HTMLDivElement>(null)
 
   const extensions = useMemo(() => {
-    const exts: Extension[] = [
-      bracketMatching(),
-      vscodeDarkTheme,
-      EditorView.lineWrapping,
-    ]
+    const exts: Extension[] = []
 
+    // Vim mode
+    if (settings.vimMode) {
+      exts.push(vim())
+    }
+
+    // Bracket matching
+    if (settings.bracketPairColors) {
+      exts.push(bracketMatching())
+    }
+
+    // Theme
+    exts.push(THEME_MAP[settings.theme] ?? vscodeDark)
+
+    // Word wrap
+    if (settings.wordWrap) {
+      exts.push(EditorView.lineWrapping)
+    }
+
+    // Font size
+    exts.push(EditorView.theme({
+      ".cm-content": {
+        fontSize: `${settings.fontSize}px`,
+        fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
+      },
+      ".cm-gutters": {
+        fontSize: `${settings.fontSize}px`,
+        fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
+      },
+    }))
+
+    // Cursor tracking
+    exts.push(EditorView.updateListener.of((update) => {
+      if (update.selectionSet || update.docChanged) {
+        const pos = update.state.selection.main.head
+        const line = update.state.doc.lineAt(pos)
+        onCursorChange?.({
+          line: line.number,
+          col: pos - line.from + 1,
+        })
+      }
+    }))
+
+    // Language
     const langFactory = LANG_MAP[ext]
     if (langFactory) exts.push(langFactory())
 
     return exts
-  }, [ext])
+  }, [ext, settings.vimMode, settings.bracketPairColors, settings.theme, settings.wordWrap, settings.fontSize, onCursorChange])
 
   const handleRun = useCallback(() => {
     if (!isRunnable) {
-      setOutput([{ text: `Execution not supported for ${langLabel}. Only JavaScript/TypeScript can be executed.`, type: "info" }])
+      setOutput([{ text: `Execution not supported for ${getLangLabel(ext)}. Only JavaScript/TypeScript can be executed.`, type: "info" }])
       setShowOutput(true)
       return
     }
@@ -185,7 +199,7 @@ export function CodeMirrorEditor({ fileName, content, onChange }: CodeMirrorEdit
 
     setOutput(entries)
     setShowOutput(true)
-  }, [content, isRunnable, langLabel])
+  }, [content, isRunnable, ext])
 
   // Keyboard shortcut: Ctrl/Cmd+Shift+Enter to run
   useEffect(() => {
@@ -198,6 +212,26 @@ export function CodeMirrorEditor({ fileName, content, onChange }: CodeMirrorEdit
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
   }, [handleRun])
+
+  // Minimap content
+  const minimapLines = useMemo(() => {
+    if (!settings.minimap) return []
+    return content.split("\n").slice(0, 500)
+  }, [content, settings.minimap])
+
+  // Minimap scroll sync
+  const handleMinimapClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientY - rect.top) / rect.height
+    const view = editorRef.current?.view
+    if (view) {
+      const targetLine = Math.floor(ratio * view.state.doc.lines) + 1
+      const line = view.state.doc.line(Math.min(targetLine, view.state.doc.lines))
+      view.dispatch({
+        effects: EditorView.scrollIntoView(line.from, { y: "start" }),
+      })
+    }
+  }, [])
 
   const outputColors: Record<OutputEntry["type"], string> = {
     log: "#d4d4d4",
@@ -212,8 +246,13 @@ export function CodeMirrorEditor({ fileName, content, onChange }: CodeMirrorEdit
       <div className="flex items-center justify-between px-3 py-1.5 bg-[#252526] border-b border-[#3c3c3c] shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-[10px] px-2 py-0.5 bg-[#1e1e1e] border border-[#3c3c3c] text-[#858585] font-mono">
-            {langLabel}
+            {getLangLabel(ext)}
           </span>
+          {settings.vimMode && (
+            <span className="text-[10px] px-2 py-0.5 bg-[#388a34]/20 border border-[#388a34]/40 text-[#4ec9b0] font-mono">
+              VIM
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isRunnable && (
@@ -234,29 +273,48 @@ export function CodeMirrorEditor({ fileName, content, onChange }: CodeMirrorEdit
         </div>
       </div>
 
-      {/* Editor */}
-      <div className={`overflow-hidden ${showOutput ? "flex-1 min-h-0" : "flex-1"}`}>
-        <CodeMirror
-          value={content}
-          onChange={onChange}
-          extensions={extensions}
-          theme="dark"
-          basicSetup={{
-            lineNumbers: true,
-            highlightActiveLineGutter: true,
-            highlightActiveLine: true,
-            foldGutter: true,
-            autocompletion: true,
-            bracketMatching: false,
-            closeBrackets: true,
-            indentOnInput: true,
-            syntaxHighlighting: true,
-            searchKeymap: true,
-            tabSize: 2,
-          }}
-          height="100%"
-          style={{ height: "100%" }}
-        />
+      {/* Editor + Minimap */}
+      <div className={`flex overflow-hidden ${showOutput ? "flex-1 min-h-0" : "flex-1"}`}>
+        <div className="flex-1 overflow-hidden">
+          <CodeMirror
+            ref={editorRef}
+            value={content}
+            onChange={onChange}
+            extensions={extensions}
+            theme="dark"
+            basicSetup={{
+              lineNumbers: settings.lineNumbers,
+              highlightActiveLineGutter: true,
+              highlightActiveLine: true,
+              foldGutter: true,
+              autocompletion: true,
+              bracketMatching: false,
+              closeBrackets: true,
+              indentOnInput: true,
+              syntaxHighlighting: true,
+              searchKeymap: true,
+              tabSize: settings.tabSize,
+            }}
+            height="100%"
+            style={{ height: "100%" }}
+          />
+        </div>
+
+        {/* Minimap */}
+        {settings.minimap && (
+          <div
+            ref={minimapRef}
+            className="w-[60px] shrink-0 bg-[#1e1e1e] border-l border-[#3c3c3c] overflow-hidden cursor-pointer relative"
+            onClick={handleMinimapClick}
+            title="Click to scroll"
+          >
+            <pre className="text-[1.5px] leading-[2px] p-1 text-[#858585] pointer-events-none select-none overflow-hidden whitespace-pre font-mono">
+              {minimapLines.map((line, i) => (
+                <div key={i}>{line || " "}</div>
+              ))}
+            </pre>
+          </div>
+        )}
       </div>
 
       {/* Output panel */}

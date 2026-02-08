@@ -5,6 +5,7 @@ import { projectsData } from "@/data/projects"
 import { blogPosts } from "@/data/blog"
 import type { TechieTab } from "./TechieLayout"
 import { CodeMirrorEditor } from "./CodeMirrorEditor"
+import type { EditorSettings, CursorPosition } from "./editor-settings"
 
 const SnakeGame = lazy(() => import("@/components/game/SnakeGame").then(m => ({ default: m.SnakeGame })))
 const TetrisGame = lazy(() => import("@/components/game/TetrisGame").then(m => ({ default: m.TetrisGame })))
@@ -18,6 +19,8 @@ interface TechieContentViewerProps {
   tab: TechieTab | null
   onEditorChange: (tabId: string, content: string) => void
   onRunCode: (code: string, lang: string) => void
+  editorSettings?: EditorSettings
+  onCursorChange?: (pos: CursorPosition) => void
 }
 
 function TerminalLine({ prefix, children }: { prefix?: string; children: React.ReactNode }) {
@@ -343,7 +346,7 @@ function WelcomeScreen() {
   )
 }
 
-export function TechieContentViewer({ tab, onEditorChange, onRunCode }: TechieContentViewerProps) {
+export function TechieContentViewer({ tab, onEditorChange, onRunCode, editorSettings, onCursorChange }: TechieContentViewerProps) {
   if (!tab) return <WelcomeScreen />
 
   // Untitled/editor tabs
@@ -354,6 +357,8 @@ export function TechieContentViewer({ tab, onEditorChange, onRunCode }: TechieCo
         content={tab.editorContent ?? ""}
         onChange={(val) => onEditorChange(tab.id, val)}
         onRun={onRunCode}
+        settings={editorSettings}
+        onCursorChange={onCursorChange}
       />
     )
   }

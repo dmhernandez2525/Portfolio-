@@ -5,12 +5,18 @@ import { TechieContentViewer } from "./TechieContentViewer"
 import { TechieTabs } from "./TechieTabs"
 import { TechieStatusBar } from "./TechieStatusBar"
 import { TechieTerminal } from "./terminal/TechieTerminal"
+import { TechieActivityBar, type ActivityBarPanel } from "./TechieActivityBar"
+import { ExtensionsPanel } from "./ExtensionsPanel"
 import { MatrixRain } from "./MatrixRain"
 import { AboutDialog } from "./AboutDialog"
 import { CommandPalette } from "./dialogs/CommandPalette"
 import { KeyboardShortcutsDialog } from "./dialogs/KeyboardShortcutsDialog"
 import { ReleaseNotesDialog } from "./dialogs/ReleaseNotesDialog"
+import { SettingsDialog } from "./dialogs/SettingsDialog"
 import { useEasterEggs } from "@/hooks/use-easter-eggs"
+import type { EditorSettings, CursorPosition } from "./editor-settings"
+import { loadEditorSettings, saveEditorSettings } from "./editor-settings"
+import { getLangLabelFromFile } from "./CodeMirrorEditor"
 
 export interface TechieTab {
   id: string
@@ -34,10 +40,23 @@ export function TechieLayout() {
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showReleaseNotes, setShowReleaseNotes] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [showHiddenFiles, setShowHiddenFiles] = useState(false)
   const [easterEggToast, setEasterEggToast] = useState<string | null>(null)
+  const [activePanel, setActivePanel] = useState<ActivityBarPanel>("files")
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>(loadEditorSettings)
+  const [cursorPosition, setCursorPosition] = useState<CursorPosition>({ line: 1, col: 1 })
 
   const activeTab = tabs.find(t => t.id === activeTabId) ?? null
+
+  // Persist editor settings
+  const updateEditorSettings = useCallback((partial: Partial<EditorSettings>) => {
+    setEditorSettings(prev => {
+      const next = { ...prev, ...partial }
+      saveEditorSettings(next)
+      return next
+    })
+  }, [])
 
   // Hacker mode auto-off after 10 seconds
   useEffect(() => {
@@ -153,7 +172,13 @@ export function TechieLayout() {
     ))
   }, [])
 
-  // Action lookup table (no switch statement)
+  const handleRenameTab = useCallback((tabId: string, newName: string) => {
+    setTabs(prev => prev.map(t =>
+      t.id === tabId ? { ...t, fileName: newName } : t
+    ))
+  }, [])
+
+  // Action lookup table
   const menuActions: Record<string, () => void> = {
     "new-file": createNewFile,
     "close-tab": () => { if (activeTabId) closeTab(activeTabId) },
@@ -173,6 +198,16 @@ export function TechieLayout() {
     "command-palette": () => setShowCommandPalette(true),
     "shortcuts": () => setShowShortcuts(true),
     "release-notes": () => setShowReleaseNotes(true),
+    "open-settings": () => setShowSettings(true),
+    "open-extensions": () => {
+      setSidebarOpen(true)
+      setActivePanel("extensions")
+    },
+    "toggle-vim": () => updateEditorSettings({ vimMode: !editorSettings.vimMode }),
+    "toggle-minimap": () => updateEditorSettings({ minimap: !editorSettings.minimap }),
+    "toggle-wordwrap": () => updateEditorSettings({ wordWrap: !editorSettings.wordWrap }),
+    "font-size-up": () => updateEditorSettings({ fontSize: Math.min(24, editorSettings.fontSize + 1) }),
+    "font-size-down": () => updateEditorSettings({ fontSize: Math.max(12, editorSettings.fontSize - 1) }),
     "welcome": () => openFile("readme", "README.md"),
     "check-updates": () => {
       // Brief visual feedback - handled by menu bar toast
@@ -185,7 +220,7 @@ export function TechieLayout() {
     const handler = menuActions[action]
     if (handler) handler()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId, createNewFile, closeAllTabs, handleSave, openFile])
+  }, [activeTabId, createNewFile, closeAllTabs, handleSave, openFile, editorSettings, updateEditorSettings])
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -217,6 +252,21 @@ export function TechieLayout() {
         createNewFile()
         return
       }
+      if (ctrl && e.key === ",") {
+        e.preventDefault()
+        setShowSettings(prev => !prev)
+        return
+      }
+      if (ctrl && e.key === "=") {
+        e.preventDefault()
+        updateEditorSettings({ fontSize: Math.min(24, editorSettings.fontSize + 1) })
+        return
+      }
+      if (ctrl && e.key === "-") {
+        e.preventDefault()
+        updateEditorSettings({ fontSize: Math.max(12, editorSettings.fontSize - 1) })
+        return
+      }
       if (e.key === "F11") {
         e.preventDefault()
         if (document.fullscreenElement) {
@@ -227,6 +277,7 @@ export function TechieLayout() {
         return
       }
       if (e.key === "Escape") {
+        if (showSettings) { setShowSettings(false); return }
         if (showCommandPalette) { setShowCommandPalette(false); return }
         if (showShortcuts) { setShowShortcuts(false); return }
         if (showReleaseNotes) { setShowReleaseNotes(false); return }
@@ -237,7 +288,7 @@ export function TechieLayout() {
     }
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout, showCommandPalette, showShortcuts, showReleaseNotes])
+  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout, showCommandPalette, showShortcuts, showReleaseNotes, showSettings, editorSettings.fontSize, updateEditorSettings])
 
   const showChrome = !zenMode
 
@@ -262,6 +313,7 @@ export function TechieLayout() {
           activeTabId={activeTabId}
           onActivate={setActiveTabId}
           onClose={closeTab}
+          onRename={handleRenameTab}
         />
       )}
 
@@ -279,14 +331,35 @@ export function TechieLayout() {
       )}
 
       <div className="flex flex-1 overflow-hidden">
+        {/* Activity Bar */}
+        {showChrome && (
+          <div className="hidden sm:block">
+            <TechieActivityBar
+              activePanel={activePanel}
+              onPanelChange={(panel) => {
+                setActivePanel(panel)
+                setSidebarOpen(true)
+              }}
+              onOpenSettings={() => setShowSettings(true)}
+            />
+          </div>
+        )}
+
         {/* Sidebar */}
         {showChrome && sidebarOpen && (
-          <div className="w-56 shrink-0 hidden sm:block">
-            <TechieFileExplorer
-              currentFile={activeTab?.contentKey ?? null}
-              onFileSelect={openFile}
-              showHidden={showHiddenFiles}
-            />
+          <div className="w-52 shrink-0 hidden sm:block">
+            {activePanel === "files" ? (
+              <TechieFileExplorer
+                currentFile={activeTab?.contentKey ?? null}
+                onFileSelect={openFile}
+                showHidden={showHiddenFiles}
+              />
+            ) : (
+              <ExtensionsPanel
+                settings={editorSettings}
+                onUpdateSettings={updateEditorSettings}
+              />
+            )}
           </div>
         )}
 
@@ -298,6 +371,8 @@ export function TechieLayout() {
               tab={activeTab}
               onEditorChange={updateEditorContent}
               onRunCode={() => {}}
+              editorSettings={editorSettings}
+              onCursorChange={setCursorPosition}
             />
           </div>
 
@@ -321,6 +396,10 @@ export function TechieLayout() {
           lineCount={activeTab?.isUntitled ? (activeTab.editorContent?.split("\n").length ?? 1) : undefined}
           terminalOpen={terminalOpen}
           onToggleTerminal={() => setTerminalOpen(prev => !prev)}
+          cursorPosition={cursorPosition}
+          language={activeTab ? getLangLabelFromFile(activeTab.fileName) : "Plain Text"}
+          editorSettings={editorSettings}
+          onUpdateSettings={updateEditorSettings}
         />
       )}
 
@@ -350,6 +429,13 @@ export function TechieLayout() {
       )}
       {showShortcuts && <KeyboardShortcutsDialog onClose={() => setShowShortcuts(false)} />}
       {showReleaseNotes && <ReleaseNotesDialog onClose={() => setShowReleaseNotes(false)} />}
+      {showSettings && (
+        <SettingsDialog
+          settings={editorSettings}
+          onUpdateSettings={updateEditorSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
 
       {/* Easter egg toast */}
       {easterEggToast && (
