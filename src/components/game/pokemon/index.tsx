@@ -11,10 +11,10 @@ import './pokemon.css';
 
 export function PokemonGame() {
   const [screen, setScreen] = useState<'select' | 'playing'>('select');
-  const [_version, setVersion] = useState<GameVersion | null>(null);
+  const [version, setVersion] = useState<GameVersion | null>(null);
 
-  const handleSelect = (version: GameVersion) => {
-    setVersion(version);
+  const handleSelect = (v: GameVersion) => {
+    setVersion(v);
     setScreen('playing');
   };
 
@@ -34,7 +34,7 @@ export function PokemonGame() {
 
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-2 sm:p-4 gap-4">
-      <PokemonCanvas onBack={handleBack} />
+      <PokemonCanvas version={version!} onBack={handleBack} />
       <Link
         to="/games"
         className="text-white/20 hover:text-white/60 text-xs transition-colors"

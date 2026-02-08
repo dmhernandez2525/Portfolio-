@@ -4,10 +4,11 @@
 
 import { useRef, useCallback } from 'react';
 import type { Player, Direction, GameMap } from '../engine/types';
-import { SCALED_TILE, PLAYER_SPEED, ENCOUNTER_RATE } from '../engine/constants';
+import { SCALED_TILE, PLAYER_SPEED } from '../engine/constants';
 import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp } from '../engine/collision';
 import { setCameraTarget } from '../engine/camera';
 import type { Camera } from '../engine/types';
+import { ENCOUNTER_RATE } from '../engine/constants';
 
 export interface OverworldState {
   player: Player;
@@ -18,6 +19,7 @@ export function useOverworld() {
   const stateRef = useRef<OverworldState | null>(null);
   const encounterCallback = useRef<(() => void) | null>(null);
   const warpCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
+  const connectionCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
   const npcCallback = useRef<((npcId: string) => void) | null>(null);
 
   const init = useCallback((map: GameMap, startX: number, startY: number): Player => {
@@ -53,8 +55,61 @@ export function useOverworld() {
     warpCallback.current = cb;
   }, []);
 
+  const onConnection = useCallback((cb: (mapId: string, x: number, y: number) => void) => {
+    connectionCallback.current = cb;
+  }, []);
+
   const onNPCInteract = useCallback((cb: (npcId: string) => void) => {
     npcCallback.current = cb;
+  }, []);
+
+  /** Check if the player is at a map edge and should transition via connection. */
+  const checkConnection = useCallback((player: Player, map: GameMap): boolean => {
+    if (!connectionCallback.current) return false;
+
+    // Determine which edge (if any) the player is at
+    const directionChecks: { condition: boolean; direction: Direction; calcPosition: (conn: { offset: number }) => { x: number; y: number } }[] = [
+      {
+        condition: player.tileY < 0,
+        direction: 'up',
+        calcPosition: (conn) => ({ x: player.tileX + conn.offset, y: -1 }),  // will be placed at bottom of target map
+      },
+      {
+        condition: player.tileY >= map.height,
+        direction: 'down',
+        calcPosition: (conn) => ({ x: player.tileX + conn.offset, y: 0 }),  // top of target map
+      },
+      {
+        condition: player.tileX < 0,
+        direction: 'left',
+        calcPosition: (conn) => ({ x: -1, y: player.tileY + conn.offset }),  // right side of target map
+      },
+      {
+        condition: player.tileX >= map.width,
+        direction: 'right',
+        calcPosition: (conn) => ({ x: 0, y: player.tileY + conn.offset }),  // left side of target map
+      },
+    ];
+
+    for (const check of directionChecks) {
+      if (!check.condition) continue;
+
+      const conn = map.connections.find(c => c.direction === check.direction);
+      if (!conn) continue;
+
+      const pos = check.calcPosition(conn);
+
+      // Resolve final position based on direction — place at opposite edge of target map
+      // We don't know the target map dimensions here, so we use sentinel values
+      // that PokemonCanvas.loadMap will resolve. Use -1 as "place at far edge".
+      const finalX = pos.x;
+      const finalY = pos.y;
+
+      connectionCallback.current(conn.targetMap, finalX, finalY);
+      return true;
+    }
+
+    return false;
   }, []);
 
   /** Main update: call every frame with input directions and A button. */
@@ -80,6 +135,11 @@ export function useOverworld() {
         player.isMoving = false;
         player.x = player.tileX * SCALED_TILE;
         player.y = player.tileY * SCALED_TILE;
+
+        // Check for map connection (edge of map)
+        if (checkConnection(player, currentMap)) {
+          return player;
+        }
 
         // Check for warp at destination
         const warp = checkWarp(currentMap, player.tileX, player.tileY);
@@ -115,15 +175,28 @@ export function useOverworld() {
 
       // Try to move
       const target = getAdjacentTile(player.tileX, player.tileY, direction);
-      const canWalk = isTileWalkable(currentMap, target.x, target.y, player.isSurfing);
-      const isLedge = canCrossLedge(currentMap, player.tileX, player.tileY, direction);
-      const npcBlocking = isNPCAtTile(currentMap.npcs, target.x, target.y);
 
-      if ((canWalk || isLedge) && !npcBlocking) {
+      // Allow moving off-map if there's a connection in that direction
+      const hasConnection = currentMap.connections.some(c => c.direction === direction);
+      const isOffMap = target.x < 0 || target.y < 0 || target.x >= currentMap.width || target.y >= currentMap.height;
+
+      if (isOffMap && hasConnection) {
+        // Allow the move — connection will be handled when movement completes
         player.tileX = target.x;
         player.tileY = target.y;
         player.isMoving = true;
         player.moveProgress = 0;
+      } else {
+        const canWalk = isTileWalkable(currentMap, target.x, target.y, player.isSurfing);
+        const isLedge = canCrossLedge(currentMap, player.tileX, player.tileY, direction);
+        const npcBlocking = isNPCAtTile(currentMap.npcs, target.x, target.y);
+
+        if ((canWalk || isLedge) && !npcBlocking) {
+          player.tileX = target.x;
+          player.tileY = target.y;
+          player.isMoving = true;
+          player.moveProgress = 0;
+        }
       }
     }
 
@@ -146,7 +219,7 @@ export function useOverworld() {
 
     setCameraTarget(camera, player.x + SCALED_TILE / 2, player.y + SCALED_TILE / 2);
     return player;
-  }, []);
+  }, [checkConnection]);
 
   return {
     init,
@@ -154,6 +227,7 @@ export function useOverworld() {
     update,
     onEncounter,
     onWarp,
+    onConnection,
     onNPCInteract,
     getState: () => stateRef.current,
   };
