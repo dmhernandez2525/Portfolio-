@@ -24,6 +24,7 @@ import { TanksGame } from "@/components/game/tanks"
 import { CookieClickerGame } from "@/components/game/cookie-clicker"
 import { ChessGame } from "@/components/game/ChessGame"
 import { AgarGame } from "@/components/game/agar"
+import { MafiaWarsGame } from "@/components/game/mafia-wars"
 import { Philosophy } from "@/pages/Philosophy"
 import { Inventions } from "@/pages/Inventions"
 import { Blog } from "@/pages/Blog"
@@ -67,6 +68,7 @@ function CreativeRoutes() {
         <Route path="/cookie-clicker" element={<CookieClickerGame />} />
         <Route path="/chess" element={<ChessGame />} />
         <Route path="/agar" element={<AgarGame />} />
+        <Route path="/mafia-wars" element={<MafiaWarsGame />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

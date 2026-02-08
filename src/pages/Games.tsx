@@ -126,6 +126,20 @@ const games: Game[] = [
     yearPlayed: "2000s",
     funFact: "This game actually helped me understand projectile motion in physics class.",
     features: ["Procedural terrain generation", "Realistic projectile physics", "Wind mechanics", "Terrain destruction", "AI opponent", "2-player local mode"]
+  },
+  {
+    id: "mafia-wars",
+    title: "Mafia Wars",
+    description: "Build your criminal empire - the classic MySpace game reborn!",
+    longDescription: "My recreation of the legendary text-based crime RPG. Manage your energy to do jobs, fight rival mobsters, collect protection money from your properties, and rise from street thug to crime boss. Features job tiers, equipment, properties, and skill progression!",
+    thumbnail: "/game-mafia.svg",
+    category: "strategy",
+    link: "/mafia-wars",
+    isExternal: false,
+    isBuiltIn: true,
+    yearPlayed: "2008-2010",
+    funFact: "I spent way too many hours on the original. 'Just one more job' they said...",
+    features: ["24 unique jobs across 6 tiers", "AI combat system", "8 property types for passive income", "24 weapons/armor/vehicles", "Skill point allocation", "Auto-save with localStorage"]
   }
 ]
 
