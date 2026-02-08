@@ -7,6 +7,7 @@ import { ResumePage } from "@/pages/ResumePage"
 import { TechieLayout } from "@/components/techie/TechieLayout"
 import { RetroTerminalPage } from "@/pages/RetroTerminalPage"
 import { DashboardPage } from "@/pages/DashboardPage"
+import { CalendarPage } from "@/pages/CalendarPage"
 
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
@@ -92,6 +93,7 @@ const MODE_PAGES: Partial<Record<PortfolioMode, React.ReactElement>> = {
   "techie": <TechieLayout />,
   "retro": <RetroTerminalPage />,
   "dashboard": <DashboardPage />,
+  "calendar": <CalendarPage />,
 }
 
 export function AppRoutes() {

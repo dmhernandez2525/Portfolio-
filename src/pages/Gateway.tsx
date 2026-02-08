@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3 } from "lucide-react"
+import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3, CalendarDays } from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 
 const modes: { key: PortfolioMode; title: string; description: string; icon: typeof CreditCard; accent: string; bg: string; preview: string }[] = [
@@ -56,6 +56,15 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
     accent: "from-orange-400 to-red-500",
     bg: "hover:border-orange-400/50",
     preview: "Data-driven & analytical",
+  },
+  {
+    key: "calendar",
+    title: "Book a Meeting",
+    description: "Schedule time with me — coffee chats, technical discussions, or quick intros.",
+    icon: CalendarDays,
+    accent: "from-teal-400 to-cyan-500",
+    bg: "hover:border-teal-400/50",
+    preview: "Calendly-style booking",
   },
 ]
 
