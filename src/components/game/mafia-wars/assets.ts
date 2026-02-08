@@ -18,69 +18,72 @@ export const SPRITES = {
   characters: charactersSprite,
 }
 
-// Sprite positions (row, col) for 8-item sheets (2x4 grid)
-// Weapons: brass knuckles, knife, bat, pistol, shotgun, tommy gun, sniper, RPG
+// Sprite positions (row, col) for sprite sheets
+// Weapons: 2x4 grid
 export const WEAPON_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Map to actual equipment IDs from constants.ts
-  'switchblade': { row: 0, col: 1 },       // knife sprite
+  'switchblade': { row: 0, col: 1 },
   'baseball_bat': { row: 0, col: 2 },
-  'pistol': { row: 0, col: 3 },            // 9mm pistol
+  'pistol': { row: 0, col: 3 },
   'shotgun': { row: 1, col: 0 },
   'tommy_gun': { row: 1, col: 1 },
+  'ak47': { row: 0, col: 0 },
   'rpg': { row: 1, col: 3 },
-  'minigun': { row: 1, col: 2 },           // use sniper slot
-  'orbital_strike': { row: 0, col: 0 },    // use brass knuckles slot
+  'minigun': { row: 1, col: 2 },
+  'sniper_50cal': { row: 0, col: 0 },
+  'orbital_strike': { row: 0, col: 0 },
 }
 
-// Vehicles: motorcycle, sedan, sports car, SUV/hummer, armored truck, limo, helicopter, yacht
+// Vehicles: 3x3 grid
 export const VEHICLE_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Map to actual equipment IDs from constants.ts
   'sedan': { row: 0, col: 1 },
   'suv': { row: 1, col: 0 },
   'sports_car': { row: 0, col: 2 },
+  'armored_limo': { row: 1, col: 2 },
   'helicopter': { row: 2, col: 1 },
   'yacht': { row: 2, col: 2 },
-  'jet': { row: 0, col: 0 },               // use motorcycle slot
-  'stealth_jet': { row: 1, col: 2 },       // use limo slot
-  'submarine': { row: 2, col: 0 },         // use armored truck slot
+  'jet': { row: 0, col: 0 },
+  'stealth_jet': { row: 1, col: 2 },
+  'submarine': { row: 2, col: 0 },
+  'aircraft_carrier': { row: 1, col: 1 },
 }
 
-// Armor: leather jacket, chain vest, kevlar, suit, tactical vest, trench coat, riot gear, exec suit
+// Armor: 2x4 grid
 export const ARMOR_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Map to actual equipment IDs from constants.ts
   'leather_jacket': { row: 0, col: 0 },
   'kevlar_vest': { row: 0, col: 2 },
   'tactical_armor': { row: 1, col: 0 },
   'armored_suit': { row: 0, col: 3 },
-  'exosuit': { row: 1, col: 2 },           // riot gear slot
-  'titan_armor': { row: 1, col: 1 },       // trench coat slot
-  'nano_shield': { row: 0, col: 1 },       // chain vest slot
-  'godmode': { row: 1, col: 3 },           // exec armor slot
+  'riot_gear': { row: 1, col: 1 },
+  'exosuit': { row: 1, col: 2 },
+  'titan_armor': { row: 1, col: 1 },
+  'nano_shield': { row: 0, col: 1 },
+  'quantum_barrier': { row: 1, col: 3 },
+  'godmode_armor': { row: 1, col: 3 },
 }
 
-// Properties: warehouse, pawn shop, nightclub, restaurant, casino, office tower, island, mansion
+// Properties: 2x4 grid
 export const PROPERTY_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Map to actual property IDs from constants.ts
-  'abandoned_lot': { row: 0, col: 0 },     // warehouse sprite
-  'italian_restaurant': { row: 0, col: 3 }, // restaurant sprite
-  'night_club': { row: 0, col: 2 },        // nightclub sprite
+  'vacant_lot': { row: 0, col: 0 },
+  'mafia_mikes': { row: 0, col: 1 },
+  'italian_restaurant': { row: 0, col: 3 },
+  'apartment_complex': { row: 0, col: 2 },
+  'warehouse': { row: 0, col: 0 },
+  'night_club': { row: 0, col: 2 },
+  'hotel': { row: 0, col: 1 },
   'casino': { row: 1, col: 0 },
-  'hotel': { row: 0, col: 1 },             // pawn shop slot (similar look)
   'marina': { row: 1, col: 3 },
-  'skyscraper': { row: 1, col: 1 },
-  'island': { row: 1, col: 2 },
+  'office_building': { row: 1, col: 1 },
 }
 
-// Characters/Opponents: street punk, thief, loan shark, enforcer, hitman, capo, underboss, godfather
+// Characters/Opponents: 2x4 grid
 export const CHARACTER_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Map to actual opponent IDs from constants.ts
   'street_punk': { row: 0, col: 0 },
   'local_thug': { row: 0, col: 1 },
   'gang_member': { row: 0, col: 2 },
   'enforcer': { row: 0, col: 3 },
   'hitman': { row: 1, col: 0 },
-  'underboss': { row: 1, col: 1 },
+  'capo_rival': { row: 1, col: 1 },
+  'underboss_rival': { row: 1, col: 1 },
   'don': { row: 1, col: 2 },
-  'godfather': { row: 1, col: 3 },
+  'godfather_opp': { row: 1, col: 3 },
 }
-

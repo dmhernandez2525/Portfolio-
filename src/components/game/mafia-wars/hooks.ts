@@ -9,10 +9,12 @@ import type {
   BattleResult,
   GameMessage,
   SavedGameData,
+  CharacterClass,
 } from './types'
 
 import {
   SAVE_KEY,
+  SAVE_VERSION,
   ENERGY_REGEN_INTERVAL_MS,
   STAMINA_REGEN_INTERVAL_MS,
   HEALTH_REGEN_INTERVAL_MS,
@@ -24,10 +26,18 @@ import {
   INITIAL_PROPERTIES,
   INITIAL_EQUIPMENT,
   INITIAL_ACHIEVEMENTS,
+  INITIAL_COLLECTIONS,
+  BOSS_FIGHTS,
+  CHARACTER_CLASSES,
+  TIER_MASTERY_REWARDS,
   OPPONENTS,
   getXPForLevel,
   calculateTotalAttack,
   calculateTotalDefense,
+  calculateBankFee,
+  getPropertyIncome,
+  getPropertyUpgradeCost,
+  getClassDefinition,
   formatMoney,
 } from './constants'
 
@@ -38,12 +48,18 @@ import {
 export function getInitialState(): GameState {
   const now = Date.now()
   return {
+    saveVersion: SAVE_VERSION,
     player: { ...INITIAL_PLAYER },
     mafiaSize: 1,
-    jobs: INITIAL_JOBS.map(j => ({ ...j })),
+    jobs: INITIAL_JOBS.map(j => ({ ...j, lootTable: j.lootTable?.map(l => ({ ...l })) })),
     properties: INITIAL_PROPERTIES.map(p => ({ ...p })),
     equipment: INITIAL_EQUIPMENT.map(e => ({ ...e })),
     achievements: INITIAL_ACHIEVEMENTS.map(a => ({ ...a })),
+    collections: INITIAL_COLLECTIONS.map(c => ({
+      ...c,
+      items: c.items.map(i => ({ ...i })),
+    })),
+    bossesDefeated: [],
     wins: 0,
     losses: 0,
     battleLog: [],
@@ -62,6 +78,13 @@ export function loadGameState(): GameState {
     if (!saved) return getInitialState()
 
     const data: SavedGameData = JSON.parse(saved)
+
+    // Version mismatch — reset (portfolio game, no migration needed)
+    if (data.saveVersion !== SAVE_VERSION) {
+      localStorage.removeItem(SAVE_KEY)
+      return getInitialState()
+    }
+
     const initial = getInitialState()
 
     return {
@@ -74,7 +97,7 @@ export function loadGameState(): GameState {
       }),
       properties: initial.properties.map(prop => {
         const savedProp = data.properties?.find(p => p.id === prop.id)
-        return savedProp ? { ...prop, ...savedProp } : prop
+        return savedProp ? { ...prop, owned: savedProp.owned, upgradeLevel: savedProp.upgradeLevel ?? 0 } : prop
       }),
       equipment: initial.equipment.map(eq => {
         const savedEq = data.equipment?.find(e => e.id === eq.id)
@@ -84,6 +107,20 @@ export function loadGameState(): GameState {
         const savedAch = data.achievements?.find(a => a.id === ach.id)
         return savedAch ? { ...ach, ...savedAch } : ach
       }),
+      collections: initial.collections.map(col => {
+        const savedCol = data.collections?.find(c => c.id === col.id)
+        if (!savedCol) return col
+        return {
+          ...col,
+          completed: savedCol.completed,
+          timesCompleted: savedCol.timesCompleted,
+          items: col.items.map(item => {
+            const savedItem = savedCol.items?.find(i => i.id === item.id)
+            return savedItem ? { ...item, collected: savedItem.collected } : item
+          }),
+        }
+      }),
+      bossesDefeated: data.bossesDefeated ?? [],
       wins: data.wins ?? 0,
       losses: data.losses ?? 0,
       battleLog: data.battleLog ?? [],
@@ -110,6 +147,7 @@ export function useSaveGame(state: GameState) {
   const saveGame = useCallback(() => {
     const s = stateRef.current
     const saveData: SavedGameData = {
+      saveVersion: SAVE_VERSION,
       player: s.player,
       mafiaSize: s.mafiaSize,
       jobs: s.jobs.map(j => ({
@@ -121,6 +159,7 @@ export function useSaveGame(state: GameState) {
       properties: s.properties.map(p => ({
         id: p.id,
         owned: p.owned,
+        upgradeLevel: p.upgradeLevel,
       })),
       equipment: s.equipment.map(e => ({
         id: e.id,
@@ -131,6 +170,13 @@ export function useSaveGame(state: GameState) {
         unlocked: a.unlocked,
         unlockedAt: a.unlockedAt,
       })),
+      collections: s.collections.map(c => ({
+        id: c.id,
+        items: c.items.map(i => ({ id: i.id, collected: i.collected })),
+        completed: c.completed,
+        timesCompleted: c.timesCompleted,
+      })),
+      bossesDefeated: s.bossesDefeated,
       wins: s.wins,
       losses: s.losses,
       battleLog: s.battleLog.slice(-20),
@@ -209,15 +255,20 @@ export function useRegeneration(
         const { maxEnergy, maxStamina, maxHealth } = prev.player
         let { lastEnergyRegen, lastStaminaRegen, lastHealthRegen } = prev
 
+        // Get class bonuses for regen
+        const classDef = getClassDefinition(prev.player.characterClass)
+        const energyBonus = classDef?.bonuses.energyRegenBonus ?? 0
+        const staminaBonus = classDef?.bonuses.staminaRegenBonus ?? 0
+
         const energyRegens = Math.floor((now - lastEnergyRegen) / ENERGY_REGEN_INTERVAL_MS)
         if (energyRegens > 0 && energy < maxEnergy) {
-          energy = Math.min(maxEnergy, energy + energyRegens)
+          energy = Math.min(maxEnergy, energy + energyRegens * (1 + energyBonus))
           lastEnergyRegen = lastEnergyRegen + energyRegens * ENERGY_REGEN_INTERVAL_MS
         }
 
         const staminaRegens = Math.floor((now - lastStaminaRegen) / STAMINA_REGEN_INTERVAL_MS)
         if (staminaRegens > 0 && stamina < maxStamina) {
-          stamina = Math.min(maxStamina, stamina + staminaRegens)
+          stamina = Math.min(maxStamina, stamina + staminaRegens * (1 + staminaBonus))
           lastStaminaRegen = lastStaminaRegen + staminaRegens * STAMINA_REGEN_INTERVAL_MS
         }
 
@@ -284,66 +335,51 @@ export function useAchievements(
     setState(prev => {
       const totalJobs = prev.jobs.reduce((sum, j) => sum + j.timesCompleted, 0)
       const totalCash = prev.player.cash + prev.player.bankedCash
+      const completedCollections = prev.collections.filter(c => c.completed).length
+      const tierJobs = (tier: string) => prev.jobs.filter(j => j.tier === tier)
+      const allGoldInTier = (tier: string) => tierJobs(tier).every(j => j.masteryLevel >= 3)
 
+      const checks: Record<string, boolean> = {
+        first_job: totalJobs >= 1,
+        hundred_jobs: totalJobs >= 100,
+        thousand_jobs: totalJobs >= 1000,
+        first_fight: prev.wins >= 1,
+        hundred_wins: prev.wins >= 100,
+        first_property: prev.properties.some(p => p.owned > 0),
+        millionaire: totalCash >= 1_000_000,
+        billionaire: totalCash >= 1_000_000_000,
+        level_10: prev.player.level >= 10,
+        level_25: prev.player.level >= 25,
+        level_50: prev.player.level >= 50,
+        level_100: prev.player.level >= 100,
+        mastery_gold: prev.jobs.some(j => j.masteryLevel >= 3),
+        fully_equipped:
+          prev.equipment.some(e => e.type === 'weapon' && e.owned > 0) &&
+          prev.equipment.some(e => e.type === 'armor' && e.owned > 0) &&
+          prev.equipment.some(e => e.type === 'vehicle' && e.owned > 0),
+        property_mogul: prev.properties.every(p => p.owned > 0),
+        beat_godfather: prev.battleLog.some(b => b.won && b.opponentId === 'godfather_opp'),
+        first_collection: completedCollections >= 1,
+        all_collections: completedCollections >= prev.collections.length,
+        first_boss: prev.bossesDefeated.length >= 1,
+        all_bosses: prev.bossesDefeated.length >= BOSS_FIGHTS.length,
+        choose_class: prev.player.characterClass !== null,
+        mafia_50: prev.mafiaSize >= 50,
+        tier_mastery: ['street_thug', 'associate', 'soldier', 'enforcer', 'hitman', 'capo', 'consigliere', 'underboss', 'boss'].some(t => allGoldInTier(t)),
+        upgrade_property: prev.properties.some(p => p.upgradeLevel >= 3),
+      }
+
+      let changed = false
       const newAchievements = prev.achievements.map(ach => {
         if (ach.unlocked) return ach
-
-        let shouldUnlock = false
-
-        switch (ach.id) {
-          case 'first_job':
-            shouldUnlock = totalJobs >= 1
-            break
-          case 'hundred_jobs':
-            shouldUnlock = totalJobs >= 100
-            break
-          case 'first_fight':
-            shouldUnlock = prev.wins >= 1
-            break
-          case 'hundred_wins':
-            shouldUnlock = prev.wins >= 100
-            break
-          case 'first_property':
-            shouldUnlock = prev.properties.some(p => p.owned > 0)
-            break
-          case 'millionaire':
-            shouldUnlock = totalCash >= 1_000_000
-            break
-          case 'billionaire':
-            shouldUnlock = totalCash >= 1_000_000_000
-            break
-          case 'level_10':
-            shouldUnlock = prev.player.level >= 10
-            break
-          case 'level_25':
-            shouldUnlock = prev.player.level >= 25
-            break
-          case 'level_50':
-            shouldUnlock = prev.player.level >= 50
-            break
-          case 'mastery_gold':
-            shouldUnlock = prev.jobs.some(j => j.masteryLevel >= 3)
-            break
-          case 'fully_equipped':
-            shouldUnlock =
-              prev.equipment.some(e => e.type === 'weapon' && e.owned > 0) &&
-              prev.equipment.some(e => e.type === 'armor' && e.owned > 0) &&
-              prev.equipment.some(e => e.type === 'vehicle' && e.owned > 0)
-            break
-          case 'property_mogul':
-            shouldUnlock = prev.properties.every(p => p.owned > 0)
-            break
-          case 'beat_godfather':
-            shouldUnlock = prev.battleLog.some(b => b.won && b.opponentId === 'godfather')
-            break
-        }
-
-        if (shouldUnlock) {
+        if (checks[ach.id]) {
+          changed = true
           return { ...ach, unlocked: true, unlockedAt: Date.now() }
         }
         return ach
       })
 
+      if (!changed) return prev
       return { ...prev, achievements: newAchievements }
     })
   }, [setState])
@@ -368,23 +404,23 @@ export function useGameActions({
 }: UseGameActionsProps) {
   // Debounce ref to prevent React StrictMode double-execution
   const lastActionRef = useRef<{ action: string; time: number }>({ action: '', time: 0 })
-  
+
   const isDebounced = (actionId: string): boolean => {
     const now = Date.now()
     if (lastActionRef.current.action === actionId && now - lastActionRef.current.time < 300) {
-      return true // Skip, already executed
+      return true
     }
     lastActionRef.current = { action: actionId, time: now }
     return false
   }
+
   // DO JOB
   const doJob = useCallback(
     (jobId: string): JobResult => {
-      // Skip if debounced (React StrictMode protection)
       if (isDebounced(`job-${jobId}`)) {
         return { success: false, cashEarned: 0, expEarned: 0, masteryGained: 0, leveledUp: false, masteryLevelUp: false }
       }
-      
+
       let result: JobResult = {
         success: false,
         cashEarned: 0,
@@ -401,8 +437,8 @@ export function useGameActions({
           addMessage('Not enough energy!', 'error')
           return prev
         }
-        
-        // Check item requirements if job has any
+
+        // Check item requirements
         if (job.itemRequirement) {
           const reqItem = prev.equipment.find(e => e.id === job.itemRequirement!.itemId)
           if (!reqItem || reqItem.owned < job.itemRequirement.quantity) {
@@ -411,10 +447,14 @@ export function useGameActions({
           }
         }
 
+        // Get class XP multiplier
+        const classDef = getClassDefinition(prev.player.characterClass)
+        const xpMultiplier = classDef?.bonuses.jobXpMultiplier ?? 1.0
+
         const cashEarned = Math.floor(
           job.cashRewardMin + Math.random() * (job.cashRewardMax - job.cashRewardMin)
         )
-        const expEarned = job.expReward
+        const expEarned = Math.floor(job.expReward * xpMultiplier)
 
         const newEnergy = prev.player.energy - job.energyCost
         const newExp = prev.player.experience + expEarned
@@ -430,23 +470,59 @@ export function useGameActions({
           newMasteryProgress = 0
           newMasteryLevel++
           masteryLevelUp = true
-          masterySkillPoint = 1 // Award skill point for mastery level up
+          masterySkillPoint = 1
         } else if (newMasteryLevel >= 3) {
           newMasteryProgress = 100
         }
 
-        // Loot drop chance (increases with mastery level)
-        const lootChance = 0.05 + (job.masteryLevel * 0.05) // 5% base + 5% per mastery
+        // Collection item drop from job's loot table
+        let updatedCollections = prev.collections
+        let collectionDrop: JobResult['collectionDrop'] = undefined
+        if (job.lootTable && job.lootTable.length > 0) {
+          for (const loot of job.lootTable) {
+            if (Math.random() < loot.dropChance) {
+              const collection = prev.collections.find(c => c.id === loot.collectionId)
+              if (collection && !collection.completed) {
+                const item = collection.items.find(i => i.id === loot.itemId)
+                if (item && !item.collected) {
+                  collectionDrop = {
+                    collectionId: collection.id,
+                    collectionName: collection.name,
+                    itemId: item.id,
+                    itemName: item.name,
+                  }
+                  updatedCollections = prev.collections.map(c => {
+                    if (c.id !== loot.collectionId) return c
+                    const newItems = c.items.map(i =>
+                      i.id === loot.itemId ? { ...i, collected: true } : i
+                    )
+                    const allCollected = newItems.every(i => i.collected)
+                    return {
+                      ...c,
+                      items: newItems,
+                      completed: allCollected,
+                      timesCompleted: allCollected ? c.timesCompleted + 1 : c.timesCompleted,
+                    }
+                  })
+                  addMessage(`Found ${item.name} for ${collection.name}!`, 'success')
+                  break // one drop per job
+                }
+              }
+            }
+          }
+        }
+
+        // Equipment loot drop (legacy system — small chance for random equipment)
+        const lootChance = 0.03 + (job.masteryLevel * 0.02)
         let lootDrop: { itemId: string; itemName: string } | undefined
         let updatedEquipment = prev.equipment
-        
+
         if (Math.random() < lootChance) {
-          // Pick a random equipment item player doesn't have many of
           const possibleLoot = prev.equipment.filter(e => e.owned < 10)
           if (possibleLoot.length > 0) {
             const lootItem = possibleLoot[Math.floor(Math.random() * possibleLoot.length)]
             lootDrop = { itemId: lootItem.id, itemName: lootItem.name }
-            updatedEquipment = prev.equipment.map(e => 
+            updatedEquipment = prev.equipment.map(e =>
               e.id === lootItem.id ? { ...e, owned: e.owned + 1 } : e
             )
             addMessage(`Loot drop: ${lootItem.name}!`, 'success')
@@ -461,20 +537,46 @@ export function useGameActions({
           leveledUp,
           masteryLevelUp,
           lootDrop,
+          collectionDrop,
         }
 
         const totalSkillPoints = skillPointsGained + masterySkillPoint
-        
+
         let message = leveledUp
           ? `Level Up! You are now level ${newLevel}! +${formatMoney(cashEarned)} +${expEarned} XP`
           : `Job complete! +${formatMoney(cashEarned)} +${expEarned} XP`
-        
+
         if (masteryLevelUp) {
           const masteryName = ['Bronze', 'Silver', 'Gold'][newMasteryLevel - 1]
           message += ` | ${masteryName} Mastery! +1 Skill Point`
         }
-        
+
         addMessage(message, leveledUp || masteryLevelUp ? 'success' : 'info')
+
+        // Check for tier mastery reward
+        let bonusUpdates: Partial<typeof prev.player> = {}
+        if (masteryLevelUp && newMasteryLevel === 3) {
+          const jobTier = job.tier
+          const allTierJobs = prev.jobs.filter(j => j.tier === jobTier)
+          const allGold = allTierJobs.every(j =>
+            j.id === jobId ? newMasteryLevel >= 3 : j.masteryLevel >= 3
+          )
+          if (allGold) {
+            const reward = TIER_MASTERY_REWARDS.find(r => r.tier === jobTier)
+            if (reward) {
+              addMessage(`Tier Mastery Complete! ${reward.description}`, 'success')
+              const rewardMap: Record<string, Partial<typeof prev.player>> = {
+                max_energy: { maxEnergy: prev.player.maxEnergy + reward.value },
+                max_stamina: { maxStamina: prev.player.maxStamina + reward.value },
+                max_health: { maxHealth: prev.player.maxHealth + reward.value },
+                attack: { attack: prev.player.attack + reward.value },
+                defense: { defense: prev.player.defense + reward.value },
+                skill_points: { skillPoints: prev.player.skillPoints + totalSkillPoints + reward.value },
+              }
+              bonusUpdates = rewardMap[reward.type] ?? {}
+            }
+          }
+        }
 
         return {
           ...prev,
@@ -488,6 +590,7 @@ export function useGameActions({
             level: newLevel,
             cash: prev.player.cash + cashEarned,
             skillPoints: prev.player.skillPoints + totalSkillPoints,
+            ...bonusUpdates,
           },
           jobs: prev.jobs.map(j =>
             j.id === jobId
@@ -495,6 +598,7 @@ export function useGameActions({
               : j
           ),
           equipment: updatedEquipment,
+          collections: updatedCollections,
         }
       })
 
@@ -507,11 +611,10 @@ export function useGameActions({
   // FIGHT OPPONENT
   const fightOpponent = useCallback(
     (opponentId: string): BattleResult | null => {
-      // Skip if debounced (React StrictMode protection)
       if (isDebounced(`fight-${opponentId}`)) {
         return null
       }
-      
+
       let result: BattleResult | null = null
 
       setState(prev => {
@@ -544,8 +647,12 @@ export function useGameActions({
         const damageReduced = Math.floor(opponentDamageDealt * (playerDefense / (playerDefense + 100)))
         const finalDamage = Math.max(1, opponentDamageDealt - damageReduced)
 
+        // Class bonus for fight cash
+        const classDef = getClassDefinition(prev.player.characterClass)
+        const fightCashMult = classDef?.bonuses.fightCashMultiplier ?? 1.0
+
         const cashEarned = won
-          ? Math.floor(opponent.cashRewardMin + Math.random() * (opponent.cashRewardMax - opponent.cashRewardMin))
+          ? Math.floor((opponent.cashRewardMin + Math.random() * (opponent.cashRewardMax - opponent.cashRewardMin)) * fightCashMult)
           : 0
         const expEarned = won ? opponent.expReward : Math.floor(opponent.expReward * 0.1)
 
@@ -621,6 +728,42 @@ export function useGameActions({
     [setState, addMessage, checkAchievements]
   )
 
+  // UPGRADE PROPERTY
+  const upgradeProperty = useCallback(
+    (propId: string) => {
+      setState(prev => {
+        const prop = prev.properties.find(p => p.id === propId)
+        if (!prop) return prev
+        if (prop.owned <= 0) {
+          addMessage('You must own this property first!', 'error')
+          return prev
+        }
+        if (prop.upgradeLevel >= 3) {
+          addMessage('This property is already at max upgrade level!', 'warning')
+          return prev
+        }
+        const upgradeCost = getPropertyUpgradeCost(prop)
+        if (prev.player.cash < upgradeCost) {
+          addMessage(`Not enough cash! Upgrade costs ${formatMoney(upgradeCost)}`, 'error')
+          return prev
+        }
+
+        const newLevel = prop.upgradeLevel + 1
+        const levelNames = ['Improved', 'Premium', 'Maximum']
+        addMessage(`Upgraded ${prop.name} to ${levelNames[newLevel - 1]}!`, 'success')
+        return {
+          ...prev,
+          player: { ...prev.player, cash: prev.player.cash - upgradeCost },
+          properties: prev.properties.map(p =>
+            p.id === propId ? { ...p, upgradeLevel: newLevel } : p
+          ),
+        }
+      })
+      setTimeout(checkAchievements, 100)
+    },
+    [setState, addMessage, checkAchievements]
+  )
+
   // BUY EQUIPMENT
   const buyEquipment = useCallback(
     (eqId: string) => {
@@ -687,16 +830,18 @@ export function useGameActions({
     [setState, addMessage]
   )
 
-  // BANK OPERATIONS
+  // BANK OPERATIONS — dynamic fee based on collections + class
   const depositCash = useCallback(
     (amount: number) => {
       setState(prev => {
         const toDeposit = Math.min(amount, prev.player.cash)
         if (toDeposit <= 0) return prev
-        // Original game had 10% deposit fee - money laundering tax!
-        const fee = Math.floor(toDeposit * 0.1)
+        const completedCollections = prev.collections.filter(c => c.completed).length
+        const feeRate = calculateBankFee(completedCollections, prev.player.characterClass)
+        const fee = Math.floor(toDeposit * feeRate)
         const netDeposit = toDeposit - fee
-        addMessage(`Deposited ${formatMoney(netDeposit)} (10% laundering fee: ${formatMoney(fee)})`, 'info')
+        const feePercent = Math.round(feeRate * 100)
+        addMessage(`Deposited ${formatMoney(netDeposit)} (${feePercent}% fee: ${formatMoney(fee)})`, 'info')
         return {
           ...prev,
           player: {
@@ -728,6 +873,128 @@ export function useGameActions({
     [setState]
   )
 
+  // SELECT CHARACTER CLASS (one-time at level 5+)
+  const selectClass = useCallback(
+    (classId: CharacterClass) => {
+      setState(prev => {
+        if (prev.player.characterClass !== null) {
+          addMessage('You have already chosen a class!', 'warning')
+          return prev
+        }
+        if (prev.player.level < 5) {
+          addMessage('You must be level 5 to choose a class!', 'error')
+          return prev
+        }
+        const classDef = CHARACTER_CLASSES.find(c => c.id === classId)
+        if (!classDef) return prev
+
+        addMessage(`You are now a ${classDef.name}! ${classDef.description}`, 'success')
+        return {
+          ...prev,
+          player: { ...prev.player, characterClass: classId },
+        }
+      })
+      setTimeout(checkAchievements, 100)
+    },
+    [setState, addMessage, checkAchievements]
+  )
+
+  // FIGHT BOSS
+  const fightBoss = useCallback(
+    (bossId: string): { won: boolean; message: string } | null => {
+      if (isDebounced(`boss-${bossId}`)) return null
+
+      let result: { won: boolean; message: string } | null = null
+
+      setState(prev => {
+        const boss = BOSS_FIGHTS.find(b => b.id === bossId)
+        if (!boss) return prev
+        if (prev.bossesDefeated.includes(bossId)) {
+          addMessage('You have already defeated this boss!', 'warning')
+          return prev
+        }
+
+        // Check required tier mastery
+        const allMastered = boss.requiredTiers.every(tier => {
+          const tierJobs = prev.jobs.filter(j => j.tier === tier)
+          return tierJobs.every(j => j.masteryLevel >= 3)
+        })
+        if (!allMastered) {
+          addMessage('You must achieve Gold Mastery on all required tier jobs first!', 'error')
+          return prev
+        }
+
+        if (prev.player.stamina < 20) {
+          addMessage('Need at least 20 stamina to fight a boss!', 'error')
+          return prev
+        }
+        if (prev.player.health < 50) {
+          addMessage('Need at least 50 health to fight a boss!', 'error')
+          return prev
+        }
+
+        // Multi-round combat (3 rounds)
+        const playerAttack = calculateTotalAttack(prev.player, prev.equipment) + prev.mafiaSize * 3
+        const playerDefense = calculateTotalDefense(prev.player, prev.equipment) + prev.mafiaSize * 2
+        let bossHP = boss.health
+        let playerHP = prev.player.health
+
+        for (let round = 0; round < 3; round++) {
+          const playerDmg = Math.floor(playerAttack * (0.7 + Math.random() * 0.6))
+          bossHP -= playerDmg
+
+          if (bossHP <= 0) break
+
+          const bossDmg = Math.floor(boss.attack * (0.5 + Math.random() * 0.5))
+          const reduced = Math.floor(bossDmg * (playerDefense / (playerDefense + 200)))
+          playerHP -= Math.max(1, bossDmg - reduced)
+        }
+
+        const won = bossHP <= 0
+
+        if (won) {
+          const { newLevel, newExp: remainingExp, skillPointsGained } = checkLevelUp(
+            prev.player.experience + boss.expReward,
+            prev.player.level
+          )
+          result = { won: true, message: `Boss defeated! ${boss.rewardDescription}` }
+          addMessage(`Defeated ${boss.name}! +${formatMoney(boss.cashReward)} | ${boss.rewardDescription}`, 'success')
+
+          return {
+            ...prev,
+            player: {
+              ...prev.player,
+              cash: prev.player.cash + boss.cashReward,
+              experience: remainingExp,
+              experienceToLevel: getXPForLevel(newLevel),
+              level: newLevel,
+              skillPoints: prev.player.skillPoints + skillPointsGained,
+              health: Math.max(1, playerHP),
+              stamina: prev.player.stamina - 20,
+            },
+            bossesDefeated: [...prev.bossesDefeated, bossId],
+          }
+        } else {
+          result = { won: false, message: `${boss.name} was too strong! Train harder.` }
+          addMessage(`Defeated by ${boss.name}! Train harder and try again.`, 'warning')
+
+          return {
+            ...prev,
+            player: {
+              ...prev.player,
+              health: Math.max(1, playerHP),
+              stamina: prev.player.stamina - 20,
+            },
+          }
+        }
+      })
+
+      setTimeout(checkAchievements, 100)
+      return result
+    },
+    [setState, addMessage, checkLevelUp, checkAchievements]
+  )
+
   // RESET GAME
   const resetGame = useCallback(() => {
     if (!confirm('Are you sure you want to reset your progress? This cannot be undone!')) return
@@ -739,7 +1006,6 @@ export function useGameActions({
   // RECRUIT MAFIA MEMBER
   const recruitMafia = useCallback(() => {
     setState(prev => {
-      // Cost scales gradually — base $1000, grows slowly
       const recruitCost = 1000 + Math.floor(500 * Math.pow(prev.mafiaSize, 1.3))
       if (prev.player.cash < recruitCost) {
         addMessage(`Not enough cash! Recruitment costs ${formatMoney(recruitCost)}`, 'error')
@@ -759,10 +1025,13 @@ export function useGameActions({
     doJob,
     fightOpponent,
     buyProperty,
+    upgradeProperty,
     buyEquipment,
     allocateSkillPoint,
     depositCash,
     withdrawCash,
+    selectClass,
+    fightBoss,
     resetGame,
     recruitMafia,
   }
@@ -796,24 +1065,37 @@ export function useComputedValues(state: GameState) {
   const calculatePendingIncome = useCallback(() => {
     const now = Date.now()
     const hoursPassed = (now - state.lastIncomeCollection) / (1000 * 60 * 60)
-    return state.properties.reduce((sum, p) => sum + p.owned * p.incomePerHour * hoursPassed, 0)
-  }, [state.lastIncomeCollection, state.properties])
+    const classDef = getClassDefinition(state.player.characterClass)
+    const incomeMultiplier = classDef?.bonuses.propertyIncomeMultiplier ?? 1.0
+    return state.properties.reduce(
+      (sum, p) => sum + p.owned * getPropertyIncome(p) * hoursPassed * incomeMultiplier, 0
+    )
+  }, [state.lastIncomeCollection, state.properties, state.player.characterClass])
 
   const pendingIncome = useMemo(() => {
     void incomeTick // force recalculation on tick
     return Math.floor(calculatePendingIncome())
   }, [calculatePendingIncome, incomeTick])
 
-  const hourlyIncome = useMemo(
-    () => state.properties.reduce((sum, p) => sum + p.owned * p.incomePerHour, 0),
-    [state.properties]
-  )
+  const hourlyIncome = useMemo(() => {
+    const classDef = getClassDefinition(state.player.characterClass)
+    const incomeMultiplier = classDef?.bonuses.propertyIncomeMultiplier ?? 1.0
+    return state.properties.reduce(
+      (sum, p) => sum + p.owned * getPropertyIncome(p) * incomeMultiplier, 0
+    )
+  }, [state.properties, state.player.characterClass])
+
+  const bankFeeRate = useMemo(() => {
+    const completedCollections = state.collections.filter(c => c.completed).length
+    return calculateBankFee(completedCollections, state.player.characterClass)
+  }, [state.collections, state.player.characterClass])
 
   return {
     totalAttack,
     totalDefense,
     pendingIncome,
     hourlyIncome,
+    bankFeeRate,
     calculatePendingIncome,
   }
 }

@@ -5,7 +5,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Star, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { formatMoney } from '../constants'
+import { formatMoney, CHARACTER_CLASSES } from '../constants'
 import type { PlayerStats } from '../types'
 
 interface HeaderProps {
@@ -13,6 +13,10 @@ interface HeaderProps {
 }
 
 export function Header({ player }: HeaderProps) {
+  const classDef = player.characterClass
+    ? CHARACTER_CLASSES.find(c => c.id === player.characterClass)
+    : null
+
   return (
     <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-sm border-b border-amber-900/30">
       <div className="container max-w-5xl mx-auto px-4 py-3">
@@ -29,6 +33,11 @@ export function Header({ player }: HeaderProps) {
             </h1>
           </div>
           <div className="flex items-center gap-4 text-sm">
+            {classDef && (
+              <span className="text-xs px-2 py-0.5 rounded bg-amber-900/50 text-amber-400 border border-amber-700/30 hidden sm:inline-block">
+                {classDef.icon} {classDef.name}
+              </span>
+            )}
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-amber-500" />
               <span>Lv.{player.level}</span>

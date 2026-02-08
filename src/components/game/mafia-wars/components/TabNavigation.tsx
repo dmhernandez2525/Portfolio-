@@ -2,7 +2,7 @@
 // MAFIA WARS - TAB NAVIGATION COMPONENT
 // ========================================
 
-import { Briefcase, Swords, Building2, Package, User } from 'lucide-react'
+import { Briefcase, Swords, Building2, Package, User, Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { GameTab } from '../types'
 
@@ -15,6 +15,7 @@ const TABS = [
   { id: 'jobs' as const, label: 'Jobs', icon: Briefcase },
   { id: 'fight' as const, label: 'Fight', icon: Swords },
   { id: 'properties' as const, label: 'Properties', icon: Building2 },
+  { id: 'collections' as const, label: 'Collections', icon: Layers },
   { id: 'inventory' as const, label: 'Inventory', icon: Package },
   { id: 'profile' as const, label: 'Profile', icon: User },
 ]
