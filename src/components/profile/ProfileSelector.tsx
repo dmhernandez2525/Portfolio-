@@ -2,8 +2,8 @@
 // Profile Selector — Modal for choosing/creating local profiles
 // ============================================================================
 
-import { useState } from 'react';
-import { useProfile, type UserProfile } from '@/context/profile-context';
+import { useState, useEffect, useRef } from 'react';
+import { useProfile, MAX_PROFILES, type UserProfile } from '@/context/profile-context';
 
 const AVATAR_OPTIONS = ['🎮', '🕹️', '👾', '🎯', '🏆', '⚡', '🔥', '💎', '🌟', '🎪', '🐉', '🦊'];
 
@@ -18,10 +18,27 @@ export function ProfileSelector({ onSelect, onCancel }: ProfileSelectorProps) {
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0]);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard accessibility — Escape to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
+  // Focus trap — focus modal on mount
+  useEffect(() => {
+    modalRef.current?.focus();
+  }, []);
 
   const handleCreate = () => {
     const profile = createProfile(newName, selectedAvatar);
-    onSelect(profile);
+    if (profile) onSelect(profile);
   };
 
   const handleSelect = (profile: UserProfile) => {
@@ -35,8 +52,18 @@ export function ProfileSelector({ onSelect, onCancel }: ProfileSelectorProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-neutral-900 border border-neutral-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel?.(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={mode === 'create' ? 'Create Profile' : 'Choose Profile'}
+    >
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="bg-neutral-900 border border-neutral-700 rounded-xl max-w-md w-full p-6 shadow-2xl outline-none"
+      >
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-xl font-bold text-white">
@@ -51,58 +78,63 @@ export function ProfileSelector({ onSelect, onCancel }: ProfileSelectorProps) {
           <>
             {/* Existing profiles */}
             <div className="space-y-2 mb-4">
-              {profiles.map(profile => (
-                <div
-                  key={profile.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors
-                    ${profile.id === activeProfile?.id
-                      ? 'bg-blue-600/20 border border-blue-500/40'
-                      : 'bg-neutral-800 border border-transparent hover:border-neutral-600'
-                    }`}
-                  onClick={() => handleSelect(profile)}
-                >
-                  <span className="text-2xl">{profile.avatar}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{profile.name}</p>
-                    <p className="text-neutral-500 text-xs">
-                      Created {new Date(profile.createdAt).toLocaleDateString()}
-                      {Object.keys(profile.gameData).length > 0 &&
-                        ` · ${Object.keys(profile.gameData).length} game${Object.keys(profile.gameData).length === 1 ? '' : 's'} saved`
-                      }
-                    </p>
-                  </div>
-
-                  {/* Delete button */}
-                  {confirmDelete === profile.id ? (
-                    <div className="flex gap-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(profile.id); }}
-                        className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-500"
-                      >
-                        Yes
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}
-                        className="px-2 py-1 bg-neutral-700 text-white text-xs rounded hover:bg-neutral-600"
-                      >
-                        No
-                      </button>
+              {profiles.map(profile => {
+                const savedGames = Object.keys(profile.gameData).length;
+                return (
+                  <div
+                    key={profile.id}
+                    role="button"
+                    tabIndex={0}
+                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors
+                      ${profile.id === activeProfile?.id
+                        ? 'bg-blue-600/20 border border-blue-500/40'
+                        : 'bg-neutral-800 border border-transparent hover:border-neutral-600'
+                      }`}
+                    onClick={() => handleSelect(profile)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelect(profile); } }}
+                  >
+                    <span className="text-2xl">{profile.avatar}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium truncate">{profile.name}</p>
+                      <p className="text-neutral-500 text-xs">
+                        Created {new Date(profile.createdAt).toLocaleDateString()}
+                        {savedGames > 0 && ` · ${savedGames} game${savedGames === 1 ? '' : 's'} saved`}
+                      </p>
                     </div>
-                  ) : (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(profile.id); }}
-                      className="text-neutral-600 hover:text-red-400 text-sm transition-colors p-1"
-                      title="Delete profile"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ))}
+
+                    {/* Delete button */}
+                    {confirmDelete === profile.id ? (
+                      <div className="flex gap-1">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(profile.id); }}
+                          className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-500"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}
+                          className="px-2 py-1 bg-neutral-700 text-white text-xs rounded hover:bg-neutral-600"
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setConfirmDelete(profile.id); }}
+                        className="text-neutral-600 hover:text-red-400 text-sm transition-colors p-1"
+                        title="Delete profile"
+                        aria-label={`Delete profile ${profile.name}`}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Create new button */}
-            {profiles.length < 5 && (
+            {profiles.length < MAX_PROFILES && (
               <button
                 onClick={() => setMode('create')}
                 className="w-full p-3 border-2 border-dashed border-neutral-700 rounded-lg text-neutral-400
@@ -145,6 +177,8 @@ export function ProfileSelector({ onSelect, onCancel }: ProfileSelectorProps) {
                           ? 'bg-blue-600/30 border border-blue-500'
                           : 'bg-neutral-800 border border-transparent hover:border-neutral-600'
                         }`}
+                      aria-label={`Select avatar ${emoji}`}
+                      aria-pressed={emoji === selectedAvatar}
                     >
                       {emoji}
                     </button>

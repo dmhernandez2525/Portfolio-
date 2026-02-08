@@ -208,35 +208,35 @@ export function Games() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="mb-6 flex items-center justify-between gap-3 p-3 bg-neutral-900/50 rounded-lg border border-neutral-800"
+            className="mb-6 flex flex-wrap items-center justify-between gap-3 p-3 bg-background/50 rounded-lg border border-border"
           >
             {activeProfile ? (
               <>
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{activeProfile.avatar}</span>
                   <div>
-                    <span className="text-sm font-medium text-white">{activeProfile.name}</span>
-                    <span className="text-xs text-neutral-500 ml-2">
-                      {Object.keys(activeProfile.gameData).length} game{Object.keys(activeProfile.gameData).length === 1 ? '' : 's'} saved
+                    <span className="text-sm font-medium text-foreground">{activeProfile.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {(() => { const count = Object.keys(activeProfile.gameData).length; return `${count} game${count === 1 ? '' : 's'} saved`; })()}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-neutral-500">Playing locally — full account system coming soon</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground">Playing locally — full account system coming soon</span>
                   <Button variant="outline" size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
                     Switch
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={clearActiveProfile} className="text-xs h-7 text-neutral-500">
+                  <Button variant="ghost" size="sm" onClick={clearActiveProfile} className="text-xs h-7 text-muted-foreground">
                     Sign Out
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <div className="flex items-center gap-2 text-sm text-neutral-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
                   <span>Create a profile to save your game progress</span>
-                  <span className="text-[10px] text-neutral-500 ml-1">— cloud sync coming soon</span>
+                  <span className="text-[10px] text-muted-foreground ml-1">— cloud sync coming soon</span>
                 </div>
                 <Button size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
                   Create Profile

@@ -4,7 +4,7 @@
 // localStorage-based user profiles for game save persistence.
 // Full cloud login/sync planned for future release.
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 
 // --- Types ---
 
@@ -19,7 +19,7 @@ export interface UserProfile {
 interface ProfileContextValue {
   profiles: UserProfile[];
   activeProfile: UserProfile | null;
-  createProfile: (name: string, avatar: string) => UserProfile;
+  createProfile: (name: string, avatar: string) => UserProfile | null;
   switchProfile: (id: string) => void;
   deleteProfile: (id: string) => void;
   clearActiveProfile: () => void;
@@ -31,32 +31,59 @@ interface ProfileContextValue {
 
 const STORAGE_KEY = 'portfolio-profiles';
 const ACTIVE_PROFILE_KEY = 'portfolio-active-profile';
-const MAX_PROFILES = 5;
+export const MAX_PROFILES = 5;
 
 // --- Storage helpers ---
+
+function isValidProfile(p: unknown): p is UserProfile {
+  if (!p || typeof p !== 'object') return false;
+  const obj = p as Record<string, unknown>;
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.avatar === 'string' &&
+    typeof obj.createdAt === 'number' &&
+    typeof obj.gameData === 'object' && obj.gameData !== null
+  );
+}
 
 function loadProfiles(): UserProfile[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidProfile);
   } catch {
     return [];
   }
 }
 
 function saveProfiles(profiles: UserProfile[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  } catch {
+    // QuotaExceededError or other storage issue — silently fail
+  }
 }
 
 function loadActiveId(): string | null {
-  return localStorage.getItem(ACTIVE_PROFILE_KEY);
+  try {
+    return localStorage.getItem(ACTIVE_PROFILE_KEY);
+  } catch {
+    return null;
+  }
 }
 
 function saveActiveId(id: string | null): void {
-  if (id) {
-    localStorage.setItem(ACTIVE_PROFILE_KEY, id);
-  } else {
-    localStorage.removeItem(ACTIVE_PROFILE_KEY);
+  try {
+    if (id) {
+      localStorage.setItem(ACTIVE_PROFILE_KEY, id);
+    } else {
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+    }
+  } catch {
+    // Storage issue — silently fail
   }
 }
 
@@ -74,9 +101,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<UserProfile[]>(loadProfiles);
   const [activeId, setActiveId] = useState<string | null>(loadActiveId);
 
-  const activeProfile = profiles.find(p => p.id === activeId) ?? null;
+  const activeProfile = useMemo(
+    () => profiles.find(p => p.id === activeId) ?? null,
+    [profiles, activeId]
+  );
 
-  const createProfile = useCallback((name: string, avatar: string): UserProfile => {
+  const createProfile = useCallback((name: string, avatar: string): UserProfile | null => {
     const profile: UserProfile = {
       id: generateId(),
       name: name.trim() || 'Player',
@@ -85,11 +115,19 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       gameData: {},
     };
 
+    let created = false;
     setProfiles(prev => {
-      const next = [...prev, profile].slice(-MAX_PROFILES);
+      if (prev.length >= MAX_PROFILES) {
+        created = false;
+        return prev;
+      }
+      const next = [...prev, profile];
       saveProfiles(next);
+      created = true;
       return next;
     });
+
+    if (!created) return null;
 
     setActiveId(profile.id);
     saveActiveId(profile.id);
@@ -109,11 +147,15 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return next;
     });
 
-    if (activeId === id) {
-      setActiveId(null);
-      saveActiveId(null);
-    }
-  }, [activeId]);
+    // Use functional update to avoid stale activeId closure
+    setActiveId(prev => {
+      if (prev === id) {
+        saveActiveId(null);
+        return null;
+      }
+      return prev;
+    });
+  }, []);
 
   const clearActiveProfile = useCallback(() => {
     setActiveId(null);
@@ -121,36 +163,39 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const saveGameData = useCallback((gameId: string, data: unknown) => {
-    if (!activeId) return;
-
     setProfiles(prev => {
+      // Read activeId from state via a closure-safe approach
+      const currentActiveId = loadActiveId();
+      if (!currentActiveId) return prev;
+
       const next = prev.map(p => {
-        if (p.id !== activeId) return p;
+        if (p.id !== currentActiveId) return p;
         return { ...p, gameData: { ...p.gameData, [gameId]: data } };
       });
       saveProfiles(next);
       return next;
     });
-  }, [activeId]);
+  }, []);
 
   const loadGameData = useCallback(<T,>(gameId: string): T | null => {
     if (!activeProfile) return null;
-    return (activeProfile.gameData[gameId] as T) ?? null;
+    const data = activeProfile.gameData[gameId];
+    return data != null ? (data as T) : null;
   }, [activeProfile]);
 
+  const value = useMemo<ProfileContextValue>(() => ({
+    profiles,
+    activeProfile,
+    createProfile,
+    switchProfile,
+    deleteProfile,
+    clearActiveProfile,
+    saveGameData,
+    loadGameData,
+  }), [profiles, activeProfile, createProfile, switchProfile, deleteProfile, clearActiveProfile, saveGameData, loadGameData]);
+
   return (
-    <ProfileContext.Provider
-      value={{
-        profiles,
-        activeProfile,
-        createProfile,
-        switchProfile,
-        deleteProfile,
-        clearActiveProfile,
-        saveGameData,
-        loadGameData,
-      }}
-    >
+    <ProfileContext.Provider value={value}>
       {children}
     </ProfileContext.Provider>
   );
