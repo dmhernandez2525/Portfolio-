@@ -208,19 +208,26 @@ export function useRegeneration(
         const energyRegens = Math.floor((now - lastEnergyRegen) / ENERGY_REGEN_INTERVAL_MS)
         if (energyRegens > 0 && energy < maxEnergy) {
           energy = Math.min(maxEnergy, energy + energyRegens)
-          lastEnergyRegen = now
+          lastEnergyRegen = lastEnergyRegen + energyRegens * ENERGY_REGEN_INTERVAL_MS
         }
 
         const staminaRegens = Math.floor((now - lastStaminaRegen) / STAMINA_REGEN_INTERVAL_MS)
         if (staminaRegens > 0 && stamina < maxStamina) {
           stamina = Math.min(maxStamina, stamina + staminaRegens)
-          lastStaminaRegen = now
+          lastStaminaRegen = lastStaminaRegen + staminaRegens * STAMINA_REGEN_INTERVAL_MS
         }
 
         const healthRegens = Math.floor((now - lastHealthRegen) / HEALTH_REGEN_INTERVAL_MS)
         if (healthRegens > 0 && health < maxHealth) {
           health = Math.min(maxHealth, health + healthRegens)
-          lastHealthRegen = now
+          lastHealthRegen = lastHealthRegen + healthRegens * HEALTH_REGEN_INTERVAL_MS
+        }
+
+        // Skip re-render if nothing changed
+        if (energy === prev.player.energy &&
+            stamina === prev.player.stamina &&
+            health === prev.player.health) {
+          return prev
         }
 
         return {
@@ -271,12 +278,13 @@ export function useAchievements(
 ) {
   return useCallback(() => {
     setState(prev => {
+      const totalJobs = prev.jobs.reduce((sum, j) => sum + j.timesCompleted, 0)
+      const totalCash = prev.player.cash + prev.player.bankedCash
+
       const newAchievements = prev.achievements.map(ach => {
         if (ach.unlocked) return ach
 
         let shouldUnlock = false
-        const totalJobs = prev.jobs.reduce((sum, j) => sum + j.timesCompleted, 0)
-        const totalCash = prev.player.cash + prev.player.bankedCash
 
         switch (ach.id) {
           case 'first_job':
@@ -468,19 +476,14 @@ export function useGameActions({
           ...prev,
           player: {
             ...prev.player,
-            energy: newEnergy,
+            energy: leveledUp ? prev.player.maxEnergy : newEnergy,
+            stamina: leveledUp ? prev.player.maxStamina : prev.player.stamina,
+            health: leveledUp ? prev.player.maxHealth : prev.player.health,
             experience: remainingExp,
             experienceToLevel: getXPForLevel(newLevel),
             level: newLevel,
             cash: prev.player.cash + cashEarned,
             skillPoints: prev.player.skillPoints + totalSkillPoints,
-            ...(leveledUp
-              ? {
-                  energy: prev.player.maxEnergy,
-                  stamina: prev.player.maxStamina,
-                  health: prev.player.maxHealth,
-                }
-              : {}),
           },
           jobs: prev.jobs.map(j =>
             j.id === jobId
@@ -567,20 +570,14 @@ export function useGameActions({
           ...prev,
           player: {
             ...prev.player,
-            stamina: prev.player.stamina - staminaCost,
-            health: Math.max(0, prev.player.health - finalDamage),
+            energy: leveledUp ? prev.player.maxEnergy : prev.player.energy,
+            stamina: leveledUp ? prev.player.maxStamina : prev.player.stamina - staminaCost,
+            health: leveledUp ? prev.player.maxHealth : Math.max(0, prev.player.health - finalDamage),
             cash: prev.player.cash + cashEarned,
             experience: remainingExp,
             experienceToLevel: getXPForLevel(newLevel),
             level: newLevel,
             skillPoints: prev.player.skillPoints + skillPointsGained,
-            ...(leveledUp
-              ? {
-                  energy: prev.player.maxEnergy,
-                  stamina: prev.player.maxStamina,
-                  health: prev.player.maxHealth,
-                }
-              : {}),
           },
           wins: prev.wins + (won ? 1 : 0),
           losses: prev.losses + (won ? 0 : 1),

@@ -84,18 +84,3 @@ export const CHARACTER_POSITIONS: Record<string, { row: number; col: number }> =
   'godfather': { row: 1, col: 3 },
 }
 
-// Helper to get sprite background style
-export function getSpriteStyle(
-  sprite: string,
-  position: { row: number; col: number },
-  size: number = 64
-): React.CSSProperties {
-  return {
-    backgroundImage: `url(${sprite})`,
-    backgroundPosition: `-${position.col * size}px -${position.row * size}px`,
-    backgroundSize: 'auto',
-    width: size,
-    height: size,
-    backgroundRepeat: 'no-repeat',
-  }
-}

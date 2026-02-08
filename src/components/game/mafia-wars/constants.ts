@@ -676,7 +676,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     id: 'godmode',
     name: 'Quantum Barrier',
     type: 'armor',
-    description: 'Bendng reality itself for protection.',
+    description: 'Bending reality itself for protection.',
     attackBonus: 100,
     defenseBonus: 500,
     cost: 100000000,
