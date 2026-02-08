@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
 
 interface UseEasterEggsProps {
     onKonami: () => void
@@ -9,40 +9,36 @@ interface UseEasterEggsProps {
 }
 
 export function useEasterEggs({ onKonami, onGandalf, onDaniel, onGhost, onMonkey }: UseEasterEggsProps) {
-    const [, setInputBuffer] = useState("")
+    const bufferRef = useRef("")
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const key = e.key.toLowerCase()
-            
-            setInputBuffer(prev => {
-                const newBuffer = (prev + key).slice(-20) // Keep last 20 chars
 
-                // Konami Code (ArrowUp, etc maps to strings)
-                // Actually browsers return "ArrowUp", "a", "b"
-                // Let's use a separate tracker for konami or map keys?
-                // Simplified Konami: uuddlrlrba
-                
-                // Words
-                if (newBuffer.endsWith("gandalf")) {
-                    onGandalf()
-                    return ""
-                }
-                if (newBuffer.endsWith("daniel")) {
-                    onDaniel()
-                    return ""
-                }
-                if (newBuffer.endsWith("ghost")) {
-                    onGhost()
-                    return ""
-                }
-                if (newBuffer.endsWith("monkey") && onMonkey) {
-                    onMonkey()
-                    return ""
-                }
-                
-                return newBuffer
-            })
+            const newBuffer = (bufferRef.current + key).slice(-20) // Keep last 20 chars
+            bufferRef.current = newBuffer
+
+            // Words
+            if (newBuffer.endsWith("gandalf")) {
+                onGandalf()
+                bufferRef.current = ""
+                return
+            }
+            if (newBuffer.endsWith("daniel")) {
+                onDaniel()
+                bufferRef.current = ""
+                return
+            }
+            if (newBuffer.endsWith("ghost")) {
+                onGhost()
+                bufferRef.current = ""
+                return
+            }
+            if (newBuffer.endsWith("monkey") && onMonkey) {
+                onMonkey()
+                bufferRef.current = ""
+                return
+            }
         }
         
         // Konami specific listener for arrow keys

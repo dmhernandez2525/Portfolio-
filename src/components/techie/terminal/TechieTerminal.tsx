@@ -64,10 +64,14 @@ export function TechieTerminal({
 
   // Focus input on mount and when clicking the terminal area
   useEffect(() => {
-    inputRef.current?.focus()
+    // Small delay to ensure DOM is ready and CodeMirror hasn't stolen focus
+    const timer = setTimeout(() => inputRef.current?.focus(), 50)
+    return () => clearTimeout(timer)
   }, [])
 
-  const handleContainerClick = () => {
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // Prevent CodeMirror or other elements from recapturing focus
+    e.stopPropagation()
     inputRef.current?.focus()
   }
 
