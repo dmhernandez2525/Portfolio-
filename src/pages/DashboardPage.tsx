@@ -72,13 +72,13 @@ export function DashboardPage() {
       </Suspense>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-        <Suspense fallback={<ChartSkeleton />}>
-          <div className="xl:col-span-2">
+        <div className="xl:col-span-2">
+          <Suspense fallback={<ChartSkeleton height="h-[300px]" />}>
             <TechFrequencyChart />
-          </div>
-        </Suspense>
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<ChartSkeleton />}>
+        <Suspense fallback={<ChartSkeleton height="h-[250px]" />}>
           <SkillsRadarChart />
         </Suspense>
 
@@ -86,23 +86,23 @@ export function DashboardPage() {
           <ProjectsStatusChart />
         </Suspense>
 
-        <Suspense fallback={<ChartSkeleton />}>
-          <div className="xl:col-span-2">
+        <div className="xl:col-span-2">
+          <Suspense fallback={<ChartSkeleton height="h-[250px]" />}>
             <ProjectsByCategoryChart />
-          </div>
-        </Suspense>
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<ChartSkeleton />}>
-          <div className="xl:col-span-2">
+        <div className="xl:col-span-2">
+          <Suspense fallback={<ChartSkeleton />}>
             <ExperienceTimeline />
-          </div>
-        </Suspense>
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<ChartSkeleton />}>
-          <div className="xl:col-span-3">
+        <div className="xl:col-span-3">
+          <Suspense fallback={<ChartSkeleton />}>
             <ContributionHeatmap />
-          </div>
-        </Suspense>
+          </Suspense>
+        </div>
 
         <Suspense fallback={<ChartSkeleton />}>
           <RecentBlogCard />
