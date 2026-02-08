@@ -154,6 +154,21 @@ const games: Game[] = [
     yearPlayed: "1996-2003",
     funFact: "I started with Pokemon Red and a Charmander. Brock was brutal without a water type.",
     features: ["151 Pokemon with accurate stats", "Full battle system with type chart", "8 Gym Leaders + Elite Four", "Wild encounters and catching", "Save/Load system", "Mobile touch controls"]
+  },
+  {
+    id: "shopping-cart-hero",
+    title: "Shopping Cart Hero",
+    description: "Launch a shopping cart off a ramp and fly as far as possible!",
+    longDescription: "A faithful recreation of the classic 2009 Flash game. Run down a hill, jump into a shopping cart, launch off a ramp, perform tricks mid-air, and earn money to buy upgrades. Features rockets, armor, groupie multipliers, and trick combos.",
+    thumbnail: "/game-shopping-cart.svg",
+    category: "arcade",
+    link: "/shopping-cart-hero",
+    externalLink: "https://www.crazygames.com/game/shopping-cart-hero",
+    isExternal: false,
+    isBuiltIn: true,
+    yearPlayed: "2009-2011",
+    funFact: "The original was a Flash game I played endlessly during class. The physics of crashing was always funnier than landing safely.",
+    features: ["Physics-based launch and flight", "Upgrade shop (wheels, rockets, armor)", "Trick system (handstands, flips, superman)", "Groupie score multipliers", "Procedural stickman animation", "High score tracking"]
   }
 ]
 
