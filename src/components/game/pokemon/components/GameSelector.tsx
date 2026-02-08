@@ -11,7 +11,7 @@ interface GameSelectorProps {
 
 const GAMES: { version: GameVersion; title: string; region: string; color: string; available: boolean }[] = [
   { version: 'red-blue', title: 'Red / Blue', region: 'Kanto', color: 'from-red-600 to-blue-600', available: true },
-  { version: 'gold-silver', title: 'Gold / Silver', region: 'Johto', color: 'from-yellow-500 to-gray-400', available: false },
+  { version: 'gold-silver', title: 'Gold / Silver', region: 'Johto', color: 'from-yellow-500 to-gray-400', available: true },
   { version: 'ruby-sapphire', title: 'Ruby / Sapphire', region: 'Hoenn', color: 'from-red-700 to-blue-500', available: false },
 ];
 
