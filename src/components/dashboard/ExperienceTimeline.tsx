@@ -12,11 +12,10 @@ function parseDuration(duration: string): TimeRange {
   const parts = duration.split(" - ")
   const start = new Date(parts[0])
   const endStr = parts[1]
-  const end = endStr === "Present" || endStr?.includes("2026")
+  const currentYear = new Date().getFullYear().toString()
+  const end = !endStr || endStr === "Present" || endStr.includes(currentYear)
     ? new Date()
-    : endStr
-      ? new Date(endStr)
-      : new Date()
+    : new Date(endStr)
   return { start, end }
 }
 

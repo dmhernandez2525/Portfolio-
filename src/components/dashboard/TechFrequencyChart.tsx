@@ -9,11 +9,16 @@ import {
 import { projectsData } from "@/data/projects"
 import { DashboardCard } from "./DashboardCard"
 
+function normalizeTech(name: string): string {
+  return name.replace(/\s*[\d.]+$/, "").replace(/\s+v\d+.*$/, "")
+}
+
 function getTechFrequency() {
   const counts: Record<string, number> = {}
   for (const p of projectsData) {
     for (const t of p.tech) {
-      counts[t] = (counts[t] || 0) + 1
+      const normalized = normalizeTech(t)
+      counts[normalized] = (counts[normalized] || 0) + 1
     }
   }
   return Object.entries(counts)

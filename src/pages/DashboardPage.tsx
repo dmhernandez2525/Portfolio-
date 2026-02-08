@@ -36,25 +36,38 @@ const RecentBlogCard = lazy(() =>
   import("@/components/dashboard/RecentBlogCard").then((m) => ({ default: m.RecentBlogCard }))
 )
 
-function ChartSkeleton() {
+function ChartSkeleton({ height = "h-[200px]" }: { height?: string }) {
   return (
     <div className="bg-[#1a1a24] border border-[#2a2a34] rounded-lg p-4 animate-pulse">
       <div className="h-3 w-24 bg-[#2a2a34] rounded mb-4" />
-      <div className="h-[200px] bg-[#2a2a34]/50 rounded" />
+      <div className={`${height} bg-[#2a2a34]/50 rounded`} />
+    </div>
+  )
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="bg-[#1a1a24] border border-[#2a2a34] rounded-lg p-4 animate-pulse">
+          <div className="h-2 w-16 bg-[#2a2a34] rounded mb-2" />
+          <div className="h-6 w-10 bg-[#2a2a34] rounded" />
+        </div>
+      ))}
     </div>
   )
 }
 
 export function DashboardPage() {
   return (
-    <div className="min-h-screen bg-[#0f0f14] text-white p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#0f0f14] text-white p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-lg font-semibold text-white">Career Dashboard</h1>
         <p className="text-xs text-[#555] mt-1">Analytics and metrics across all projects and skills</p>
       </div>
 
-      <Suspense fallback={<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">{Array.from({ length: 6 }).map((_, i) => <ChartSkeleton key={i} />)}</div>}>
+      <Suspense fallback={<StatsSkeleton />}>
         <CareerStatsCards />
       </Suspense>
 

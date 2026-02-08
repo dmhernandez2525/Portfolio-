@@ -61,16 +61,26 @@ function FileTreeNode({
   const icon = getFileIcon(node.name)
   const isHidden = node.hidden
 
+  const stateStyle = isActive
+    ? "bg-[#094771] text-white"
+    : isHidden
+      ? "text-[#6a6a6a] hover:bg-[#2a2d2e]"
+      : "text-[#cccccc] hover:bg-[#2a2d2e]"
+
+  const nameStyle = node.name.endsWith(".exe")
+    ? "text-[#4ec9b0]"
+    : isHidden
+      ? "italic"
+      : ""
+
   return (
     <button
       onClick={() => node.contentKey && onFileSelect(node.contentKey, node.name)}
-      className={`w-full flex items-center gap-1.5 px-2 py-0.5 text-left text-xs transition-colors ${
-        isActive ? "bg-[#094771] text-white" : isHidden ? "text-[#6a6a6a] hover:bg-[#2a2d2e]" : "text-[#cccccc] hover:bg-[#2a2d2e]"
-      }`}
+      className={`w-full flex items-center gap-1.5 px-2 py-0.5 text-left text-xs transition-colors ${stateStyle}`}
       style={{ paddingLeft: `${depth * 12 + 8}px` }}
     >
       <span className="text-[10px] shrink-0">{icon}</span>
-      <span className={node.name.endsWith(".exe") ? "text-[#4ec9b0]" : isHidden ? "italic" : ""}>{node.name}</span>
+      <span className={nameStyle}>{node.name}</span>
     </button>
   )
 }

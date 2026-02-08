@@ -1,6 +1,7 @@
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
@@ -36,7 +37,7 @@ export function ProjectsByCategoryChart() {
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]}>
               {data.map((_, i) => (
-                <rect key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
               ))}
             </Bar>
           </BarChart>

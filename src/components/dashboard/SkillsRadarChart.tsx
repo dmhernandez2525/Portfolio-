@@ -21,7 +21,7 @@ function getRadarData() {
   return CATEGORIES.map((cat) => {
     const skills = skillsData.filter((s) => s.category === cat)
     const avgLevel =
-      skills.reduce((sum, s) => sum + (LEVEL_VALUES[s.level] ?? 0), 0) / skills.length
+      skills.reduce((sum, s) => sum + (LEVEL_VALUES[s.level] ?? 0), 0) / (skills.length || 1)
     return {
       category: cat,
       level: Math.round(avgLevel * 25),

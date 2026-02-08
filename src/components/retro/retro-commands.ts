@@ -134,8 +134,10 @@ function handleFortune(_args: string[], ctx: RetroContext) {
   ])
 }
 
+const VALID_SCHEMES = new Set<"green" | "amber">(["green", "amber"])
+
 function handleColor(_args: string[], ctx: RetroContext) {
-  const scheme = _args[0] === "amber" ? "amber" : _args[0] === "green" ? "green" : null
+  const scheme = VALID_SCHEMES.has(_args[0] as "green" | "amber") ? (_args[0] as "green" | "amber") : null
   if (!scheme) {
     ctx.addLines([{ text: 'Usage: color <green|amber>', color: "dim" }])
     return
