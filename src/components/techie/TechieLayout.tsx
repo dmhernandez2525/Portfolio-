@@ -10,6 +10,7 @@ import { AboutDialog } from "./AboutDialog"
 import { CommandPalette } from "./dialogs/CommandPalette"
 import { KeyboardShortcutsDialog } from "./dialogs/KeyboardShortcutsDialog"
 import { ReleaseNotesDialog } from "./dialogs/ReleaseNotesDialog"
+import { useEasterEggs } from "@/hooks/use-easter-eggs"
 
 export interface TechieTab {
   id: string
@@ -33,6 +34,8 @@ export function TechieLayout() {
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showReleaseNotes, setShowReleaseNotes] = useState(false)
+  const [showHiddenFiles, setShowHiddenFiles] = useState(false)
+  const [easterEggToast, setEasterEggToast] = useState<string | null>(null)
 
   const activeTab = tabs.find(t => t.id === activeTabId) ?? null
 
@@ -42,6 +45,33 @@ export function TechieLayout() {
     const timer = setTimeout(() => setHackerMode(false), 10000)
     return () => clearTimeout(timer)
   }, [hackerMode])
+
+  // Easter egg toast auto-dismiss
+  useEffect(() => {
+    if (!easterEggToast) return
+    const timer = setTimeout(() => setEasterEggToast(null), 3000)
+    return () => clearTimeout(timer)
+  }, [easterEggToast])
+
+  // Easter egg keyboard triggers
+  useEasterEggs({
+    onKonami: useCallback(() => {
+      setShowHiddenFiles(true)
+      setEasterEggToast("Hidden files revealed! Check the explorer.")
+    }, []),
+    onGandalf: useCallback(() => {
+      setEasterEggToast("You shall not pass! ...but you can browse.")
+    }, []),
+    onDaniel: useCallback(() => {
+      setShowAbout(true)
+    }, []),
+    onGhost: useCallback(() => {
+      setEasterEggToast("Boo! ...did I scare you?")
+    }, []),
+    onMonkey: useCallback(() => {
+      setEasterEggToast("Monkey mode activated! Just kidding.")
+    }, []),
+  })
 
   const openFile = useCallback((contentKey: string, fileName: string) => {
     // External links
@@ -255,6 +285,7 @@ export function TechieLayout() {
             <TechieFileExplorer
               currentFile={activeTab?.contentKey ?? null}
               onFileSelect={openFile}
+              showHidden={showHiddenFiles}
             />
           </div>
         )}
@@ -304,6 +335,7 @@ export function TechieLayout() {
         currentFile={activeTab?.contentKey ?? null}
         onFileSelect={openFile}
         sidebarOpen={sidebarOpen}
+        showHidden={showHiddenFiles}
       />
 
       {/* Overlays */}
@@ -317,6 +349,13 @@ export function TechieLayout() {
       )}
       {showShortcuts && <KeyboardShortcutsDialog onClose={() => setShowShortcuts(false)} />}
       {showReleaseNotes && <ReleaseNotesDialog onClose={() => setShowReleaseNotes(false)} />}
+
+      {/* Easter egg toast */}
+      {easterEggToast && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 bg-[#252526] border border-[#454545] px-4 py-2 text-xs text-[#4ec9b0] font-mono shadow-xl">
+          {easterEggToast}
+        </div>
+      )}
     </div>
   )
 }
@@ -325,10 +364,12 @@ function MobileSidebar({
   currentFile,
   onFileSelect,
   sidebarOpen,
+  showHidden,
 }: {
   currentFile: string | null
   onFileSelect: (contentKey: string, fileName: string) => void
   sidebarOpen: boolean
+  showHidden: boolean
 }) {
   const [open, setOpen] = useState(false)
 
@@ -353,6 +394,7 @@ function MobileSidebar({
                 onFileSelect(key, name)
                 setOpen(false)
               }}
+              showHidden={showHidden}
             />
           </div>
         </div>

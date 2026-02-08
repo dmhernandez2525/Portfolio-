@@ -130,8 +130,6 @@ export function buildTreeString(
   if (!node) return ["No such directory"]
 
   const lines: string[] = []
-  const displayName =
-    node.name || absolutePath === ROOT_PATH ? "/" : absolutePath
   lines.push(node.name || "/")
 
   function walk(parent: FileNode, prefix: string) {
