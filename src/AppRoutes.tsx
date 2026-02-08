@@ -1,5 +1,10 @@
 import { Routes, Route } from "react-router-dom"
+import { useMode } from "@/context/mode-context"
 import { RootLayout } from "@/components/layout/RootLayout"
+import { Gateway } from "@/pages/Gateway"
+import { BusinessCardPage } from "@/pages/BusinessCardPage"
+import { ResumePage } from "@/pages/ResumePage"
+import { TechieLayout } from "@/components/techie/TechieLayout"
 
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
@@ -42,7 +47,7 @@ const Home = () => (
     </div>
 )
 
-export function AppRoutes() {
+function CreativeRoutes() {
   return (
     <Routes>
       <Route element={<RootLayout />}>
@@ -75,4 +80,43 @@ export function AppRoutes() {
       />
     </Routes>
   )
+}
+
+export function AppRoutes() {
+  const { mode } = useMode()
+
+  if (!mode) {
+    return (
+      <Routes>
+        <Route path="*" element={<Gateway />} />
+      </Routes>
+    )
+  }
+
+  if (mode === 'business-card') {
+    return (
+      <Routes>
+        <Route path="*" element={<BusinessCardPage />} />
+      </Routes>
+    )
+  }
+
+  if (mode === 'resume') {
+    return (
+      <Routes>
+        <Route path="*" element={<ResumePage />} />
+      </Routes>
+    )
+  }
+
+  if (mode === 'techie') {
+    return (
+      <Routes>
+        <Route path="*" element={<TechieLayout />} />
+      </Routes>
+    )
+  }
+
+  // mode === 'creative'
+  return <CreativeRoutes />
 }
