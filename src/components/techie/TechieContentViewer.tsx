@@ -1,9 +1,10 @@
-import { lazy, Suspense, useRef, useEffect } from "react"
+import { lazy, Suspense } from "react"
 import { experienceData } from "@/data/experience"
 import { skillsData } from "@/data/skills"
 import { projectsData } from "@/data/projects"
 import { blogPosts } from "@/data/blog"
 import type { TechieTab } from "./TechieLayout"
+import { CodeMirrorEditor } from "./CodeMirrorEditor"
 
 const SnakeGame = lazy(() => import("@/components/game/SnakeGame").then(m => ({ default: m.SnakeGame })))
 const TetrisGame = lazy(() => import("@/components/game/TetrisGame").then(m => ({ default: m.TetrisGame })))
@@ -11,10 +12,12 @@ const ChessGame = lazy(() => import("@/components/game/ChessGame").then(m => ({ 
 const FallingBlocksGame = lazy(() => import("@/components/game/FallingBlocksGame").then(m => ({ default: m.FallingBlocksGame })))
 const CookieClickerGame = lazy(() => import("@/components/game/cookie-clicker").then(m => ({ default: m.CookieClickerGame })))
 const AgarGame = lazy(() => import("@/components/game/agar").then(m => ({ default: m.AgarGame })))
+const MafiaWars = lazy(() => import("@/components/game/mafia-wars"))
 
 interface TechieContentViewerProps {
   tab: TechieTab | null
   onEditorChange: (tabId: string, content: string) => void
+  onRunCode: (code: string, lang: string) => void
 }
 
 function TerminalLine({ prefix, children }: { prefix?: string; children: React.ReactNode }) {
@@ -162,7 +165,14 @@ function ProjectsContent() {
               {projects.map(p => (
                 <div key={p.id} className="text-sm">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[#4ec9b0] font-bold">{p.title}</span>
+                    {p.link ? (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer"
+                         className="text-[#4ec9b0] font-bold hover:underline hover:text-[#6ee7c2] transition-colors">
+                        {p.title}
+                      </a>
+                    ) : (
+                      <span className="text-[#4ec9b0] font-bold">{p.title}</span>
+                    )}
                     <span className="text-[#858585]">—</span>
                     <span className="text-[#d7ba7d] text-xs">{p.category}</span>
                     {p.status === "production" && (
@@ -333,41 +343,19 @@ function WelcomeScreen() {
   )
 }
 
-function TechieEditor({ tab, onEditorChange }: { tab: TechieTab; onEditorChange: (tabId: string, content: string) => void }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const lineCount = (tab.editorContent ?? "").split("\n").length
-
-  useEffect(() => {
-    textareaRef.current?.focus()
-  }, [tab.id])
-
-  return (
-    <div className="flex h-full">
-      {/* Line numbers */}
-      <div className="py-4 px-2 text-right select-none text-[#858585] text-xs leading-[1.5rem] bg-[#1e1e1e] border-r border-[#3c3c3c] w-12 shrink-0">
-        {Array.from({ length: Math.max(lineCount, 20) }, (_, i) => (
-          <div key={i}>{i + 1}</div>
-        ))}
-      </div>
-      {/* Editor area */}
-      <textarea
-        ref={textareaRef}
-        value={tab.editorContent ?? ""}
-        onChange={(e) => onEditorChange(tab.id, e.target.value)}
-        className="flex-1 bg-[#1e1e1e] text-[#d4d4d4] text-sm font-mono p-4 resize-none outline-none leading-[1.5rem] caret-[#aeafad]"
-        spellCheck={false}
-        placeholder="Start typing..."
-      />
-    </div>
-  )
-}
-
-export function TechieContentViewer({ tab, onEditorChange }: TechieContentViewerProps) {
+export function TechieContentViewer({ tab, onEditorChange, onRunCode }: TechieContentViewerProps) {
   if (!tab) return <WelcomeScreen />
 
   // Untitled/editor tabs
   if (tab.isUntitled) {
-    return <TechieEditor tab={tab} onEditorChange={onEditorChange} />
+    return (
+      <CodeMirrorEditor
+        fileName={tab.fileName}
+        content={tab.editorContent ?? ""}
+        onChange={(val) => onEditorChange(tab.id, val)}
+        onRun={onRunCode}
+      />
+    )
   }
 
   const contentKey = tab.contentKey
@@ -380,6 +368,7 @@ export function TechieContentViewer({ tab, onEditorChange }: TechieContentViewer
     "game-falling-blocks": <GameLoader><FallingBlocksGame /></GameLoader>,
     "game-cookie-clicker": <GameLoader><CookieClickerGame /></GameLoader>,
     "game-agar": <GameLoader><AgarGame /></GameLoader>,
+    "game-mafia-wars": <GameLoader><MafiaWars /></GameLoader>,
   }
 
   if (contentKey in gameMap) return <>{gameMap[contentKey]}</>
