@@ -1,0 +1,147 @@
+// ============================================================================
+// Red/Blue — Story Events & Cutscenes
+// ============================================================================
+
+export interface StoryEvent {
+  id: string;
+  trigger: 'map_enter' | 'interact' | 'flag_check';
+  mapId?: string;
+  npcId?: string;
+  requiredFlags?: string[];
+  blockedByFlags?: string[];
+  dialog: string[];
+  setsFlags?: string[];
+  givesItem?: { itemId: string; quantity: number };
+  givesPokemon?: { speciesId: number; level: number };
+  starterSelection?: boolean;
+  battle?: { trainerId: string };
+}
+
+export const storyEvents: StoryEvent[] = [
+  // --- Opening sequence ---
+  {
+    id: 'oak_intro',
+    trigger: 'map_enter',
+    mapId: 'pallet_town',
+    blockedByFlags: ['got_starter'],
+    dialog: [
+      'OAK: Hello there! Welcome to the',
+      'world of POKeMON!',
+      'My name is OAK! People call me',
+      'the POKeMON PROF!',
+      'This world is inhabited by creatures',
+      'called POKeMON!',
+      'For some people, POKeMON are pets.',
+      'Others use them for fights.',
+      'Myself... I study POKeMON as a',
+      'profession.',
+      'First, tell me about yourself.',
+    ],
+    setsFlags: ['intro_complete'],
+  },
+
+  // --- Starter selection ---
+  {
+    id: 'oak_lab_starters',
+    trigger: 'map_enter',
+    mapId: 'oaks_lab',
+    requiredFlags: ['intro_complete'],
+    blockedByFlags: ['got_starter'],
+    dialog: [
+      'OAK: Ah, you\'re here!',
+      'There are 3 POKeMON on the table.',
+      'They are for you and your rival.',
+      'Go ahead, choose one!',
+    ],
+    starterSelection: true,
+    setsFlags: ['got_starter'],
+  },
+
+  // --- Rival battle at Route 22 ---
+  {
+    id: 'rival_battle_1',
+    trigger: 'map_enter',
+    mapId: 'route_22',
+    requiredFlags: ['got_starter'],
+    blockedByFlags: ['rival_battle_1_done'],
+    dialog: [
+      'BLUE: Hey! Wait up!',
+      'Let me see how tough you are!',
+    ],
+    battle: { trainerId: 'rival_1' },
+    setsFlags: ['rival_battle_1_done'],
+  },
+
+  // --- Brock rematch gate ---
+  {
+    id: 'pewter_gym_hint',
+    trigger: 'interact',
+    npcId: 'pewter_guide',
+    blockedByFlags: ['badge_boulder'],
+    dialog: [
+      'You should challenge BROCK!',
+      'He\'s the GYM LEADER here.',
+      'His POKeMON are all ROCK type.',
+      'WATER and GRASS moves work great!',
+    ],
+  },
+
+  // --- SS Anne ticket ---
+  {
+    id: 'bill_gives_ticket',
+    trigger: 'interact',
+    npcId: 'bill',
+    requiredFlags: ['bill_transformed_back'],
+    blockedByFlags: ['has_ss_ticket'],
+    dialog: [
+      'BILL: Thanks for helping me out!',
+      'Here, take this as thanks!',
+      'Obtained SS TICKET!',
+    ],
+    givesItem: { itemId: 'ss_ticket', quantity: 1 },
+    setsFlags: ['has_ss_ticket'],
+  },
+
+  // --- Legendary bird hints ---
+  {
+    id: 'power_plant_hint',
+    trigger: 'interact',
+    npcId: 'power_plant_scientist',
+    dialog: [
+      'They say a legendary bird POKeMON',
+      'roosts in the abandoned POWER PLANT.',
+      'It controls ELECTRICITY!',
+    ],
+  },
+
+  // --- Champion victory ---
+  {
+    id: 'champion_victory',
+    trigger: 'flag_check',
+    requiredFlags: ['defeated_champion'],
+    dialog: [
+      'OAK: Congratulations!',
+      'You are the new POKeMON CHAMPION!',
+      'Your POKeMON team is recorded in',
+      'the HALL OF FAME!',
+    ],
+    setsFlags: ['hall_of_fame'],
+  },
+];
+
+// Helper to find applicable events
+export function getActiveEvents(
+  trigger: StoryEvent['trigger'],
+  flags: Record<string, boolean>,
+  mapId?: string,
+  npcId?: string,
+): StoryEvent[] {
+  return storyEvents.filter(event => {
+    if (event.trigger !== trigger) return false;
+    if (event.mapId && event.mapId !== mapId) return false;
+    if (event.npcId && event.npcId !== npcId) return false;
+    if (event.requiredFlags?.some(f => !flags[f])) return false;
+    if (event.blockedByFlags?.some(f => flags[f])) return false;
+    return true;
+  });
+}

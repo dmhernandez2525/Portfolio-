@@ -179,7 +179,7 @@ function isNPCOccupied(states: Map<string, NPCState>, excludeId: string, x: numb
 // --- Dialog ---
 
 export function getNPCDialog(npc: NPCDef, state: NPCState): string[] {
-  if (npc.isTrainer && state.defeated && npc.trainerData?.defeatDialog) {
+  if (npc.isTrainer && state.defeated && npc.trainerData && 'defeatDialog' in npc.trainerData) {
     return npc.trainerData.defeatDialog;
   }
   return npc.dialog;
