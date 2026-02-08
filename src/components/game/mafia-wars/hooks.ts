@@ -160,13 +160,21 @@ export function useMessages(
   setState: React.Dispatch<React.SetStateAction<GameState>>
 ) {
   const messageIdRef = useRef(0)
+  const lastMessageRef = useRef<{ text: string; timestamp: number }>({ text: '', timestamp: 0 })
 
   const addMessage = useCallback(
     (text: string, type: GameMessage['type'] = 'info') => {
+      // Prevent duplicate messages within 500ms
+      const now = Date.now()
+      if (lastMessageRef.current.text === text && now - lastMessageRef.current.timestamp < 500) {
+        return
+      }
+      lastMessageRef.current = { text, timestamp: now }
+
       const id = ++messageIdRef.current
       setState(prev => ({
         ...prev,
-        messages: [...(prev.messages || []).slice(-4), { id, text, type, timestamp: Date.now() }],
+        messages: [...(prev.messages || []).slice(-4), { id, text, type, timestamp: now }],
       }))
       setTimeout(() => {
         setState(prev => ({
@@ -448,6 +456,10 @@ export function useGameActions({
           addMessage('Not enough stamina!', 'error')
           return prev
         }
+        if (prev.player.health < 10) {
+          addMessage('Too injured to fight! Rest or wait for health to regenerate.', 'error')
+          return prev
+        }
 
         const playerAttack = calculateTotalAttack(prev.player, prev.equipment) + prev.mafiaSize * 2
         const playerDefense = calculateTotalDefense(prev.player, prev.equipment) + prev.mafiaSize
@@ -615,17 +627,21 @@ export function useGameActions({
       setState(prev => {
         const toDeposit = Math.min(amount, prev.player.cash)
         if (toDeposit <= 0) return prev
+        // Original game had 10% deposit fee - money laundering tax!
+        const fee = Math.floor(toDeposit * 0.1)
+        const netDeposit = toDeposit - fee
+        addMessage(`Deposited ${formatMoney(netDeposit)} (10% laundering fee: ${formatMoney(fee)})`, 'info')
         return {
           ...prev,
           player: {
             ...prev.player,
             cash: prev.player.cash - toDeposit,
-            bankedCash: prev.player.bankedCash + toDeposit,
+            bankedCash: prev.player.bankedCash + netDeposit,
           },
         }
       })
     },
-    [setState]
+    [setState, addMessage]
   )
 
   const withdrawCash = useCallback(
@@ -654,6 +670,25 @@ export function useGameActions({
     addMessage('Game reset. Start your new criminal empire!', 'info')
   }, [setState, addMessage])
 
+  // RECRUIT MAFIA MEMBER
+  const recruitMafia = useCallback(() => {
+    setState(prev => {
+      // Cost scales with current mafia size
+      const recruitCost = 5000 * prev.mafiaSize
+      if (prev.player.cash < recruitCost) {
+        addMessage(`Not enough cash! Recruitment costs ${formatMoney(recruitCost)}`, 'error')
+        return prev
+      }
+
+      addMessage(`Recruited a new crew member! Your mafia is now ${prev.mafiaSize + 1} strong.`, 'success')
+      return {
+        ...prev,
+        player: { ...prev.player, cash: prev.player.cash - recruitCost },
+        mafiaSize: prev.mafiaSize + 1,
+      }
+    })
+  }, [setState, addMessage])
+
   return {
     doJob,
     fightOpponent,
@@ -663,6 +698,7 @@ export function useGameActions({
     depositCash,
     withdrawCash,
     resetGame,
+    recruitMafia,
   }
 }
 

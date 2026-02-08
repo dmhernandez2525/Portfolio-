@@ -15,6 +15,7 @@ import {
   Award, 
   RefreshCw,
   Plus,
+  Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -248,6 +249,7 @@ interface ProfileTabProps {
   onDeposit: (amount: number) => void
   onWithdraw: (amount: number) => void
   onReset: () => void
+  onRecruit: () => void
 }
 
 export function ProfileTab({
@@ -258,7 +260,10 @@ export function ProfileTab({
   onDeposit,
   onWithdraw,
   onReset,
+  onRecruit,
 }: ProfileTabProps) {
+  const recruitCost = 5000 * state.mafiaSize
+  
   return (
     <motion.div key="profile" {...tabAnimation} className="space-y-6">
       {/* Stats Overview */}
@@ -300,6 +305,30 @@ export function ProfileTab({
             <div className="text-zinc-400">Losses</div>
             <div className="text-xl font-bold">{formatNumber(state.losses)}</div>
           </div>
+        </div>
+      </div>
+
+      {/* Mafia Recruitment */}
+      <div className="p-6 bg-gradient-to-r from-red-900/30 to-orange-900/30 rounded-xl border border-red-700/50">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-red-500" />
+          Mafia Recruitment
+        </h3>
+        <p className="text-sm text-zinc-400 mb-3">
+          Expand your crew to increase your combat power. Each member adds +2 Attack and +1 Defense.
+        </p>
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={onRecruit} 
+            disabled={state.player.cash < recruitCost}
+            className="bg-red-600 hover:bg-red-500"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Recruit Member ({formatMoney(recruitCost)})
+          </Button>
+          <span className="text-sm text-zinc-400">
+            Current crew: <span className="text-amber-500 font-bold">{state.mafiaSize}</span>
+          </span>
         </div>
       </div>
 

@@ -63,6 +63,7 @@ export function MafiaWarsGame() {
     depositCash,
     withdrawCash,
     resetGame,
+    recruitMafia,
   } = useGameActions({
     setState,
     addMessage,
@@ -130,6 +131,7 @@ export function MafiaWarsGame() {
               onDeposit={depositCash}
               onWithdraw={withdrawCash}
               onReset={resetGame}
+              onRecruit={recruitMafia}
             />
           )}
         </AnimatePresence>
