@@ -203,6 +203,7 @@ const run: CommandHandler = (args, ctx) => {
     agar: { contentKey: "game-agar", fileName: "agar.exe" },
     "mafia-wars": { contentKey: "game-mafia-wars", fileName: "mafia-wars.exe" },
     pokemon: { contentKey: "game-pokemon", fileName: "pokemon.exe" },
+    "shopping-cart-hero": { contentKey: "game-shopping-cart-hero", fileName: "shopping-cart-hero.exe" },
   }
 
   const game = gameKeys[gameName]
