@@ -436,10 +436,20 @@ const cowsay: CommandHandler = (args, ctx) => {
 const SANDBOX_TIMEOUT_MS = 3000
 
 const BLOCKED_GLOBALS = [
-  "window", "document", "fetch", "XMLHttpRequest", "localStorage",
+  "window", "globalThis", "self", "top", "parent", "frames",
+  "document", "fetch", "XMLHttpRequest", "localStorage",
   "sessionStorage", "indexedDB", "navigator", "location", "history",
   "alert", "confirm", "prompt", "eval", "Function", "importScripts",
   "WebSocket", "Worker", "SharedWorker", "ServiceWorker",
+] as const
+
+// Patterns that can escape the sandbox via prototype chain traversal
+const BLOCKED_PATTERNS = [
+  /\.constructor\b/,          // obj.constructor → Function constructor
+  /\["constructor"\]/,        // obj["constructor"] bracket access
+  /\.__proto__\b/,            // prototype chain access
+  /\["__proto__"\]/,
+  /\bimport\s*\(/,            // dynamic import()
 ] as const
 
 function formatValue(val: unknown, depth = 0, quoteStrings = false): string {
@@ -507,6 +517,13 @@ function createSandbox() {
 }
 
 function executeJS(code: string): { logs: string[]; result: string | null; error: string | null } {
+  // Block prototype chain escape vectors before execution
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(code)) {
+      return { logs: [], result: null, error: "Blocked: restricted syntax detected (prototype chain access)" }
+    }
+  }
+
   const { logs, console } = createSandbox()
 
   const blockedParams = BLOCKED_GLOBALS.join(", ")
