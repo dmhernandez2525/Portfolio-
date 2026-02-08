@@ -299,3 +299,23 @@
 .hacker-mode .bg-\[\#007acc\] {
   background-color: #003300 !important;
 }
+
+/* Print styles for resume */
+@media print {
+  body {
+    background-image: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  section {
+    break-inside: avoid;
+  }
+}
