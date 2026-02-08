@@ -66,22 +66,22 @@ export const PROPERTY_POSITIONS: Record<string, { row: number; col: number }> = 
   'night_club': { row: 0, col: 2 },        // nightclub sprite
   'casino': { row: 1, col: 0 },
   'hotel': { row: 0, col: 1 },             // pawn shop slot (similar look)
-  'marina': { row: 1, col: 2 },            // island slot
-  'skyscraper': { row: 1, col: 1 },        // office building
-  'island': { row: 1, col: 2 },            // private island
+  'marina': { row: 1, col: 3 },
+  'skyscraper': { row: 1, col: 1 },
+  'island': { row: 1, col: 2 },
 }
 
 // Characters/Opponents: street punk, thief, loan shark, enforcer, hitman, capo, underboss, godfather
 export const CHARACTER_POSITIONS: Record<string, { row: number; col: number }> = {
   // Map to actual opponent IDs from constants.ts
   'street_punk': { row: 0, col: 0 },
-  'local_thug': { row: 0, col: 1 },        // petty thief slot
-  'gang_member': { row: 0, col: 2 },       // loan shark slot
-  'mob_enforcer': { row: 0, col: 3 },      // enforcer slot
-  'professional_hitman': { row: 1, col: 0 }, // hitman slot
-  'crime_boss': { row: 1, col: 1 },        // capo slot
-  'rival_underboss': { row: 1, col: 2 },   // underboss slot
-  'crime_lord': { row: 1, col: 3 },        // godfather slot
+  'local_thug': { row: 0, col: 1 },
+  'gang_member': { row: 0, col: 2 },
+  'enforcer': { row: 0, col: 3 },
+  'hitman': { row: 1, col: 0 },
+  'underboss': { row: 1, col: 1 },
+  'don': { row: 1, col: 2 },
+  'godfather': { row: 1, col: 3 },
 }
 
 // Helper to get sprite background style

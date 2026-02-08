@@ -136,6 +136,8 @@ export interface Achievement {
  * Battle result from fighting an opponent
  */
 export interface BattleResult {
+  opponentId: string
+  opponentName: string
   won: boolean
   playerDamageDealt: number
   opponentDamageDealt: number
@@ -211,6 +213,7 @@ export interface SavedGameData {
   }>
   wins: number
   losses: number
+  battleLog: BattleResult[]
   lastEnergyRegen: number
   lastStaminaRegen: number
   lastHealthRegen: number

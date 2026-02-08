@@ -262,7 +262,7 @@ export function ProfileTab({
   onReset,
   onRecruit,
 }: ProfileTabProps) {
-  const recruitCost = 5000 * state.mafiaSize
+  const recruitCost = 1000 + Math.floor(500 * Math.pow(state.mafiaSize, 1.3))
   
   return (
     <motion.div key="profile" {...tabAnimation} className="space-y-6">

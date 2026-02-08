@@ -86,7 +86,7 @@ export function loadGameState(): GameState {
       }),
       wins: data.wins ?? 0,
       losses: data.losses ?? 0,
-      battleLog: [],
+      battleLog: data.battleLog ?? [],
       lastEnergyRegen: data.lastEnergyRegen ?? Date.now(),
       lastStaminaRegen: data.lastStaminaRegen ?? Date.now(),
       lastHealthRegen: data.lastHealthRegen ?? Date.now(),
@@ -129,6 +129,7 @@ export function useSaveGame(state: GameState) {
       })),
       wins: state.wins,
       losses: state.losses,
+      battleLog: state.battleLog.slice(-20),
       lastEnergyRegen: state.lastEnergyRegen,
       lastStaminaRegen: state.lastStaminaRegen,
       lastHealthRegen: state.lastHealthRegen,
@@ -321,7 +322,7 @@ export function useAchievements(
             shouldUnlock = prev.properties.every(p => p.owned > 0)
             break
           case 'beat_godfather':
-            shouldUnlock = prev.battleLog.some(b => b.won && b.expEarned === 10000)
+            shouldUnlock = prev.battleLog.some(b => b.won && b.opponentId === 'godfather')
             break
         }
 
@@ -547,6 +548,8 @@ export function useGameActions({
         const leveledUp = newLevel > prev.player.level
 
         result = {
+          opponentId: opponent.id,
+          opponentName: opponent.name,
           won,
           playerDamageDealt,
           opponentDamageDealt: finalDamage,
@@ -733,8 +736,8 @@ export function useGameActions({
   // RECRUIT MAFIA MEMBER
   const recruitMafia = useCallback(() => {
     setState(prev => {
-      // Cost scales with current mafia size
-      const recruitCost = 5000 * prev.mafiaSize
+      // Cost scales gradually — base $1000, grows slowly
+      const recruitCost = 1000 + Math.floor(500 * Math.pow(prev.mafiaSize, 1.3))
       if (prev.player.cash < recruitCost) {
         addMessage(`Not enough cash! Recruitment costs ${formatMoney(recruitCost)}`, 'error')
         return prev
