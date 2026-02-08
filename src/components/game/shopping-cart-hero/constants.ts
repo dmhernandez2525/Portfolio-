@@ -14,8 +14,6 @@ export const HILL_START_Y = 80;
 export const HILL_END_X = 500;
 export const HILL_END_Y = 380;
 export const RAMP_WIDTH = 60;
-export const RAMP_HEIGHT = 40;
-export const RAMP_ANGLE = Math.PI / 4; // 45 degrees
 
 // --- Marker posts ---
 export const MARKER_1_X = 300;  // "jump into cart" marker
@@ -30,8 +28,6 @@ export const ROTATION_SPEED = 0.07;  // radians per frame
 export const BOUNCE_COEFFICIENT = 0.45;
 export const ROLL_FRICTION = 0.985;
 export const MIN_BOUNCE_VEL = 2;
-export const CRASH_ANGLE = Math.PI / 4;  // 45 degrees from level = crash
-
 // --- Launch ---
 export const LAUNCH_ANGLE = -Math.PI / 3.5; // ~51 degrees upward
 export const LAUNCH_SPEED_MULT = 1.6;        // speed multiplier at launch

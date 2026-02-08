@@ -24,8 +24,19 @@ const SAVE_KEY = 'shopping-cart-hero-save';
 function loadSave(): { money: number; highScore: number; upgrades: typeof DEFAULT_UPGRADES; totalRuns: number } {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* ignore */ }
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Validate shape before using
+      if (typeof parsed.money === 'number' && typeof parsed.highScore === 'number' && parsed.upgrades) {
+        return {
+          money: parsed.money,
+          highScore: parsed.highScore,
+          upgrades: { ...DEFAULT_UPGRADES, ...parsed.upgrades },
+          totalRuns: typeof parsed.totalRuns === 'number' ? parsed.totalRuns : 0,
+        };
+      }
+    }
+  } catch { /* ignore corrupted data */ }
   return { money: 0, highScore: 0, upgrades: { ...DEFAULT_UPGRADES }, totalRuns: 0 };
 }
 
@@ -40,12 +51,14 @@ export function ShoppingCartHeroGame() {
   const frameRef = useRef(0);
   const animRef = useRef<number>(0);
   const maxHeightRef = useRef(0);
+  const crashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const initialSave = useRef(loadSave());
   const [phase, setPhase] = useState<GamePhase>('menu');
-  const [money, setMoney] = useState(() => loadSave().money);
-  const [highScore, setHighScore] = useState(() => loadSave().highScore);
-  const [upgrades, setUpgrades] = useState(() => loadSave().upgrades);
-  const [totalRuns, setTotalRuns] = useState(() => loadSave().totalRuns);
+  const [money, setMoney] = useState(initialSave.current.money);
+  const [highScore, setHighScore] = useState(initialSave.current.highScore);
+  const [upgrades, setUpgrades] = useState(initialSave.current.upgrades);
+  const [totalRuns, setTotalRuns] = useState(initialSave.current.totalRuns);
   const [lastResult, setLastResult] = useState<ReturnType<typeof calculateResult> | null>(null);
 
   // --- Input handling ---
@@ -141,7 +154,9 @@ export function ShoppingCartHeroGame() {
         if (state.cart.crashed) {
           state.phase = 'landing';
           setPhase('landing');
-          setTimeout(() => {
+          if (crashTimerRef.current) clearTimeout(crashTimerRef.current);
+          crashTimerRef.current = setTimeout(() => {
+            crashTimerRef.current = null;
             finishRun(state);
           }, 1500);
         } else {
@@ -246,7 +261,10 @@ export function ShoppingCartHeroGame() {
   // --- Cleanup ---
 
   useEffect(() => {
-    return () => cancelAnimationFrame(animRef.current);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      if (crashTimerRef.current) clearTimeout(crashTimerRef.current);
+    };
   }, []);
 
   // --- Render canvas for menu ---
@@ -385,16 +403,20 @@ export function ShoppingCartHeroGame() {
               </h3>
               <p className="text-gray-400 text-xs mb-3 font-mono">Warning: Lost on crash!</p>
               <div className="flex gap-3">
-                {GROUPIE_COSTS.map((cost, i) => (
-                  <button
-                    key={i}
-                    disabled={upgrades.groupies > i || money < cost}
-                    onClick={() => handlePurchase(`groupie_${i}`)}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:text-gray-400 text-white text-sm rounded font-mono transition-colors"
-                  >
-                    {upgrades.groupies > i ? 'HIRED' : `Groupie ${i + 1} — $${cost}`}
-                  </button>
-                ))}
+                {GROUPIE_COSTS.map((cost, i) => {
+                  const hired = upgrades.groupies > i;
+                  const isNext = upgrades.groupies === i;
+                  return (
+                    <button
+                      key={i}
+                      disabled={!isNext || money < cost}
+                      onClick={() => handlePurchase(`groupie_${i}`)}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:text-gray-400 text-white text-sm rounded font-mono transition-colors"
+                    >
+                      {hired ? 'HIRED' : `Groupie ${i + 1} — $${cost}`}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

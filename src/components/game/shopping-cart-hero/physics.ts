@@ -199,7 +199,9 @@ export function updateCartRolling(cart: CartState, upgrades: PlayerUpgrades): Ca
   };
 
   const wheelMult = WHEEL_MULTIPLIERS[upgrades.wheels];
-  next.vel.x *= ROLL_FRICTION * (1 + (wheelMult - 1) * 0.1);
+  // Better wheels = less friction (higher multiplier = closer to 1.0)
+  const adjustedFriction = 1 - (1 - ROLL_FRICTION) / wheelMult;
+  next.vel.x *= adjustedFriction;
   next.pos.x += next.vel.x;
 
   // Stop when slow enough
