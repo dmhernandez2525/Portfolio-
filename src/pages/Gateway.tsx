@@ -64,7 +64,7 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
     icon: CalendarDays,
     accent: "from-teal-400 to-cyan-500",
     bg: "hover:border-teal-400/50",
-    preview: "Calendly-style booking",
+    preview: "Under development",
   },
 ]
 

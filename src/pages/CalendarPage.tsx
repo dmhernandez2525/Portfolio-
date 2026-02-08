@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Construction } from 'lucide-react'
 import { CalendarProfile } from '@/components/calendar/CalendarProfile'
 import { MeetingTypeSelector } from '@/components/calendar/MeetingTypeSelector'
 import { CalendarDatePicker } from '@/components/calendar/CalendarDatePicker'
@@ -73,6 +74,18 @@ export function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1214] text-white">
+      {/* Development banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-amber-900/30 border-b border-amber-700/40 px-4 py-2.5 text-center"
+      >
+        <p className="text-sm text-amber-300 flex items-center justify-center gap-2">
+          <Construction className="w-4 h-4" />
+          Under Development — Booking is simulated and not yet connected to a real calendar.
+        </p>
+      </motion.div>
+
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-12">
           {/* Profile sidebar */}
