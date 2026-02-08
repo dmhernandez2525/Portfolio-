@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import type { GameVersion } from './engine/types';
 import GameSelector from './components/GameSelector';
 import PokemonCanvas from './components/PokemonCanvas';
+import './pokemon.css';
 
 export function PokemonGame() {
   const [screen, setScreen] = useState<'select' | 'playing'>('select');

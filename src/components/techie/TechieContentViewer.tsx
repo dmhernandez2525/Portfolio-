@@ -14,6 +14,7 @@ const FallingBlocksGame = lazy(() => import("@/components/game/FallingBlocksGame
 const CookieClickerGame = lazy(() => import("@/components/game/cookie-clicker").then(m => ({ default: m.CookieClickerGame })))
 const AgarGame = lazy(() => import("@/components/game/agar").then(m => ({ default: m.AgarGame })))
 const MafiaWars = lazy(() => import("@/components/game/mafia-wars"))
+const PokemonGame = lazy(() => import("@/components/game/pokemon").then(m => ({ default: m.PokemonGame })))
 
 interface TechieContentViewerProps {
   tab: TechieTab | null
@@ -374,6 +375,7 @@ export function TechieContentViewer({ tab, onEditorChange, onRunCode, editorSett
     "game-cookie-clicker": <GameLoader><CookieClickerGame /></GameLoader>,
     "game-agar": <GameLoader><AgarGame /></GameLoader>,
     "game-mafia-wars": <GameLoader><MafiaWars /></GameLoader>,
+    "game-pokemon": <GameLoader><PokemonGame /></GameLoader>,
   }
 
   if (contentKey in gameMap) return <>{gameMap[contentKey]}</>

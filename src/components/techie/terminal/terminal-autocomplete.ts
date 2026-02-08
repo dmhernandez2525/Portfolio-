@@ -31,7 +31,7 @@ export function getCompletions(
 
   // run command: complete with game names
   if (cmdName === "run") {
-    const gameNames = ["snake", "tetris", "chess", "falling-blocks", "cookie-clicker", "agar", "mafia-wars"]
+    const gameNames = ["snake", "tetris", "chess", "falling-blocks", "cookie-clicker", "agar", "mafia-wars", "pokemon"]
     const partial = parts[parts.length - 1].toLowerCase()
     return gameNames
       .filter((g) => g.startsWith(partial) && g !== partial)

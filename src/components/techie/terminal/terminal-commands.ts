@@ -202,6 +202,7 @@ const run: CommandHandler = (args, ctx) => {
     "cookie-clicker": { contentKey: "game-cookie-clicker", fileName: "cookie-clicker.exe" },
     agar: { contentKey: "game-agar", fileName: "agar.exe" },
     "mafia-wars": { contentKey: "game-mafia-wars", fileName: "mafia-wars.exe" },
+    pokemon: { contentKey: "game-pokemon", fileName: "pokemon.exe" },
   }
 
   const game = gameKeys[gameName]
@@ -341,7 +342,7 @@ const man: CommandHandler = (args, ctx) => {
       "",
       "DESCRIPTION:",
       "  Launches a game executable.",
-      "  Available: snake, tetris, chess, falling-blocks, cookie-clicker, agar, mafia-wars",
+      "  Available: snake, tetris, chess, falling-blocks, cookie-clicker, agar, mafia-wars, pokemon",
     ],
     js: [
       "JS(1) — run JavaScript code",

@@ -140,6 +140,20 @@ const games: Game[] = [
     yearPlayed: "2008-2010",
     funFact: "I spent way too many hours on the original. 'Just one more job' they said...",
     features: ["24 unique jobs across 6 tiers", "AI combat system", "8 property types for passive income", "24 weapons/armor/vehicles", "Skill point allocation", "Auto-save with localStorage"]
+  },
+  {
+    id: "pokemon",
+    title: "Pokemon RPG",
+    description: "A full Pokemon RPG recreation with battles, catching, and exploration!",
+    longDescription: "My pixel-art recreation of the classic Pokemon games. Explore the Kanto region, catch all 151 Pokemon, battle 8 Gym Leaders, defeat the Elite Four, and become the Champion! Features the complete battle system with type effectiveness, status conditions, and trainer AI.",
+    thumbnail: "/game-pokemon.svg",
+    category: "strategy",
+    link: "/pokemon",
+    isExternal: false,
+    isBuiltIn: true,
+    yearPlayed: "1996-2003",
+    funFact: "I started with Pokemon Red and a Charmander. Brock was brutal without a water type.",
+    features: ["151 Pokemon with accurate stats", "Full battle system with type chart", "8 Gym Leaders + Elite Four", "Wild encounters and catching", "Save/Load system", "Mobile touch controls"]
   }
 ]
 
@@ -257,6 +271,11 @@ export function Games() {
                     <Play className="w-3 h-3" /> Agar.io
                   </Button>
                 </Link>
+                <Link to="/pokemon">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Pokemon
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           )}
@@ -301,6 +320,8 @@ export function Games() {
                     {game.id === "falling-blocks" && "🎮"}
                     {game.id === "tetris" && "🧱"}
                     {game.id === "snake" && "🐍"}
+                    {game.id === "mafia-wars" && "🔫"}
+                    {game.id === "pokemon" && "⚡"}
                   </div>
                   {game.isExternal && (
                     <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-black/50 px-2 py-1 rounded">
