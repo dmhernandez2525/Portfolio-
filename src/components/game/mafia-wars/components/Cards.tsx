@@ -12,10 +12,11 @@ import {
   Skull,
   Shield,
   Swords,
+  ArrowUpCircle,
 } from 'lucide-react'
 
-import type { Job, Property, Equipment, Opponent } from '../types'
-import { formatMoney } from '../constants'
+import type { Job, Property, Equipment, Opponent, Collection } from '../types'
+import { formatMoney, getPropertyIncome, getPropertyUpgradeCost } from '../constants'
 import {
   SPRITES,
   CHARACTER_POSITIONS,
@@ -198,11 +199,16 @@ interface PropertyCardProps {
   property: Property
   cash: number
   onBuy: () => void
+  onUpgrade?: () => void
 }
 
-export function PropertyCard({ property, cash, onBuy }: PropertyCardProps) {
+export function PropertyCard({ property, cash, onBuy, onUpgrade }: PropertyCardProps) {
   const canAfford = cash >= property.cost
   const maxedOut = property.owned >= property.maxOwnable
+  const upgradeCost = getPropertyUpgradeCost(property)
+  const canUpgrade = property.owned > 0 && property.upgradeLevel < 3 && cash >= upgradeCost
+  const upgradeNames = ['Base', 'Improved', 'Premium', 'Maximum']
+  const income = getPropertyIncome(property)
 
   return (
     <div className="mafia-card p-4 rounded-xl border border-amber-900/50 hover:border-green-700/50 transition-colors">
@@ -220,21 +226,40 @@ export function PropertyCard({ property, cash, onBuy }: PropertyCardProps) {
           <div className="text-xs text-amber-200/70">
             Owned: {property.owned}/{property.maxOwnable}
           </div>
+          {property.owned > 0 && (
+            <div className="text-xs text-zinc-400">
+              Level: <span className="text-amber-400">{upgradeNames[property.upgradeLevel]}</span>
+            </div>
+          )}
         </div>
       </div>
       <p className="text-sm text-zinc-400 mb-3">{property.description}</p>
       <div className="flex items-center justify-between text-xs mb-3">
-        <span className="text-green-500">+{formatMoney(property.incomePerHour)}/hr</span>
+        <span className="text-green-500">+{formatMoney(income)}/hr per unit</span>
         <span className="text-zinc-400">{formatMoney(property.cost)}</span>
       </div>
-      <Button
-        onClick={onBuy}
-        disabled={!canAfford || maxedOut}
-        className="w-full bg-green-600 hover:bg-green-500"
-        size="sm"
-      >
-        {maxedOut ? 'Maxed Out' : `Buy (${formatMoney(property.cost)})`}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={onBuy}
+          disabled={!canAfford || maxedOut}
+          className="flex-1 bg-green-600 hover:bg-green-500"
+          size="sm"
+        >
+          {maxedOut ? 'Maxed Out' : `Buy (${formatMoney(property.cost)})`}
+        </Button>
+        {property.owned > 0 && property.upgradeLevel < 3 && onUpgrade && (
+          <Button
+            onClick={onUpgrade}
+            disabled={!canUpgrade}
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+          >
+            <ArrowUpCircle className="w-4 h-4 mr-1" />
+            {formatMoney(upgradeCost)}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
@@ -296,6 +321,78 @@ export function EquipmentCard({ equipment, cash, onBuy }: EquipmentCardProps) {
       <Button onClick={onBuy} disabled={!canAfford} variant="outline" size="sm" className="w-full text-xs">
         {maxedOut ? 'MAXED' : formatMoney(equipment.cost)}
       </Button>
+    </div>
+  )
+}
+
+// ----------------------------------------
+// COLLECTION CARD
+// ----------------------------------------
+
+interface CollectionCardProps {
+  collection: Collection
+}
+
+export function CollectionCard({ collection }: CollectionCardProps) {
+  const collectedCount = collection.items.filter(i => i.collected).length
+  const totalItems = collection.items.length
+  const progress = Math.round((collectedCount / totalItems) * 100)
+
+  return (
+    <div
+      className={cn(
+        'p-4 rounded-xl border transition-colors',
+        collection.completed
+          ? 'bg-green-900/20 border-green-700/50'
+          : collectedCount > 0
+            ? 'bg-amber-900/10 border-amber-700/30'
+            : 'bg-zinc-800/50 border-zinc-700/50'
+      )}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-bold text-amber-100">{collection.name}</h4>
+        <span className={cn(
+          'text-xs font-medium',
+          collection.completed ? 'text-green-500' : 'text-zinc-400'
+        )}>
+          {collectedCount}/{totalItems}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-3">
+        {collection.items.map(item => (
+          <div
+            key={item.id}
+            className={cn(
+              'w-8 h-8 flex items-center justify-center rounded text-lg border transition-colors',
+              item.collected
+                ? 'bg-amber-900/40 border-amber-600/50'
+                : 'bg-zinc-800/80 border-zinc-700/50 grayscale opacity-40'
+            )}
+            title={item.collected ? item.name : '???'}
+          >
+            {item.icon}
+          </div>
+        ))}
+      </div>
+
+      {!collection.completed && (
+        <div className="mb-2">
+          <div className="w-full h-1.5 bg-zinc-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-amber-600 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className={cn(
+        'text-xs',
+        collection.completed ? 'text-green-400 font-medium' : 'text-zinc-500'
+      )}>
+        {collection.completed ? `Completed! ${collection.rewardDescription}` : `Reward: ${collection.rewardDescription}`}
+      </div>
     </div>
   )
 }

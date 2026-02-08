@@ -1,7 +1,7 @@
 // ========================================
 // MAFIA WARS - MAIN GAME COMPONENT
 // ========================================
-// A recreation of the classic MySpace game
+// A recreation of the classic 2009 Zynga game
 // ========================================
 
 import { useState } from 'react'
@@ -29,6 +29,7 @@ import {
   JobsTab,
   FightTab,
   PropertiesTab,
+  CollectionsTab,
   InventoryTab,
   ProfileTab,
 } from './components'
@@ -58,10 +59,13 @@ export function MafiaWarsGame() {
     doJob,
     fightOpponent,
     buyProperty,
+    upgradeProperty,
     buyEquipment,
     allocateSkillPoint,
     depositCash,
     withdrawCash,
+    selectClass,
+    fightBoss,
     resetGame,
     recruitMafia,
   } = useGameActions({
@@ -72,7 +76,7 @@ export function MafiaWarsGame() {
   })
 
   // Computed values
-  const { totalAttack, totalDefense, pendingIncome, hourlyIncome, calculatePendingIncome } =
+  const { totalAttack, totalDefense, pendingIncome, hourlyIncome, bankFeeRate, calculatePendingIncome } =
     useComputedValues(state)
 
   // Income collection
@@ -96,6 +100,7 @@ export function MafiaWarsGame() {
               selectedTier={selectedTier}
               onTierChange={setSelectedTier}
               onDoJob={doJob}
+              onFightBoss={fightBoss}
             />
           )}
 
@@ -115,7 +120,12 @@ export function MafiaWarsGame() {
               hourlyIncome={hourlyIncome}
               onCollectIncome={collectIncome}
               onBuyProperty={buyProperty}
+              onUpgradeProperty={upgradeProperty}
             />
+          )}
+
+          {activeTab === 'collections' && (
+            <CollectionsTab state={state} />
           )}
 
           {activeTab === 'inventory' && (
@@ -127,11 +137,13 @@ export function MafiaWarsGame() {
               state={state}
               totalAttack={totalAttack}
               totalDefense={totalDefense}
+              bankFeeRate={bankFeeRate}
               onAllocateSkill={allocateSkillPoint}
               onDeposit={depositCash}
               onWithdraw={withdrawCash}
               onReset={resetGame}
               onRecruit={recruitMafia}
+              onSelectClass={selectClass}
             />
           )}
         </AnimatePresence>
