@@ -1,0 +1,713 @@
+[
+  {
+    "id": "poke-ball",
+    "name": "Poke Ball",
+    "category": "pokeballs",
+    "description": "A device for catching wild Pokemon. It is thrown like a ball at a Pokemon, comfortably encapsulating its target.",
+    "price": 200,
+    "isKeyItem": false,
+    "effect": { "type": "pokeball", "catchMultiplier": 1.0 }
+  },
+  {
+    "id": "great-ball",
+    "name": "Great Ball",
+    "category": "pokeballs",
+    "description": "A good, high-performance Poke Ball that provides a higher Pokemon catch rate than a standard Poke Ball.",
+    "price": 600,
+    "isKeyItem": false,
+    "effect": { "type": "pokeball", "catchMultiplier": 1.5 }
+  },
+  {
+    "id": "ultra-ball",
+    "name": "Ultra Ball",
+    "category": "pokeballs",
+    "description": "An ultra-high-performance Poke Ball that provides a higher success rate for catching Pokemon than a Great Ball.",
+    "price": 1200,
+    "isKeyItem": false,
+    "effect": { "type": "pokeball", "catchMultiplier": 2.0 }
+  },
+  {
+    "id": "master-ball",
+    "name": "Master Ball",
+    "category": "pokeballs",
+    "description": "The best Poke Ball with the ultimate level of performance. With it, you will catch any wild Pokemon without fail.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "pokeball", "catchMultiplier": 255 }
+  },
+  {
+    "id": "potion",
+    "name": "Potion",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating wounds. It can be used to restore 20 HP to a single Pokemon.",
+    "price": 300,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 20 }
+  },
+  {
+    "id": "super-potion",
+    "name": "Super Potion",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating wounds. It can be used to restore 50 HP to a single Pokemon.",
+    "price": 700,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 50 }
+  },
+  {
+    "id": "hyper-potion",
+    "name": "Hyper Potion",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating wounds. It can be used to restore 200 HP to a single Pokemon.",
+    "price": 1200,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 200 }
+  },
+  {
+    "id": "max-potion",
+    "name": "Max Potion",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating wounds. It will fully restore the max HP of a single Pokemon.",
+    "price": 2500,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 9999 }
+  },
+  {
+    "id": "full-restore",
+    "name": "Full Restore",
+    "category": "medicine",
+    "description": "A medicine that can be used to fully restore the HP of a single Pokemon and heal any status conditions.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 9999, "curesStatus": "all" }
+  },
+  {
+    "id": "revive",
+    "name": "Revive",
+    "category": "medicine",
+    "description": "A medicine that can revive a fainted Pokemon. It will restore half of a fainted Pokemon's max HP.",
+    "price": 1500,
+    "isKeyItem": false,
+    "effect": { "type": "revive", "value": 0.5 }
+  },
+  {
+    "id": "max-revive",
+    "name": "Max Revive",
+    "category": "medicine",
+    "description": "A medicine that can revive a fainted Pokemon. It will fully restore a fainted Pokemon's max HP.",
+    "price": 4000,
+    "isKeyItem": false,
+    "effect": { "type": "revive", "value": 1.0 }
+  },
+  {
+    "id": "antidote",
+    "name": "Antidote",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating poisoning. It can be used to lift the effects of being poisoned from a single Pokemon.",
+    "price": 100,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "poison" }
+  },
+  {
+    "id": "burn-heal",
+    "name": "Burn Heal",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating burns. It can be used to heal a single Pokemon suffering from a burn.",
+    "price": 250,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "burn" }
+  },
+  {
+    "id": "ice-heal",
+    "name": "Ice Heal",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating freezing. It can be used to defrost a single frozen Pokemon.",
+    "price": 250,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "freeze" }
+  },
+  {
+    "id": "awakening",
+    "name": "Awakening",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating sleep. It can be used to awaken a single Pokemon from the clutches of sleep.",
+    "price": 250,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "sleep" }
+  },
+  {
+    "id": "paralyz-heal",
+    "name": "Paralyz Heal",
+    "category": "medicine",
+    "description": "A spray-type medicine for treating paralysis. It can be used to free a single Pokemon that has been paralyzed.",
+    "price": 200,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "paralysis" }
+  },
+  {
+    "id": "full-heal",
+    "name": "Full Heal",
+    "category": "medicine",
+    "description": "A spray-type medicine that is broadly effective. It can be used to heal all the status conditions of a single Pokemon.",
+    "price": 600,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "all" }
+  },
+  {
+    "id": "ether",
+    "name": "Ether",
+    "category": "medicine",
+    "description": "A medicine that can be used to restore 10 PP to a single selected move that has been learned by a Pokemon.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "heal_pp", "value": 10 }
+  },
+  {
+    "id": "max-ether",
+    "name": "Max Ether",
+    "category": "medicine",
+    "description": "A medicine that can be used to fully restore the PP of a single selected move that has been learned by a Pokemon.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "heal_pp", "value": 9999 }
+  },
+  {
+    "id": "elixir",
+    "name": "Elixir",
+    "category": "medicine",
+    "description": "A medicine that can be used to restore 10 PP to each of the moves that have been learned by a Pokemon.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "heal_pp", "value": 10, "allMoves": true }
+  },
+  {
+    "id": "max-elixir",
+    "name": "Max Elixir",
+    "category": "medicine",
+    "description": "A medicine that can be used to fully restore the PP of all of the moves that have been learned by a Pokemon.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "heal_pp", "value": 9999, "allMoves": true }
+  },
+  {
+    "id": "rare-candy",
+    "name": "Rare Candy",
+    "category": "medicine",
+    "description": "A candy that is packed with energy. When consumed, it will instantly raise the level of a single Pokemon by one.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "rare_candy", "value": 1 }
+  },
+  {
+    "id": "x-attack",
+    "name": "X Attack",
+    "category": "items",
+    "description": "An item that sharply boosts the Attack stat of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 500,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "attack", "stages": 1 }
+  },
+  {
+    "id": "x-defense",
+    "name": "X Defense",
+    "category": "items",
+    "description": "An item that sharply boosts the Defense stat of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 550,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "defense", "stages": 1 }
+  },
+  {
+    "id": "x-speed",
+    "name": "X Speed",
+    "category": "items",
+    "description": "An item that sharply boosts the Speed stat of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 350,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "speed", "stages": 1 }
+  },
+  {
+    "id": "x-special",
+    "name": "X Special",
+    "category": "items",
+    "description": "An item that sharply boosts the Sp. Atk stat of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 350,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "specialAttack", "stages": 1 }
+  },
+  {
+    "id": "x-sp-def",
+    "name": "X Sp. Def",
+    "category": "items",
+    "description": "An item that sharply boosts the Sp. Def stat of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 350,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "specialDefense", "stages": 1 }
+  },
+  {
+    "id": "x-accuracy",
+    "name": "X Accuracy",
+    "category": "items",
+    "description": "An item that sharply boosts the accuracy of a Pokemon during a battle. It wears off once the Pokemon is withdrawn.",
+    "price": 950,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "accuracy", "stages": 1 }
+  },
+  {
+    "id": "dire-hit",
+    "name": "Dire Hit",
+    "category": "items",
+    "description": "An item that raises the critical-hit ratio greatly. It can be used only once and wears off if the Pokemon is withdrawn.",
+    "price": 650,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "critRatio", "stages": 1 }
+  },
+  {
+    "id": "guard-spec",
+    "name": "Guard Spec.",
+    "category": "items",
+    "description": "An item that prevents stat reduction among the Trainer's party Pokemon for five turns after it is used in battle.",
+    "price": 700,
+    "isKeyItem": false,
+    "effect": { "type": "boost_stat", "stat": "guardSpec", "stages": 1 }
+  },
+  {
+    "id": "repel",
+    "name": "Repel",
+    "category": "items",
+    "description": "An item that prevents weak wild Pokemon from appearing in the wild for 100 steps after its use.",
+    "price": 350,
+    "isKeyItem": false,
+    "effect": { "type": "repel", "steps": 100 }
+  },
+  {
+    "id": "super-repel",
+    "name": "Super Repel",
+    "category": "items",
+    "description": "An item that prevents weak wild Pokemon from appearing in the wild for 200 steps after its use.",
+    "price": 500,
+    "isKeyItem": false,
+    "effect": { "type": "repel", "steps": 200 }
+  },
+  {
+    "id": "max-repel",
+    "name": "Max Repel",
+    "category": "items",
+    "description": "An item that prevents weak wild Pokemon from appearing in the wild for 250 steps after its use.",
+    "price": 700,
+    "isKeyItem": false,
+    "effect": { "type": "repel", "steps": 250 }
+  },
+  {
+    "id": "escape-rope",
+    "name": "Escape Rope",
+    "category": "items",
+    "description": "A long and durable rope. Use it to escape instantly from a cave or a dungeon.",
+    "price": 550,
+    "isKeyItem": false,
+    "effect": { "type": "escape" }
+  },
+  {
+    "id": "oran-berry",
+    "name": "Oran Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can restore its own HP by 10 points during battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 10, "holdable": true }
+  },
+  {
+    "id": "sitrus-berry",
+    "name": "Sitrus Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can restore its own HP by 25% during battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_hp", "value": 0.25, "percentage": true, "holdable": true }
+  },
+  {
+    "id": "lum-berry",
+    "name": "Lum Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from any status condition during battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "all", "holdable": true }
+  },
+  {
+    "id": "rawst-berry",
+    "name": "Rawst Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from a burn on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "burn", "holdable": true }
+  },
+  {
+    "id": "cheri-berry",
+    "name": "Cheri Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from paralysis on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "paralysis", "holdable": true }
+  },
+  {
+    "id": "pecha-berry",
+    "name": "Pecha Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from poisoning on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "poison", "holdable": true }
+  },
+  {
+    "id": "aspear-berry",
+    "name": "Aspear Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from being frozen on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "freeze", "holdable": true }
+  },
+  {
+    "id": "chesto-berry",
+    "name": "Chesto Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from sleep on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "sleep", "holdable": true }
+  },
+  {
+    "id": "leppa-berry",
+    "name": "Leppa Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can restore 10 PP to a depleted move during battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_pp", "value": 10, "holdable": true }
+  },
+  {
+    "id": "persim-berry",
+    "name": "Persim Berry",
+    "category": "berries",
+    "description": "A Berry to be consumed by Pokemon. If a Pokemon holds one, it can recover from confusion on its own in battle.",
+    "price": 20,
+    "isKeyItem": false,
+    "effect": { "type": "heal_status", "status": "confusion", "holdable": true }
+  },
+  {
+    "id": "fire-stone",
+    "name": "Fire Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. The stone has a fiery orange heart.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "fire" }
+  },
+  {
+    "id": "water-stone",
+    "name": "Water Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. It is the blue of a pool of clear water.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "water" }
+  },
+  {
+    "id": "thunder-stone",
+    "name": "Thunder Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. It has a distinct thunderbolt pattern.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "electric" }
+  },
+  {
+    "id": "leaf-stone",
+    "name": "Leaf Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. It has an unmistakable leaf pattern.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "grass" }
+  },
+  {
+    "id": "moon-stone",
+    "name": "Moon Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. It is as dark as the night sky.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "moon" }
+  },
+  {
+    "id": "sun-stone",
+    "name": "Sun Stone",
+    "category": "items",
+    "description": "A peculiar stone that can make certain species of Pokemon evolve. It burns as red as the evening sun.",
+    "price": 2100,
+    "isKeyItem": false,
+    "effect": { "type": "evolution", "element": "sun" }
+  },
+  {
+    "id": "leftovers",
+    "name": "Leftovers",
+    "category": "items",
+    "description": "An item to be held by a Pokemon. The holder's HP is slowly but steadily restored throughout every battle.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "held", "restoreHpPercent": 6.25, "trigger": "end_of_turn" }
+  },
+  {
+    "id": "choice-band",
+    "name": "Choice Band",
+    "category": "items",
+    "description": "An item to be held by a Pokemon. This curious headband boosts Attack by 50% but only allows the use of one move.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "held", "boostStat": "attack", "boostMultiplier": 1.5, "lockMove": true }
+  },
+  {
+    "id": "shell-bell",
+    "name": "Shell Bell",
+    "category": "items",
+    "description": "An item to be held by a Pokemon. The holder restores a little HP every time it inflicts damage on a foe.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "held", "drainPercent": 12.5, "trigger": "on_damage" }
+  },
+  {
+    "id": "focus-sash",
+    "name": "Focus Sash",
+    "category": "items",
+    "description": "An item to be held by a Pokemon. If the holder has full HP, it will endure a potential KO attack with 1 HP. It is consumed after use.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "held", "surviveKO": true, "requireFullHP": true, "consumable": true }
+  },
+  {
+    "id": "life-orb",
+    "name": "Life Orb",
+    "category": "items",
+    "description": "An item to be held by a Pokemon. It boosts the power of moves but at the cost of some HP on each hit.",
+    "price": 0,
+    "isKeyItem": false,
+    "effect": { "type": "held", "damageMultiplier": 1.3, "recoilPercent": 10 }
+  },
+  {
+    "id": "bicycle",
+    "name": "Bicycle",
+    "category": "key_items",
+    "description": "A folding bicycle that enables a rider to get around much faster than with Running Shoes.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "ride", "speedMultiplier": 2 }
+  },
+  {
+    "id": "old-rod",
+    "name": "Old Rod",
+    "category": "key_items",
+    "description": "An old and beat-up fishing rod. Use it at any body of water to fish for wild aquatic Pokemon.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "fish", "tier": 1 }
+  },
+  {
+    "id": "good-rod",
+    "name": "Good Rod",
+    "category": "key_items",
+    "description": "A new, good-quality fishing rod. Use it at any body of water to fish for wild aquatic Pokemon.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "fish", "tier": 2 }
+  },
+  {
+    "id": "super-rod",
+    "name": "Super Rod",
+    "category": "key_items",
+    "description": "An awesome, high-tech fishing rod. Use it at any body of water to fish for wild aquatic Pokemon.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "fish", "tier": 3 }
+  },
+  {
+    "id": "town-map",
+    "name": "Town Map",
+    "category": "key_items",
+    "description": "A very convenient map that can be viewed anytime. It even shows your present location in the region.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "map" }
+  },
+  {
+    "id": "pokedex",
+    "name": "Pokedex",
+    "category": "key_items",
+    "description": "A high-tech encyclopedia that automatically records data on all Pokemon that are seen or caught.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "pokedex" }
+  },
+  {
+    "id": "exp-share",
+    "name": "Exp. Share",
+    "category": "key_items",
+    "description": "Turning on this special device will allow all the Pokemon on your team to receive Exp. Points from battles.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "key_item", "action": "exp_share" }
+  },
+  {
+    "id": "hm01-cut",
+    "name": "HM01 Cut",
+    "category": "tms",
+    "description": "The target is cut with a scythe or claw. This can also be used to cut down thin trees.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "cut", "moveType": "normal", "power": 50, "accuracy": 95, "isHM": true }
+  },
+  {
+    "id": "hm02-fly",
+    "name": "HM02 Fly",
+    "category": "tms",
+    "description": "The user soars and then strikes its target on the next turn. This can also be used to fly to any familiar town.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "fly", "moveType": "flying", "power": 90, "accuracy": 95, "isHM": true }
+  },
+  {
+    "id": "hm03-surf",
+    "name": "HM03 Surf",
+    "category": "tms",
+    "description": "The user attacks everything around it by swamping its surroundings with a giant wave. It can also be used for crossing water.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "surf", "moveType": "water", "power": 90, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "hm04-strength",
+    "name": "HM04 Strength",
+    "category": "tms",
+    "description": "The target is slugged with a punch thrown at maximum power. This can also be used to move heavy boulders.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "strength", "moveType": "normal", "power": 80, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "hm05-flash",
+    "name": "HM05 Flash",
+    "category": "tms",
+    "description": "The user flashes a bright light that cuts the target's accuracy. It can also be used to illuminate dark caves.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "flash", "moveType": "normal", "power": 0, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "hm06-rock-smash",
+    "name": "HM06 Rock Smash",
+    "category": "tms",
+    "description": "The user attacks with a punch. This may also lower the target's Defense stat. This move can also shatter rocks in the field.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "rock_smash", "moveType": "fighting", "power": 40, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "hm07-waterfall",
+    "name": "HM07 Waterfall",
+    "category": "tms",
+    "description": "The user charges at the target and may make it flinch. This can also be used to climb a waterfall.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "waterfall", "moveType": "water", "power": 80, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "hm08-dive",
+    "name": "HM08 Dive",
+    "category": "tms",
+    "description": "Diving on the first turn, the user floats up and attacks on the next turn. It can be used to dive deep in the ocean.",
+    "price": 0,
+    "isKeyItem": true,
+    "effect": { "type": "tm", "move": "dive", "moveType": "water", "power": 80, "accuracy": 100, "isHM": true }
+  },
+  {
+    "id": "tm13-ice-beam",
+    "name": "TM13 Ice Beam",
+    "category": "tms",
+    "description": "The target is struck with an icy-cold beam of energy. This may also leave the target frozen.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "ice_beam", "moveType": "ice", "power": 90, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm24-thunderbolt",
+    "name": "TM24 Thunderbolt",
+    "category": "tms",
+    "description": "A strong electric blast crashes down on the target. This may also leave the target with paralysis.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "thunderbolt", "moveType": "electric", "power": 90, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm26-earthquake",
+    "name": "TM26 Earthquake",
+    "category": "tms",
+    "description": "The user sets off an earthquake that strikes every Pokemon around it.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "earthquake", "moveType": "ground", "power": 100, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm29-psychic",
+    "name": "TM29 Psychic",
+    "category": "tms",
+    "description": "The target is hit by a strong telekinetic force. This may also lower the target's Sp. Def stat.",
+    "price": 2000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "psychic", "moveType": "psychic", "power": 90, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm35-flamethrower",
+    "name": "TM35 Flamethrower",
+    "category": "tms",
+    "description": "The target is scorched with an intense blast of fire. This may also leave the target with a burn.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "flamethrower", "moveType": "fire", "power": 90, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm36-sludge-bomb",
+    "name": "TM36 Sludge Bomb",
+    "category": "tms",
+    "description": "Unsanitary sludge is hurled at the target. This may also poison the target.",
+    "price": 1000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "sludge_bomb", "moveType": "poison", "power": 90, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm38-fire-blast",
+    "name": "TM38 Fire Blast",
+    "category": "tms",
+    "description": "The target is attacked with an intense blast of all-consuming fire. This may also leave the target with a burn.",
+    "price": 5500,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "fire_blast", "moveType": "fire", "power": 110, "accuracy": 85, "isHM": false }
+  },
+  {
+    "id": "tm44-rest",
+    "name": "TM44 Rest",
+    "category": "tms",
+    "description": "The user goes to sleep for two turns. This fully restores the user's HP and heals any status conditions.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "rest", "moveType": "psychic", "power": 0, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "tm45-attract",
+    "name": "TM45 Attract",
+    "category": "tms",
+    "description": "If it is the opposite gender of the user, the target becomes infatuated and less likely to attack.",
+    "price": 3000,
+    "isKeyItem": false,
+    "effect": { "type": "tm", "move": "attract", "moveType": "normal", "power": 0, "accuracy": 100, "isHM": false }
+  }
+]
