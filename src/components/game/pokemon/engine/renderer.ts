@@ -3,7 +3,7 @@
 // ============================================================================
 
 import type { Camera, GameMap, Player, BattleState, BattlePokemon } from './types';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, SCALED_TILE, COLORS } from './constants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from './constants';
 import { renderMap, renderAboveLayer, renderNPCs, renderPlayer } from './tilemap';
 
 // --- Overworld rendering ---
@@ -35,10 +35,6 @@ export function renderOverworld(
 
   // Map name overlay (fade in/out)
   renderMapName(ctx, map.name, frameCount);
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
 }
 
 // --- Map name display ---

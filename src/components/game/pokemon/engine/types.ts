@@ -222,6 +222,7 @@ export interface ItemEffect {
   status?: StatusCondition | 'all';
   moveId?: string;          // for TMs
   catchMultiplier?: number; // for pokeballs
+  curesStatus?: boolean;    // for items that also cure status
 }
 
 // --- Battle types ---
