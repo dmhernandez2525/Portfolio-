@@ -134,7 +134,8 @@ function drawBattlePokemon(
   }
 
   // Draw a simple colored shape based on type
-  const typeColor = TYPE_COLORS[pokemon.moves[0]?.moveId ? 'normal' : 'normal'];
+  const primaryType = bp.types?.[0] ?? 'normal';
+  const typeColor = TYPE_COLORS[primaryType] ?? TYPE_COLORS['normal'];
   ctx.fillStyle = typeColor;
 
   // Body (rounded rectangle)

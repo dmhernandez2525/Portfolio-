@@ -78,7 +78,7 @@
     "description": "A medicine that can be used to fully restore the HP of a single Pokemon and heal any status conditions.",
     "price": 3000,
     "isKeyItem": false,
-    "effect": { "type": "heal_hp", "value": 9999, "curesStatus": "all" }
+    "effect": { "type": "heal_hp", "value": 9999, "curesStatus": true }
   },
   {
     "id": "revive",

@@ -19,25 +19,28 @@ export default function EvolutionScreen({
   const [flashOpacity, setFlashOpacity] = useState(0);
 
   useEffect(() => {
-    // Start phase
     const t1 = setTimeout(() => setPhase('evolving'), 2000);
 
-    // Flash animation during evolution
+    let interval: ReturnType<typeof setInterval> | null = null;
     const t2 = setTimeout(() => {
       let count = 0;
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setFlashOpacity(o => o > 0.5 ? 0 : 1);
         count++;
         if (count >= 10) {
-          clearInterval(interval);
+          if (interval) clearInterval(interval);
+          interval = null;
           setFlashOpacity(0);
           setPhase('done');
         }
       }, 200);
-      return () => clearInterval(interval);
     }, 2500);
 
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   return (

@@ -40,6 +40,7 @@ interface SpeciesLookup {
   baseStats: Record<StatName, number>;
   baseExp: number;
   growthRate: string;
+  catchRate?: number;
 }
 
 let speciesDatabase: Record<number, SpeciesLookup> = {};
@@ -58,9 +59,13 @@ export function getSpeciesData(id: number): SpeciesLookup | null {
 // --- Battle Pokemon helpers ---
 
 export function createBattlePokemon(pokemon: Pokemon): BattlePokemon {
+  const species = getSpeciesData(pokemon.speciesId);
   return {
     pokemon,
+    types: (species?.types as PokemonType[]) ?? ['normal'],
     statStages: { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 },
+    accuracyStage: 0,
+    evasionStage: 0,
     volatileStatuses: new Set(),
     isProtected: false,
     sleepTurns: 0,
@@ -129,7 +134,7 @@ export function executeTurn(
       const canRun = calculateRunChance(
         getEffectiveStat(playerBp, 'speed'),
         getEffectiveStat(opponentBp, 'speed'),
-        state.catchAttempts
+        state.runAttempts
       );
       if (canRun) {
         messages.push('Got away safely!');
@@ -177,7 +182,7 @@ export function executeTurn(
   } else {
     const playerSpeed = getEffectiveStat(playerBp, 'speed');
     const opponentSpeed = getEffectiveStat(opponentBp, 'speed');
-    playerFirst = playerSpeed >= opponentSpeed ? true : (playerSpeed === opponentSpeed ? Math.random() < 0.5 : false);
+    playerFirst = playerSpeed > opponentSpeed || (playerSpeed === opponentSpeed && Math.random() < 0.5);
   }
 
   const first = playerFirst ? { attacker: playerBp, defender: opponentBp, move: playerMove } : { attacker: opponentBp, defender: playerBp, move: opponentMove };
@@ -195,9 +200,9 @@ export function executeTurn(
     else playerDamageDealt = secondResult.damage;
   }
 
-  // Post-turn effects (status damage, weather, etc.)
-  applyPostTurnEffects(playerBp, messages, 'Your');
-  applyPostTurnEffects(opponentBp, messages, 'Foe');
+  // Post-turn effects (status damage, weather, leech seed, etc.)
+  applyPostTurnEffects(playerBp, opponentBp, messages, 'Your');
+  applyPostTurnEffects(opponentBp, playerBp, messages, 'Foe');
 
   playerFainted = playerPoke.currentHp <= 0;
   opponentFainted = opponentPoke.currentHp <= 0;
@@ -259,8 +264,8 @@ function executeMove(
 
   // Accuracy check
   if (moveData.accuracy !== null) {
-    const accStage = attacker.statStages.hp; // using HP slot for accuracy tracking
-    const evaStage = defender.statStages.hp;  // simplified
+    const accStage = attacker.accuracyStage;
+    const evaStage = defender.evasionStage;
     const accMult = ACCURACY_STAGE_MULTIPLIERS[Math.max(-6, Math.min(6, accStage - evaStage))] ?? 1;
     const hitChance = moveData.accuracy * accMult / 100;
 
@@ -465,11 +470,29 @@ function applyMoveEffect(
       }
     }
   }
+
+  // Accuracy/evasion changes (Flash, Sand Attack, Smokescreen, Mud-Slap)
+  if (effect.accuracyChange) {
+    const change = effect.accuracyChange;
+    const oldStage = target.accuracyStage;
+    const newStage = Math.max(STAT_STAGE_MIN, Math.min(STAT_STAGE_MAX, oldStage + change));
+
+    if (newStage === oldStage) {
+      const dir = change > 0 ? "won't go higher" : "won't go lower";
+      messages.push(`${targetName}'s accuracy ${dir}!`);
+    } else {
+      target.accuracyStage = newStage;
+      const magnitude = Math.abs(change);
+      const dir = change > 0 ? 'rose' : 'fell';
+      const adverb = magnitude >= 3 ? ' drastically' : magnitude === 2 ? ' sharply' : '';
+      messages.push(`${targetName}'s accuracy${adverb} ${dir}!`);
+    }
+  }
 }
 
 // --- Post-turn effects ---
 
-function applyPostTurnEffects(bp: BattlePokemon, messages: string[], prefix: string) {
+function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages: string[], prefix: string) {
   const poke = bp.pokemon;
   if (poke.currentHp <= 0) return;
 
@@ -497,10 +520,11 @@ function applyPostTurnEffects(bp: BattlePokemon, messages: string[], prefix: str
     messages.push(`${prefix} ${name} is hurt by poison!`);
   }
 
-  // Leech Seed
+  // Leech Seed — drains HP and heals the other Pokemon
   if (bp.volatileStatuses.has('leech_seed')) {
     const dmg = Math.max(1, Math.floor(poke.stats.hp / 8));
     poke.currentHp = Math.max(0, poke.currentHp - dmg);
+    other.pokemon.currentHp = Math.min(other.pokemon.stats.hp, other.pokemon.currentHp + dmg);
     messages.push(`${prefix} ${name}'s health is sapped by Leech Seed!`);
   }
 }
@@ -668,7 +692,7 @@ export function attemptCatch(
     : 1;
 
   const species = getSpeciesData(pokemon.speciesId);
-  const catchRate = species ? 45 : 45; // Default catch rate if unknown
+  const catchRate = species?.catchRate ?? 45;
 
   const shakes = calculateCatchRate(
     pokemon.stats.hp, pokemon.currentHp, catchRate, ballMultiplier, statusBonus

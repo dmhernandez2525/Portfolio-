@@ -47,6 +47,7 @@ export function createBattleState(config: BattleConfig): BattleState {
     trainerDef: config.trainerDef,
     canRun: config.type === 'wild',
     catchAttempts: 0,
+    runAttempts: 0,
     expGained: 0,
     pendingLevelUps: [],
     pendingEvolution: null,
@@ -262,7 +263,7 @@ export function selectRun(state: BattleState): BattleState {
   const result = executeTurn(state, null, 'run');
   const newState = {
     ...state,
-    catchAttempts: state.catchAttempts + 1,
+    runAttempts: state.runAttempts + 1,
     textQueue: result.messages,
     currentText: result.messages[0] ?? '',
   };
@@ -327,7 +328,7 @@ export function useItemInBattle(
     }
 
     const multiplierMap: Record<string, number> = {
-      'poke_ball': 1, 'great_ball': 1.5, 'ultra_ball': 2, 'master_ball': 255,
+      'poke-ball': 1, 'great-ball': 1.5, 'ultra-ball': 2, 'master-ball': 255,
     };
     const multiplier = multiplierMap[itemId] ?? 1;
     const result = attemptCatch(state.opponentActive.pokemon, multiplier);

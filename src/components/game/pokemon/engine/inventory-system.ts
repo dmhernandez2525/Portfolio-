@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type { BagItem, BagCategory, ItemData, Pokemon } from './types';
+import { recalculateStats } from './battle-engine';
 
 // --- Item database ---
 
@@ -77,7 +78,10 @@ export function useItem(
 
   switch (data.effect.type) {
     case 'heal_hp': {
-      if (target.currentHp >= target.stats.hp) {
+      const atFullHp = target.currentHp >= target.stats.hp;
+      const hasStatus = target.status !== null;
+      const willCureStatus = data.effect.curesStatus && hasStatus;
+      if (atFullHp && !willCureStatus) {
         return { success: false, message: "It won't have any effect.", bag };
       }
       if (target.currentHp <= 0) {
@@ -85,7 +89,10 @@ export function useItem(
       }
       const heal = data.effect.value ?? 20;
       target.currentHp = Math.min(target.stats.hp, target.currentHp + heal);
-      message = `${target.nickname ?? '#' + target.speciesId} recovered ${heal} HP!`;
+      if (data.effect.curesStatus) {
+        target.status = null;
+      }
+      message = `${target.nickname ?? '#' + target.speciesId} recovered HP!`;
       break;
     }
 
@@ -105,7 +112,8 @@ export function useItem(
       if (target.currentHp > 0) {
         return { success: false, message: "This Pokemon hasn't fainted!", bag };
       }
-      const reviveHp = data.effect.value ?? Math.floor(target.stats.hp / 2);
+      const ratio = data.effect.value ?? 0.5;
+      const reviveHp = Math.max(1, Math.floor(target.stats.hp * ratio));
       target.currentHp = reviveHp;
       target.status = null;
       message = `${target.nickname ?? '#' + target.speciesId} was revived!`;
@@ -128,6 +136,7 @@ export function useItem(
         return { success: false, message: "It won't have any effect.", bag };
       }
       target.level++;
+      recalculateStats(target);
       message = `${target.nickname ?? '#' + target.speciesId} grew to Lv. ${target.level}!`;
       break;
     }

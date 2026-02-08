@@ -118,7 +118,7 @@ export default function BattleUI({
     };
 
     handlePhaseInput();
-  });
+  }, [state.phase, isJustPressed, onFight, onItem, onSwitch, onRun, onChooseMove, onChooseSwitch, onCancel, onAdvance, state.playerActive.pokemon.moves, state.playerParty]);
 
   return null; // All rendering is done on the shared canvas
 }

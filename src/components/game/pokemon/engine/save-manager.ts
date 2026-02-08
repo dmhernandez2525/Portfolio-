@@ -76,7 +76,7 @@ export function createNewSave(
     })),
     bag: [
       { itemId: 'potion', quantity: 5 },
-      { itemId: 'poke_ball', quantity: 5 },
+      { itemId: 'poke-ball', quantity: 5 },
     ],
     money: 3000,
     badges: [],
