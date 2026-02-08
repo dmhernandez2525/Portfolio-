@@ -250,7 +250,8 @@ interface EquipmentCardProps {
 }
 
 export function EquipmentCard({ equipment, cash, onBuy }: EquipmentCardProps) {
-  const canAfford = cash >= equipment.cost
+  const maxedOut = equipment.owned >= equipment.maxOwnable
+  const canAfford = cash >= equipment.cost && !maxedOut
 
   return (
     <div
@@ -290,10 +291,10 @@ export function EquipmentCard({ equipment, cash, onBuy }: EquipmentCardProps) {
         {equipment.defenseBonus > 0 && <span className="text-blue-400">+{equipment.defenseBonus} DEF</span>}
       </div>
       {equipment.owned > 0 && (
-        <div className="text-xs text-center text-amber-500 mb-2">Owned: {equipment.owned}</div>
+        <div className="text-xs text-center text-amber-500 mb-2">Owned: {equipment.owned}/{equipment.maxOwnable}</div>
       )}
       <Button onClick={onBuy} disabled={!canAfford} variant="outline" size="sm" className="w-full text-xs">
-        {formatMoney(equipment.cost)}
+        {maxedOut ? 'MAXED' : formatMoney(equipment.cost)}
       </Button>
     </div>
   )

@@ -2,7 +2,7 @@
 // MAFIA WARS - CUSTOM HOOKS
 // ========================================
 
-import { useCallback, useEffect, useRef, useMemo } from 'react'
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
 import type {
   GameState,
   JobResult,
@@ -104,40 +104,44 @@ export function loadGameState(): GameState {
 // ----------------------------------------
 
 export function useSaveGame(state: GameState) {
+  const stateRef = useRef(state)
+  stateRef.current = state
+
   const saveGame = useCallback(() => {
+    const s = stateRef.current
     const saveData: SavedGameData = {
-      player: state.player,
-      mafiaSize: state.mafiaSize,
-      jobs: state.jobs.map(j => ({
+      player: s.player,
+      mafiaSize: s.mafiaSize,
+      jobs: s.jobs.map(j => ({
         id: j.id,
         masteryProgress: j.masteryProgress,
         masteryLevel: j.masteryLevel,
         timesCompleted: j.timesCompleted,
       })),
-      properties: state.properties.map(p => ({
+      properties: s.properties.map(p => ({
         id: p.id,
         owned: p.owned,
       })),
-      equipment: state.equipment.map(e => ({
+      equipment: s.equipment.map(e => ({
         id: e.id,
         owned: e.owned,
       })),
-      achievements: state.achievements.map(a => ({
+      achievements: s.achievements.map(a => ({
         id: a.id,
         unlocked: a.unlocked,
         unlockedAt: a.unlockedAt,
       })),
-      wins: state.wins,
-      losses: state.losses,
-      battleLog: state.battleLog.slice(-20),
-      lastEnergyRegen: state.lastEnergyRegen,
-      lastStaminaRegen: state.lastStaminaRegen,
-      lastHealthRegen: state.lastHealthRegen,
-      lastIncomeCollection: state.lastIncomeCollection,
+      wins: s.wins,
+      losses: s.losses,
+      battleLog: s.battleLog.slice(-20),
+      lastEnergyRegen: s.lastEnergyRegen,
+      lastStaminaRegen: s.lastStaminaRegen,
+      lastHealthRegen: s.lastHealthRegen,
+      lastIncomeCollection: s.lastIncomeCollection,
       lastSaved: Date.now(),
     }
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveData))
-  }, [state])
+  }, []) // stable — reads from ref
 
   // Auto-save interval
   useEffect(() => {
@@ -491,7 +495,6 @@ export function useGameActions({
               : j
           ),
           equipment: updatedEquipment,
-          lastEnergyRegen: Date.now(),
         }
       })
 
@@ -582,7 +585,6 @@ export function useGameActions({
           wins: prev.wins + (won ? 1 : 0),
           losses: prev.losses + (won ? 0 : 1),
           battleLog: [...prev.battleLog.slice(-9), result!],
-          lastStaminaRegen: Date.now(),
         }
       })
 
@@ -625,6 +627,10 @@ export function useGameActions({
       setState(prev => {
         const eq = prev.equipment.find(e => e.id === eqId)
         if (!eq) return prev
+        if (eq.owned >= eq.maxOwnable) {
+          addMessage(`You own the maximum ${eq.name}!`, 'warning')
+          return prev
+        }
         if (prev.player.cash < eq.cost) {
           addMessage('Not enough cash!', 'error')
           return prev
@@ -767,6 +773,16 @@ export function useGameActions({
 // ----------------------------------------
 
 export function useComputedValues(state: GameState) {
+  const [incomeTick, setIncomeTick] = useState(0)
+
+  // Tick every 5s so pendingIncome visually updates
+  useEffect(() => {
+    if (state.properties.some(p => p.owned > 0)) {
+      const interval = setInterval(() => setIncomeTick(t => t + 1), 5000)
+      return () => clearInterval(interval)
+    }
+  }, [state.properties])
+
   const totalAttack = useMemo(
     () => calculateTotalAttack(state.player, state.equipment),
     [state.player, state.equipment]
@@ -783,7 +799,10 @@ export function useComputedValues(state: GameState) {
     return state.properties.reduce((sum, p) => sum + p.owned * p.incomePerHour * hoursPassed, 0)
   }, [state.lastIncomeCollection, state.properties])
 
-  const pendingIncome = useMemo(() => Math.floor(calculatePendingIncome()), [calculatePendingIncome])
+  const pendingIncome = useMemo(() => {
+    void incomeTick // force recalculation on tick
+    return Math.floor(calculatePendingIncome())
+  }, [calculatePendingIncome, incomeTick])
 
   const hourlyIncome = useMemo(
     () => state.properties.reduce((sum, p) => sum + p.owned * p.incomePerHour, 0),

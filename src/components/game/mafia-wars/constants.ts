@@ -514,6 +514,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 500,
     owned: 0,
+    maxOwnable: 10,
     icon: '🔪',
   },
   {
@@ -525,6 +526,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 1,
     cost: 1500,
     owned: 0,
+    maxOwnable: 10,
     icon: '🏏',
   },
   {
@@ -536,6 +538,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 5000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🔫',
   },
   {
@@ -547,6 +550,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 15000,
     owned: 0,
+    maxOwnable: 10,
     icon: '💥',
   },
   {
@@ -558,6 +562,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 50000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🔫',
   },
   {
@@ -569,6 +574,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 200000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🚀',
   },
   {
@@ -580,6 +586,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 1000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '⚙️',
   },
   {
@@ -591,6 +598,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 0,
     cost: 10000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '☄️',
   },
 
@@ -604,6 +612,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 3,
     cost: 1000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🧥',
   },
   {
@@ -615,6 +624,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 8,
     cost: 5000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🦺',
   },
   {
@@ -626,6 +636,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 15,
     cost: 20000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🛡️',
   },
   {
@@ -637,6 +648,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 25,
     cost: 75000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🕴️',
   },
   {
@@ -648,6 +660,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 50,
     cost: 500000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🤖',
   },
   {
@@ -659,6 +672,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 100,
     cost: 5000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '⚔️',
   },
   {
@@ -670,6 +684,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 200,
     cost: 25000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '✨',
   },
   {
@@ -681,6 +696,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 500,
     cost: 100000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🌀',
   },
 
@@ -694,6 +710,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 2,
     cost: 2000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🚗',
   },
   {
@@ -705,6 +722,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 8,
     cost: 25000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🚙',
   },
   {
@@ -716,6 +734,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 4,
     cost: 100000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🏎️',
   },
   {
@@ -727,6 +746,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 10,
     cost: 500000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🚁',
   },
   {
@@ -738,6 +758,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 25,
     cost: 2000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🛥️',
   },
   {
@@ -749,6 +770,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 40,
     cost: 10000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '✈️',
   },
   {
@@ -760,6 +782,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 75,
     cost: 50000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🛩️',
   },
   {
@@ -771,6 +794,7 @@ export const INITIAL_EQUIPMENT: Equipment[] = [
     defenseBonus: 150,
     cost: 250000000,
     owned: 0,
+    maxOwnable: 10,
     icon: '🚢',
   },
 ]

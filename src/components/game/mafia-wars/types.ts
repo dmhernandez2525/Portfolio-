@@ -100,6 +100,7 @@ export interface Equipment {
   defenseBonus: number
   cost: number
   owned: number
+  maxOwnable: number
   icon: string
 }
 
