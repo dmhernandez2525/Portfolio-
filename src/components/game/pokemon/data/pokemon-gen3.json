@@ -2,1627 +2,8407 @@
   {
     "id": 252,
     "name": "Treecko",
-    "types": ["grass"],
-    "baseStats": { "hp": 40, "attack": 45, "defense": 35, "spAttack": 65, "spDefense": 55, "speed": 70 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "spAttack": 65,
+      "spDefense": 55,
+      "speed": 70
+    },
     "baseExp": 62,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "treecko",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 253, "condition": { "type": "level", "level": 16 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 253,
+        "condition": {
+          "type": "level",
+          "level": 16
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 6,
+        "moveId": "absorb"
+      },
+      {
+        "level": 11,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 16,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 21,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 26,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 31,
+        "moveId": "agility"
+      },
+      {
+        "level": 36,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 253,
     "name": "Grovyle",
-    "types": ["grass"],
-    "baseStats": { "hp": 50, "attack": 65, "defense": 45, "spAttack": 85, "spDefense": 65, "speed": 95 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 65,
+      "defense": 45,
+      "spAttack": 85,
+      "spDefense": 65,
+      "speed": 95
+    },
     "baseExp": 142,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "grovyle",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 254, "condition": { "type": "level", "level": 36 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 254,
+        "condition": {
+          "type": "level",
+          "level": 36
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 6,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 12,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 18,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 24,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 30,
+        "moveId": "agility"
+      },
+      {
+        "level": 36,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 42,
+        "moveId": "swords_dance"
+      }
+    ]
   },
   {
     "id": 254,
     "name": "Sceptile",
-    "types": ["grass"],
-    "baseStats": { "hp": 70, "attack": 85, "defense": 65, "spAttack": 105, "spDefense": 85, "speed": 120 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 65,
+      "spAttack": 105,
+      "spDefense": 85,
+      "speed": 120
+    },
     "baseExp": 239,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "sceptile",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 12,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 18,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 24,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 30,
+        "moveId": "agility"
+      },
+      {
+        "level": 39,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 45,
+        "moveId": "swords_dance"
+      },
+      {
+        "level": 51,
+        "moveId": "solar_beam"
+      }
+    ]
   },
   {
     "id": 255,
     "name": "Torchic",
-    "types": ["fire"],
-    "baseStats": { "hp": 45, "attack": 60, "defense": 40, "spAttack": 70, "spDefense": 50, "speed": 45 },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 60,
+      "defense": 40,
+      "spAttack": 70,
+      "spDefense": 50,
+      "speed": 45
+    },
     "baseExp": 62,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "torchic",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 256, "condition": { "type": "level", "level": 16 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 256,
+        "condition": {
+          "type": "level",
+          "level": 16
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 7,
+        "moveId": "ember"
+      },
+      {
+        "level": 10,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 16,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 19,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 25,
+        "moveId": "slash"
+      },
+      {
+        "level": 28,
+        "moveId": "flamethrower"
+      }
+    ]
   },
   {
     "id": 256,
     "name": "Combusken",
-    "types": ["fire", "fighting"],
-    "baseStats": { "hp": 60, "attack": 85, "defense": 60, "spAttack": 85, "spDefense": 60, "speed": 55 },
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 60,
+      "spAttack": 85,
+      "spDefense": 60,
+      "speed": 55
+    },
     "baseExp": 142,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "combusken",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 257, "condition": { "type": "level", "level": 36 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 257,
+        "condition": {
+          "type": "level",
+          "level": 36
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 7,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 13,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 16,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 22,
+        "moveId": "slash"
+      },
+      {
+        "level": 28,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 34,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 39,
+        "moveId": "sky_uppercut"
+      }
+    ]
   },
   {
     "id": 257,
     "name": "Blaziken",
-    "types": ["fire", "fighting"],
-    "baseStats": { "hp": 80, "attack": 120, "defense": 70, "spAttack": 110, "spDefense": 70, "speed": 80 },
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 70,
+      "spAttack": 110,
+      "spDefense": 70,
+      "speed": 80
+    },
     "baseExp": 239,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "blaziken",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 1,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 13,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 16,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 22,
+        "moveId": "slash"
+      },
+      {
+        "level": 28,
+        "moveId": "blaze_kick"
+      },
+      {
+        "level": 36,
+        "moveId": "sky_uppercut"
+      },
+      {
+        "level": 42,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 49,
+        "moveId": "fire_blast"
+      },
+      {
+        "level": 55,
+        "moveId": "overheat"
+      }
+    ]
   },
   {
     "id": 258,
     "name": "Mudkip",
-    "types": ["water"],
-    "baseStats": { "hp": 50, "attack": 70, "defense": 50, "spAttack": 50, "spDefense": 50, "speed": 40 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 50,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 40
+    },
     "baseExp": 62,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "mudkip",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 259, "condition": { "type": "level", "level": 16 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 259,
+        "condition": {
+          "type": "level",
+          "level": 16
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 6,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 10,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 15,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 19,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 24,
+        "moveId": "take_down"
+      },
+      {
+        "level": 28,
+        "moveId": "protect"
+      }
+    ]
   },
   {
     "id": 259,
     "name": "Marshtomp",
-    "types": ["water", "ground"],
-    "baseStats": { "hp": 70, "attack": 85, "defense": 70, "spAttack": 60, "spDefense": 70, "speed": 50 },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 70,
+      "spAttack": 60,
+      "spDefense": 70,
+      "speed": 50
+    },
     "baseExp": 142,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "marshtomp",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 260, "condition": { "type": "level", "level": 36 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 260,
+        "condition": {
+          "type": "level",
+          "level": 36
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 16,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 20,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 25,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 30,
+        "moveId": "take_down"
+      },
+      {
+        "level": 35,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 40,
+        "moveId": "protect"
+      }
+    ]
   },
   {
     "id": 260,
     "name": "Swampert",
-    "types": ["water", "ground"],
-    "baseStats": { "hp": 100, "attack": 110, "defense": 90, "spAttack": 85, "spDefense": 90, "speed": 60 },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 110,
+      "defense": 90,
+      "spAttack": 85,
+      "spDefense": 90,
+      "speed": 60
+    },
     "baseExp": 241,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "swampert",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 16,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 20,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 25,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 30,
+        "moveId": "take_down"
+      },
+      {
+        "level": 39,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 46,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 52,
+        "moveId": "surf"
+      }
+    ]
   },
   {
     "id": 261,
     "name": "Poochyena",
-    "types": ["dark"],
-    "baseStats": { "hp": 35, "attack": 55, "defense": 35, "spAttack": 30, "spDefense": 30, "speed": 35 },
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 35,
+      "spAttack": 30,
+      "spDefense": 30,
+      "speed": 35
+    },
     "baseExp": 56,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "poochyena",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 262, "condition": { "type": "level", "level": 18 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 262,
+        "condition": {
+          "type": "level",
+          "level": 18
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "bite"
+      },
+      {
+        "level": 9,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 13,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 17,
+        "moveId": "crunch"
+      },
+      {
+        "level": 22,
+        "moveId": "take_down"
+      }
+    ]
   },
   {
     "id": 262,
     "name": "Mightyena",
-    "types": ["dark"],
-    "baseStats": { "hp": 70, "attack": 90, "defense": 70, "spAttack": 60, "spDefense": 60, "speed": 70 },
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 90,
+      "defense": 70,
+      "spAttack": 60,
+      "spDefense": 60,
+      "speed": 70
+    },
     "baseExp": 147,
     "catchRate": 127,
     "growthRate": "medium_fast",
     "spriteId": "mightyena",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 18,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 22,
+        "moveId": "crunch"
+      },
+      {
+        "level": 27,
+        "moveId": "take_down"
+      },
+      {
+        "level": 32,
+        "moveId": "roar"
+      },
+      {
+        "level": 38,
+        "moveId": "dark_pulse"
+      }
+    ]
   },
   {
     "id": 263,
     "name": "Zigzagoon",
-    "types": ["normal"],
-    "baseStats": { "hp": 38, "attack": 30, "defense": 41, "spAttack": 30, "spDefense": 41, "speed": 60 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 30,
+      "defense": 41,
+      "spAttack": 30,
+      "spDefense": 41,
+      "speed": 60
+    },
     "baseExp": 56,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "zigzagoon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 264, "condition": { "type": "level", "level": 20 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 264,
+        "condition": {
+          "type": "level",
+          "level": 20
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "tail_whip"
+      },
+      {
+        "level": 9,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 13,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 17,
+        "moveId": "cut"
+      },
+      {
+        "level": 21,
+        "moveId": "take_down"
+      }
+    ]
   },
   {
     "id": 264,
     "name": "Linoone",
-    "types": ["normal"],
-    "baseStats": { "hp": 78, "attack": 70, "defense": 61, "spAttack": 50, "spDefense": 61, "speed": 100 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 70,
+      "defense": 61,
+      "spAttack": 50,
+      "spDefense": 61,
+      "speed": 100
+    },
     "baseExp": 147,
     "catchRate": 90,
     "growthRate": "medium_fast",
     "spriteId": "linoone",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "tail_whip"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 20,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 23,
+        "moveId": "slash"
+      },
+      {
+        "level": 29,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 35,
+        "moveId": "facade"
+      },
+      {
+        "level": 41,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 265,
     "name": "Wurmple",
-    "types": ["bug"],
-    "baseStats": { "hp": 45, "attack": 45, "defense": 35, "spAttack": 20, "spDefense": 30, "speed": 20 },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 45,
+      "defense": 35,
+      "spAttack": 20,
+      "spDefense": 30,
+      "speed": 20
+    },
     "baseExp": 56,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "wurmple",
     "generation": 3,
     "evolvesTo": [
-      { "speciesId": 266, "condition": { "type": "level", "level": 7 } },
-      { "speciesId": 268, "condition": { "type": "level", "level": 7 } }
+      {
+        "speciesId": 266,
+        "condition": {
+          "type": "level",
+          "level": 7
+        }
+      },
+      {
+        "speciesId": 268,
+        "condition": {
+          "type": "level",
+          "level": 7
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "string_shot"
+      },
+      {
+        "level": 5,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 9,
+        "moveId": "bug_bite"
+      }
     ]
   },
   {
     "id": 266,
     "name": "Silcoon",
-    "types": ["bug"],
-    "baseStats": { "hp": 50, "attack": 35, "defense": 55, "spAttack": 25, "spDefense": 25, "speed": 15 },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 35,
+      "defense": 55,
+      "spAttack": 25,
+      "spDefense": 25,
+      "speed": 15
+    },
     "baseExp": 72,
     "catchRate": 120,
     "growthRate": "medium_fast",
     "spriteId": "silcoon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 267, "condition": { "type": "level", "level": 10 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 267,
+        "condition": {
+          "type": "level",
+          "level": 10
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 7,
+        "moveId": "string_shot"
+      }
+    ]
   },
   {
     "id": 267,
     "name": "Beautifly",
-    "types": ["bug", "flying"],
-    "baseStats": { "hp": 60, "attack": 70, "defense": 50, "spAttack": 100, "spDefense": 50, "speed": 65 },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 70,
+      "defense": 50,
+      "spAttack": 100,
+      "spDefense": 50,
+      "speed": 65
+    },
     "baseExp": 178,
     "catchRate": 45,
     "growthRate": "medium_fast",
     "spriteId": "beautifly",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "gust"
+      },
+      {
+        "level": 10,
+        "moveId": "stun_spore"
+      },
+      {
+        "level": 13,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 17,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 22,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 27,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 34,
+        "moveId": "solar_beam"
+      }
+    ]
   },
   {
     "id": 268,
     "name": "Cascoon",
-    "types": ["bug"],
-    "baseStats": { "hp": 50, "attack": 35, "defense": 55, "spAttack": 25, "spDefense": 25, "speed": 15 },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 35,
+      "defense": 55,
+      "spAttack": 25,
+      "spDefense": 25,
+      "speed": 15
+    },
     "baseExp": 72,
     "catchRate": 120,
     "growthRate": "medium_fast",
     "spriteId": "cascoon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 269, "condition": { "type": "level", "level": 10 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 269,
+        "condition": {
+          "type": "level",
+          "level": 10
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 7,
+        "moveId": "string_shot"
+      }
+    ]
   },
   {
     "id": 269,
     "name": "Dustox",
-    "types": ["bug", "poison"],
-    "baseStats": { "hp": 60, "attack": 50, "defense": 70, "spAttack": 50, "spDefense": 90, "speed": 65 },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 70,
+      "spAttack": 50,
+      "spDefense": 90,
+      "speed": 65
+    },
     "baseExp": 173,
     "catchRate": 45,
     "growthRate": "medium_fast",
     "spriteId": "dustox",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "gust"
+      },
+      {
+        "level": 10,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 13,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 17,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 22,
+        "moveId": "toxic"
+      },
+      {
+        "level": 27,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 34,
+        "moveId": "sludge_bomb"
+      }
+    ]
   },
   {
     "id": 270,
     "name": "Lotad",
-    "types": ["water", "grass"],
-    "baseStats": { "hp": 40, "attack": 30, "defense": 30, "spAttack": 40, "spDefense": 50, "speed": 30 },
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 30,
+      "spAttack": 40,
+      "spDefense": 50,
+      "speed": 30
+    },
     "baseExp": 44,
     "catchRate": 255,
     "growthRate": "medium_slow",
     "spriteId": "lotad",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 271, "condition": { "type": "level", "level": 14 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 271,
+        "condition": {
+          "type": "level",
+          "level": 14
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "bubble"
+      },
+      {
+        "level": 9,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 13,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 18,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 22,
+        "moveId": "rain_dance"
+      }
+    ]
   },
   {
     "id": 271,
     "name": "Lombre",
-    "types": ["water", "grass"],
-    "baseStats": { "hp": 60, "attack": 50, "defense": 50, "spAttack": 60, "spDefense": 70, "speed": 50 },
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 50,
+      "spAttack": 60,
+      "spDefense": 70,
+      "speed": 50
+    },
     "baseExp": 119,
     "catchRate": 120,
     "growthRate": "medium_slow",
     "spriteId": "lombre",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 272, "condition": { "type": "item", "item": "water_stone" } }]
+    "evolvesTo": [
+      {
+        "speciesId": 272,
+        "condition": {
+          "type": "item",
+          "item": "water_stone"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 14,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 18,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 22,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 26,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 30,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 34,
+        "moveId": "rain_dance"
+      }
+    ]
   },
   {
     "id": 272,
     "name": "Ludicolo",
-    "types": ["water", "grass"],
-    "baseStats": { "hp": 80, "attack": 70, "defense": 70, "spAttack": 90, "spDefense": 100, "speed": 70 },
+    "types": [
+      "water",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 70,
+      "defense": 70,
+      "spAttack": 90,
+      "spDefense": 100,
+      "speed": 70
+    },
     "baseExp": 216,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "ludicolo",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 1,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 18,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 24,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 30,
+        "moveId": "surf"
+      },
+      {
+        "level": 36,
+        "moveId": "rain_dance"
+      },
+      {
+        "level": 42,
+        "moveId": "solar_beam"
+      },
+      {
+        "level": 48,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 273,
     "name": "Seedot",
-    "types": ["grass"],
-    "baseStats": { "hp": 40, "attack": 40, "defense": 50, "spAttack": 30, "spDefense": 30, "speed": 30 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 50,
+      "spAttack": 30,
+      "spDefense": 30,
+      "speed": 30
+    },
     "baseExp": 44,
     "catchRate": 255,
     "growthRate": "medium_slow",
     "spriteId": "seedot",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 274, "condition": { "type": "level", "level": 14 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 274,
+        "condition": {
+          "type": "level",
+          "level": 14
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "growth"
+      },
+      {
+        "level": 9,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 13,
+        "moveId": "bullet_seed"
+      },
+      {
+        "level": 17,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 21,
+        "moveId": "headbutt"
+      }
+    ]
   },
   {
     "id": 274,
     "name": "Nuzleaf",
-    "types": ["grass", "dark"],
-    "baseStats": { "hp": 70, "attack": 70, "defense": 40, "spAttack": 60, "spDefense": 40, "speed": 60 },
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 70,
+      "defense": 40,
+      "spAttack": 60,
+      "spDefense": 40,
+      "speed": 60
+    },
     "baseExp": 119,
     "catchRate": 120,
     "growthRate": "medium_slow",
     "spriteId": "nuzleaf",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 275, "condition": { "type": "item", "item": "leaf_stone" } }]
+    "evolvesTo": [
+      {
+        "speciesId": 275,
+        "condition": {
+          "type": "item",
+          "item": "leaf_stone"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "growth"
+      },
+      {
+        "level": 14,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 19,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 24,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 28,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 32,
+        "moveId": "dark_pulse"
+      }
+    ]
   },
   {
     "id": 275,
     "name": "Shiftry",
-    "types": ["grass", "dark"],
-    "baseStats": { "hp": 90, "attack": 100, "defense": 60, "spAttack": 90, "spDefense": 60, "speed": 80 },
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 100,
+      "defense": 60,
+      "spAttack": 90,
+      "spDefense": 60,
+      "speed": 80
+    },
     "baseExp": 216,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "shiftry",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 1,
+        "moveId": "growth"
+      },
+      {
+        "level": 1,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 20,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 28,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 36,
+        "moveId": "nasty_plot"
+      },
+      {
+        "level": 44,
+        "moveId": "solar_beam"
+      },
+      {
+        "level": 50,
+        "moveId": "swords_dance"
+      }
+    ]
   },
   {
     "id": 276,
     "name": "Taillow",
-    "types": ["normal", "flying"],
-    "baseStats": { "hp": 40, "attack": 55, "defense": 30, "spAttack": 30, "spDefense": 30, "speed": 85 },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 30,
+      "spAttack": 30,
+      "spDefense": 30,
+      "speed": 85
+    },
     "baseExp": 54,
     "catchRate": 200,
     "growthRate": "medium_slow",
     "spriteId": "taillow",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 277, "condition": { "type": "level", "level": 22 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 277,
+        "condition": {
+          "type": "level",
+          "level": 22
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "peck"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 6,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 10,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 15,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 19,
+        "moveId": "agility"
+      },
+      {
+        "level": 23,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 277,
     "name": "Swellow",
-    "types": ["normal", "flying"],
-    "baseStats": { "hp": 60, "attack": 85, "defense": 60, "spAttack": 50, "spDefense": 50, "speed": 125 },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 85,
+      "defense": 60,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 125
+    },
     "baseExp": 159,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "swellow",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "peck"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 1,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 22,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 28,
+        "moveId": "agility"
+      },
+      {
+        "level": 34,
+        "moveId": "double_edge"
+      },
+      {
+        "level": 40,
+        "moveId": "brave_bird"
+      },
+      {
+        "level": 46,
+        "moveId": "facade"
+      }
+    ]
   },
   {
     "id": 278,
     "name": "Wingull",
-    "types": ["water", "flying"],
-    "baseStats": { "hp": 40, "attack": 30, "defense": 30, "spAttack": 55, "spDefense": 30, "speed": 85 },
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 30,
+      "spAttack": 55,
+      "spDefense": 30,
+      "speed": 85
+    },
     "baseExp": 54,
     "catchRate": 190,
     "growthRate": "medium_fast",
     "spriteId": "wingull",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 279, "condition": { "type": "level", "level": 25 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 279,
+        "condition": {
+          "type": "level",
+          "level": 25
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 6,
+        "moveId": "gust"
+      },
+      {
+        "level": 9,
+        "moveId": "supersonic"
+      },
+      {
+        "level": 14,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 19,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 24,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 28,
+        "moveId": "agility"
+      }
+    ]
   },
   {
     "id": 279,
     "name": "Pelipper",
-    "types": ["water", "flying"],
-    "baseStats": { "hp": 60, "attack": 50, "defense": 100, "spAttack": 95, "spDefense": 70, "speed": 65 },
+    "types": [
+      "water",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 100,
+      "spAttack": 95,
+      "spDefense": 70,
+      "speed": 65
+    },
     "baseExp": 154,
     "catchRate": 45,
     "growthRate": "medium_fast",
     "spriteId": "pelipper",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "gust"
+      },
+      {
+        "level": 1,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 25,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 30,
+        "moveId": "protect"
+      },
+      {
+        "level": 35,
+        "moveId": "surf"
+      },
+      {
+        "level": 40,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 46,
+        "moveId": "ice_beam"
+      }
+    ]
   },
   {
     "id": 280,
     "name": "Ralts",
-    "types": ["psychic"],
-    "baseStats": { "hp": 28, "attack": 25, "defense": 25, "spAttack": 45, "spDefense": 35, "speed": 40 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 28,
+      "attack": 25,
+      "defense": 25,
+      "spAttack": 45,
+      "spDefense": 35,
+      "speed": 40
+    },
     "baseExp": 40,
     "catchRate": 235,
     "growthRate": "slow",
     "spriteId": "ralts",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 281, "condition": { "type": "level", "level": 20 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 281,
+        "condition": {
+          "type": "level",
+          "level": 20
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 6,
+        "moveId": "hypnosis"
+      },
+      {
+        "level": 10,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 14,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 18,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 22,
+        "moveId": "psychic"
+      }
+    ]
   },
   {
     "id": 281,
     "name": "Kirlia",
-    "types": ["psychic"],
-    "baseStats": { "hp": 38, "attack": 35, "defense": 35, "spAttack": 65, "spDefense": 55, "speed": 50 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 35,
+      "defense": 35,
+      "spAttack": 65,
+      "spDefense": 55,
+      "speed": 50
+    },
     "baseExp": 97,
     "catchRate": 120,
     "growthRate": "slow",
     "spriteId": "kirlia",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 282, "condition": { "type": "level", "level": 30 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 282,
+        "condition": {
+          "type": "level",
+          "level": 30
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "hypnosis"
+      },
+      {
+        "level": 20,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 24,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 28,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 32,
+        "moveId": "psychic"
+      },
+      {
+        "level": 36,
+        "moveId": "dream_eater"
+      }
+    ]
   },
   {
     "id": 282,
     "name": "Gardevoir",
-    "types": ["psychic"],
-    "baseStats": { "hp": 68, "attack": 65, "defense": 65, "spAttack": 125, "spDefense": 115, "speed": 80 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 65,
+      "spAttack": 125,
+      "spDefense": 115,
+      "speed": 80
+    },
     "baseExp": 233,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "gardevoir",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "hypnosis"
+      },
+      {
+        "level": 1,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 30,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 35,
+        "moveId": "psychic"
+      },
+      {
+        "level": 40,
+        "moveId": "dream_eater"
+      },
+      {
+        "level": 45,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 50,
+        "moveId": "focus_blast"
+      },
+      {
+        "level": 55,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 283,
     "name": "Surskit",
-    "types": ["bug", "water"],
-    "baseStats": { "hp": 40, "attack": 30, "defense": 32, "spAttack": 50, "spDefense": 52, "speed": 65 },
+    "types": [
+      "bug",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 30,
+      "defense": 32,
+      "spAttack": 50,
+      "spDefense": 52,
+      "speed": 65
+    },
     "baseExp": 54,
     "catchRate": 200,
     "growthRate": "medium_fast",
     "spriteId": "surskit",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 284, "condition": { "type": "level", "level": 22 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 284,
+        "condition": {
+          "type": "level",
+          "level": 22
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 1,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 7,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 13,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 17,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 22,
+        "moveId": "agility"
+      },
+      {
+        "level": 26,
+        "moveId": "signal_beam"
+      }
+    ]
   },
   {
     "id": 284,
     "name": "Masquerain",
-    "types": ["bug", "flying"],
-    "baseStats": { "hp": 70, "attack": 60, "defense": 62, "spAttack": 100, "spDefense": 82, "speed": 80 },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 60,
+      "defense": 62,
+      "spAttack": 100,
+      "spDefense": 82,
+      "speed": 80
+    },
     "baseExp": 159,
     "catchRate": 75,
     "growthRate": "medium_fast",
     "spriteId": "masquerain",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 1,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 1,
+        "moveId": "gust"
+      },
+      {
+        "level": 22,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 26,
+        "moveId": "signal_beam"
+      },
+      {
+        "level": 30,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 34,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 40,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 46,
+        "moveId": "giga_drain"
+      }
+    ]
   },
   {
     "id": 285,
     "name": "Shroomish",
-    "types": ["grass"],
-    "baseStats": { "hp": 60, "attack": 40, "defense": 60, "spAttack": 40, "spDefense": 60, "speed": 35 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 60,
+      "spAttack": 40,
+      "spDefense": 60,
+      "speed": 35
+    },
     "baseExp": 59,
     "catchRate": 255,
     "growthRate": "fluctuating",
     "spriteId": "shroomish",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 286, "condition": { "type": "level", "level": 23 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 286,
+        "condition": {
+          "type": "level",
+          "level": 23
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 5,
+        "moveId": "stun_spore"
+      },
+      {
+        "level": 9,
+        "moveId": "leech_seed"
+      },
+      {
+        "level": 13,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 17,
+        "moveId": "poison_powder"
+      },
+      {
+        "level": 21,
+        "moveId": "bullet_seed"
+      },
+      {
+        "level": 25,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 29,
+        "moveId": "spore"
+      }
+    ]
   },
   {
     "id": 286,
     "name": "Breloom",
-    "types": ["grass", "fighting"],
-    "baseStats": { "hp": 60, "attack": 130, "defense": 80, "spAttack": 60, "spDefense": 60, "speed": 70 },
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 130,
+      "defense": 80,
+      "spAttack": 60,
+      "spDefense": 60,
+      "speed": 70
+    },
     "baseExp": 161,
     "catchRate": 90,
     "growthRate": "fluctuating",
     "spriteId": "breloom",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "stun_spore"
+      },
+      {
+        "level": 23,
+        "moveId": "mach_punch"
+      },
+      {
+        "level": 27,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 31,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 35,
+        "moveId": "bullet_seed"
+      },
+      {
+        "level": 39,
+        "moveId": "sky_uppercut"
+      },
+      {
+        "level": 43,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 47,
+        "moveId": "solar_beam"
+      }
+    ]
   },
   {
     "id": 287,
     "name": "Slakoth",
-    "types": ["normal"],
-    "baseStats": { "hp": 60, "attack": 60, "defense": 60, "spAttack": 35, "spDefense": 35, "speed": 30 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "spAttack": 35,
+      "spDefense": 35,
+      "speed": 30
+    },
     "baseExp": 56,
     "catchRate": 255,
     "growthRate": "slow",
     "spriteId": "slakoth",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 288, "condition": { "type": "level", "level": 18 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 288,
+        "condition": {
+          "type": "level",
+          "level": 18
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 7,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 13,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 17,
+        "moveId": "slash"
+      },
+      {
+        "level": 21,
+        "moveId": "take_down"
+      }
+    ]
   },
   {
     "id": 288,
     "name": "Vigoroth",
-    "types": ["normal"],
-    "baseStats": { "hp": 80, "attack": 80, "defense": 80, "spAttack": 55, "spDefense": 55, "speed": 90 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 80,
+      "spAttack": 55,
+      "spDefense": 55,
+      "speed": 90
+    },
     "baseExp": 154,
     "catchRate": 120,
     "growthRate": "slow",
     "spriteId": "vigoroth",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 289, "condition": { "type": "level", "level": 36 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 289,
+        "condition": {
+          "type": "level",
+          "level": 36
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 18,
+        "moveId": "slash"
+      },
+      {
+        "level": 23,
+        "moveId": "fury_swipes"
+      },
+      {
+        "level": 28,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 33,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 38,
+        "moveId": "reversal"
+      }
+    ]
   },
   {
     "id": 289,
     "name": "Slaking",
-    "types": ["normal"],
-    "baseStats": { "hp": 150, "attack": 160, "defense": 100, "spAttack": 95, "spDefense": 65, "speed": 100 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "attack": 160,
+      "defense": 100,
+      "spAttack": 95,
+      "spDefense": 65,
+      "speed": 100
+    },
     "baseExp": 252,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "slaking",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 1,
+        "moveId": "slash"
+      },
+      {
+        "level": 36,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 40,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 44,
+        "moveId": "strength"
+      },
+      {
+        "level": 48,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 52,
+        "moveId": "hyper_beam"
+      },
+      {
+        "level": 56,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 290,
     "name": "Nincada",
-    "types": ["bug", "ground"],
-    "baseStats": { "hp": 31, "attack": 45, "defense": 90, "spAttack": 30, "spDefense": 30, "speed": 40 },
+    "types": [
+      "bug",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 31,
+      "attack": 45,
+      "defense": 90,
+      "spAttack": 30,
+      "spDefense": 30,
+      "speed": 40
+    },
     "baseExp": 53,
     "catchRate": 255,
     "growthRate": "erratic",
     "spriteId": "nincada",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 291, "condition": { "type": "level", "level": 20 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 291,
+        "condition": {
+          "type": "level",
+          "level": 20
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 9,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 13,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 17,
+        "moveId": "dig"
+      },
+      {
+        "level": 21,
+        "moveId": "fury_swipes"
+      }
+    ]
   },
   {
     "id": 291,
     "name": "Ninjask",
-    "types": ["bug", "flying"],
-    "baseStats": { "hp": 61, "attack": 90, "defense": 45, "spAttack": 50, "spDefense": 50, "speed": 160 },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 61,
+      "attack": 90,
+      "defense": 45,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 160
+    },
     "baseExp": 160,
     "catchRate": 120,
     "growthRate": "erratic",
     "spriteId": "ninjask",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 20,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 25,
+        "moveId": "agility"
+      },
+      {
+        "level": 31,
+        "moveId": "swords_dance"
+      },
+      {
+        "level": 37,
+        "moveId": "x_scissor"
+      },
+      {
+        "level": 43,
+        "moveId": "slash"
+      }
+    ]
   },
   {
     "id": 292,
     "name": "Shedinja",
-    "types": ["bug", "ghost"],
-    "baseStats": { "hp": 1, "attack": 90, "defense": 45, "spAttack": 30, "spDefense": 30, "speed": 40 },
+    "types": [
+      "bug",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 1,
+      "attack": 90,
+      "defense": 45,
+      "spAttack": 30,
+      "spDefense": 30,
+      "speed": 40
+    },
     "baseExp": 83,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "shedinja",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 9,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 13,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 17,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 21,
+        "moveId": "shadow_claw"
+      },
+      {
+        "level": 25,
+        "moveId": "x_scissor"
+      }
+    ]
   },
   {
     "id": 293,
     "name": "Whismur",
-    "types": ["normal"],
-    "baseStats": { "hp": 64, "attack": 51, "defense": 23, "spAttack": 51, "spDefense": 23, "speed": 28 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 51,
+      "defense": 23,
+      "spAttack": 51,
+      "spDefense": 23,
+      "speed": 28
+    },
     "baseExp": 48,
     "catchRate": 190,
     "growthRate": "medium_slow",
     "spriteId": "whismur",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 294, "condition": { "type": "level", "level": 20 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 294,
+        "condition": {
+          "type": "level",
+          "level": 20
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "supersonic"
+      },
+      {
+        "level": 11,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 15,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 20,
+        "moveId": "rest"
+      }
+    ]
   },
   {
     "id": 294,
     "name": "Loudred",
-    "types": ["normal"],
-    "baseStats": { "hp": 84, "attack": 71, "defense": 43, "spAttack": 71, "spDefense": 43, "speed": 48 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 84,
+      "attack": 71,
+      "defense": 43,
+      "spAttack": 71,
+      "spDefense": 43,
+      "speed": 48
+    },
     "baseExp": 126,
     "catchRate": 120,
     "growthRate": "medium_slow",
     "spriteId": "loudred",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 295, "condition": { "type": "level", "level": 40 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 295,
+        "condition": {
+          "type": "level",
+          "level": 40
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "supersonic"
+      },
+      {
+        "level": 20,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 23,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 29,
+        "moveId": "bite"
+      },
+      {
+        "level": 35,
+        "moveId": "rest"
+      },
+      {
+        "level": 40,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 295,
     "name": "Exploud",
-    "types": ["normal"],
-    "baseStats": { "hp": 104, "attack": 91, "defense": 63, "spAttack": 91, "spDefense": 73, "speed": 68 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 104,
+      "attack": 91,
+      "defense": 63,
+      "spAttack": 91,
+      "spDefense": 73,
+      "speed": 68
+    },
     "baseExp": 221,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "exploud",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "supersonic"
+      },
+      {
+        "level": 1,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 40,
+        "moveId": "bite"
+      },
+      {
+        "level": 44,
+        "moveId": "crunch"
+      },
+      {
+        "level": 48,
+        "moveId": "rest"
+      },
+      {
+        "level": 52,
+        "moveId": "hyper_beam"
+      },
+      {
+        "level": 58,
+        "moveId": "facade"
+      }
+    ]
   },
   {
     "id": 296,
     "name": "Makuhita",
-    "types": ["fighting"],
-    "baseStats": { "hp": 72, "attack": 60, "defense": 30, "spAttack": 20, "spDefense": 30, "speed": 25 },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 72,
+      "attack": 60,
+      "defense": 30,
+      "spAttack": 20,
+      "spDefense": 30,
+      "speed": 25
+    },
     "baseExp": 47,
     "catchRate": 180,
     "growthRate": "fluctuating",
     "spriteId": "makuhita",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 297, "condition": { "type": "level", "level": 24 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 297,
+        "condition": {
+          "type": "level",
+          "level": 24
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 4,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 7,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 13,
+        "moveId": "karate_chop"
+      },
+      {
+        "level": 19,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 22,
+        "moveId": "bulk_up"
+      },
+      {
+        "level": 25,
+        "moveId": "cross_chop"
+      }
+    ]
   },
   {
     "id": 297,
     "name": "Hariyama",
-    "types": ["fighting"],
-    "baseStats": { "hp": 144, "attack": 120, "defense": 60, "spAttack": 40, "spDefense": 60, "speed": 50 },
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 144,
+      "attack": 120,
+      "defense": 60,
+      "spAttack": 40,
+      "spDefense": 60,
+      "speed": 50
+    },
     "baseExp": 166,
     "catchRate": 200,
     "growthRate": "fluctuating",
     "spriteId": "hariyama",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 1,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 24,
+        "moveId": "karate_chop"
+      },
+      {
+        "level": 28,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 32,
+        "moveId": "bulk_up"
+      },
+      {
+        "level": 36,
+        "moveId": "cross_chop"
+      },
+      {
+        "level": 42,
+        "moveId": "seismic_toss"
+      },
+      {
+        "level": 48,
+        "moveId": "reversal"
+      }
+    ]
   },
   {
     "id": 298,
     "name": "Azurill",
-    "types": ["normal"],
-    "baseStats": { "hp": 50, "attack": 20, "defense": 40, "spAttack": 20, "spDefense": 40, "speed": 20 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 20,
+      "defense": 40,
+      "spAttack": 20,
+      "spDefense": 40,
+      "speed": 20
+    },
     "baseExp": 33,
     "catchRate": 150,
     "growthRate": "fast",
     "spriteId": "azurill",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 183, "condition": { "type": "happiness" } }]
+    "evolvesTo": [
+      {
+        "speciesId": 183,
+        "condition": {
+          "type": "happiness"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "tail_whip"
+      },
+      {
+        "level": 3,
+        "moveId": "bubble"
+      },
+      {
+        "level": 7,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 10,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 13,
+        "moveId": "body_slam"
+      }
+    ]
   },
   {
     "id": 299,
     "name": "Nosepass",
-    "types": ["rock"],
-    "baseStats": { "hp": 30, "attack": 45, "defense": 135, "spAttack": 45, "spDefense": 90, "speed": 30 },
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 45,
+      "defense": 135,
+      "spAttack": 45,
+      "spDefense": 90,
+      "speed": 30
+    },
     "baseExp": 75,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "nosepass",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 7,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 13,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 16,
+        "moveId": "thunder_wave"
+      },
+      {
+        "level": 22,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 28,
+        "moveId": "sandstorm"
+      },
+      {
+        "level": 34,
+        "moveId": "stone_edge"
+      }
+    ]
   },
   {
     "id": 300,
     "name": "Skitty",
-    "types": ["normal"],
-    "baseStats": { "hp": 50, "attack": 45, "defense": 45, "spAttack": 35, "spDefense": 35, "speed": 50 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 45,
+      "defense": 45,
+      "spAttack": 35,
+      "spDefense": 35,
+      "speed": 50
+    },
     "baseExp": 52,
     "catchRate": 255,
     "growthRate": "fast",
     "spriteId": "skitty",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 301, "condition": { "type": "item", "item": "moon_stone" } }]
+    "evolvesTo": [
+      {
+        "speciesId": 301,
+        "condition": {
+          "type": "item",
+          "item": "moon_stone"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "tail_whip"
+      },
+      {
+        "level": 7,
+        "moveId": "sing"
+      },
+      {
+        "level": 13,
+        "moveId": "slash"
+      },
+      {
+        "level": 19,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 25,
+        "moveId": "facade"
+      }
+    ]
   },
   {
     "id": 301,
     "name": "Delcatty",
-    "types": ["normal"],
-    "baseStats": { "hp": 70, "attack": 65, "defense": 65, "spAttack": 55, "spDefense": 55, "speed": 90 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 65,
+      "defense": 65,
+      "spAttack": 55,
+      "spDefense": 55,
+      "speed": 90
+    },
     "baseExp": 140,
     "catchRate": 60,
     "growthRate": "fast",
     "spriteId": "delcatty",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "tail_whip"
+      },
+      {
+        "level": 1,
+        "moveId": "sing"
+      },
+      {
+        "level": 22,
+        "moveId": "slash"
+      },
+      {
+        "level": 28,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 34,
+        "moveId": "facade"
+      },
+      {
+        "level": 40,
+        "moveId": "double_edge"
+      },
+      {
+        "level": 46,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 302,
     "name": "Sableye",
-    "types": ["dark", "ghost"],
-    "baseStats": { "hp": 50, "attack": 75, "defense": 75, "spAttack": 65, "spDefense": 65, "speed": 50 },
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 75,
+      "spAttack": 65,
+      "spDefense": 65,
+      "speed": 50
+    },
     "baseExp": 133,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "sableye",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 5,
+        "moveId": "lick"
+      },
+      {
+        "level": 9,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 13,
+        "moveId": "night_shade"
+      },
+      {
+        "level": 17,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 21,
+        "moveId": "shadow_claw"
+      },
+      {
+        "level": 25,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 29,
+        "moveId": "shadow_ball"
+      }
+    ]
   },
   {
     "id": 303,
     "name": "Mawile",
-    "types": ["steel"],
-    "baseStats": { "hp": 50, "attack": 85, "defense": 85, "spAttack": 55, "spDefense": 55, "speed": 50 },
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 85,
+      "spAttack": 55,
+      "spDefense": 55,
+      "speed": 50
+    },
     "baseExp": 133,
     "catchRate": 45,
     "growthRate": "fast",
     "spriteId": "mawile",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 6,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 11,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 16,
+        "moveId": "crunch"
+      },
+      {
+        "level": 21,
+        "moveId": "iron_tail"
+      },
+      {
+        "level": 26,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 31,
+        "moveId": "flash_cannon"
+      },
+      {
+        "level": 36,
+        "moveId": "swords_dance"
+      }
+    ]
   },
   {
     "id": 304,
     "name": "Aron",
-    "types": ["steel", "rock"],
-    "baseStats": { "hp": 50, "attack": 70, "defense": 100, "spAttack": 40, "spDefense": 40, "speed": 30 },
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 100,
+      "spAttack": 40,
+      "spDefense": 40,
+      "speed": 30
+    },
     "baseExp": 66,
     "catchRate": 180,
     "growthRate": "slow",
     "spriteId": "aron",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 305, "condition": { "type": "level", "level": 32 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 305,
+        "condition": {
+          "type": "level",
+          "level": 32
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 4,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 8,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 12,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 16,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 20,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 24,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 28,
+        "moveId": "iron_tail"
+      }
+    ]
   },
   {
     "id": 305,
     "name": "Lairon",
-    "types": ["steel", "rock"],
-    "baseStats": { "hp": 60, "attack": 90, "defense": 140, "spAttack": 50, "spDefense": 50, "speed": 40 },
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 140,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 40
+    },
     "baseExp": 151,
     "catchRate": 90,
     "growthRate": "slow",
     "spriteId": "lairon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 306, "condition": { "type": "level", "level": 42 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 306,
+        "condition": {
+          "type": "level",
+          "level": 42
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 1,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 32,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 35,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 38,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 42,
+        "moveId": "iron_tail"
+      },
+      {
+        "level": 46,
+        "moveId": "stone_edge"
+      }
+    ]
   },
   {
     "id": 306,
     "name": "Aggron",
-    "types": ["steel", "rock"],
-    "baseStats": { "hp": 70, "attack": 110, "defense": 180, "spAttack": 60, "spDefense": 60, "speed": 50 },
+    "types": [
+      "steel",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 180,
+      "spAttack": 60,
+      "spDefense": 60,
+      "speed": 50
+    },
     "baseExp": 239,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "aggron",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 1,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 42,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 45,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 48,
+        "moveId": "iron_tail"
+      },
+      {
+        "level": 52,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 56,
+        "moveId": "double_edge"
+      },
+      {
+        "level": 60,
+        "moveId": "hyper_beam"
+      },
+      {
+        "level": 64,
+        "moveId": "flash_cannon"
+      }
+    ]
   },
   {
     "id": 307,
     "name": "Meditite",
-    "types": ["fighting", "psychic"],
-    "baseStats": { "hp": 30, "attack": 40, "defense": 55, "spAttack": 40, "spDefense": 55, "speed": 60 },
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 40,
+      "defense": 55,
+      "spAttack": 40,
+      "spDefense": 55,
+      "speed": 60
+    },
     "baseExp": 56,
     "catchRate": 180,
     "growthRate": "medium_fast",
     "spriteId": "meditite",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 308, "condition": { "type": "level", "level": 37 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 308,
+        "condition": {
+          "type": "level",
+          "level": 37
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 6,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 15,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 20,
+        "moveId": "psychic"
+      },
+      {
+        "level": 25,
+        "moveId": "recover"
+      }
+    ]
   },
   {
     "id": 308,
     "name": "Medicham",
-    "types": ["fighting", "psychic"],
-    "baseStats": { "hp": 60, "attack": 60, "defense": 75, "spAttack": 60, "spDefense": 75, "speed": 80 },
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 75,
+      "spAttack": 60,
+      "spDefense": 75,
+      "speed": 80
+    },
     "baseExp": 144,
     "catchRate": 90,
     "growthRate": "medium_fast",
     "spriteId": "medicham",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "low_kick"
+      },
+      {
+        "level": 1,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 37,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 40,
+        "moveId": "psychic"
+      },
+      {
+        "level": 43,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 47,
+        "moveId": "recover"
+      },
+      {
+        "level": 51,
+        "moveId": "focus_blast"
+      },
+      {
+        "level": 55,
+        "moveId": "reversal"
+      }
+    ]
   },
   {
     "id": 309,
     "name": "Electrike",
-    "types": ["electric"],
-    "baseStats": { "hp": 40, "attack": 45, "defense": 40, "spAttack": 65, "spDefense": 40, "speed": 65 },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 40,
+      "spAttack": 65,
+      "spDefense": 40,
+      "speed": 65
+    },
     "baseExp": 59,
     "catchRate": 120,
     "growthRate": "slow",
     "spriteId": "electrike",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 310, "condition": { "type": "level", "level": 26 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 310,
+        "condition": {
+          "type": "level",
+          "level": 26
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 4,
+        "moveId": "thundershock"
+      },
+      {
+        "level": 9,
+        "moveId": "spark"
+      },
+      {
+        "level": 14,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 19,
+        "moveId": "thunder_wave"
+      },
+      {
+        "level": 24,
+        "moveId": "thunderbolt"
+      },
+      {
+        "level": 29,
+        "moveId": "bite"
+      }
+    ]
   },
   {
     "id": 310,
     "name": "Manectric",
-    "types": ["electric"],
-    "baseStats": { "hp": 70, "attack": 75, "defense": 60, "spAttack": 105, "spDefense": 60, "speed": 105 },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 75,
+      "defense": 60,
+      "spAttack": 105,
+      "spDefense": 60,
+      "speed": 105
+    },
     "baseExp": 166,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "manectric",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "thundershock"
+      },
+      {
+        "level": 1,
+        "moveId": "spark"
+      },
+      {
+        "level": 26,
+        "moveId": "thunder_wave"
+      },
+      {
+        "level": 30,
+        "moveId": "thunderbolt"
+      },
+      {
+        "level": 34,
+        "moveId": "bite"
+      },
+      {
+        "level": 38,
+        "moveId": "crunch"
+      },
+      {
+        "level": 44,
+        "moveId": "thunder"
+      },
+      {
+        "level": 50,
+        "moveId": "flamethrower"
+      }
+    ]
   },
   {
     "id": 311,
     "name": "Plusle",
-    "types": ["electric"],
-    "baseStats": { "hp": 60, "attack": 50, "defense": 40, "spAttack": 85, "spDefense": 75, "speed": 95 },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 50,
+      "defense": 40,
+      "spAttack": 85,
+      "spDefense": 75,
+      "speed": 95
+    },
     "baseExp": 142,
     "catchRate": 200,
     "growthRate": "medium_fast",
     "spriteId": "plusle",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "thundershock"
+      },
+      {
+        "level": 4,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 10,
+        "moveId": "spark"
+      },
+      {
+        "level": 16,
+        "moveId": "thunder_wave"
+      },
+      {
+        "level": 22,
+        "moveId": "thunderbolt"
+      },
+      {
+        "level": 28,
+        "moveId": "agility"
+      },
+      {
+        "level": 34,
+        "moveId": "thunder"
+      }
+    ]
   },
   {
     "id": 312,
     "name": "Minun",
-    "types": ["electric"],
-    "baseStats": { "hp": 60, "attack": 40, "defense": 50, "spAttack": 75, "spDefense": 85, "speed": 95 },
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 40,
+      "defense": 50,
+      "spAttack": 75,
+      "spDefense": 85,
+      "speed": 95
+    },
     "baseExp": 142,
     "catchRate": 200,
     "growthRate": "medium_fast",
     "spriteId": "minun",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "thundershock"
+      },
+      {
+        "level": 4,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 10,
+        "moveId": "spark"
+      },
+      {
+        "level": 16,
+        "moveId": "thunder_wave"
+      },
+      {
+        "level": 22,
+        "moveId": "thunderbolt"
+      },
+      {
+        "level": 28,
+        "moveId": "agility"
+      },
+      {
+        "level": 34,
+        "moveId": "thunder"
+      }
+    ]
   },
   {
     "id": 313,
     "name": "Volbeat",
-    "types": ["bug"],
-    "baseStats": { "hp": 65, "attack": 73, "defense": 55, "spAttack": 47, "spDefense": 75, "speed": 85 },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 73,
+      "defense": 55,
+      "spAttack": 47,
+      "spDefense": 75,
+      "speed": 85
+    },
     "baseExp": 151,
     "catchRate": 150,
     "growthRate": "erratic",
     "spriteId": "volbeat",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "flash"
+      },
+      {
+        "level": 5,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 9,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 13,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 17,
+        "moveId": "signal_beam"
+      },
+      {
+        "level": 21,
+        "moveId": "protect"
+      },
+      {
+        "level": 25,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 314,
     "name": "Illumise",
-    "types": ["bug"],
-    "baseStats": { "hp": 65, "attack": 47, "defense": 55, "spAttack": 73, "spDefense": 75, "speed": 85 },
+    "types": [
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 47,
+      "defense": 55,
+      "spAttack": 73,
+      "spDefense": 75,
+      "speed": 85
+    },
     "baseExp": 151,
     "catchRate": 150,
     "growthRate": "fluctuating",
     "spriteId": "illumise",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "flash"
+      },
+      {
+        "level": 5,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 9,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 13,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 17,
+        "moveId": "signal_beam"
+      },
+      {
+        "level": 21,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 25,
+        "moveId": "body_slam"
+      }
+    ]
   },
   {
     "id": 315,
     "name": "Roselia",
-    "types": ["grass", "poison"],
-    "baseStats": { "hp": 50, "attack": 60, "defense": 45, "spAttack": 100, "spDefense": 80, "speed": 65 },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 60,
+      "defense": 45,
+      "spAttack": 100,
+      "spDefense": 80,
+      "speed": 65
+    },
     "baseExp": 140,
     "catchRate": 150,
     "growthRate": "medium_slow",
     "spriteId": "roselia",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 5,
+        "moveId": "growth"
+      },
+      {
+        "level": 9,
+        "moveId": "stun_spore"
+      },
+      {
+        "level": 13,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 17,
+        "moveId": "leech_seed"
+      },
+      {
+        "level": 22,
+        "moveId": "poison_jab"
+      },
+      {
+        "level": 27,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 32,
+        "moveId": "petal_dance"
+      },
+      {
+        "level": 37,
+        "moveId": "toxic"
+      },
+      {
+        "level": 42,
+        "moveId": "solar_beam"
+      }
+    ]
   },
   {
     "id": 316,
     "name": "Gulpin",
-    "types": ["poison"],
-    "baseStats": { "hp": 70, "attack": 43, "defense": 53, "spAttack": 43, "spDefense": 53, "speed": 40 },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 43,
+      "defense": 53,
+      "spAttack": 43,
+      "spDefense": 53,
+      "speed": 40
+    },
     "baseExp": 60,
     "catchRate": 225,
     "growthRate": "fluctuating",
     "spriteId": "gulpin",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 317, "condition": { "type": "level", "level": 26 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 317,
+        "condition": {
+          "type": "level",
+          "level": 26
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 6,
+        "moveId": "sludge"
+      },
+      {
+        "level": 10,
+        "moveId": "amnesia"
+      },
+      {
+        "level": 14,
+        "moveId": "toxic"
+      },
+      {
+        "level": 18,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 22,
+        "moveId": "sludge_bomb"
+      }
+    ]
   },
   {
     "id": 317,
     "name": "Swalot",
-    "types": ["poison"],
-    "baseStats": { "hp": 100, "attack": 73, "defense": 83, "spAttack": 73, "spDefense": 83, "speed": 55 },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 73,
+      "defense": 83,
+      "spAttack": 73,
+      "spDefense": 83,
+      "speed": 55
+    },
     "baseExp": 163,
     "catchRate": 75,
     "growthRate": "fluctuating",
     "spriteId": "swalot",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 1,
+        "moveId": "sludge"
+      },
+      {
+        "level": 26,
+        "moveId": "amnesia"
+      },
+      {
+        "level": 30,
+        "moveId": "toxic"
+      },
+      {
+        "level": 34,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 38,
+        "moveId": "sludge_bomb"
+      },
+      {
+        "level": 44,
+        "moveId": "poison_jab"
+      },
+      {
+        "level": 50,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 318,
     "name": "Carvanha",
-    "types": ["water", "dark"],
-    "baseStats": { "hp": 45, "attack": 90, "defense": 20, "spAttack": 65, "spDefense": 20, "speed": 65 },
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 90,
+      "defense": 20,
+      "spAttack": 65,
+      "spDefense": 20,
+      "speed": 65
+    },
     "baseExp": 61,
     "catchRate": 225,
     "growthRate": "slow",
     "spriteId": "carvanha",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 319, "condition": { "type": "level", "level": 30 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 319,
+        "condition": {
+          "type": "level",
+          "level": 30
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 6,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 10,
+        "moveId": "crunch"
+      },
+      {
+        "level": 16,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 20,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 24,
+        "moveId": "dark_pulse"
+      }
+    ]
   },
   {
     "id": 319,
     "name": "Sharpedo",
-    "types": ["water", "dark"],
-    "baseStats": { "hp": 70, "attack": 120, "defense": 40, "spAttack": 95, "spDefense": 40, "speed": 95 },
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 120,
+      "defense": 40,
+      "spAttack": 95,
+      "spDefense": 40,
+      "speed": 95
+    },
     "baseExp": 161,
     "catchRate": 60,
     "growthRate": "slow",
     "spriteId": "sharpedo",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "crunch"
+      },
+      {
+        "level": 30,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 34,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 38,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 42,
+        "moveId": "surf"
+      },
+      {
+        "level": 46,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 50,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 320,
     "name": "Wailmer",
-    "types": ["water"],
-    "baseStats": { "hp": 130, "attack": 70, "defense": 35, "spAttack": 70, "spDefense": 35, "speed": 60 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 70,
+      "defense": 35,
+      "spAttack": 70,
+      "spDefense": 35,
+      "speed": 60
+    },
     "baseExp": 80,
     "catchRate": 125,
     "growthRate": "fluctuating",
     "spriteId": "wailmer",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 321, "condition": { "type": "level", "level": 40 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 321,
+        "condition": {
+          "type": "level",
+          "level": 40
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 10,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 14,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 19,
+        "moveId": "dive"
+      },
+      {
+        "level": 24,
+        "moveId": "rest"
+      },
+      {
+        "level": 29,
+        "moveId": "surf"
+      },
+      {
+        "level": 34,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 321,
     "name": "Wailord",
-    "types": ["water"],
-    "baseStats": { "hp": 170, "attack": 90, "defense": 45, "spAttack": 90, "spDefense": 45, "speed": 60 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 170,
+      "attack": 90,
+      "defense": 45,
+      "spAttack": 90,
+      "spDefense": 45,
+      "speed": 60
+    },
     "baseExp": 175,
     "catchRate": 60,
     "growthRate": "fluctuating",
     "spriteId": "wailord",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 40,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 44,
+        "moveId": "dive"
+      },
+      {
+        "level": 48,
+        "moveId": "rest"
+      },
+      {
+        "level": 52,
+        "moveId": "surf"
+      },
+      {
+        "level": 56,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 60,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 322,
     "name": "Numel",
-    "types": ["fire", "ground"],
-    "baseStats": { "hp": 60, "attack": 60, "defense": 40, "spAttack": 65, "spDefense": 45, "speed": 35 },
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 40,
+      "spAttack": 65,
+      "spDefense": 45,
+      "speed": 35
+    },
     "baseExp": 61,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "numel",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 323, "condition": { "type": "level", "level": 33 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 323,
+        "condition": {
+          "type": "level",
+          "level": 33
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 5,
+        "moveId": "ember"
+      },
+      {
+        "level": 11,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 15,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 19,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 25,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 29,
+        "moveId": "earthquake"
+      }
+    ]
   },
   {
     "id": 323,
     "name": "Camerupt",
-    "types": ["fire", "ground"],
-    "baseStats": { "hp": 70, "attack": 100, "defense": 70, "spAttack": 105, "spDefense": 75, "speed": 40 },
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 100,
+      "defense": 70,
+      "spAttack": 105,
+      "spDefense": 75,
+      "speed": 40
+    },
     "baseExp": 161,
     "catchRate": 150,
     "growthRate": "medium_fast",
     "spriteId": "camerupt",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 33,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 37,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 41,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 45,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 49,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 53,
+        "moveId": "fire_blast"
+      },
+      {
+        "level": 57,
+        "moveId": "earth_power"
+      }
+    ]
   },
   {
     "id": 324,
     "name": "Torkoal",
-    "types": ["fire"],
-    "baseStats": { "hp": 70, "attack": 85, "defense": 140, "spAttack": 85, "spDefense": 70, "speed": 20 },
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 140,
+      "spAttack": 85,
+      "spDefense": 70,
+      "speed": 20
+    },
     "baseExp": 165,
     "catchRate": 90,
     "growthRate": "medium_fast",
     "spriteId": "torkoal",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 1,
+        "moveId": "smokescreen"
+      },
+      {
+        "level": 4,
+        "moveId": "withdraw"
+      },
+      {
+        "level": 7,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 14,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 20,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 27,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 33,
+        "moveId": "fire_blast"
+      },
+      {
+        "level": 39,
+        "moveId": "overheat"
+      },
+      {
+        "level": 45,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 325,
     "name": "Spoink",
-    "types": ["psychic"],
-    "baseStats": { "hp": 60, "attack": 25, "defense": 35, "spAttack": 70, "spDefense": 80, "speed": 60 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 25,
+      "defense": 35,
+      "spAttack": 70,
+      "spDefense": 80,
+      "speed": 60
+    },
     "baseExp": 66,
     "catchRate": 255,
     "growthRate": "fast",
     "spriteId": "spoink",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 326, "condition": { "type": "level", "level": 32 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 326,
+        "condition": {
+          "type": "level",
+          "level": 32
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 7,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 16,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 20,
+        "moveId": "psychic"
+      },
+      {
+        "level": 26,
+        "moveId": "rest"
+      },
+      {
+        "level": 30,
+        "moveId": "shadow_ball"
+      }
+    ]
   },
   {
     "id": 326,
     "name": "Grumpig",
-    "types": ["psychic"],
-    "baseStats": { "hp": 80, "attack": 45, "defense": 65, "spAttack": 90, "spDefense": 110, "speed": 80 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 45,
+      "defense": 65,
+      "spAttack": 90,
+      "spDefense": 110,
+      "speed": 80
+    },
     "baseExp": 165,
     "catchRate": 60,
     "growthRate": "fast",
     "spriteId": "grumpig",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 1,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 32,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 36,
+        "moveId": "psychic"
+      },
+      {
+        "level": 40,
+        "moveId": "rest"
+      },
+      {
+        "level": 44,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 48,
+        "moveId": "focus_blast"
+      },
+      {
+        "level": 52,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 327,
     "name": "Spinda",
-    "types": ["normal"],
-    "baseStats": { "hp": 60, "attack": 60, "defense": 60, "spAttack": 60, "spDefense": 60, "speed": 60 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 60,
+      "defense": 60,
+      "spAttack": 60,
+      "spDefense": 60,
+      "speed": 60
+    },
     "baseExp": 126,
     "catchRate": 255,
     "growthRate": "fast",
     "spriteId": "spinda",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "confusion"
+      },
+      {
+        "level": 12,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 19,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 23,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 28,
+        "moveId": "facade"
+      },
+      {
+        "level": 32,
+        "moveId": "rest"
+      },
+      {
+        "level": 36,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 328,
     "name": "Trapinch",
-    "types": ["ground"],
-    "baseStats": { "hp": 45, "attack": 100, "defense": 45, "spAttack": 45, "spDefense": 45, "speed": 10 },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 100,
+      "defense": 45,
+      "spAttack": 45,
+      "spDefense": 45,
+      "speed": 10
+    },
     "baseExp": 58,
     "catchRate": 255,
     "growthRate": "medium_slow",
     "spriteId": "trapinch",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 329, "condition": { "type": "level", "level": 35 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 329,
+        "condition": {
+          "type": "level",
+          "level": 35
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 5,
+        "moveId": "dig"
+      },
+      {
+        "level": 9,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 14,
+        "moveId": "crunch"
+      },
+      {
+        "level": 19,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 25,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 31,
+        "moveId": "sandstorm"
+      }
+    ]
   },
   {
     "id": 329,
     "name": "Vibrava",
-    "types": ["ground", "dragon"],
-    "baseStats": { "hp": 50, "attack": 70, "defense": 50, "spAttack": 50, "spDefense": 50, "speed": 70 },
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 70,
+      "defense": 50,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 70
+    },
     "baseExp": 119,
     "catchRate": 120,
     "growthRate": "medium_slow",
     "spriteId": "vibrava",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 330, "condition": { "type": "level", "level": 45 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 330,
+        "condition": {
+          "type": "level",
+          "level": 45
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 1,
+        "moveId": "dig"
+      },
+      {
+        "level": 35,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 38,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 41,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 44,
+        "moveId": "sandstorm"
+      },
+      {
+        "level": 47,
+        "moveId": "dragon_claw"
+      }
+    ]
   },
   {
     "id": 330,
     "name": "Flygon",
-    "types": ["ground", "dragon"],
-    "baseStats": { "hp": 80, "attack": 100, "defense": 80, "spAttack": 80, "spDefense": 80, "speed": 100 },
+    "types": [
+      "ground",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 80,
+      "spAttack": 80,
+      "spDefense": 80,
+      "speed": 100
+    },
     "baseExp": 234,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "flygon",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 1,
+        "moveId": "dig"
+      },
+      {
+        "level": 1,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 45,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 48,
+        "moveId": "dragon_claw"
+      },
+      {
+        "level": 52,
+        "moveId": "sandstorm"
+      },
+      {
+        "level": 56,
+        "moveId": "earth_power"
+      },
+      {
+        "level": 60,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 64,
+        "moveId": "outrage"
+      },
+      {
+        "level": 68,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 331,
     "name": "Cacnea",
-    "types": ["grass"],
-    "baseStats": { "hp": 50, "attack": 85, "defense": 40, "spAttack": 85, "spDefense": 40, "speed": 35 },
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 40,
+      "spAttack": 85,
+      "spDefense": 40,
+      "speed": 35
+    },
     "baseExp": 67,
     "catchRate": 190,
     "growthRate": "medium_slow",
     "spriteId": "cacnea",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 332, "condition": { "type": "level", "level": 32 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 332,
+        "condition": {
+          "type": "level",
+          "level": 32
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "absorb"
+      },
+      {
+        "level": 9,
+        "moveId": "growth"
+      },
+      {
+        "level": 13,
+        "moveId": "bullet_seed"
+      },
+      {
+        "level": 17,
+        "moveId": "sand_attack"
+      },
+      {
+        "level": 21,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 25,
+        "moveId": "poison_jab"
+      }
+    ]
   },
   {
     "id": 332,
     "name": "Cacturne",
-    "types": ["grass", "dark"],
-    "baseStats": { "hp": 70, "attack": 115, "defense": 60, "spAttack": 115, "spDefense": 60, "speed": 55 },
+    "types": [
+      "grass",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 115,
+      "defense": 60,
+      "spAttack": 115,
+      "spDefense": 60,
+      "speed": 55
+    },
     "baseExp": 166,
     "catchRate": 60,
     "growthRate": "medium_slow",
     "spriteId": "cacturne",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "growth"
+      },
+      {
+        "level": 32,
+        "moveId": "bullet_seed"
+      },
+      {
+        "level": 35,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 38,
+        "moveId": "poison_jab"
+      },
+      {
+        "level": 42,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 46,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 50,
+        "moveId": "swords_dance"
+      }
+    ]
   },
   {
     "id": 333,
     "name": "Swablu",
-    "types": ["normal", "flying"],
-    "baseStats": { "hp": 45, "attack": 40, "defense": 60, "spAttack": 40, "spDefense": 75, "speed": 50 },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 40,
+      "defense": 60,
+      "spAttack": 40,
+      "spDefense": 75,
+      "speed": 50
+    },
     "baseExp": 62,
     "catchRate": 255,
     "growthRate": "erratic",
     "spriteId": "swablu",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 334, "condition": { "type": "level", "level": 35 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 334,
+        "condition": {
+          "type": "level",
+          "level": 35
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "peck"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "sing"
+      },
+      {
+        "level": 9,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 14,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 18,
+        "moveId": "take_down"
+      },
+      {
+        "level": 23,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 28,
+        "moveId": "fly"
+      }
+    ]
   },
   {
     "id": 334,
     "name": "Altaria",
-    "types": ["dragon", "flying"],
-    "baseStats": { "hp": 75, "attack": 70, "defense": 90, "spAttack": 70, "spDefense": 105, "speed": 80 },
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 70,
+      "defense": 90,
+      "spAttack": 70,
+      "spDefense": 105,
+      "speed": 80
+    },
     "baseExp": 172,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "altaria",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "peck"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 1,
+        "moveId": "sing"
+      },
+      {
+        "level": 1,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 35,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 39,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 43,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 47,
+        "moveId": "fly"
+      },
+      {
+        "level": 51,
+        "moveId": "dragon_dance"
+      },
+      {
+        "level": 55,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 335,
     "name": "Zangoose",
-    "types": ["normal"],
-    "baseStats": { "hp": 73, "attack": 115, "defense": 60, "spAttack": 60, "spDefense": 60, "speed": 90 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 115,
+      "defense": 60,
+      "spAttack": 60,
+      "spDefense": 60,
+      "speed": 90
+    },
     "baseExp": 160,
     "catchRate": 90,
     "growthRate": "erratic",
     "spriteId": "zangoose",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 8,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 12,
+        "moveId": "slash"
+      },
+      {
+        "level": 17,
+        "moveId": "fury_swipes"
+      },
+      {
+        "level": 22,
+        "moveId": "swords_dance"
+      },
+      {
+        "level": 28,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 34,
+        "moveId": "x_scissor"
+      },
+      {
+        "level": 40,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 336,
     "name": "Seviper",
-    "types": ["poison"],
-    "baseStats": { "hp": 73, "attack": 100, "defense": 60, "spAttack": 100, "spDefense": 60, "speed": 65 },
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "attack": 100,
+      "defense": 60,
+      "spAttack": 100,
+      "spDefense": 60,
+      "speed": 65
+    },
     "baseExp": 160,
     "catchRate": 90,
     "growthRate": "fluctuating",
     "spriteId": "seviper",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "wrap"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "bite"
+      },
+      {
+        "level": 9,
+        "moveId": "poison_sting"
+      },
+      {
+        "level": 14,
+        "moveId": "poison_jab"
+      },
+      {
+        "level": 20,
+        "moveId": "crunch"
+      },
+      {
+        "level": 26,
+        "moveId": "sludge_bomb"
+      },
+      {
+        "level": 32,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 38,
+        "moveId": "toxic"
+      }
+    ]
   },
   {
     "id": 337,
     "name": "Lunatone",
-    "types": ["rock", "psychic"],
-    "baseStats": { "hp": 70, "attack": 55, "defense": 65, "spAttack": 95, "spDefense": 85, "speed": 70 },
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 55,
+      "defense": 65,
+      "spAttack": 95,
+      "spDefense": 85,
+      "speed": 70
+    },
     "baseExp": 161,
     "catchRate": 45,
     "growthRate": "fast",
     "spriteId": "lunatone",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 5,
+        "moveId": "harden"
+      },
+      {
+        "level": 9,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 13,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 17,
+        "moveId": "hypnosis"
+      },
+      {
+        "level": 22,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 27,
+        "moveId": "psychic"
+      },
+      {
+        "level": 33,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 39,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 45,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 338,
     "name": "Solrock",
-    "types": ["rock", "psychic"],
-    "baseStats": { "hp": 70, "attack": 95, "defense": 85, "spAttack": 55, "spDefense": 65, "speed": 70 },
+    "types": [
+      "rock",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 95,
+      "defense": 85,
+      "spAttack": 55,
+      "spDefense": 65,
+      "speed": 70
+    },
     "baseExp": 161,
     "catchRate": 45,
     "growthRate": "fast",
     "spriteId": "solrock",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 5,
+        "moveId": "harden"
+      },
+      {
+        "level": 9,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 13,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 17,
+        "moveId": "fire_spin"
+      },
+      {
+        "level": 22,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 27,
+        "moveId": "psychic"
+      },
+      {
+        "level": 33,
+        "moveId": "sunny_day"
+      },
+      {
+        "level": 39,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 45,
+        "moveId": "solar_beam"
+      },
+      {
+        "level": 50,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 339,
     "name": "Barboach",
-    "types": ["water", "ground"],
-    "baseStats": { "hp": 50, "attack": 48, "defense": 43, "spAttack": 46, "spDefense": 41, "speed": 60 },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 48,
+      "defense": 43,
+      "spAttack": 46,
+      "spDefense": 41,
+      "speed": 60
+    },
     "baseExp": 58,
     "catchRate": 190,
     "growthRate": "medium_fast",
     "spriteId": "barboach",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 340, "condition": { "type": "level", "level": 30 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 340,
+        "condition": {
+          "type": "level",
+          "level": 30
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 6,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 11,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 16,
+        "moveId": "surf"
+      },
+      {
+        "level": 21,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 26,
+        "moveId": "rest"
+      }
+    ]
   },
   {
     "id": 340,
     "name": "Whiscash",
-    "types": ["water", "ground"],
-    "baseStats": { "hp": 110, "attack": 78, "defense": 73, "spAttack": 76, "spDefense": 71, "speed": 60 },
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 78,
+      "defense": 73,
+      "spAttack": 76,
+      "spDefense": 71,
+      "speed": 60
+    },
     "baseExp": 164,
     "catchRate": 75,
     "growthRate": "medium_fast",
     "spriteId": "whiscash",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 1,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 30,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 34,
+        "moveId": "surf"
+      },
+      {
+        "level": 38,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 42,
+        "moveId": "rest"
+      },
+      {
+        "level": 46,
+        "moveId": "earth_power"
+      },
+      {
+        "level": 50,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 341,
     "name": "Corphish",
-    "types": ["water"],
-    "baseStats": { "hp": 43, "attack": 80, "defense": 65, "spAttack": 50, "spDefense": 35, "speed": 35 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 43,
+      "attack": 80,
+      "defense": 65,
+      "spAttack": 50,
+      "spDefense": 35,
+      "speed": 35
+    },
     "baseExp": 62,
     "catchRate": 205,
     "growthRate": "fluctuating",
     "spriteId": "corphish",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 342, "condition": { "type": "level", "level": 30 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 342,
+        "condition": {
+          "type": "level",
+          "level": 30
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 10,
+        "moveId": "leer"
+      },
+      {
+        "level": 14,
+        "moveId": "bite"
+      },
+      {
+        "level": 18,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 23,
+        "moveId": "crunch"
+      },
+      {
+        "level": 28,
+        "moveId": "aqua_tail"
+      }
+    ]
   },
   {
     "id": 342,
     "name": "Crawdaunt",
-    "types": ["water", "dark"],
-    "baseStats": { "hp": 63, "attack": 120, "defense": 85, "spAttack": 90, "spDefense": 55, "speed": 55 },
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "attack": 120,
+      "defense": 85,
+      "spAttack": 90,
+      "spDefense": 55,
+      "speed": 55
+    },
     "baseExp": 164,
     "catchRate": 155,
     "growthRate": "fluctuating",
     "spriteId": "crawdaunt",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bubble"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 30,
+        "moveId": "crunch"
+      },
+      {
+        "level": 34,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 38,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 42,
+        "moveId": "surf"
+      },
+      {
+        "level": 46,
+        "moveId": "swords_dance"
+      },
+      {
+        "level": 50,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 343,
     "name": "Baltoy",
-    "types": ["ground", "psychic"],
-    "baseStats": { "hp": 40, "attack": 40, "defense": 55, "spAttack": 40, "spDefense": 70, "speed": 55 },
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 40,
+      "defense": 55,
+      "spAttack": 40,
+      "spDefense": 70,
+      "speed": 55
+    },
     "baseExp": 60,
     "catchRate": 255,
     "growthRate": "medium_fast",
     "spriteId": "baltoy",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 344, "condition": { "type": "level", "level": 36 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 344,
+        "condition": {
+          "type": "level",
+          "level": 36
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "rapid_spin"
+      },
+      {
+        "level": 9,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 13,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 17,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 22,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 28,
+        "moveId": "earthquake"
+      }
+    ]
   },
   {
     "id": 344,
     "name": "Claydol",
-    "types": ["ground", "psychic"],
-    "baseStats": { "hp": 60, "attack": 70, "defense": 105, "spAttack": 70, "spDefense": 120, "speed": 75 },
+    "types": [
+      "ground",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 70,
+      "defense": 105,
+      "spAttack": 70,
+      "spDefense": 120,
+      "speed": 75
+    },
     "baseExp": 175,
     "catchRate": 90,
     "growthRate": "medium_fast",
     "spriteId": "claydol",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "rapid_spin"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 36,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 40,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 44,
+        "moveId": "psychic"
+      },
+      {
+        "level": 48,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 52,
+        "moveId": "earth_power"
+      },
+      {
+        "level": 56,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 345,
     "name": "Lileep",
-    "types": ["rock", "grass"],
-    "baseStats": { "hp": 66, "attack": 41, "defense": 77, "spAttack": 61, "spDefense": 87, "speed": 23 },
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "attack": 41,
+      "defense": 77,
+      "spAttack": 61,
+      "spDefense": 87,
+      "speed": 23
+    },
     "baseExp": 71,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "lileep",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 346, "condition": { "type": "level", "level": 40 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 346,
+        "condition": {
+          "type": "level",
+          "level": 40
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 9,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 13,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 18,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 23,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 28,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 33,
+        "moveId": "amnesia"
+      }
+    ]
   },
   {
     "id": 346,
     "name": "Cradily",
-    "types": ["rock", "grass"],
-    "baseStats": { "hp": 86, "attack": 81, "defense": 97, "spAttack": 81, "spDefense": 107, "speed": 43 },
+    "types": [
+      "rock",
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "attack": 81,
+      "defense": 97,
+      "spAttack": 81,
+      "spDefense": 107,
+      "speed": 43
+    },
     "baseExp": 173,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "cradily",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "absorb"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 1,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 40,
+        "moveId": "giga_drain"
+      },
+      {
+        "level": 44,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 48,
+        "moveId": "amnesia"
+      },
+      {
+        "level": 52,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 56,
+        "moveId": "solar_beam"
+      }
+    ]
   },
   {
     "id": 347,
     "name": "Anorith",
-    "types": ["rock", "bug"],
-    "baseStats": { "hp": 45, "attack": 95, "defense": 50, "spAttack": 40, "spDefense": 50, "speed": 75 },
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 95,
+      "defense": 50,
+      "spAttack": 40,
+      "spDefense": 50,
+      "speed": 75
+    },
     "baseExp": 71,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "anorith",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 348, "condition": { "type": "level", "level": 40 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 348,
+        "condition": {
+          "type": "level",
+          "level": 40
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 5,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 9,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 13,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 18,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 23,
+        "moveId": "slash"
+      },
+      {
+        "level": 28,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 33,
+        "moveId": "x_scissor"
+      }
+    ]
   },
   {
     "id": 348,
     "name": "Armaldo",
-    "types": ["rock", "bug"],
-    "baseStats": { "hp": 75, "attack": 125, "defense": 100, "spAttack": 70, "spDefense": 80, "speed": 45 },
+    "types": [
+      "rock",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 125,
+      "defense": 100,
+      "spAttack": 70,
+      "spDefense": 80,
+      "speed": 45
+    },
     "baseExp": 173,
     "catchRate": 45,
     "growthRate": "erratic",
     "spriteId": "armaldo",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 1,
+        "moveId": "bug_bite"
+      },
+      {
+        "level": 40,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 44,
+        "moveId": "slash"
+      },
+      {
+        "level": 48,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 52,
+        "moveId": "x_scissor"
+      },
+      {
+        "level": 56,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 60,
+        "moveId": "earthquake"
+      }
+    ]
   },
   {
     "id": 349,
     "name": "Feebas",
-    "types": ["water"],
-    "baseStats": { "hp": 20, "attack": 15, "defense": 20, "spAttack": 10, "spDefense": 55, "speed": 80 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 15,
+      "defense": 20,
+      "spAttack": 10,
+      "spDefense": 55,
+      "speed": 80
+    },
     "baseExp": 40,
     "catchRate": 255,
     "growthRate": "erratic",
     "spriteId": "feebas",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 350, "condition": { "type": "trade" } }]
+    "evolvesTo": [
+      {
+        "speciesId": 350,
+        "condition": {
+          "type": "trade"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 15,
+        "moveId": "flail"
+      }
+    ]
   },
   {
     "id": 350,
     "name": "Milotic",
-    "types": ["water"],
-    "baseStats": { "hp": 95, "attack": 60, "defense": 79, "spAttack": 100, "spDefense": 125, "speed": 81 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 60,
+      "defense": 79,
+      "spAttack": 100,
+      "spDefense": 125,
+      "speed": 81
+    },
     "baseExp": 189,
     "catchRate": 60,
     "growthRate": "erratic",
     "spriteId": "milotic",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "wrap"
+      },
+      {
+        "level": 5,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 12,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 20,
+        "moveId": "recover"
+      },
+      {
+        "level": 28,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 36,
+        "moveId": "surf"
+      },
+      {
+        "level": 44,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 351,
     "name": "Castform",
-    "types": ["normal"],
-    "baseStats": { "hp": 70, "attack": 70, "defense": 70, "spAttack": 70, "spDefense": 70, "speed": 70 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 70,
+      "defense": 70,
+      "spAttack": 70,
+      "spDefense": 70,
+      "speed": 70
+    },
     "baseExp": 147,
     "catchRate": 45,
     "growthRate": "medium_fast",
     "spriteId": "castform",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 10,
+        "moveId": "ember"
+      },
+      {
+        "level": 15,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 20,
+        "moveId": "rain_dance"
+      },
+      {
+        "level": 25,
+        "moveId": "sunny_day"
+      },
+      {
+        "level": 30,
+        "moveId": "hail"
+      },
+      {
+        "level": 35,
+        "moveId": "thunderbolt"
+      },
+      {
+        "level": 40,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 45,
+        "moveId": "ice_beam"
+      }
+    ]
   },
   {
     "id": 352,
     "name": "Kecleon",
-    "types": ["normal"],
-    "baseStats": { "hp": 60, "attack": 90, "defense": 70, "spAttack": 60, "spDefense": 120, "speed": 40 },
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 70,
+      "spAttack": 60,
+      "spDefense": 120,
+      "speed": 40
+    },
     "baseExp": 154,
     "catchRate": 200,
     "growthRate": "medium_slow",
     "spriteId": "kecleon",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 4,
+        "moveId": "lick"
+      },
+      {
+        "level": 7,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 12,
+        "moveId": "slash"
+      },
+      {
+        "level": 18,
+        "moveId": "shadow_claw"
+      },
+      {
+        "level": 24,
+        "moveId": "brick_break"
+      },
+      {
+        "level": 30,
+        "moveId": "facade"
+      },
+      {
+        "level": 36,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 42,
+        "moveId": "substitute"
+      }
+    ]
   },
   {
     "id": 353,
     "name": "Shuppet",
-    "types": ["ghost"],
-    "baseStats": { "hp": 44, "attack": 75, "defense": 35, "spAttack": 63, "spDefense": 33, "speed": 45 },
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 75,
+      "defense": 35,
+      "spAttack": 63,
+      "spDefense": 33,
+      "speed": 45
+    },
     "baseExp": 59,
     "catchRate": 225,
     "growthRate": "fast",
     "spriteId": "shuppet",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 354, "condition": { "type": "level", "level": 37 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 354,
+        "condition": {
+          "type": "level",
+          "level": 37
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "lick"
+      },
+      {
+        "level": 1,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 6,
+        "moveId": "night_shade"
+      },
+      {
+        "level": 10,
+        "moveId": "shadow_punch"
+      },
+      {
+        "level": 14,
+        "moveId": "will_o_wisp"
+      },
+      {
+        "level": 20,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 26,
+        "moveId": "dark_pulse"
+      }
+    ]
   },
   {
     "id": 354,
     "name": "Banette",
-    "types": ["ghost"],
-    "baseStats": { "hp": 64, "attack": 115, "defense": 65, "spAttack": 83, "spDefense": 63, "speed": 65 },
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 115,
+      "defense": 65,
+      "spAttack": 83,
+      "spDefense": 63,
+      "speed": 65
+    },
     "baseExp": 159,
     "catchRate": 45,
     "growthRate": "fast",
     "spriteId": "banette",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 1,
+        "moveId": "night_shade"
+      },
+      {
+        "level": 1,
+        "moveId": "shadow_punch"
+      },
+      {
+        "level": 37,
+        "moveId": "will_o_wisp"
+      },
+      {
+        "level": 40,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 44,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 48,
+        "moveId": "shadow_claw"
+      },
+      {
+        "level": 52,
+        "moveId": "nasty_plot"
+      }
+    ]
   },
   {
     "id": 355,
     "name": "Duskull",
-    "types": ["ghost"],
-    "baseStats": { "hp": 20, "attack": 40, "defense": 90, "spAttack": 30, "spDefense": 90, "speed": 25 },
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "attack": 40,
+      "defense": 90,
+      "spAttack": 30,
+      "spDefense": 90,
+      "speed": 25
+    },
     "baseExp": 59,
     "catchRate": 190,
     "growthRate": "fast",
     "spriteId": "duskull",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 356, "condition": { "type": "level", "level": 37 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 356,
+        "condition": {
+          "type": "level",
+          "level": 37
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "night_shade"
+      },
+      {
+        "level": 6,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 12,
+        "moveId": "shadow_punch"
+      },
+      {
+        "level": 17,
+        "moveId": "will_o_wisp"
+      },
+      {
+        "level": 22,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 27,
+        "moveId": "shadow_ball"
+      }
+    ]
   },
   {
     "id": 356,
     "name": "Dusclops",
-    "types": ["ghost"],
-    "baseStats": { "hp": 40, "attack": 70, "defense": 130, "spAttack": 60, "spDefense": 130, "speed": 25 },
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 70,
+      "defense": 130,
+      "spAttack": 60,
+      "spDefense": 130,
+      "speed": 25
+    },
     "baseExp": 159,
     "catchRate": 90,
     "growthRate": "fast",
     "spriteId": "dusclops",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "night_shade"
+      },
+      {
+        "level": 1,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 37,
+        "moveId": "shadow_punch"
+      },
+      {
+        "level": 41,
+        "moveId": "will_o_wisp"
+      },
+      {
+        "level": 45,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 49,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 53,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 57,
+        "moveId": "ice_punch"
+      }
+    ]
   },
   {
     "id": 357,
     "name": "Tropius",
-    "types": ["grass", "flying"],
-    "baseStats": { "hp": 99, "attack": 68, "defense": 83, "spAttack": 72, "spDefense": 87, "speed": 51 },
+    "types": [
+      "grass",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 99,
+      "attack": 68,
+      "defense": 83,
+      "spAttack": 72,
+      "spDefense": 87,
+      "speed": 51
+    },
     "baseExp": 161,
     "catchRate": 200,
     "growthRate": "slow",
     "spriteId": "tropius",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "gust"
+      },
+      {
+        "level": 1,
+        "moveId": "razor_leaf"
+      },
+      {
+        "level": 7,
+        "moveId": "growth"
+      },
+      {
+        "level": 11,
+        "moveId": "wing_attack"
+      },
+      {
+        "level": 17,
+        "moveId": "mega_drain"
+      },
+      {
+        "level": 21,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 27,
+        "moveId": "leaf_blade"
+      },
+      {
+        "level": 33,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 39,
+        "moveId": "solar_beam"
+      },
+      {
+        "level": 47,
+        "moveId": "fly"
+      }
+    ]
   },
   {
     "id": 358,
     "name": "Chimecho",
-    "types": ["psychic"],
-    "baseStats": { "hp": 65, "attack": 50, "defense": 70, "spAttack": 95, "spDefense": 80, "speed": 65 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 50,
+      "defense": 70,
+      "spAttack": 95,
+      "spDefense": 80,
+      "speed": 65
+    },
     "baseExp": 159,
     "catchRate": 45,
     "growthRate": "fast",
     "spriteId": "chimecho",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "wrap"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 6,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 12,
+        "moveId": "confuse_ray"
+      },
+      {
+        "level": 17,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 22,
+        "moveId": "psychic"
+      },
+      {
+        "level": 27,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 32,
+        "moveId": "recover"
+      },
+      {
+        "level": 37,
+        "moveId": "dream_eater"
+      },
+      {
+        "level": 42,
+        "moveId": "shadow_ball"
+      }
+    ]
   },
   {
     "id": 359,
     "name": "Absol",
-    "types": ["dark"],
-    "baseStats": { "hp": 65, "attack": 130, "defense": 60, "spAttack": 75, "spDefense": 60, "speed": 75 },
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 130,
+      "defense": 60,
+      "spAttack": 75,
+      "spDefense": 60,
+      "speed": 75
+    },
     "baseExp": 163,
     "catchRate": 30,
     "growthRate": "medium_slow",
     "spriteId": "absol",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "quick_attack"
+      },
+      {
+        "level": 9,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 13,
+        "moveId": "bite"
+      },
+      {
+        "level": 17,
+        "moveId": "slash"
+      },
+      {
+        "level": 21,
+        "moveId": "swords_dance"
+      },
+      {
+        "level": 26,
+        "moveId": "crunch"
+      },
+      {
+        "level": 31,
+        "moveId": "dark_pulse"
+      },
+      {
+        "level": 36,
+        "moveId": "psychic"
+      },
+      {
+        "level": 41,
+        "moveId": "shadow_ball"
+      }
+    ]
   },
   {
     "id": 360,
     "name": "Wynaut",
-    "types": ["psychic"],
-    "baseStats": { "hp": 95, "attack": 23, "defense": 48, "spAttack": 23, "spDefense": 48, "speed": 23 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 23,
+      "defense": 48,
+      "spAttack": 23,
+      "spDefense": 48,
+      "speed": 23
+    },
     "baseExp": 44,
     "catchRate": 125,
     "growthRate": "medium_fast",
     "spriteId": "wynaut",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 202, "condition": { "type": "level", "level": 15 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 202,
+        "condition": {
+          "type": "level",
+          "level": 15
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 5,
+        "moveId": "rest"
+      },
+      {
+        "level": 10,
+        "moveId": "reflect"
+      },
+      {
+        "level": 15,
+        "moveId": "light_screen"
+      }
+    ]
   },
   {
     "id": 361,
     "name": "Snorunt",
-    "types": ["ice"],
-    "baseStats": { "hp": 50, "attack": 50, "defense": 50, "spAttack": 50, "spDefense": 50, "speed": 50 },
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 50,
+      "defense": 50,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 50
+    },
     "baseExp": 60,
     "catchRate": 190,
     "growthRate": "medium_fast",
     "spriteId": "snorunt",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 362, "condition": { "type": "level", "level": 42 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 362,
+        "condition": {
+          "type": "level",
+          "level": 42
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 10,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 16,
+        "moveId": "bite"
+      },
+      {
+        "level": 22,
+        "moveId": "protect"
+      },
+      {
+        "level": 28,
+        "moveId": "aurora_beam"
+      },
+      {
+        "level": 34,
+        "moveId": "crunch"
+      },
+      {
+        "level": 40,
+        "moveId": "blizzard"
+      }
+    ]
   },
   {
     "id": 362,
     "name": "Glalie",
-    "types": ["ice"],
-    "baseStats": { "hp": 80, "attack": 80, "defense": 80, "spAttack": 80, "spDefense": 80, "speed": 80 },
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 80,
+      "spAttack": 80,
+      "spDefense": 80,
+      "speed": 80
+    },
     "baseExp": 168,
     "catchRate": 75,
     "growthRate": "medium_fast",
     "spriteId": "glalie",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 42,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 46,
+        "moveId": "crunch"
+      },
+      {
+        "level": 50,
+        "moveId": "protect"
+      },
+      {
+        "level": 54,
+        "moveId": "blizzard"
+      },
+      {
+        "level": 58,
+        "moveId": "hail"
+      },
+      {
+        "level": 62,
+        "moveId": "explosion"
+      }
+    ]
   },
   {
     "id": 363,
     "name": "Spheal",
-    "types": ["ice", "water"],
-    "baseStats": { "hp": 70, "attack": 40, "defense": 50, "spAttack": 55, "spDefense": 50, "speed": 25 },
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 40,
+      "defense": 50,
+      "spAttack": 55,
+      "spDefense": 50,
+      "speed": 25
+    },
     "baseExp": 58,
     "catchRate": 255,
     "growthRate": "medium_slow",
     "spriteId": "spheal",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 364, "condition": { "type": "level", "level": 32 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 364,
+        "condition": {
+          "type": "level",
+          "level": 32
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 7,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 13,
+        "moveId": "aurora_beam"
+      },
+      {
+        "level": 19,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 25,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 31,
+        "moveId": "rest"
+      }
+    ]
   },
   {
     "id": 364,
     "name": "Sealeo",
-    "types": ["ice", "water"],
-    "baseStats": { "hp": 90, "attack": 60, "defense": 70, "spAttack": 75, "spDefense": 70, "speed": 45 },
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 60,
+      "defense": 70,
+      "spAttack": 75,
+      "spDefense": 70,
+      "speed": 45
+    },
     "baseExp": 144,
     "catchRate": 120,
     "growthRate": "medium_slow",
     "spriteId": "sealeo",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 365, "condition": { "type": "level", "level": 44 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 365,
+        "condition": {
+          "type": "level",
+          "level": 44
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 32,
+        "moveId": "aurora_beam"
+      },
+      {
+        "level": 36,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 40,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 44,
+        "moveId": "rest"
+      },
+      {
+        "level": 48,
+        "moveId": "surf"
+      }
+    ]
   },
   {
     "id": 365,
     "name": "Walrein",
-    "types": ["ice", "water"],
-    "baseStats": { "hp": 110, "attack": 80, "defense": 90, "spAttack": 95, "spDefense": 90, "speed": 65 },
+    "types": [
+      "ice",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 80,
+      "defense": 90,
+      "spAttack": 95,
+      "spDefense": 90,
+      "speed": 65
+    },
     "baseExp": 239,
     "catchRate": 45,
     "growthRate": "medium_slow",
     "spriteId": "walrein",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "defense_curl"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 44,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 48,
+        "moveId": "surf"
+      },
+      {
+        "level": 52,
+        "moveId": "blizzard"
+      },
+      {
+        "level": 56,
+        "moveId": "rest"
+      },
+      {
+        "level": 60,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 64,
+        "moveId": "hail"
+      }
+    ]
   },
   {
     "id": 366,
     "name": "Clamperl",
-    "types": ["water"],
-    "baseStats": { "hp": 35, "attack": 64, "defense": 85, "spAttack": 74, "spDefense": 55, "speed": 32 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 64,
+      "defense": 85,
+      "spAttack": 74,
+      "spDefense": 55,
+      "speed": 32
+    },
     "baseExp": 69,
     "catchRate": 255,
     "growthRate": "erratic",
     "spriteId": "clamperl",
     "generation": 3,
     "evolvesTo": [
-      { "speciesId": 367, "condition": { "type": "trade", "item": "deep_sea_tooth" } },
-      { "speciesId": 368, "condition": { "type": "trade", "item": "deep_sea_scale" } }
+      {
+        "speciesId": 367,
+        "condition": {
+          "type": "trade",
+          "item": "deep_sea_tooth"
+        }
+      },
+      {
+        "speciesId": 368,
+        "condition": {
+          "type": "trade",
+          "item": "deep_sea_scale"
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "withdraw"
+      },
+      {
+        "level": 8,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 15,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 22,
+        "moveId": "dive"
+      },
+      {
+        "level": 29,
+        "moveId": "aqua_tail"
+      }
     ]
   },
   {
     "id": 367,
     "name": "Huntail",
-    "types": ["water"],
-    "baseStats": { "hp": 55, "attack": 104, "defense": 105, "spAttack": 94, "spDefense": 75, "speed": 52 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 104,
+      "defense": 105,
+      "spAttack": 94,
+      "spDefense": 75,
+      "speed": 52
+    },
     "baseExp": 170,
     "catchRate": 60,
     "growthRate": "erratic",
     "spriteId": "huntail",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 6,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 12,
+        "moveId": "crunch"
+      },
+      {
+        "level": 18,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 24,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 30,
+        "moveId": "dive"
+      },
+      {
+        "level": 36,
+        "moveId": "surf"
+      },
+      {
+        "level": 42,
+        "moveId": "hydro_pump"
+      }
+    ]
   },
   {
     "id": 368,
     "name": "Gorebyss",
-    "types": ["water"],
-    "baseStats": { "hp": 55, "attack": 84, "defense": 105, "spAttack": 114, "spDefense": 75, "speed": 52 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 84,
+      "defense": 105,
+      "spAttack": 114,
+      "spDefense": 75,
+      "speed": 52
+    },
     "baseExp": 170,
     "catchRate": 60,
     "growthRate": "erratic",
     "spriteId": "gorebyss",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 6,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 12,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 18,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 24,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 30,
+        "moveId": "dive"
+      },
+      {
+        "level": 36,
+        "moveId": "surf"
+      },
+      {
+        "level": 42,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 48,
+        "moveId": "psychic"
+      }
+    ]
   },
   {
     "id": 369,
     "name": "Relicanth",
-    "types": ["water", "rock"],
-    "baseStats": { "hp": 100, "attack": 90, "defense": 130, "spAttack": 45, "spDefense": 65, "speed": 55 },
+    "types": [
+      "water",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 90,
+      "defense": 130,
+      "spAttack": 45,
+      "spDefense": 65,
+      "speed": 55
+    },
     "baseExp": 170,
     "catchRate": 25,
     "growthRate": "slow",
     "spriteId": "relicanth",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 8,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 15,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 22,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 29,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 36,
+        "moveId": "dive"
+      },
+      {
+        "level": 43,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 50,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 57,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 370,
     "name": "Luvdisc",
-    "types": ["water"],
-    "baseStats": { "hp": 43, "attack": 30, "defense": 55, "spAttack": 40, "spDefense": 65, "speed": 97 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 43,
+      "attack": 30,
+      "defense": 55,
+      "spAttack": 40,
+      "spDefense": 65,
+      "speed": 97
+    },
     "baseExp": 116,
     "catchRate": 225,
     "growthRate": "fast",
     "spriteId": "luvdisc",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 4,
+        "moveId": "agility"
+      },
+      {
+        "level": 9,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 14,
+        "moveId": "flail"
+      },
+      {
+        "level": 20,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 26,
+        "moveId": "surf"
+      },
+      {
+        "level": 31,
+        "moveId": "ice_beam"
+      }
+    ]
   },
   {
     "id": 371,
     "name": "Bagon",
-    "types": ["dragon"],
-    "baseStats": { "hp": 45, "attack": 75, "defense": 60, "spAttack": 40, "spDefense": 30, "speed": 50 },
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 75,
+      "defense": 60,
+      "spAttack": 40,
+      "spDefense": 30,
+      "speed": 50
+    },
     "baseExp": 60,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "bagon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 372, "condition": { "type": "level", "level": 30 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 372,
+        "condition": {
+          "type": "level",
+          "level": 30
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "ember"
+      },
+      {
+        "level": 9,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 13,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 17,
+        "moveId": "crunch"
+      },
+      {
+        "level": 21,
+        "moveId": "dragon_claw"
+      },
+      {
+        "level": 25,
+        "moveId": "take_down"
+      }
+    ]
   },
   {
     "id": 372,
     "name": "Shelgon",
-    "types": ["dragon"],
-    "baseStats": { "hp": 65, "attack": 95, "defense": 100, "spAttack": 60, "spDefense": 50, "speed": 50 },
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 100,
+      "spAttack": 60,
+      "spDefense": 50,
+      "speed": 50
+    },
     "baseExp": 147,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "shelgon",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 373, "condition": { "type": "level", "level": 50 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 373,
+        "condition": {
+          "type": "level",
+          "level": 50
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 30,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 33,
+        "moveId": "crunch"
+      },
+      {
+        "level": 37,
+        "moveId": "dragon_claw"
+      },
+      {
+        "level": 41,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 45,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 49,
+        "moveId": "double_edge"
+      }
+    ]
   },
   {
     "id": 373,
     "name": "Salamence",
-    "types": ["dragon", "flying"],
-    "baseStats": { "hp": 95, "attack": 135, "defense": 80, "spAttack": 110, "spDefense": 80, "speed": 100 },
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 135,
+      "defense": 80,
+      "spAttack": 110,
+      "spDefense": 80,
+      "speed": 100
+    },
     "baseExp": 270,
     "catchRate": 45,
     "growthRate": "slow",
     "spriteId": "salamence",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 1,
+        "moveId": "ember"
+      },
+      {
+        "level": 1,
+        "moveId": "headbutt"
+      },
+      {
+        "level": 50,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 53,
+        "moveId": "fly"
+      },
+      {
+        "level": 56,
+        "moveId": "dragon_claw"
+      },
+      {
+        "level": 59,
+        "moveId": "dragon_dance"
+      },
+      {
+        "level": 62,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 65,
+        "moveId": "flamethrower"
+      },
+      {
+        "level": 68,
+        "moveId": "outrage"
+      },
+      {
+        "level": 72,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 374,
     "name": "Beldum",
-    "types": ["steel", "psychic"],
-    "baseStats": { "hp": 40, "attack": 55, "defense": 80, "spAttack": 35, "spDefense": 60, "speed": 30 },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 55,
+      "defense": 80,
+      "spAttack": 35,
+      "spDefense": 60,
+      "speed": 30
+    },
     "baseExp": 60,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "beldum",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 375, "condition": { "type": "level", "level": 20 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 375,
+        "condition": {
+          "type": "level",
+          "level": 20
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      }
+    ]
   },
   {
     "id": 375,
     "name": "Metang",
-    "types": ["steel", "psychic"],
-    "baseStats": { "hp": 60, "attack": 75, "defense": 100, "spAttack": 55, "spDefense": 80, "speed": 50 },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 100,
+      "spAttack": 55,
+      "spDefense": 80,
+      "speed": 50
+    },
     "baseExp": 147,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "metang",
     "generation": 3,
-    "evolvesTo": [{ "speciesId": 376, "condition": { "type": "level", "level": 45 } }]
+    "evolvesTo": [
+      {
+        "speciesId": 376,
+        "condition": {
+          "type": "level",
+          "level": 45
+        }
+      }
+    ],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 20,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 26,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 32,
+        "moveId": "psychic"
+      },
+      {
+        "level": 38,
+        "moveId": "meteor_mash"
+      },
+      {
+        "level": 44,
+        "moveId": "agility"
+      }
+    ]
   },
   {
     "id": 376,
     "name": "Metagross",
-    "types": ["steel", "psychic"],
-    "baseStats": { "hp": 80, "attack": 135, "defense": 130, "spAttack": 95, "spDefense": 90, "speed": 70 },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 135,
+      "defense": 130,
+      "spAttack": 95,
+      "spDefense": 90,
+      "speed": 70
+    },
     "baseExp": 270,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "metagross",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "tackle"
+      },
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 45,
+        "moveId": "psychic"
+      },
+      {
+        "level": 49,
+        "moveId": "meteor_mash"
+      },
+      {
+        "level": 53,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 57,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 61,
+        "moveId": "agility"
+      },
+      {
+        "level": 65,
+        "moveId": "flash_cannon"
+      },
+      {
+        "level": 69,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 377,
     "name": "Regirock",
-    "types": ["rock"],
-    "baseStats": { "hp": 80, "attack": 100, "defense": 200, "spAttack": 50, "spDefense": 100, "speed": 50 },
+    "types": [
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 200,
+      "spAttack": 50,
+      "spDefense": 100,
+      "speed": 50
+    },
     "baseExp": 261,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "regirock",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 9,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 17,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 25,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 33,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 41,
+        "moveId": "sandstorm"
+      },
+      {
+        "level": 49,
+        "moveId": "stone_edge"
+      },
+      {
+        "level": 57,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 65,
+        "moveId": "explosion"
+      },
+      {
+        "level": 73,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 378,
     "name": "Regice",
-    "types": ["ice"],
-    "baseStats": { "hp": 80, "attack": 50, "defense": 100, "spAttack": 100, "spDefense": 200, "speed": 50 },
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 50,
+      "defense": 100,
+      "spAttack": 100,
+      "spDefense": 200,
+      "speed": 50
+    },
     "baseExp": 261,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "regice",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "powder_snow"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 9,
+        "moveId": "aurora_beam"
+      },
+      {
+        "level": 17,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 25,
+        "moveId": "amnesia"
+      },
+      {
+        "level": 33,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 41,
+        "moveId": "hail"
+      },
+      {
+        "level": 49,
+        "moveId": "blizzard"
+      },
+      {
+        "level": 57,
+        "moveId": "rest"
+      },
+      {
+        "level": 65,
+        "moveId": "explosion"
+      },
+      {
+        "level": 73,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 379,
     "name": "Registeel",
-    "types": ["steel"],
-    "baseStats": { "hp": 80, "attack": 75, "defense": 150, "spAttack": 75, "spDefense": 150, "speed": 50 },
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 75,
+      "defense": 150,
+      "spAttack": 75,
+      "spDefense": 150,
+      "speed": 50
+    },
     "baseExp": 261,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "registeel",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "metal_claw"
+      },
+      {
+        "level": 1,
+        "moveId": "harden"
+      },
+      {
+        "level": 9,
+        "moveId": "rock_tomb"
+      },
+      {
+        "level": 17,
+        "moveId": "ancient_power"
+      },
+      {
+        "level": 25,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 33,
+        "moveId": "flash_cannon"
+      },
+      {
+        "level": 41,
+        "moveId": "amnesia"
+      },
+      {
+        "level": 49,
+        "moveId": "iron_tail"
+      },
+      {
+        "level": 57,
+        "moveId": "rest"
+      },
+      {
+        "level": 65,
+        "moveId": "explosion"
+      },
+      {
+        "level": 73,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 380,
     "name": "Latias",
-    "types": ["dragon", "psychic"],
-    "baseStats": { "hp": 80, "attack": 80, "defense": 90, "spAttack": 110, "spDefense": 130, "speed": 110 },
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 90,
+      "spAttack": 110,
+      "spDefense": 130,
+      "speed": 110
+    },
     "baseExp": 270,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "latias",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 20,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 30,
+        "moveId": "psychic"
+      },
+      {
+        "level": 35,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 40,
+        "moveId": "recover"
+      },
+      {
+        "level": 45,
+        "moveId": "reflect"
+      },
+      {
+        "level": 50,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 55,
+        "moveId": "outrage"
+      }
+    ]
   },
   {
     "id": 381,
     "name": "Latios",
-    "types": ["dragon", "psychic"],
-    "baseStats": { "hp": 80, "attack": 90, "defense": 80, "spAttack": 130, "spDefense": 110, "speed": 110 },
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 90,
+      "defense": 80,
+      "spAttack": 130,
+      "spDefense": 110,
+      "speed": 110
+    },
     "baseExp": 270,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "latios",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "growl"
+      },
+      {
+        "level": 5,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 20,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 30,
+        "moveId": "psychic"
+      },
+      {
+        "level": 35,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 40,
+        "moveId": "recover"
+      },
+      {
+        "level": 45,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 50,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 55,
+        "moveId": "outrage"
+      }
+    ]
   },
   {
     "id": 382,
     "name": "Kyogre",
-    "types": ["water"],
-    "baseStats": { "hp": 100, "attack": 100, "defense": 90, "spAttack": 150, "spDefense": 140, "speed": 90 },
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 90,
+      "spAttack": 150,
+      "spDefense": 140,
+      "speed": 90
+    },
     "baseExp": 302,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "kyogre",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "water_gun"
+      },
+      {
+        "level": 1,
+        "moveId": "body_slam"
+      },
+      {
+        "level": 5,
+        "moveId": "water_pulse"
+      },
+      {
+        "level": 15,
+        "moveId": "aqua_tail"
+      },
+      {
+        "level": 20,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 30,
+        "moveId": "ice_beam"
+      },
+      {
+        "level": 35,
+        "moveId": "surf"
+      },
+      {
+        "level": 45,
+        "moveId": "rain_dance"
+      },
+      {
+        "level": 50,
+        "moveId": "thunder"
+      },
+      {
+        "level": 60,
+        "moveId": "hydro_pump"
+      },
+      {
+        "level": 65,
+        "moveId": "blizzard"
+      },
+      {
+        "level": 75,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 383,
     "name": "Groudon",
-    "types": ["ground"],
-    "baseStats": { "hp": 100, "attack": 150, "defense": 140, "spAttack": 100, "spDefense": 90, "speed": 90 },
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 150,
+      "defense": 140,
+      "spAttack": 100,
+      "spDefense": 90,
+      "speed": 90
+    },
     "baseExp": 302,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "groudon",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "mud_slap"
+      },
+      {
+        "level": 1,
+        "moveId": "scratch"
+      },
+      {
+        "level": 5,
+        "moveId": "mud_shot"
+      },
+      {
+        "level": 15,
+        "moveId": "rock_throw"
+      },
+      {
+        "level": 20,
+        "moveId": "slash"
+      },
+      {
+        "level": 30,
+        "moveId": "earthquake"
+      },
+      {
+        "level": 35,
+        "moveId": "rock_slide"
+      },
+      {
+        "level": 45,
+        "moveId": "sunny_day"
+      },
+      {
+        "level": 50,
+        "moveId": "fire_blast"
+      },
+      {
+        "level": 60,
+        "moveId": "earth_power"
+      },
+      {
+        "level": 65,
+        "moveId": "solar_beam"
+      },
+      {
+        "level": 75,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 384,
     "name": "Rayquaza",
-    "types": ["dragon", "flying"],
-    "baseStats": { "hp": 105, "attack": 150, "defense": 90, "spAttack": 150, "spDefense": 90, "speed": 95 },
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 150,
+      "defense": 90,
+      "spAttack": 150,
+      "spDefense": 90,
+      "speed": 95
+    },
     "baseExp": 306,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "rayquaza",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "twister"
+      },
+      {
+        "level": 1,
+        "moveId": "bite"
+      },
+      {
+        "level": 5,
+        "moveId": "dragon_breath"
+      },
+      {
+        "level": 15,
+        "moveId": "aerial_ace"
+      },
+      {
+        "level": 20,
+        "moveId": "crunch"
+      },
+      {
+        "level": 30,
+        "moveId": "dragon_claw"
+      },
+      {
+        "level": 35,
+        "moveId": "fly"
+      },
+      {
+        "level": 45,
+        "moveId": "dragon_dance"
+      },
+      {
+        "level": 50,
+        "moveId": "dragon_pulse"
+      },
+      {
+        "level": 60,
+        "moveId": "outrage"
+      },
+      {
+        "level": 65,
+        "moveId": "extreme_speed"
+      },
+      {
+        "level": 75,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 385,
     "name": "Jirachi",
-    "types": ["steel", "psychic"],
-    "baseStats": { "hp": 100, "attack": 100, "defense": 100, "spAttack": 100, "spDefense": 100, "speed": 100 },
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "spAttack": 100,
+      "spDefense": 100,
+      "speed": 100
+    },
     "baseExp": 270,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "jirachi",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "pound"
+      },
+      {
+        "level": 5,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "flash_cannon"
+      },
+      {
+        "level": 15,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 20,
+        "moveId": "psychic"
+      },
+      {
+        "level": 25,
+        "moveId": "iron_tail"
+      },
+      {
+        "level": 30,
+        "moveId": "meteor_mash"
+      },
+      {
+        "level": 35,
+        "moveId": "light_screen"
+      },
+      {
+        "level": 40,
+        "moveId": "recover"
+      },
+      {
+        "level": 45,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 50,
+        "moveId": "iron_defense"
+      },
+      {
+        "level": 55,
+        "moveId": "hyper_beam"
+      }
+    ]
   },
   {
     "id": 386,
     "name": "Deoxys",
-    "types": ["psychic"],
-    "baseStats": { "hp": 50, "attack": 150, "defense": 50, "spAttack": 150, "spDefense": 50, "speed": 150 },
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 150,
+      "defense": 50,
+      "spAttack": 150,
+      "spDefense": 50,
+      "speed": 150
+    },
     "baseExp": 270,
     "catchRate": 3,
     "growthRate": "slow",
     "spriteId": "deoxys",
     "generation": 3,
-    "evolvesTo": []
+    "evolvesTo": [],
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": "confusion"
+      },
+      {
+        "level": 1,
+        "moveId": "leer"
+      },
+      {
+        "level": 5,
+        "moveId": "psybeam"
+      },
+      {
+        "level": 10,
+        "moveId": "pursuit"
+      },
+      {
+        "level": 15,
+        "moveId": "psychic"
+      },
+      {
+        "level": 20,
+        "moveId": "recover"
+      },
+      {
+        "level": 25,
+        "moveId": "shadow_ball"
+      },
+      {
+        "level": 30,
+        "moveId": "calm_mind"
+      },
+      {
+        "level": 35,
+        "moveId": "focus_blast"
+      },
+      {
+        "level": 40,
+        "moveId": "extreme_speed"
+      },
+      {
+        "level": 45,
+        "moveId": "hyper_beam"
+      }
+    ]
   }
 ]

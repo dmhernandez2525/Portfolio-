@@ -22,7 +22,7 @@ export const rubySapphireConfig: GameConfig = {
     { leaderId: 'norman',     badge: 'balance',  type: 'normal' as PokemonType,   mapId: 'petalburg_gym' },
     { leaderId: 'winona',     badge: 'feather',  type: 'flying' as PokemonType,   mapId: 'fortree_gym' },
     { leaderId: 'tate_liza',  badge: 'mind',     type: 'psychic' as PokemonType,  mapId: 'mossdeep_gym' },
-    { leaderId: 'juan',       badge: 'rain',     type: 'water' as PokemonType,    mapId: 'sootopolis_gym' },
+    { leaderId: 'wallace',    badge: 'rain',     type: 'water' as PokemonType,    mapId: 'sootopolis_gym' },
   ],
   eliteFour: [
     { trainerId: 'sidney',    type: 'dark' as PokemonType },

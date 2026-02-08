@@ -59,7 +59,7 @@ export const littlerootTown: GameMap = {
     {
       id: 'littleroot_sign', x: 7, y: 7, spriteId: 'sign', direction: 'down',
       movement: 'static',
-      dialog: ['LITTLEROOT TOWN', 'A town that can\u0027t be Pokemon on a map.'],
+      dialog: ['LITTLEROOT TOWN', 'A town that can\u0027t be shown on a map.'],
       isTrainer: false,
     },
   ],

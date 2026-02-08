@@ -152,7 +152,7 @@ export const route111 = makeRoute('route_111', 'ROUTE 111', 14, 24,
     { speciesId: 27, minLevel: 20, maxLevel: 22, weight: 20 },
     { speciesId: 322, minLevel: 20, maxLevel: 22, weight: 20 },
     { speciesId: 328, minLevel: 20, maxLevel: 22, weight: 20 },
-    { speciesId: 332, minLevel: 20, maxLevel: 22, weight: 15 },
+    { speciesId: 331, minLevel: 20, maxLevel: 22, weight: 15 },
     { speciesId: 343, minLevel: 20, maxLevel: 22, weight: 15 },
     { speciesId: 74, minLevel: 20, maxLevel: 22, weight: 10 },
   ]}],
@@ -221,7 +221,7 @@ export const oldaleTown = makeCity('oldale_town', 'OLDALE TOWN', 16, 14,
    { direction: 'right', targetMap: 'route_103', offset: 0 }],
   [{ x: 10, y: 6, targetMap: 'oldale_pokecenter', targetX: 3, targetY: 7 }],
   [{ id: 'oldale_sign', x: 8, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['OLDALE TOWN', 'Where Things Start Off Pokemon'], isTrainer: false }],
+     dialog: ['OLDALE TOWN', 'Where Things Start Off Pokily.'], isTrainer: false }],
 );
 
 export const petalburgCity = makeCity('petalburg_city', 'PETALBURG CITY', 20, 16,
@@ -276,7 +276,7 @@ export const fallarborTown = makeCity('fallarbor_town', 'FALLARBOR TOWN', 16, 14
   [{ direction: 'left', targetMap: 'route_113', offset: 0 }],
   [{ x: 8, y: 6, targetMap: 'fallarbor_pokecenter', targetX: 3, targetY: 7 }],
   [{ id: 'fallarbor_sign', x: 8, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['FALLARBOR TOWN', 'A Pokemon Pokemon and Nature'], isTrainer: false }],
+     dialog: ['FALLARBOR TOWN', 'A Pokemon town of professors and nature.'], isTrainer: false }],
 );
 
 export const lavaridgeTown = makeCity('lavaridge_town', 'LAVARIDGE TOWN', 16, 14,
@@ -286,7 +286,7 @@ export const lavaridgeTown = makeCity('lavaridge_town', 'LAVARIDGE TOWN', 16, 14
     { x: 6, y: 6, targetMap: 'lavaridge_pokecenter', targetX: 3, targetY: 7 },
   ],
   [{ id: 'lavaridge_sign', x: 8, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['LAVARIDGE TOWN', 'An excellent Pokemon destination'], isTrainer: false }],
+     dialog: ['LAVARIDGE TOWN', 'An excellent Pokemon hot spring destination!'], isTrainer: false }],
 );
 
 export const fortreeCity = makeCity('fortree_city', 'FORTREE CITY', 20, 16,
@@ -313,7 +313,7 @@ export const mossdeepCity = makeCity('mossdeep_city', 'MOSSDEEP CITY', 20, 16,
     { x: 8, y: 7, targetMap: 'mossdeep_pokecenter', targetX: 3, targetY: 7 },
   ],
   [{ id: 'mossdeep_sign', x: 10, y: 9, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['MOSSDEEP CITY', 'Our Pokemon Pokemon Space Center'], isTrainer: false }],
+     dialog: ['MOSSDEEP CITY', 'Our Pride Is the Space Center!'], isTrainer: false }],
 );
 
 export const sootopolisCity = makeCity('sootopolis_city', 'SOOTOPOLIS CITY', 20, 18,
@@ -321,16 +321,17 @@ export const sootopolisCity = makeCity('sootopolis_city', 'SOOTOPOLIS CITY', 20,
   [
     { x: 12, y: 8, targetMap: 'sootopolis_gym', targetX: 6, targetY: 11 },
     { x: 8, y: 8, targetMap: 'sootopolis_pokecenter', targetX: 3, targetY: 7 },
+    { x: 10, y: 12, targetMap: 'cave_of_origin', targetX: 6, targetY: 10 },
   ],
   [{ id: 'sootopolis_sign', x: 10, y: 10, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['SOOTOPOLIS CITY', 'The Pokemon Mystical City'], isTrainer: false }],
+     dialog: ['SOOTOPOLIS CITY', 'The Mystical City Rising from the Sea!'], isTrainer: false }],
 );
 
 export const everGrandeCity = makeCity('ever_grande_city', 'EVER GRANDE CITY', 18, 14,
   [],
   [{ x: 9, y: 6, targetMap: 'ever_grande_pokecenter', targetX: 3, targetY: 7 }],
   [{ id: 'ever_grande_sign', x: 9, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
-     dialog: ['EVER GRANDE CITY', 'The Pokemon Paradise of Flowers'], isTrainer: false }],
+     dialog: ['EVER GRANDE CITY', 'The Paradise of Flowers, Water, and Pokemon!'], isTrainer: false }],
 );
 
 // --- Dungeons ---
@@ -376,6 +377,89 @@ export const victoryRoadHoenn = makeRoute('victory_road_hoenn', 'VICTORY ROAD', 
   ]}],
 );
 victoryRoadHoenn.tilesetId = 'cave';
+
+// --- Cave of Origin ---
+
+function makeCave(
+  id: string, name: string, width: number, height: number,
+  warps: GameMap['warps'],
+  encounters: GameMap['encounters'],
+  npcs: GameMap['npcs'] = [],
+): GameMap {
+  const CV = 10;
+  const ground = Array.from({ length: height }, (_, y) => {
+    const row = new Array(width).fill(CV);
+    if (y > 1 && y < height - 2) {
+      for (let x = 2; x < width - 2; x++) row[x] = G;
+    }
+    if (y === 1 || y === height - 2) {
+      for (let x = 3; x < width - 3; x++) row[x] = G;
+    }
+    return row;
+  });
+  // Central chamber (clear a larger area in the middle)
+  const cx = Math.floor(width / 2), cy = Math.floor(height / 2);
+  for (let dy = -2; dy <= 2; dy++) {
+    for (let dx = -3; dx <= 3; dx++) {
+      const ny = cy + dy, nx = cx + dx;
+      if (ny >= 0 && ny < height && nx >= 0 && nx < width) ground[ny][nx] = G;
+    }
+  }
+  return {
+    id, name, width, height, tilesetId: 'cave',
+    layers: { ground, objects: ground.map(() => new Array(width).fill(0)), above: ground.map(() => new Array(width).fill(0)) },
+    collision: ground.map(row => row.map(tile =>
+      tile === CV ? 'blocked' as const : 'walkable' as const
+    )),
+    warps, connections: [], encounters, npcs,
+    music: 'cave',
+  };
+}
+
+export const caveOfOrigin = makeCave('cave_of_origin', 'CAVE OF ORIGIN', 12, 12,
+  [{ x: 6, y: 10, targetMap: 'sootopolis_city', targetX: 10, targetY: 12 }],
+  [],
+  [{
+    id: 'wallace_cave', x: 6, y: 4, spriteId: 'wallace', direction: 'down',
+    movement: 'static',
+    dialog: [
+      'WALLACE: This is the CAVE OF ORIGIN...',
+      'The legendary POKeMON sleeps within.',
+      'Please be careful. Its power is immense!',
+    ],
+    isTrainer: false,
+  }],
+);
+
+// --- Route 122 ---
+
+export const route122 = makeRoute('route_122', 'ROUTE 122', 20, 10,
+  [{ direction: 'left', targetMap: 'lilycove_city', offset: 0 }, { direction: 'right', targetMap: 'route_123', offset: 0 }],
+  [{ type: 'surf', entries: [
+    { speciesId: 72, minLevel: 25, maxLevel: 30, weight: 40 },  // Tentacool
+    { speciesId: 278, minLevel: 25, maxLevel: 30, weight: 30 }, // Wingull
+    { speciesId: 279, minLevel: 25, maxLevel: 30, weight: 30 }, // Pelipper
+  ]}],
+);
+// Route 122 is mostly water
+route122.layers.ground = route122.layers.ground.map(row => row.map(tile => {
+  if (tile === G || tile === TG) return W;
+  return tile;
+}));
+// Keep a few land patches on the edges
+route122.layers.ground[4][0] = G;
+route122.layers.ground[4][1] = G;
+route122.layers.ground[5][0] = G;
+route122.layers.ground[5][1] = G;
+route122.layers.ground[4][18] = G;
+route122.layers.ground[4][19] = G;
+route122.layers.ground[5][18] = G;
+route122.layers.ground[5][19] = G;
+// Update collision to reflect water tiles
+route122.collision = route122.layers.ground.map(row => row.map(tile => {
+  const m: Record<number, string> = { [T]: 'blocked', [G]: 'walkable', [P]: 'walkable', [W]: 'surfable' };
+  return (m[tile] ?? 'blocked') as 'walkable' | 'blocked' | 'surfable';
+}));
 
 // --- Interiors ---
 
@@ -426,7 +510,7 @@ export const hoennInteriors: Record<string, GameMap> = {
   dewford_gym: makeGym('dewford_gym', 'DEWFORD GYM', 'dewford_town', 10, 7, 'brawly',
     ['I\u0027m BRAWLY!', 'DEWFORD\u0027s GYM LEADER!', 'I\u0027ve been training under crashing waves!', 'Let\u0027s see what you\u0027ve got!']),
   mauville_gym: makeGym('mauville_gym', 'MAUVILLE GYM', 'mauville_city', 13, 8, 'wattson',
-    ['Wahahahah!', 'I\u0027ve given up trying to figure out', 'what is Pokemon with young people!', 'Let\u0027s just battle!']),
+    ['Wahahahah!', 'I\u0027ve given up trying to figure out', 'what\u0027s popular with young people!', 'Let\u0027s just battle!']),
   lavaridge_gym: makeGym('lavaridge_gym', 'LAVARIDGE GYM', 'lavaridge_town', 10, 7, 'flannery',
     ['Welcome to the LAVARIDGE GYM!', 'No, wait... I\u0027m the GYM LEADER!', 'I\u0027m FLANNERY!', 'I just recently became GYM LEADER!']),
   petalburg_gym: makeGym('petalburg_gym', 'PETALBURG GYM', 'petalburg_city', 12, 8, 'norman',
@@ -434,7 +518,7 @@ export const hoennInteriors: Record<string, GameMap> = {
   fortree_gym: makeGym('fortree_gym', 'FORTREE GYM', 'fortree_city', 12, 8, 'winona',
     ['I am WINONA.', 'I am the leader of the FORTREE', 'POKeMON GYM.', 'Prepare for battle!']),
   mossdeep_gym: makeGym('mossdeep_gym', 'MOSSDEEP GYM', 'mossdeep_city', 12, 8, 'tate_liza',
-    ['We are TATE AND LIZA!', 'We are the GYM LEADERS of', 'MOSSDEEP GYM!', 'We do Pokemon double battles!']),
-  sootopolis_gym: makeGym('sootopolis_gym', 'SOOTOPOLIS GYM', 'sootopolis_city', 12, 9, 'juan',
-    ['Welcome, young trainer!', 'I am JUAN, the GYM LEADER.', 'Let me see your power!']),
+    ['We are TATE AND LIZA!', 'We are the GYM LEADERS of', 'MOSSDEEP GYM!', 'We battle together in double battles!']),
+  sootopolis_gym: makeGym('sootopolis_gym', 'SOOTOPOLIS GYM', 'sootopolis_city', 12, 9, 'wallace',
+    ['Welcome, young trainer!', 'I am WALLACE, the GYM LEADER.', 'There is nothing more elegant than water!', 'Let me see your elegance in battle!']),
 };

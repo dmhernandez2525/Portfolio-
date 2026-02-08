@@ -69,7 +69,7 @@ export const hoennEncounters: Record<string, WildEncounterZone[]> = {
       { speciesId: 27, minLevel: 20, maxLevel: 22, weight: 20 },  // Sandshrew
       { speciesId: 322, minLevel: 20, maxLevel: 22, weight: 20 }, // Numel
       { speciesId: 328, minLevel: 20, maxLevel: 22, weight: 20 }, // Trapinch
-      { speciesId: 332, minLevel: 20, maxLevel: 22, weight: 15 }, // Cacnea -> Cacturne
+      { speciesId: 331, minLevel: 20, maxLevel: 22, weight: 15 }, // Cacnea
       { speciesId: 343, minLevel: 20, maxLevel: 22, weight: 15 }, // Baltoy
       { speciesId: 74, minLevel: 20, maxLevel: 22, weight: 10 },  // Geodude
     ],
@@ -107,6 +107,15 @@ export const hoennEncounters: Record<string, WildEncounterZone[]> = {
       { speciesId: 264, minLevel: 25, maxLevel: 27, weight: 20 }, // Linoone
       { speciesId: 262, minLevel: 25, maxLevel: 27, weight: 20 }, // Mightyena
       { speciesId: 183, minLevel: 25, maxLevel: 27, weight: 20 }, // Marill
+    ],
+  }],
+
+  route_122: [{
+    type: 'surf',
+    entries: [
+      { speciesId: 72, minLevel: 25, maxLevel: 30, weight: 40 },  // Tentacool
+      { speciesId: 278, minLevel: 25, maxLevel: 30, weight: 30 }, // Wingull
+      { speciesId: 279, minLevel: 25, maxLevel: 30, weight: 30 }, // Pelipper
     ],
   }],
 

@@ -45,9 +45,9 @@ export const gymLeaders: Record<string, TrainerDef> = {
     id: 'flannery', name: 'Flannery', class: 'Gym Leader', spriteId: 'flannery',
     aiTier: 'smart', reward: 2800, isGymLeader: true, badge: 'heat',
     party: [
-      { speciesId: 218, level: 24 }, // Slugma
-      { speciesId: 218, level: 24 }, // Slugma
-      { speciesId: 323, level: 26 }, // Camerupt
+      { speciesId: 322, level: 26 }, // Numel
+      { speciesId: 218, level: 26 }, // Slugma
+      { speciesId: 323, level: 28 }, // Camerupt
       { speciesId: 324, level: 29 }, // Torkoal
     ],
     defeatDialog: ['Oh... I guess I was trying too hard...', 'Take the HEAT BADGE!'],
@@ -57,8 +57,9 @@ export const gymLeaders: Record<string, TrainerDef> = {
     id: 'norman', name: 'Norman', class: 'Gym Leader', spriteId: 'norman',
     aiTier: 'expert', reward: 3100, isGymLeader: true, badge: 'balance',
     party: [
-      { speciesId: 289, level: 28 }, // Slaking
-      { speciesId: 288, level: 30 }, // Vigoroth
+      { speciesId: 327, level: 27 }, // Spinda
+      { speciesId: 288, level: 27 }, // Vigoroth
+      { speciesId: 264, level: 29 }, // Linoone
       { speciesId: 289, level: 31 }, // Slaking
     ],
     defeatDialog: ['... I... I can\u0027t...', 'You\u0027ve beaten me... Take the BALANCE BADGE.'],
@@ -84,20 +85,20 @@ export const gymLeaders: Record<string, TrainerDef> = {
       { speciesId: 337, level: 42 }, // Lunatone
       { speciesId: 338, level: 42 }, // Solrock
     ],
-    defeatDialog: ['What?! Our combination was Pokemon?!', 'Take the MIND BADGE!'],
+    defeatDialog: ['What?! Our combination was defeated?!', 'Take the MIND BADGE!'],
   },
 
-  juan: {
-    id: 'juan', name: 'Juan', class: 'Gym Leader', spriteId: 'juan',
-    aiTier: 'expert', reward: 4600, isGymLeader: true, badge: 'rain',
+  wallace: {
+    id: 'wallace', name: 'Wallace', class: 'Gym Leader', spriteId: 'wallace',
+    aiTier: 'smart', reward: 4600, isGymLeader: true, badge: 'rain',
     party: [
-      { speciesId: 211, level: 41 }, // Qwilfish (Luvdisc in Emerald)
-      { speciesId: 340, level: 41 }, // Whiscash
-      { speciesId: 121, level: 43 }, // Starmie (Sealeo)
-      { speciesId: 342, level: 43 }, // Crawdaunt
-      { speciesId: 230, level: 46 }, // Kingdra
+      { speciesId: 370, level: 42 }, // Luvdisc
+      { speciesId: 340, level: 42 }, // Whiscash
+      { speciesId: 364, level: 43 }, // Sealeo
+      { speciesId: 119, level: 44 }, // Seaking
+      { speciesId: 350, level: 46 }, // Milotic
     ],
-    defeatDialog: ['Ahahaha, excellente!', 'You are worthy of the RAIN BADGE!'],
+    defeatDialog: ['I realize now your elegance surpasses mine!', 'You are worthy of the RAIN BADGE!'],
   },
 };
 
