@@ -297,6 +297,7 @@ export function TechieLayout() {
             <TechieContentViewer
               tab={activeTab}
               onEditorChange={updateEditorContent}
+              onRunCode={() => {}}
             />
           </div>
 

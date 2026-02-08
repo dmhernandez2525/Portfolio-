@@ -32,6 +32,7 @@ export const fileTree: FileNode[] = [
           { name: "falling-blocks.exe", type: "file", contentKey: "game-falling-blocks" },
           { name: "cookie-clicker.exe", type: "file", contentKey: "game-cookie-clicker" },
           { name: "agar.exe", type: "file", contentKey: "game-agar" },
+          { name: "mafia-wars.exe", type: "file", contentKey: "game-mafia-wars" },
         ],
       },
       { name: ".env", type: "file", contentKey: "hidden-env", hidden: true },

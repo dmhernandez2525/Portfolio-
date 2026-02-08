@@ -58,6 +58,14 @@ const menus: MenuGroup[] = [
     ],
   },
   {
+    label: "Run",
+    items: [
+      { label: "Run Code", shortcut: "\u2318\u21E7\u21B5", action: "run-code" },
+      { label: "separator" },
+      { label: "Clear Output", action: "clear-output" },
+    ],
+  },
+  {
     label: "Go",
     items: [
       { label: "Go to File...", shortcut: "\u2318P", action: "command-palette" },
