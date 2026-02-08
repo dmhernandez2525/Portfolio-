@@ -7,6 +7,9 @@ import { TechieStatusBar } from "./TechieStatusBar"
 import { TechieTerminal } from "./terminal/TechieTerminal"
 import { MatrixRain } from "./MatrixRain"
 import { AboutDialog } from "./AboutDialog"
+import { CommandPalette } from "./dialogs/CommandPalette"
+import { KeyboardShortcutsDialog } from "./dialogs/KeyboardShortcutsDialog"
+import { ReleaseNotesDialog } from "./dialogs/ReleaseNotesDialog"
 
 export interface TechieTab {
   id: string
@@ -27,6 +30,9 @@ export function TechieLayout() {
   const [hackerMode, setHackerMode] = useState(false)
   const [showStatusBar, setShowStatusBar] = useState(true)
   const [zenMode, setZenMode] = useState(false)
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showReleaseNotes, setShowReleaseNotes] = useState(false)
 
   const activeTab = tabs.find(t => t.id === activeTabId) ?? null
 
@@ -134,9 +140,12 @@ export function TechieLayout() {
       }
     },
     "zen-mode": () => setZenMode(prev => !prev),
+    "command-palette": () => setShowCommandPalette(true),
+    "shortcuts": () => setShowShortcuts(true),
+    "release-notes": () => setShowReleaseNotes(true),
     "welcome": () => openFile("readme", "README.md"),
     "check-updates": () => {
-      // Brief visual feedback - just a no-op for now, handled by menu bar
+      // Brief visual feedback - handled by menu bar toast
     },
     "panic": () => setShowMatrix(true),
     "about": () => setShowAbout(true),
@@ -168,6 +177,11 @@ export function TechieLayout() {
         if (activeTabId) closeTab(activeTabId)
         return
       }
+      if (ctrl && e.key === "p") {
+        e.preventDefault()
+        setShowCommandPalette(prev => !prev)
+        return
+      }
       if (ctrl && e.key === "n") {
         e.preventDefault()
         createNewFile()
@@ -183,6 +197,9 @@ export function TechieLayout() {
         return
       }
       if (e.key === "Escape") {
+        if (showCommandPalette) { setShowCommandPalette(false); return }
+        if (showShortcuts) { setShowShortcuts(false); return }
+        if (showReleaseNotes) { setShowReleaseNotes(false); return }
         if (zenMode) { setZenMode(false); return }
         if (showMatrix) { setShowMatrix(false); return }
         if (showAbout) { setShowAbout(false); return }
@@ -190,7 +207,7 @@ export function TechieLayout() {
     }
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout])
+  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout, showCommandPalette, showShortcuts, showReleaseNotes])
 
   const showChrome = !zenMode
 
@@ -292,6 +309,14 @@ export function TechieLayout() {
       {/* Overlays */}
       {showMatrix && <MatrixRain onDismiss={() => setShowMatrix(false)} />}
       {showAbout && <AboutDialog onClose={() => setShowAbout(false)} />}
+      {showCommandPalette && (
+        <CommandPalette
+          onSelect={openFile}
+          onClose={() => setShowCommandPalette(false)}
+        />
+      )}
+      {showShortcuts && <KeyboardShortcutsDialog onClose={() => setShowShortcuts(false)} />}
+      {showReleaseNotes && <ReleaseNotesDialog onClose={() => setShowReleaseNotes(false)} />}
     </div>
   )
 }
