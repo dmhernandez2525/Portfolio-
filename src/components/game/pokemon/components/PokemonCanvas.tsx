@@ -10,6 +10,7 @@ import { renderOverworld, showMapName } from '../engine/renderer';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { useInput } from '../hooks/useInput';
 import { useOverworld } from '../hooks/useOverworld';
+import { initSprites } from '../engine/sprites';
 import { kantoMaps } from '../games/red-blue/maps';
 import { johtoMaps } from '../games/gold-silver/maps';
 import { hoennMaps } from '../games/ruby-sapphire/maps';
@@ -96,6 +97,9 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
   // Initialize
   useEffect(() => {
+    // Generate retro pixel sprite atlases
+    initSprites();
+
     const start = VERSION_START[version];
     loadMap(start.mapId, start.startX, start.startY);
 

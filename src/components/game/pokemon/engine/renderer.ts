@@ -5,6 +5,7 @@
 import type { Camera, GameMap, Player, BattleState, BattlePokemon } from './types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from './constants';
 import { renderMap, renderAboveLayer, renderNPCs, renderPlayer } from './tilemap';
+import { drawPokemonSprite } from './sprites';
 
 // --- Overworld rendering ---
 
@@ -123,7 +124,7 @@ function drawBattlePokemon(
   frame: number
 ) {
   const pokemon = bp.pokemon;
-  const size = isBack ? 64 : 48;
+  const size = isBack ? 80 : 64;
 
   // Idle bounce animation
   const bounceY = Math.sin(frame * 0.05) * 2;
@@ -133,36 +134,40 @@ function drawBattlePokemon(
     ctx.globalAlpha = 0.3;
   }
 
-  // Draw a simple colored shape based on type
-  const primaryType = bp.types?.[0] ?? 'normal';
-  const typeColor = TYPE_COLORS[primaryType] ?? TYPE_COLORS['normal'];
-  ctx.fillStyle = typeColor;
+  // Try to draw PokeAPI sprite first
+  const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack);
 
-  // Body (rounded rectangle)
-  const bx = x - size / 2;
-  const by = y - size / 2 + bounceY;
-  roundRect(ctx, bx, by, size, size, 8);
-  ctx.fill();
+  if (!spriteDrawn) {
+    // Procedural fallback — colored shape based on type
+    const primaryType = bp.types?.[0] ?? 'normal';
+    const typeColor = TYPE_COLORS[primaryType] ?? TYPE_COLORS['normal'];
+    ctx.fillStyle = typeColor;
 
-  // Eyes (if front view)
-  if (!isBack) {
+    const bx = x - size / 2;
+    const by = y - size / 2 + bounceY;
+    roundRect(ctx, bx, by, size, size, 8);
+    ctx.fill();
+
+    // Eyes (if front view)
+    if (!isBack) {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x - size / 5, y - size / 6 + bounceY, 5, 0, Math.PI * 2);
+      ctx.arc(x + size / 5, y - size / 6 + bounceY, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(x - size / 5 + 1, y - size / 6 + bounceY, 3, 0, Math.PI * 2);
+      ctx.arc(x + size / 5 + 1, y - size / 6 + bounceY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Species ID label
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x - size / 5, y - size / 6 + bounceY, 5, 0, Math.PI * 2);
-    ctx.arc(x + size / 5, y - size / 6 + bounceY, 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.arc(x - size / 5 + 1, y - size / 6 + bounceY, 3, 0, Math.PI * 2);
-    ctx.arc(x + size / 5 + 1, y - size / 6 + bounceY, 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`#${pokemon.speciesId}`, x, y + size / 4 + bounceY);
   }
-
-  // Species ID label (placeholder for sprite)
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 10px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(`#${pokemon.speciesId}`, x, y + size / 4 + bounceY);
 
   ctx.globalAlpha = 1;
 }

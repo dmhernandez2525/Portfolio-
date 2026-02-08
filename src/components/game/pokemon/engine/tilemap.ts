@@ -1,18 +1,15 @@
 // ============================================================================
 // Pokemon RPG Engine — Tilemap Renderer
 // ============================================================================
-// Procedurally renders maps using colored rectangles until sprite tilesets
-// are loaded. This allows full gameplay without external sprite assets.
+// Renders maps using retro pixel sprites from the sprite atlas.
+// Falls back to procedural colored rectangles if sprites aren't loaded.
 
 import type { GameMap, Camera, TileType } from './types';
 import { SCALED_TILE, COLORS } from './constants';
 import { worldToScreen, isOnScreen } from './camera';
+import { isSpritesReady, drawTile, drawPlayer, drawNPC } from './sprites';
 
-// Map tile IDs to colors for procedural rendering
-// Tile IDs: 0=empty, 1=grass, 2=path, 3=tallGrass, 4=water,
-// 5=tree, 6=building, 7=roof, 8=door, 9=wall, 10=sand, 11=rock,
-// 12=fence, 13=ledge, 14=flowerRed, 15=flowerYellow, 16=sign
-
+// Map tile IDs to colors for procedural fallback rendering
 const TILE_COLORS: Record<number, string> = {
   0: 'transparent',
   1: COLORS.grass,
@@ -44,11 +41,16 @@ function renderLayer(
 ) {
   if (alpha < 1) ctx.globalAlpha = alpha;
 
+  const useSprites = isSpritesReady();
+
   // Calculate visible tile range for culling
   const startTileX = Math.max(0, Math.floor(camera.x / SCALED_TILE));
   const startTileY = Math.max(0, Math.floor(camera.y / SCALED_TILE));
   const endTileX = Math.min(mapWidth, Math.ceil((camera.x + camera.viewportWidth) / SCALED_TILE) + 1);
   const endTileY = Math.min(mapHeight, Math.ceil((camera.y + camera.viewportHeight) / SCALED_TILE) + 1);
+
+  // Disable image smoothing for crisp pixel art
+  if (useSprites) ctx.imageSmoothingEnabled = false;
 
   for (let y = startTileY; y < endTileY; y++) {
     const row = layer[y];
@@ -57,22 +59,28 @@ function renderLayer(
       const tileId = row[x];
       if (tileId === 0 || tileId === undefined) continue;
 
+      const screen = worldToScreen(camera, x * SCALED_TILE, y * SCALED_TILE);
+
+      // Try sprite first, then fall back to procedural
+      if (useSprites && drawTile(ctx, tileId, screen.x, screen.y)) {
+        continue;
+      }
+
+      // Procedural fallback
       const color = TILE_COLORS[tileId];
       if (!color || color === 'transparent') continue;
 
-      const screen = worldToScreen(camera, x * SCALED_TILE, y * SCALED_TILE);
       ctx.fillStyle = color;
       ctx.fillRect(screen.x, screen.y, SCALED_TILE, SCALED_TILE);
-
-      // Add detail patterns for certain tiles
       renderTileDetail(ctx, tileId, screen.x, screen.y);
     }
   }
 
+  if (useSprites) ctx.imageSmoothingEnabled = true;
   if (alpha < 1) ctx.globalAlpha = 1;
 }
 
-/** Add visual detail to specific tile types. */
+/** Add visual detail to specific tile types (procedural fallback). */
 function renderTileDetail(
   ctx: CanvasRenderingContext2D,
   tileId: number,
@@ -165,6 +173,8 @@ export function renderNPCs(
   camera: Camera,
   _frameCount: number
 ) {
+  const useSprites = isSpritesReady();
+
   for (const npc of map.npcs) {
     const worldX = npc.x * SCALED_TILE;
     const worldY = npc.y * SCALED_TILE;
@@ -173,7 +183,24 @@ export function renderNPCs(
 
     const screen = worldToScreen(camera, worldX, worldY);
 
-    // Simple colored sprite
+    // Try sprite atlas first
+    if (useSprites) {
+      ctx.imageSmoothingEnabled = false;
+      const drawn = drawNPC(ctx, screen.x, screen.y, npc.direction, npc.spriteId, npc.isTrainer);
+      ctx.imageSmoothingEnabled = true;
+      if (drawn) {
+        // Trainer exclamation indicator
+        if (npc.isTrainer) {
+          ctx.fillStyle = '#e04040';
+          ctx.font = 'bold 10px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('!', screen.x + SCALED_TILE / 2, screen.y - 10);
+        }
+        continue;
+      }
+    }
+
+    // Procedural fallback
     ctx.fillStyle = npc.isTrainer ? '#e04040' : COLORS.npc;
     const bodyW = SCALED_TILE * 0.6;
     const bodyH = SCALED_TILE * 0.7;
@@ -218,6 +245,16 @@ export function renderPlayer(
   camera: Camera
 ) {
   const screen = worldToScreen(camera, playerX, playerY);
+
+  // Try sprite atlas first
+  if (isSpritesReady()) {
+    ctx.imageSmoothingEnabled = false;
+    const drawn = drawPlayer(ctx, screen.x, screen.y, direction, isMoving, frameCount);
+    ctx.imageSmoothingEnabled = true;
+    if (drawn) return;
+  }
+
+  // Procedural fallback
   const s = SCALED_TILE;
 
   // Walking animation bob
