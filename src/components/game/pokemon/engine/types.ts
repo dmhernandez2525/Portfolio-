@@ -198,9 +198,11 @@ export interface MoveEffect {
   status?: StatusCondition;
   volatileStatus?: VolatileStatus;
   statChanges?: Partial<Record<StatName, number>>;
+  accuracyChange?: number;  // -6 to +6 modifier to target's accuracy stage
   chance?: number;          // 0-100 probability
   drain?: number;           // fraction of damage drained
   recoil?: number;          // fraction of damage as recoil
+  curesStatus?: boolean;    // for items: also cures status conditions
 }
 
 // --- Item data ---
@@ -259,7 +261,10 @@ export interface BattleAction {
 
 export interface BattlePokemon {
   pokemon: Pokemon;
+  types: PokemonType[];
   statStages: Record<StatName, number>;  // -6 to +6
+  accuracyStage: number;   // -6 to +6
+  evasionStage: number;    // -6 to +6
   volatileStatuses: Set<VolatileStatus>;
   isProtected: boolean;
   sleepTurns: number;
@@ -284,6 +289,7 @@ export interface BattleState {
   trainerDef?: TrainerDef;
   canRun: boolean;
   catchAttempts: number;
+  runAttempts: number;
   expGained: number;
   pendingLevelUps: { pokemon: Pokemon; newLevel: number; newMoves: string[] }[];
   pendingEvolution: { pokemon: Pokemon; evolvesTo: number } | null;
