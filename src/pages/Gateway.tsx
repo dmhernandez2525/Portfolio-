@@ -2,7 +2,7 @@ import { motion } from "framer-motion"
 import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3, CalendarDays } from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 
-const modes: { key: PortfolioMode; title: string; description: string; icon: typeof CreditCard; accent: string; bg: string; preview: string }[] = [
+const modes: { key: PortfolioMode; title: string; description: string; icon: typeof CreditCard; accent: string; bg: string; preview: string; comingSoon?: boolean }[] = [
   {
     key: "business-card",
     title: "Business Card",
@@ -60,11 +60,12 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
   {
     key: "calendar",
     title: "Book a Meeting",
-    description: "Schedule time with me — coffee chats, technical discussions, or quick intros.",
+    description: "Schedule time with me — coming soon! This feature is currently under development.",
     icon: CalendarDays,
     accent: "from-teal-400 to-cyan-500",
     bg: "hover:border-teal-400/50",
-    preview: "Under development",
+    preview: "Coming Soon",
+    comingSoon: true,
   },
 ]
 
@@ -110,12 +111,19 @@ export function Gateway() {
           <motion.button
             key={m.key}
             variants={cardVariants}
-            whileHover={{ scale: 1.03, y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setMode(m.key)}
-            className={`group relative flex flex-col items-center text-center p-8 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-colors duration-300 cursor-pointer ${m.bg}`}
+            whileHover={m.comingSoon ? {} : { scale: 1.03, y: -4 }}
+            whileTap={m.comingSoon ? {} : { scale: 0.98 }}
+            onClick={() => !m.comingSoon && setMode(m.key)}
+            disabled={m.comingSoon}
+            className={`group relative flex flex-col items-center text-center p-8 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-colors duration-300 ${m.comingSoon ? 'cursor-not-allowed opacity-60' : `cursor-pointer ${m.bg}`}`}
           >
-            <div className={`mb-5 p-4 rounded-xl bg-gradient-to-br ${m.accent} bg-opacity-10`}>
+            {m.comingSoon && (
+              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/30">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-400">Coming Soon</span>
+              </div>
+            )}
+
+            <div className={`mb-5 p-4 rounded-xl bg-gradient-to-br ${m.accent} ${m.comingSoon ? 'opacity-50' : ''} bg-opacity-10`}>
               <m.icon className="h-8 w-8 text-white" />
             </div>
 
