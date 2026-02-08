@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom"
-import { useMode } from "@/context/mode-context"
+import { useMode, type PortfolioMode } from "@/context/mode-context"
 import { RootLayout } from "@/components/layout/RootLayout"
 import { Gateway } from "@/pages/Gateway"
 import { BusinessCardPage } from "@/pages/BusinessCardPage"
 import { ResumePage } from "@/pages/ResumePage"
 import { TechieLayout } from "@/components/techie/TechieLayout"
+import { RetroTerminalPage } from "@/pages/RetroTerminalPage"
 
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
@@ -82,6 +83,13 @@ function CreativeRoutes() {
   )
 }
 
+const MODE_PAGES: Partial<Record<PortfolioMode, React.ReactElement>> = {
+  "business-card": <BusinessCardPage />,
+  "resume": <ResumePage />,
+  "techie": <TechieLayout />,
+  "retro": <RetroTerminalPage />,
+}
+
 export function AppRoutes() {
   const { mode } = useMode()
 
@@ -93,30 +101,22 @@ export function AppRoutes() {
     )
   }
 
-  if (mode === 'business-card') {
+  // Creative mode has nested sub-routes
+  if (mode === "creative") return <CreativeRoutes />
+
+  const page = MODE_PAGES[mode]
+  if (page) {
     return (
       <Routes>
-        <Route path="*" element={<BusinessCardPage />} />
+        <Route path="*" element={page} />
       </Routes>
     )
   }
 
-  if (mode === 'resume') {
-    return (
-      <Routes>
-        <Route path="*" element={<ResumePage />} />
-      </Routes>
-    )
-  }
-
-  if (mode === 'techie') {
-    return (
-      <Routes>
-        <Route path="*" element={<TechieLayout />} />
-      </Routes>
-    )
-  }
-
-  // mode === 'creative'
-  return <CreativeRoutes />
+  // Fallback for modes without pages yet (e.g., dashboard)
+  return (
+    <Routes>
+      <Route path="*" element={<Gateway />} />
+    </Routes>
+  )
 }
