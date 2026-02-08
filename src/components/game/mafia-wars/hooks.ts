@@ -388,6 +388,15 @@ export function useGameActions({
           addMessage('Not enough energy!', 'error')
           return prev
         }
+        
+        // Check item requirements if job has any
+        if (job.itemRequirement) {
+          const reqItem = prev.equipment.find(e => e.id === job.itemRequirement!.itemId)
+          if (!reqItem || reqItem.owned < job.itemRequirement.quantity) {
+            addMessage(`Requires ${job.itemRequirement.quantity}x item to perform this job!`, 'error')
+            return prev
+          }
+        }
 
         const cashEarned = Math.floor(
           job.cashRewardMin + Math.random() * (job.cashRewardMax - job.cashRewardMin)
@@ -402,13 +411,33 @@ export function useGameActions({
         let newMasteryProgress = job.masteryProgress + MASTERY_PER_COMPLETION
         let newMasteryLevel = job.masteryLevel
         let masteryLevelUp = false
+        let masterySkillPoint = 0
 
         if (newMasteryProgress >= 100 && newMasteryLevel < 3) {
           newMasteryProgress = 0
           newMasteryLevel++
           masteryLevelUp = true
+          masterySkillPoint = 1 // Award skill point for mastery level up
         } else if (newMasteryLevel >= 3) {
           newMasteryProgress = 100
+        }
+
+        // Loot drop chance (increases with mastery level)
+        const lootChance = 0.05 + (job.masteryLevel * 0.05) // 5% base + 5% per mastery
+        let lootDrop: { itemId: string; itemName: string } | undefined
+        let updatedEquipment = prev.equipment
+        
+        if (Math.random() < lootChance) {
+          // Pick a random equipment item player doesn't have many of
+          const possibleLoot = prev.equipment.filter(e => e.owned < 10)
+          if (possibleLoot.length > 0) {
+            const lootItem = possibleLoot[Math.floor(Math.random() * possibleLoot.length)]
+            lootDrop = { itemId: lootItem.id, itemName: lootItem.name }
+            updatedEquipment = prev.equipment.map(e => 
+              e.id === lootItem.id ? { ...e, owned: e.owned + 1 } : e
+            )
+            addMessage(`Loot drop: ${lootItem.name}!`, 'success')
+          }
         }
 
         result = {
@@ -418,12 +447,21 @@ export function useGameActions({
           masteryGained: MASTERY_PER_COMPLETION,
           leveledUp,
           masteryLevelUp,
+          lootDrop,
         }
 
-        const message = leveledUp
+        const totalSkillPoints = skillPointsGained + masterySkillPoint
+        
+        let message = leveledUp
           ? `Level Up! You are now level ${newLevel}! +${formatMoney(cashEarned)} +${expEarned} XP`
           : `Job complete! +${formatMoney(cashEarned)} +${expEarned} XP`
-        addMessage(message, leveledUp ? 'success' : 'info')
+        
+        if (masteryLevelUp) {
+          const masteryName = ['Bronze', 'Silver', 'Gold'][newMasteryLevel - 1]
+          message += ` | ${masteryName} Mastery! +1 Skill Point`
+        }
+        
+        addMessage(message, leveledUp || masteryLevelUp ? 'success' : 'info')
 
         return {
           ...prev,
@@ -434,7 +472,7 @@ export function useGameActions({
             experienceToLevel: getXPForLevel(newLevel),
             level: newLevel,
             cash: prev.player.cash + cashEarned,
-            skillPoints: prev.player.skillPoints + skillPointsGained,
+            skillPoints: prev.player.skillPoints + totalSkillPoints,
             ...(leveledUp
               ? {
                   energy: prev.player.maxEnergy,
@@ -448,6 +486,7 @@ export function useGameActions({
               ? { ...j, masteryProgress: newMasteryProgress, masteryLevel: newMasteryLevel, timesCompleted: j.timesCompleted + 1 }
               : j
           ),
+          equipment: updatedEquipment,
           lastEnergyRegen: Date.now(),
         }
       })
