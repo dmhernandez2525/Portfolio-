@@ -446,9 +446,10 @@ const BLOCKED_GLOBALS = [
 // Patterns that can escape the sandbox via prototype chain traversal
 const BLOCKED_PATTERNS = [
   /\.constructor\b/,          // obj.constructor → Function constructor
-  /\["constructor"\]/,        // obj["constructor"] bracket access
+  /\[['"`]constructor['"`]\]/, // obj["constructor"] / obj['constructor'] bracket access
   /\.__proto__\b/,            // prototype chain access
-  /\["__proto__"\]/,
+  /\[['"`]__proto__['"`]\]/,  // obj["__proto__"] / obj['__proto__'] bracket access
+  /\[\s*['"`].*\+/,           // string concatenation in brackets: ["con"+"structor"]
   /\bimport\s*\(/,            // dynamic import()
 ] as const
 
@@ -527,7 +528,7 @@ function executeJS(code: string): { logs: string[]; result: string | null; error
   const { logs, console } = createSandbox()
 
   const blockedParams = BLOCKED_GLOBALS.join(", ")
-  const blockedValues = BLOCKED_GLOBALS.map(() => "undefined")
+  const blockedValues = BLOCKED_GLOBALS.map(() => undefined)
 
   try {
     const wrappedCode = `"use strict"; ${code}`
