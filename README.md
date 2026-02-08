@@ -1,6 +1,6 @@
 # Daniel's Portfolio
 
-> A portfolio website that got slightly out of hand. What started as "I should probably have a website" turned into a 3D globe, 7 playable games, 16 Easter eggs, and enough animations to make your GPU question its life choices.
+> A portfolio website that got slightly out of hand. What started as "I should probably have a website" turned into a 3D globe, 8 playable games, 16 Easter eggs, and enough animations to make your GPU question its life choices.
 
 ## What Is This?
 
