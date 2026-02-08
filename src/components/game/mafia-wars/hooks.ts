@@ -353,9 +353,25 @@ export function useGameActions({
   checkLevelUp,
   checkAchievements,
 }: UseGameActionsProps) {
+  // Debounce ref to prevent React StrictMode double-execution
+  const lastActionRef = useRef<{ action: string; time: number }>({ action: '', time: 0 })
+  
+  const isDebounced = (actionId: string): boolean => {
+    const now = Date.now()
+    if (lastActionRef.current.action === actionId && now - lastActionRef.current.time < 300) {
+      return true // Skip, already executed
+    }
+    lastActionRef.current = { action: actionId, time: now }
+    return false
+  }
   // DO JOB
   const doJob = useCallback(
     (jobId: string): JobResult => {
+      // Skip if debounced (React StrictMode protection)
+      if (isDebounced(`job-${jobId}`)) {
+        return { success: false, cashEarned: 0, expEarned: 0, masteryGained: 0, leveledUp: false, masteryLevelUp: false }
+      }
+      
       let result: JobResult = {
         success: false,
         cashEarned: 0,
@@ -445,6 +461,11 @@ export function useGameActions({
   // FIGHT OPPONENT
   const fightOpponent = useCallback(
     (opponentId: string): BattleResult | null => {
+      // Skip if debounced (React StrictMode protection)
+      if (isDebounced(`fight-${opponentId}`)) {
+        return null
+      }
+      
       let result: BattleResult | null = null
 
       setState(prev => {
