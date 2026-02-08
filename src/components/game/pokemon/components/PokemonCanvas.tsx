@@ -1,0 +1,170 @@
+// ============================================================================
+// Pokemon RPG — Main Canvas Component
+// ============================================================================
+
+import { useRef, useEffect, useCallback, useState } from 'react';
+import type { Player, GameMap, Camera as CameraType } from '../engine/types';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../engine/constants';
+import { createCamera, updateCamera } from '../engine/camera';
+import { renderOverworld, showMapName } from '../engine/renderer';
+import { useGameLoop } from '../hooks/useGameLoop';
+import { useInput } from '../hooks/useInput';
+import { useOverworld } from '../hooks/useOverworld';
+import { palletTown } from '../games/red-blue/maps/pallet-town';
+import MobileControls from './MobileControls';
+import DialogBox from './DialogBox';
+
+interface PokemonCanvasProps {
+  onBack?: () => void;
+}
+
+export default function PokemonCanvas({ onBack }: PokemonCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraRef = useRef<CameraType>(createCamera());
+  const [player, setPlayer] = useState<Player | null>(null);
+  const [dialogText, setDialogText] = useState<string[] | null>(null);
+  const [dialogIndex, setDialogIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const currentMapRef = useRef<GameMap>(palletTown);
+
+  const input = useInput();
+  const overworld = useOverworld();
+
+  // Initialize
+  useEffect(() => {
+    const p = overworld.init(palletTown, 10, 9);  // Start on path in Pallet Town
+    setPlayer(p);
+    showMapName('PALLET TOWN');
+
+    overworld.onEncounter(() => {
+      // Will be handled in Phase 3 — for now just log
+      console.log('[Pokemon] Wild encounter triggered!');
+    });
+
+    overworld.onWarp((mapId, x, y) => {
+      console.log(`[Pokemon] Warp to ${mapId} at (${x}, ${y})`);
+      // Map loading will be implemented in Phase 5
+    });
+
+    overworld.onNPCInteract((npcId) => {
+      const npc = currentMapRef.current.npcs.find(n => n.id === npcId);
+      if (npc) {
+        setDialogText(npc.dialog);
+        setDialogIndex(0);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle dialog advancement
+  const advanceDialog = useCallback(() => {
+    if (!dialogText) return;
+    if (dialogIndex < dialogText.length - 1) {
+      setDialogIndex(i => i + 1);
+    } else {
+      setDialogText(null);
+      setDialogIndex(0);
+    }
+  }, [dialogText, dialogIndex]);
+
+  // Game loop
+  useGameLoop((_dt, frameCount) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    // Update input state
+    input.update();
+
+    // Handle pause
+    if (input.isJustPressed('start')) {
+      setIsPaused(p => !p);
+      return;
+    }
+
+    // Dialog mode
+    if (dialogText) {
+      if (input.isJustPressed('a')) {
+        advanceDialog();
+      }
+      // Still render overworld behind dialog
+      const p = overworld.getState()?.player;
+      if (p) {
+        renderOverworld(ctx, currentMapRef.current, p, cameraRef.current, frameCount);
+      }
+      return;
+    }
+
+    if (isPaused) return;
+
+    // Overworld update
+    const dir = input.getDirection();
+    const aPressed = input.isJustPressed('a');
+    const updatedPlayer = overworld.update(dir.x, dir.y, aPressed, cameraRef.current);
+
+    if (updatedPlayer) {
+      updateCamera(cameraRef.current, currentMapRef.current.width, currentMapRef.current.height);
+      renderOverworld(ctx, currentMapRef.current, updatedPlayer, cameraRef.current, frameCount);
+      setPlayer({ ...updatedPlayer });
+    }
+  }, true);
+
+  return (
+    <div className="relative flex flex-col items-center gap-4">
+      {/* Game viewport */}
+      <div
+        className="relative bg-black rounded-lg overflow-hidden border-4 border-neutral-800 shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+        style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, maxWidth: '100%' }}
+      >
+        <canvas
+          ref={canvasRef}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          className="block w-full h-full"
+          style={{ imageRendering: 'pixelated' }}
+        />
+
+        {/* Dialog overlay */}
+        {dialogText && (
+          <DialogBox
+            text={dialogText[dialogIndex]}
+            showContinue={dialogIndex < dialogText.length - 1}
+            onAdvance={advanceDialog}
+          />
+        )}
+
+        {/* Pause overlay */}
+        {isPaused && (
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-40">
+            <div className="text-white text-center">
+              <h2 className="text-2xl font-bold mb-2">PAUSED</h2>
+              <p className="text-sm text-neutral-400">Press P or START to resume</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Info bar */}
+      <div className="flex items-center justify-between w-full max-w-[480px] text-xs text-neutral-500">
+        <span>WASD/Arrows: Move | Z/Enter: Interact | X/Esc: Cancel | P: Pause</span>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="text-neutral-400 hover:text-white transition-colors"
+          >
+            Back
+          </button>
+        )}
+      </div>
+
+      {/* Mobile controls */}
+      <MobileControls input={input} />
+
+      {/* Debug info */}
+      {player && (
+        <div className="text-[10px] text-neutral-600 font-mono">
+          Tile: ({player.tileX}, {player.tileY}) | Facing: {player.direction} | Map: {currentMapRef.current.name}
+        </div>
+      )}
+    </div>
+  );
+}
