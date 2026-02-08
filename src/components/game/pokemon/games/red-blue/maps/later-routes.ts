@@ -19,7 +19,30 @@ function makeRoute(
     const row = new Array(width).fill(G);
     row[0] = T; row[width - 1] = T;
     if (y === 0 || y === height - 1) { row.fill(T); row[Math.floor(width / 2)] = P; row[Math.floor(width / 2) + 1] = P; }
-    else { row[Math.floor(width / 2)] = P; row[Math.floor(width / 2) + 1] = P; }
+    else {
+      row[Math.floor(width / 2)] = P; row[Math.floor(width / 2) + 1] = P;
+      // Add tall_grass patches on both sides of the path for wild encounters
+      const midX = Math.floor(width / 2);
+      // Left patch: rows 2-4
+      if (y >= 2 && y <= 4) {
+        for (let x = 2; x < midX - 1; x++) row[x] = TG;
+      }
+      // Right patch: rows height-5 to height-3
+      if (y >= height - 5 && y <= height - 3) {
+        for (let x = midX + 2; x < width - 1; x++) row[x] = TG;
+      }
+      // Additional patches for larger maps
+      if (height > 12) {
+        // Left patch lower: rows 7-9
+        if (y >= 7 && y <= 9) {
+          for (let x = midX + 2; x < width - 1; x++) row[x] = TG;
+        }
+        // Right patch upper: rows height-9 to height-7
+        if (y >= height - 9 && y <= height - 7) {
+          for (let x = 2; x < midX - 1; x++) row[x] = TG;
+        }
+      }
+    }
     return row;
   });
 

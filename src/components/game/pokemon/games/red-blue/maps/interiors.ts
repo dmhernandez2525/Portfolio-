@@ -224,6 +224,90 @@ export const viridianGym = makeGym(
   ['So! You have come all the way', 'to challenge me.', 'I am GIOVANNI, the leader of', 'TEAM ROCKET!', 'For your Pokemon\u0027s sake,', 'I hope you are ready!'],
 );
 
+// --- Pewter Museum ---
+export const pewterMuseum: GameMap = makeInterior(
+  'pewter_museum', 'PEWTER MUSEUM', 10, 10,
+  'pewter_city', 4, 5,
+  [
+    {
+      id: 'museum_guide', x: 5, y: 3, spriteId: 'scientist', direction: 'down',
+      movement: 'static',
+      dialog: ['Welcome to PEWTER MUSEUM!', 'We have a fine collection of', 'fossils and space exhibits!'],
+      isTrainer: false,
+    },
+  ],
+);
+
+// --- Cerulean Bike Shop ---
+export const ceruleanBikeShop: GameMap = makeInterior(
+  'cerulean_bike_shop', 'BIKE SHOP', 8, 8,
+  'cerulean_city', 3, 5,
+  [
+    {
+      id: 'bike_clerk', x: 4, y: 2, spriteId: 'clerk', direction: 'down',
+      movement: 'static',
+      dialog: ['Welcome to the BIKE SHOP!', 'We have a great selection!', 'A BICYCLE costs 1,000,000!', '...You don\'t have enough money.'],
+      isTrainer: false,
+    },
+  ],
+);
+
+// --- Cerulean House ---
+export const ceruleanHouse: GameMap = makeInterior(
+  'cerulean_house', 'CERULEAN HOUSE', 8, 8,
+  'cerulean_city', 16, 5,
+  [
+    {
+      id: 'cerulean_resident', x: 3, y: 3, spriteId: 'boy', direction: 'down',
+      movement: 'static',
+      dialog: ['TEAM ROCKET broke into our', 'house through the back!', 'They stole a TM!'],
+      isTrainer: false,
+    },
+  ],
+);
+
+// --- Victory Road Entrance ---
+export const victoryRoadEntrance: GameMap = makeInterior(
+  'victory_road_entrance', 'VICTORY ROAD GATE', 10, 8,
+  'route_23', 7, 1,
+  [
+    {
+      id: 'vr_guard', x: 5, y: 3, spriteId: 'guard', direction: 'down',
+      movement: 'static',
+      dialog: ['This is the entrance to', 'VICTORY ROAD!', 'Only trainers with all 8', 'BADGES may enter!'],
+      isTrainer: false,
+    },
+  ],
+);
+
+// --- Victory Road Exit ---
+export const victoryRoadExit: GameMap = makeInterior(
+  'victory_road_exit', 'VICTORY ROAD GATE', 10, 8,
+  'route_23', 7, 28,
+  [
+    {
+      id: 'vr_exit_guard', x: 5, y: 3, spriteId: 'guard', direction: 'down',
+      movement: 'static',
+      dialog: ['You made it through', 'VICTORY ROAD!', 'The INDIGO PLATEAU awaits!'],
+      isTrainer: false,
+    },
+  ],
+);
+
+// --- Rock Tunnel Entrance ---
+export const rockTunnelEntrance: GameMap = makeInterior(
+  'rock_tunnel_entrance', 'ROCK TUNNEL GATE', 10, 8,
+  'route_9', 18, 5,
+  [
+    {
+      id: 'rt_guard', x: 5, y: 3, spriteId: 'boy', direction: 'down',
+      movement: 'static',
+      dialog: ['This cave leads to', 'LAVENDER TOWN.', 'It\'s pitch black inside!', 'You\'ll need FLASH!'],
+      isTrainer: false,
+    },
+  ],
+);
+
 // --- Elite Four / Indigo Plateau ---
 export const indigoPlateau: GameMap = makeInterior(
   'indigo_plateau', 'INDIGO PLATEAU', 12, 10,
