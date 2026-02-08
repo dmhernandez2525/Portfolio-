@@ -1,9 +1,11 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ExternalLink, Gamepad2, Trophy, Star, Clock, Play, Code, Sparkles } from "lucide-react"
+import { ArrowLeft, ExternalLink, Gamepad2, Trophy, Star, Clock, Play, Code, Sparkles, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useProfile } from "@/context/profile-context"
+import { ProfileSelector } from "@/components/profile/ProfileSelector"
 
 interface Game {
   id: string
@@ -182,6 +184,8 @@ const categoryColors = {
 export function Games() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null)
   const [filter, setFilter] = useState<"all" | "built-in" | "classic" | "arcade" | "strategy" | "original">("all")
+  const [showProfileSelector, setShowProfileSelector] = useState(false)
+  const { activeProfile, clearActiveProfile } = useProfile()
 
   const filteredGames = filter === "all"
     ? games
@@ -213,6 +217,56 @@ export function Games() {
               with my grandfather to building my own games today - here are the ones that shaped me.
             </p>
           </motion.div>
+
+          {/* Profile banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6 flex flex-wrap items-center justify-between gap-3 p-3 bg-background/50 rounded-lg border border-border"
+          >
+            {activeProfile ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{activeProfile.avatar}</span>
+                  <div>
+                    <span className="text-sm font-medium text-foreground">{activeProfile.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {(() => { const count = Object.keys(activeProfile.gameData).length; return `${count} game${count === 1 ? '' : 's'} saved`; })()}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground">Playing locally — full account system coming soon</span>
+                  <Button variant="outline" size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
+                    Switch
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={clearActiveProfile} className="text-xs h-7 text-muted-foreground">
+                    Sign Out
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>Create a profile to save your game progress</span>
+                  <span className="text-[10px] text-muted-foreground ml-1">— cloud sync coming soon</span>
+                </div>
+                <Button size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
+                  Create Profile
+                </Button>
+              </>
+            )}
+          </motion.div>
+
+          {/* Profile selector modal */}
+          {showProfileSelector && (
+            <ProfileSelector
+              onSelect={() => setShowProfileSelector(false)}
+              onCancel={() => setShowProfileSelector(false)}
+            />
+          )}
 
           {/* Filter */}
           <motion.div

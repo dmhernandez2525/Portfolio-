@@ -5,6 +5,7 @@ import { GamificationProvider } from "@/components/providers/GamificationProvide
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider"
 import { BossProvider } from "@/context/boss-context"
 import { AuthProvider } from "@/context/auth-context"
+import { ProfileProvider } from "@/context/profile-context"
 import { ModeProvider, useMode } from "@/context/mode-context"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
 import { CustomCursor } from "@/components/ui/CustomCursor"
@@ -105,11 +106,13 @@ function App() {
       <GamificationProvider>
         <BossProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <ModeProvider>
-                <AppShell />
-              </ModeProvider>
-            </BrowserRouter>
+            <ProfileProvider>
+              <BrowserRouter>
+                <ModeProvider>
+                  <AppShell />
+                </ModeProvider>
+              </BrowserRouter>
+            </ProfileProvider>
           </AuthProvider>
         </BossProvider>
       </GamificationProvider>
