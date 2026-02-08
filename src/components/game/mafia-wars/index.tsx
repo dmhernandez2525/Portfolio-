@@ -33,6 +33,9 @@ import {
   ProfileTab,
 } from './components'
 
+// Import authentic Mafia Wars styling
+import './mafia-wars.css'
+
 // ----------------------------------------
 // MAIN COMPONENT
 // ----------------------------------------
@@ -79,12 +82,12 @@ export function MafiaWarsGame() {
   // ----------------------------------------
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-white">
+    <div className="mafia-wars-container min-h-screen">
       <Header player={state.player} />
       <ResourceBars player={state.player} />
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="container max-w-5xl mx-auto px-4 py-6">
+      <main className="container max-w-5xl mx-auto px-4 py-6 relative z-10">
         <AnimatePresence mode="wait">
           {activeTab === 'jobs' && (
             <JobsTab

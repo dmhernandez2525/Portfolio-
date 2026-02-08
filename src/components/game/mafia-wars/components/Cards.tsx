@@ -16,6 +16,56 @@ import {
 
 import type { Job, Property, Equipment, Opponent } from '../types'
 import { formatMoney } from '../constants'
+import {
+  SPRITES,
+  CHARACTER_POSITIONS,
+  PROPERTY_POSITIONS,
+  WEAPON_POSITIONS,
+  ARMOR_POSITIONS,
+  VEHICLE_POSITIONS,
+} from '../assets'
+
+// ----------------------------------------
+// SPRITE ICON HELPER
+// ----------------------------------------
+
+interface SpriteIconProps {
+  sprite: string
+  position: { row: number; col: number } | undefined
+  size?: number
+  cols: number
+  baseSize: number
+  fallbackIcon?: string
+  className?: string
+}
+
+function SpriteIcon({
+  sprite,
+  position,
+  size = 48,
+  cols,
+  baseSize,
+  fallbackIcon = '❓',
+  className = '',
+}: SpriteIconProps) {
+  if (!position) {
+    return <span className={`text-3xl ${className}`}>{fallbackIcon}</span>
+  }
+
+  return (
+    <div
+      className={`overflow-hidden flex-shrink-0 rounded-lg ${className}`}
+      style={{
+        width: size,
+        height: size,
+        backgroundImage: `url(${sprite})`,
+        backgroundPosition: `-${position.col * baseSize}px -${position.row * baseSize}px`,
+        backgroundSize: `${cols * baseSize}px auto`,
+        backgroundRepeat: 'no-repeat',
+      }}
+    />
+  )
+}
 
 // ----------------------------------------
 // JOB CARD
@@ -103,11 +153,18 @@ export function OpponentCard({ opponent, playerLevel, stamina, onFight }: Oppone
   }[difficulty]
 
   return (
-    <div className="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:border-red-700/50 transition-colors">
+    <div className="mafia-card p-4 rounded-xl border border-amber-900/50 hover:border-red-700/50 transition-colors">
       <div className="flex items-center gap-3 mb-3">
-        <div className="text-3xl">{opponent.icon}</div>
+        <SpriteIcon
+          sprite={SPRITES.characters}
+          position={CHARACTER_POSITIONS[opponent.id]}
+          size={64}
+          cols={4}
+          baseSize={128}
+          fallbackIcon={opponent.icon}
+        />
         <div>
-          <h4 className="font-bold">{opponent.name}</h4>
+          <h4 className="font-bold text-amber-100">{opponent.name}</h4>
           <div className={cn('text-xs', difficultyColor)}>
             Lv.{opponent.level} • {difficulty}
           </div>
@@ -148,12 +205,19 @@ export function PropertyCard({ property, cash, onBuy }: PropertyCardProps) {
   const maxedOut = property.owned >= property.maxOwnable
 
   return (
-    <div className="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50 hover:border-green-700/50 transition-colors">
+    <div className="mafia-card p-4 rounded-xl border border-amber-900/50 hover:border-green-700/50 transition-colors">
       <div className="flex items-center gap-3 mb-3">
-        <div className="text-3xl">{property.icon}</div>
+        <SpriteIcon
+          sprite={SPRITES.properties}
+          position={PROPERTY_POSITIONS[property.id]}
+          size={64}
+          cols={4}
+          baseSize={128}
+          fallbackIcon={property.icon}
+        />
         <div>
-          <h4 className="font-bold">{property.name}</h4>
-          <div className="text-xs text-zinc-400">
+          <h4 className="font-bold text-amber-100">{property.name}</h4>
+          <div className="text-xs text-amber-200/70">
             Owned: {property.owned}/{property.maxOwnable}
           </div>
         </div>
@@ -197,8 +261,29 @@ export function EquipmentCard({ equipment, cash, onBuy }: EquipmentCardProps) {
           : 'bg-zinc-800/50 border-zinc-700/50 hover:border-zinc-600/50'
       )}
     >
-      <div className="text-2xl text-center mb-1">{equipment.icon}</div>
-      <h5 className="font-medium text-sm text-center mb-1">{equipment.name}</h5>
+      <div className="flex justify-center mb-1">
+        <SpriteIcon
+          sprite={
+            equipment.type === 'weapon'
+              ? SPRITES.weapons
+              : equipment.type === 'armor'
+              ? SPRITES.armor
+              : SPRITES.vehicles
+          }
+          position={
+            equipment.type === 'weapon'
+              ? WEAPON_POSITIONS[equipment.id]
+              : equipment.type === 'armor'
+              ? ARMOR_POSITIONS[equipment.id]
+              : VEHICLE_POSITIONS[equipment.id]
+          }
+          size={48}
+          cols={equipment.type === 'vehicle' ? 3 : 4}
+          baseSize={equipment.type === 'vehicle' ? 170 : 128}
+          fallbackIcon={equipment.icon}
+        />
+      </div>
+      <h5 className="font-medium text-sm text-center mb-1 text-amber-100">{equipment.name}</h5>
       <div className="text-xs text-center text-zinc-400 mb-2">
         {equipment.attackBonus > 0 && <span className="text-red-400">+{equipment.attackBonus} ATK</span>}
         {equipment.attackBonus > 0 && equipment.defenseBonus > 0 && ' / '}
