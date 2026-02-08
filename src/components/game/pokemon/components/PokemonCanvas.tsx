@@ -17,6 +17,8 @@ import { hoennMaps } from '../games/ruby-sapphire/maps';
 import MobileControls from './MobileControls';
 import DialogBox from './DialogBox';
 
+type LoadMapFn = (mapId: string, startX: number, startY: number) => void;
+
 // --- Version → starting config ---
 
 interface StartConfig {
@@ -61,6 +63,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
   const input = useInput();
   const overworld = useOverworld();
+  const loadMapRef = useRef<LoadMapFn | null>(null);
 
   // Load a new map and place the player
   // x/y of -1 means "place at far edge" (used by map connections)
@@ -76,7 +79,6 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     const resolvedY = startY === -1 ? map.height - 1 : Math.max(0, Math.min(startY, map.height - 1));
 
     currentMapRef.current = map;
-    overworld.setMap(map);
 
     const p = overworld.init(map, resolvedX, resolvedY);
     setPlayer(p);
@@ -86,8 +88,6 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     const centerX = resolvedX * SCALED_TILE + SCALED_TILE / 2;
     const centerY = resolvedY * SCALED_TILE + SCALED_TILE / 2;
     setCameraTarget(cam, centerX, centerY);
-    cam.x = cam.targetX;
-    cam.y = cam.targetY;
     updateCamera(cam, map.width, map.height);
     cam.x = cam.targetX;
     cam.y = cam.targetY;
@@ -95,13 +95,16 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     showMapName(map.name);
   }, [overworld]);
 
+  // Keep loadMap ref current to avoid stale closures in event callbacks
+  loadMapRef.current = loadMap;
+
   // Initialize
   useEffect(() => {
     // Generate retro pixel sprite atlases
     initSprites();
 
     const start = VERSION_START[version];
-    loadMap(start.mapId, start.startX, start.startY);
+    loadMapRef.current?.(start.mapId, start.startX, start.startY);
 
     overworld.onEncounter(() => {
       console.log('[Pokemon] Wild encounter triggered!');
@@ -109,12 +112,12 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
     // Warp handler — fires when player steps on a warp tile
     overworld.onWarp((mapId, x, y) => {
-      loadMap(mapId, x, y);
+      loadMapRef.current?.(mapId, x, y);
     });
 
     // Connection handler — fires when player walks off map edge
     overworld.onConnection((mapId, x, y) => {
-      loadMap(mapId, x, y);
+      loadMapRef.current?.(mapId, x, y);
     });
 
     overworld.onNPCInteract((npcId) => {

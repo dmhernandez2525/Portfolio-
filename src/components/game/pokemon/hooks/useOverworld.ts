@@ -4,11 +4,10 @@
 
 import { useRef, useCallback } from 'react';
 import type { Player, Direction, GameMap } from '../engine/types';
-import { SCALED_TILE, PLAYER_SPEED } from '../engine/constants';
+import { SCALED_TILE, PLAYER_SPEED, ENCOUNTER_RATE } from '../engine/constants';
 import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp } from '../engine/collision';
 import { setCameraTarget } from '../engine/camera';
 import type { Camera } from '../engine/types';
-import { ENCOUNTER_RATE } from '../engine/constants';
 
 export interface OverworldState {
   player: Player;
@@ -127,7 +126,6 @@ export function useOverworld() {
     // If currently moving, continue the movement animation
     if (player.isMoving) {
       player.moveProgress += player.speed / SCALED_TILE;
-      player.spriteFrame++;
 
       if (player.moveProgress >= 1) {
         // Movement complete

@@ -39,7 +39,8 @@ function generateTileAtlas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = TILE_SIZE * TILE_COUNT;
   canvas.height = TILE_SIZE;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
 
   // Helper to set a single pixel
   const px = (tileIdx: number, x: number, y: number, color: string) => {
@@ -259,7 +260,8 @@ function generatePlayerAtlas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = PLAYER_FRAME_W * cols;
   canvas.height = PLAYER_FRAME_H * rows;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
 
   const directions = ['down', 'up', 'left', 'right'] as const;
 
@@ -283,7 +285,8 @@ function generateNPCAtlas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = PLAYER_FRAME_W * dirs;
   canvas.height = PLAYER_FRAME_H * npcTypes;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
 
   const directions = ['down', 'up', 'left', 'right'] as const;
   const types = ['npc_girl', 'npc_boy', 'npc_elder', 'npc_trainer'] as const;
@@ -457,7 +460,7 @@ export function drawPlayer(
 
 const NPC_TYPE_ROW: Record<string, number> = {
   girl: 0, boy: 1, elder: 2, trainer: 3,
-  default: 1,
+  sign: 1, default: 1,
 };
 
 export function drawNPC(
@@ -504,6 +507,10 @@ export function getPokemonSprite(
   // Start loading
   const img = new Image();
   img.crossOrigin = 'anonymous';
+  img.onerror = () => {
+    // Remove failed entry so caller always gets null → procedural fallback
+    pokemonSpriteCache.delete(key);
+  };
   img.src = isBack
     ? `${POKEAPI_SPRITE_URL}/back/${speciesId}.png`
     : `${POKEAPI_SPRITE_URL}/${speciesId}.png`;
