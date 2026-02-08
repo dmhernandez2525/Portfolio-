@@ -6,12 +6,13 @@ import type { SkillCategory } from "@/data/skills"
 import { projectsData } from "@/data/projects"
 import { styles } from "./resume-styles"
 
-const QR_LINKS = [
+export const QR_LINKS = [
   { label: "GitHub", url: "https://github.com/dmhernandez2525" },
   { label: "LinkedIn", url: "https://linkedin.com/in/dh25" },
   { label: "Portfolio", url: "https://interestingandbeyond.com" },
 ] as const
 
+// Intentionally excludes "Learning" category — only show proficient skills on resume
 const SKILL_CATEGORIES: SkillCategory[] = [
   "Frontend",
   "Backend",
@@ -96,9 +97,11 @@ function Experience() {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Experience</Text>
-      {experienceData.map((exp) => (
-        <ExperienceEntry key={exp.id} exp={exp} />
-      ))}
+      {experienceData
+        .filter((exp) => !exp.isCollapsed)
+        .map((exp) => (
+          <ExperienceEntry key={exp.id} exp={exp} />
+        ))}
     </View>
   )
 }

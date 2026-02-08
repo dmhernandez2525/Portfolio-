@@ -2,22 +2,16 @@ import { fileURLToPath } from "node:url"
 import path from "node:path"
 import QRCode from "qrcode"
 import { renderToFile } from "@react-pdf/renderer"
-import { ResumeDocument } from "./resume-document"
+import { ResumeDocument, QR_LINKS } from "./resume-document"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PROJECT_ROOT = path.resolve(__dirname, "..")
 const OUTPUT_PATH = path.join(PROJECT_ROOT, "public", "resume.pdf")
 
-const QR_URLS = [
-  "https://github.com/dmhernandez2525",
-  "https://linkedin.com/in/dh25",
-  "https://interestingandbeyond.com",
-]
-
 async function generateQRCodes(): Promise<Map<string, string>> {
   const entries = await Promise.all(
-    QR_URLS.map(async (url) => {
+    QR_LINKS.map(async ({ url }) => {
       const dataUrl = await QRCode.toDataURL(url, {
         width: 200,
         margin: 1,
