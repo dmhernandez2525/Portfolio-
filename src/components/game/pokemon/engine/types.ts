@@ -74,6 +74,12 @@ export interface WildEncounterZone {
   entries: WildEncounterEntry[];
 }
 
+// Simplified trainer data for inline NPC definitions
+export interface NPCTrainerData {
+  id: string;
+  party: TrainerPokemon[];
+}
+
 export interface NPCDef {
   id: string;
   x: number;
@@ -84,7 +90,7 @@ export interface NPCDef {
   patrolPath?: { x: number; y: number }[];
   dialog: string[];
   isTrainer: boolean;
-  trainerData?: TrainerDef;
+  trainerData?: NPCTrainerData | TrainerDef;
   lineOfSight?: number;     // tiles of LOS for trainers
 }
 
