@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { CreditCard, FileText, Sparkles, Terminal } from "lucide-react"
+import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3 } from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 
 const modes: { key: PortfolioMode; title: string; description: string; icon: typeof CreditCard; accent: string; bg: string; preview: string }[] = [
@@ -39,6 +39,24 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
     bg: "hover:border-green-400/50",
     preview: "Terminal & hacker vibes",
   },
+  {
+    key: "retro",
+    title: "Retro Terminal",
+    description: "Vintage computing — green phosphor CRT with command-line navigation.",
+    icon: Monitor,
+    accent: "from-lime-400 to-green-600",
+    bg: "hover:border-lime-400/50",
+    preview: "1980s hacker vibes",
+  },
+  {
+    key: "dashboard",
+    title: "Dashboard",
+    description: "Career analytics — skills radar, project metrics, and data visualizations.",
+    icon: BarChart3,
+    accent: "from-orange-400 to-red-500",
+    bg: "hover:border-orange-400/50",
+    preview: "Data-driven & analytical",
+  },
 ]
 
 const containerVariants = {
@@ -77,7 +95,7 @@ export function Gateway() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl w-full"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full"
       >
         {modes.map((m) => (
           <motion.button
