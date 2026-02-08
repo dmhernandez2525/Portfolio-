@@ -192,7 +192,7 @@ export type GrowthRate = 'fast' | 'medium_fast' | 'medium_slow' | 'slow' | 'erra
 const EXP_FORMULAS: Record<GrowthRate, (n: number) => number> = {
   fast:        (n) => Math.floor(4 * n * n * n / 5),
   medium_fast: (n) => n * n * n,
-  medium_slow: (n) => Math.floor(6 / 5 * n * n * n - 15 * n * n + 100 * n - 140),
+  medium_slow: (n) => Math.max(0, Math.floor(6 / 5 * n * n * n - 15 * n * n + 100 * n - 140)),
   slow:        (n) => Math.floor(5 * n * n * n / 4),
   erratic: (n) => {
     if (n <= 50) return Math.floor(n * n * n * (100 - n) / 50);

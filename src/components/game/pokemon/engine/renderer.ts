@@ -24,13 +24,9 @@ export function renderOverworld(
   // NPCs
   renderNPCs(ctx, map, camera, frameCount);
 
-  // Player
-  const playerPixelX = player.isMoving
-    ? lerp(player.tileX * SCALED_TILE, player.x, player.moveProgress)
-    : player.x;
-  const playerPixelY = player.isMoving
-    ? lerp(player.tileY * SCALED_TILE, player.y, player.moveProgress)
-    : player.y;
+  // Player — pixel position is already interpolated by the movement system
+  const playerPixelX = player.x;
+  const playerPixelY = player.y;
 
   renderPlayer(ctx, playerPixelX, playerPixelY, player.direction, player.isMoving, frameCount, camera);
 
