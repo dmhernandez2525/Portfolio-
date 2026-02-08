@@ -7,6 +7,10 @@ import { TechieStatusBar } from "./TechieStatusBar"
 import { TechieTerminal } from "./terminal/TechieTerminal"
 import { MatrixRain } from "./MatrixRain"
 import { AboutDialog } from "./AboutDialog"
+import { CommandPalette } from "./dialogs/CommandPalette"
+import { KeyboardShortcutsDialog } from "./dialogs/KeyboardShortcutsDialog"
+import { ReleaseNotesDialog } from "./dialogs/ReleaseNotesDialog"
+import { useEasterEggs } from "@/hooks/use-easter-eggs"
 
 export interface TechieTab {
   id: string
@@ -27,6 +31,11 @@ export function TechieLayout() {
   const [hackerMode, setHackerMode] = useState(false)
   const [showStatusBar, setShowStatusBar] = useState(true)
   const [zenMode, setZenMode] = useState(false)
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showReleaseNotes, setShowReleaseNotes] = useState(false)
+  const [showHiddenFiles, setShowHiddenFiles] = useState(false)
+  const [easterEggToast, setEasterEggToast] = useState<string | null>(null)
 
   const activeTab = tabs.find(t => t.id === activeTabId) ?? null
 
@@ -36,6 +45,33 @@ export function TechieLayout() {
     const timer = setTimeout(() => setHackerMode(false), 10000)
     return () => clearTimeout(timer)
   }, [hackerMode])
+
+  // Easter egg toast auto-dismiss
+  useEffect(() => {
+    if (!easterEggToast) return
+    const timer = setTimeout(() => setEasterEggToast(null), 3000)
+    return () => clearTimeout(timer)
+  }, [easterEggToast])
+
+  // Easter egg keyboard triggers
+  useEasterEggs({
+    onKonami: useCallback(() => {
+      setShowHiddenFiles(true)
+      setEasterEggToast("Hidden files revealed! Check the explorer.")
+    }, []),
+    onGandalf: useCallback(() => {
+      setEasterEggToast("You shall not pass! ...but you can browse.")
+    }, []),
+    onDaniel: useCallback(() => {
+      setShowAbout(true)
+    }, []),
+    onGhost: useCallback(() => {
+      setEasterEggToast("Boo! ...did I scare you?")
+    }, []),
+    onMonkey: useCallback(() => {
+      setEasterEggToast("Monkey mode activated! Just kidding.")
+    }, []),
+  })
 
   const openFile = useCallback((contentKey: string, fileName: string) => {
     // External links
@@ -134,9 +170,12 @@ export function TechieLayout() {
       }
     },
     "zen-mode": () => setZenMode(prev => !prev),
+    "command-palette": () => setShowCommandPalette(true),
+    "shortcuts": () => setShowShortcuts(true),
+    "release-notes": () => setShowReleaseNotes(true),
     "welcome": () => openFile("readme", "README.md"),
     "check-updates": () => {
-      // Brief visual feedback - just a no-op for now, handled by menu bar
+      // Brief visual feedback - handled by menu bar toast
     },
     "panic": () => setShowMatrix(true),
     "about": () => setShowAbout(true),
@@ -168,6 +207,11 @@ export function TechieLayout() {
         if (activeTabId) closeTab(activeTabId)
         return
       }
+      if (ctrl && e.key === "p") {
+        e.preventDefault()
+        setShowCommandPalette(prev => !prev)
+        return
+      }
       if (ctrl && e.key === "n") {
         e.preventDefault()
         createNewFile()
@@ -183,6 +227,9 @@ export function TechieLayout() {
         return
       }
       if (e.key === "Escape") {
+        if (showCommandPalette) { setShowCommandPalette(false); return }
+        if (showShortcuts) { setShowShortcuts(false); return }
+        if (showReleaseNotes) { setShowReleaseNotes(false); return }
         if (zenMode) { setZenMode(false); return }
         if (showMatrix) { setShowMatrix(false); return }
         if (showAbout) { setShowAbout(false); return }
@@ -190,7 +237,7 @@ export function TechieLayout() {
     }
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout])
+  }, [activeTabId, closeTab, createNewFile, zenMode, showMatrix, showAbout, showCommandPalette, showShortcuts, showReleaseNotes])
 
   const showChrome = !zenMode
 
@@ -238,6 +285,7 @@ export function TechieLayout() {
             <TechieFileExplorer
               currentFile={activeTab?.contentKey ?? null}
               onFileSelect={openFile}
+              showHidden={showHiddenFiles}
             />
           </div>
         )}
@@ -287,11 +335,27 @@ export function TechieLayout() {
         currentFile={activeTab?.contentKey ?? null}
         onFileSelect={openFile}
         sidebarOpen={sidebarOpen}
+        showHidden={showHiddenFiles}
       />
 
       {/* Overlays */}
       {showMatrix && <MatrixRain onDismiss={() => setShowMatrix(false)} />}
       {showAbout && <AboutDialog onClose={() => setShowAbout(false)} />}
+      {showCommandPalette && (
+        <CommandPalette
+          onSelect={openFile}
+          onClose={() => setShowCommandPalette(false)}
+        />
+      )}
+      {showShortcuts && <KeyboardShortcutsDialog onClose={() => setShowShortcuts(false)} />}
+      {showReleaseNotes && <ReleaseNotesDialog onClose={() => setShowReleaseNotes(false)} />}
+
+      {/* Easter egg toast */}
+      {easterEggToast && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 bg-[#252526] border border-[#454545] px-4 py-2 text-xs text-[#4ec9b0] font-mono shadow-xl">
+          {easterEggToast}
+        </div>
+      )}
     </div>
   )
 }
@@ -300,10 +364,12 @@ function MobileSidebar({
   currentFile,
   onFileSelect,
   sidebarOpen,
+  showHidden,
 }: {
   currentFile: string | null
   onFileSelect: (contentKey: string, fileName: string) => void
   sidebarOpen: boolean
+  showHidden: boolean
 }) {
   const [open, setOpen] = useState(false)
 
@@ -328,6 +394,7 @@ function MobileSidebar({
                 onFileSelect(key, name)
                 setOpen(false)
               }}
+              showHidden={showHidden}
             />
           </div>
         </div>

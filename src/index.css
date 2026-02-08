@@ -299,3 +299,62 @@
 .hacker-mode .bg-\[\#007acc\] {
   background-color: #003300 !important;
 }
+
+/* Retro CRT effects */
+.retro-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.12) 1px,
+    rgba(0, 0, 0, 0.12) 2px
+  );
+  pointer-events: none;
+}
+
+.retro-crt-screen {
+  border-radius: 16px;
+}
+
+@keyframes retro-glow {
+  0% { text-shadow: 0 0 2px currentColor; }
+  50% { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; }
+  100% { text-shadow: 0 0 2px currentColor; }
+}
+
+.retro-text-glow {
+  animation: retro-glow 4s ease-in-out infinite;
+}
+
+@keyframes retro-cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.retro-cursor {
+  animation: retro-cursor-blink 1s step-end infinite;
+}
+
+/* Print styles for resume */
+@media print {
+  body {
+    background-image: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  section {
+    break-inside: avoid;
+  }
+
+  .fixed {
+    display: none !important;
+  }
+}

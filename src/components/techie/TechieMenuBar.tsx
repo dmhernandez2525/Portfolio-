@@ -73,7 +73,9 @@ const menus: MenuGroup[] = [
     label: "Help",
     items: [
       { label: "About DH OS", action: "about" },
+      { label: "Keyboard Shortcuts", shortcut: "\u2318K \u2318S", action: "shortcuts" },
       { label: "Welcome", action: "welcome" },
+      { label: "Release Notes", action: "release-notes" },
       { label: "separator" },
       { label: "Check for Updates", action: "check-updates" },
       { label: "separator" },

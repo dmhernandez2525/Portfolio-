@@ -1,8 +1,33 @@
 import { motion } from "framer-motion"
 import { Download, Github, Linkedin, Mail, Printer } from "lucide-react"
+import { QRCodeSVG } from "qrcode.react"
 import { experienceData } from "@/data/experience"
 import { skillsData, type SkillCategory } from "@/data/skills"
 import { projectsData } from "@/data/projects"
+
+const QR_LINKS = [
+  { label: "GitHub", url: "https://github.com/dmhernandez2525" },
+  { label: "LinkedIn", url: "https://linkedin.com/in/dh25" },
+  { label: "Portfolio", url: "https://interestingandbeyond.com" },
+] as const
+
+function ResumeQRCodes() {
+  return (
+    <div className="hidden print:block mt-8 pt-6 border-t border-border">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground print:text-black mb-4">
+        Scan to Connect
+      </h2>
+      <div className="flex items-start gap-8">
+        {QR_LINKS.map((link) => (
+          <div key={link.label} className="flex flex-col items-center gap-2">
+            <QRCodeSVG value={link.url} size={80} level="M" />
+            <span className="text-xs text-muted-foreground print:text-black">{link.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 const fadeIn = {
   initial: { opacity: 0, y: 12 },
@@ -121,6 +146,9 @@ export function ResumePage() {
             ))}
           </div>
         </motion.section>
+
+        {/* QR codes - visible only in print */}
+        <ResumeQRCodes />
       </div>
     </div>
   )

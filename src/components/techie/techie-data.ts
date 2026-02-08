@@ -3,6 +3,7 @@ export interface FileNode {
   type: "file" | "folder"
   contentKey?: string
   children?: FileNode[]
+  hidden?: boolean
 }
 
 export const fileTree: FileNode[] = [
@@ -33,6 +34,9 @@ export const fileTree: FileNode[] = [
           { name: "agar.exe", type: "file", contentKey: "game-agar" },
         ],
       },
+      { name: ".env", type: "file", contentKey: "hidden-env", hidden: true },
+      { name: ".secret", type: "file", contentKey: "hidden-secret", hidden: true },
+      { name: ".gitignore", type: "file", contentKey: "hidden-gitignore", hidden: true },
       { name: "BLOG.md", type: "file", contentKey: "blog" },
       { name: "CONTACT.sh", type: "file", contentKey: "contact" },
       {
@@ -48,6 +52,9 @@ export const fileTree: FileNode[] = [
 ]
 
 export function getFileIcon(name: string): string {
+  // Dotfiles get a lock icon
+  if (name.startsWith(".")) return "\u{1F512}"
+
   const ext = name.split(".").pop()?.toLowerCase()
   const icons: Record<string, string> = {
     md: "\u{1F4C4}",
