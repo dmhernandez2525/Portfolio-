@@ -14,14 +14,14 @@ const QR_LINKS = [
 function ResumeQRCodes() {
   return (
     <div className="hidden print:block mt-8 pt-6 border-t border-border">
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground print:text-black mb-4">
         Scan to Connect
       </h2>
       <div className="flex items-start gap-8">
         {QR_LINKS.map((link) => (
           <div key={link.label} className="flex flex-col items-center gap-2">
             <QRCodeSVG value={link.url} size={80} level="M" />
-            <span className="text-xs text-muted-foreground">{link.label}</span>
+            <span className="text-xs text-muted-foreground print:text-black">{link.label}</span>
           </div>
         ))}
       </div>

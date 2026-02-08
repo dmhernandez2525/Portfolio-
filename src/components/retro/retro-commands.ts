@@ -27,7 +27,7 @@ function handleHelp(_args: string[], ctx: RetroContext) {
     { text: "  contact     Get in touch", color: "green" },
     { text: "" },
     { text: "  fortune     Random quote", color: "dim" },
-    { text: "  color       Toggle green/amber", color: "dim" },
+    { text: "  color       Set green/amber theme", color: "dim" },
     { text: "  clear       Clear screen", color: "dim" },
     { text: "  help        Show this menu", color: "dim" },
     { text: "" },
@@ -41,7 +41,7 @@ function handleWhoami(_args: string[], ctx: RetroContext) {
     { text: "" },
     { text: "Self-taught engineer who went from a GED to building DoD" },
     { text: "applications for Space Force. Co-founded a software" },
-    { text: "consultancy, built 28+ projects, and never stopped learning." },
+    { text: `consultancy, built ${projectsData.length}+ projects, and never stopped learning.` },
     { text: "" },
     { text: "Beyond code: welding, 3D printing, VR development, PCB" },
     { text: "soldering, and CAD prototyping. The best engineers build" },
@@ -134,8 +134,10 @@ function handleFortune(_args: string[], ctx: RetroContext) {
   ])
 }
 
+const VALID_SCHEMES = new Set<"green" | "amber">(["green", "amber"])
+
 function handleColor(_args: string[], ctx: RetroContext) {
-  const scheme = _args[0] === "amber" ? "amber" : _args[0] === "green" ? "green" : null
+  const scheme = VALID_SCHEMES.has(_args[0] as "green" | "amber") ? (_args[0] as "green" | "amber") : null
   if (!scheme) {
     ctx.addLines([{ text: 'Usage: color <green|amber>', color: "dim" }])
     return

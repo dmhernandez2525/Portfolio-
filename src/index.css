@@ -316,15 +316,6 @@
   border-radius: 16px;
 }
 
-@keyframes retro-flicker {
-  0%, 19.9%, 22%, 62.9%, 64%, 64.9%, 70%, 100% {
-    opacity: 1;
-  }
-  20%, 21.9%, 63%, 63.9%, 65%, 69.9% {
-    opacity: 0.97;
-  }
-}
-
 @keyframes retro-glow {
   0% { text-shadow: 0 0 2px currentColor; }
   50% { text-shadow: 0 0 6px currentColor, 0 0 12px currentColor; }
@@ -361,5 +352,9 @@
 
   section {
     break-inside: avoid;
+  }
+
+  .fixed {
+    display: none !important;
   }
 }

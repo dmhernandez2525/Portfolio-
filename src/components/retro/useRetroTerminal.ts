@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react"
 import { BOOT_LINES } from "./RetroAsciiArt"
 import { executeRetroCommand, type RetroLine, type RetroContext } from "./retro-commands"
 
+const MAX_HISTORY = 50
+
 interface UseRetroTerminalProps {
   onColorChange: (scheme: "green" | "amber") => void
 }
@@ -21,6 +23,10 @@ export function useRetroTerminal({ onColorChange }: UseRetroTerminalProps): UseR
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [bootComplete, setBootComplete] = useState(false)
   const bootRef = useRef(false)
+
+  // Store callbacks in refs to avoid stale closures
+  const onColorChangeRef = useRef(onColorChange)
+  onColorChangeRef.current = onColorChange
 
   // Boot sequence
   useEffect(() => {
@@ -50,11 +56,8 @@ export function useRetroTerminal({ onColorChange }: UseRetroTerminalProps): UseR
     setLines([])
   }, [])
 
-  const ctx: RetroContext = {
-    addLines,
-    clear,
-    setColorScheme: onColorChange,
-  }
+  const ctxRef = useRef<RetroContext>({ addLines, clear, setColorScheme: onColorChange })
+  ctxRef.current = { addLines, clear, setColorScheme: onColorChangeRef.current }
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -65,8 +68,8 @@ export function useRetroTerminal({ onColorChange }: UseRetroTerminalProps): UseR
       setLines(prev => [...prev, { text: `> ${currentInput}`, color: "bright" }])
 
       if (input) {
-        setCommandHistory(prev => [...prev, input])
-        executeRetroCommand(input, ctx)
+        setCommandHistory(prev => [...prev, input].slice(-MAX_HISTORY))
+        executeRetroCommand(input, ctxRef.current)
       }
 
       setCurrentInput("")
@@ -109,8 +112,7 @@ export function useRetroTerminal({ onColorChange }: UseRetroTerminalProps): UseR
       setCurrentInput("")
       return
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentInput, commandHistory, historyIndex])
+  }, [currentInput, commandHistory, historyIndex, clear])
 
   return {
     lines,
