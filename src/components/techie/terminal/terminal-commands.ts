@@ -57,6 +57,7 @@ const help: CommandHandler = (_args, ctx) => {
     { parts: [{ text: "  date", color: "#4ec9b0" }, { text: "             Current date and time" }] },
     { parts: [{ text: "  uptime", color: "#4ec9b0" }, { text: "           Time since page load" }] },
     { parts: [{ text: "  history", color: "#4ec9b0" }, { text: "          Command history" }] },
+    { parts: [{ text: "  js <code>", color: "#4ec9b0" }, { text: "        Run JavaScript (sandboxed)" }] },
     { parts: [{ text: "  echo <text>", color: "#4ec9b0" }, { text: "      Print text" }] },
     { parts: [{ text: "  clear", color: "#4ec9b0" }, { text: "            Clear terminal" }] },
     { parts: [{ text: "  man <cmd>", color: "#4ec9b0" }, { text: "        Manual for a command" }] },
@@ -340,6 +341,39 @@ const man: CommandHandler = (args, ctx) => {
       "  Launches a game executable.",
       "  Available: snake, tetris, chess, falling-blocks, cookie-clicker, agar",
     ],
+    js: [
+      "JS(1) — run JavaScript code",
+      "",
+      "SYNOPSIS: js <code>",
+      "",
+      "DESCRIPTION:",
+      "  Executes JavaScript in a sandboxed environment.",
+      "  console.log() output is captured and displayed.",
+      "  The return value of the last expression is shown.",
+      "",
+      "AVAILABLE:",
+      "  Math, JSON, Date, Array, Object, String, Number,",
+      "  Boolean, RegExp, Map, Set, Symbol, Promise,",
+      "  parseInt, parseFloat, isNaN, isFinite",
+      "",
+      "BLOCKED:",
+      "  window, document, fetch, localStorage, eval,",
+      "  and other browser/DOM APIs (for security)",
+      "",
+      "EXAMPLES:",
+      '  js [1,2,3].reduce((a,b) => a+b, 0)',
+      '  js console.log("hello")',
+      "  js Math.PI * 2",
+      "  js Array.from({length: 5}, (_, i) => i * i)",
+    ],
+    node: [
+      "NODE(1) — alias for js",
+      "",
+      "SYNOPSIS: node <code>",
+      "",
+      "DESCRIPTION:",
+      "  Alias for the js command. See: man js",
+    ],
     neofetch: [
       "NEOFETCH(1) — system information",
       "",
@@ -396,6 +430,191 @@ const cowsay: CommandHandler = (args, ctx) => {
     { text: "                ||     ||" },
   ])
 }
+
+// --- JavaScript execution ---
+
+const SANDBOX_TIMEOUT_MS = 3000
+
+const BLOCKED_GLOBALS = [
+  "window", "globalThis", "self", "top", "parent", "frames",
+  "document", "fetch", "XMLHttpRequest", "localStorage",
+  "sessionStorage", "indexedDB", "navigator", "location", "history",
+  "alert", "confirm", "prompt", "eval", "Function", "importScripts",
+  "WebSocket", "Worker", "SharedWorker", "ServiceWorker",
+] as const
+
+// Patterns that can escape the sandbox via prototype chain traversal
+const BLOCKED_PATTERNS = [
+  /\.constructor\b/,          // obj.constructor → Function constructor
+  /\[['"`]constructor['"`]\]/, // obj["constructor"] / obj['constructor'] bracket access
+  /\.__proto__\b/,            // prototype chain access
+  /\[['"`]__proto__['"`]\]/,  // obj["__proto__"] / obj['__proto__'] bracket access
+  /\[\s*['"`].*\+/,           // string concatenation in brackets: ["con"+"structor"]
+  /\bimport\s*\(/,            // dynamic import()
+] as const
+
+function formatValue(val: unknown, depth = 0, quoteStrings = false): string {
+  if (depth > 3) return "[...]"
+  if (val === null) return "null"
+  if (val === undefined) return "undefined"
+  if (typeof val === "string") return quoteStrings || depth > 0 ? `"${val}"` : val
+  if (typeof val === "number" || typeof val === "boolean") return String(val)
+  if (typeof val === "function") return `[Function: ${val.name || "anonymous"}]`
+  if (typeof val === "symbol") return val.toString()
+  if (Array.isArray(val)) {
+    const items = val.slice(0, 20).map((v) => formatValue(v, depth + 1, true))
+    const suffix = val.length > 20 ? `, ... (${val.length} items)` : ""
+    return `[${items.join(", ")}${suffix}]`
+  }
+  if (typeof val === "object") {
+    const entries = Object.entries(val as Record<string, unknown>).slice(0, 10)
+    const items = entries.map(([k, v]) => `${k}: ${formatValue(v, depth + 1, true)}`)
+    return `{ ${items.join(", ")} }`
+  }
+  return String(val)
+}
+
+function createSandbox() {
+  const logs: string[] = []
+  const maxLogs = 100
+
+  function capture(...args: unknown[]) {
+    if (logs.length >= maxLogs) return
+    logs.push(args.map((a) => formatValue(a)).join(" "))
+  }
+
+  const console = {
+    log: capture,
+    info: capture,
+    warn: capture,
+    error: capture,
+    debug: capture,
+    dir: capture,
+    table: (...args: unknown[]) => {
+      if (Array.isArray(args[0])) {
+        args[0].forEach((row, i) => capture(`[${i}]`, row))
+      } else {
+        capture(...args)
+      }
+    },
+    clear: () => { logs.length = 0 },
+    time: () => {},
+    timeEnd: () => {},
+    assert: (cond: unknown, ...args: unknown[]) => {
+      if (!cond) capture("Assertion failed:", ...args)
+    },
+    count: (() => {
+      const counts: Record<string, number> = {}
+      return (label = "default") => {
+        counts[label] = (counts[label] ?? 0) + 1
+        capture(`${label}: ${counts[label]}`)
+      }
+    })(),
+    group: () => {},
+    groupEnd: () => {},
+  }
+
+  return { logs, console }
+}
+
+function executeJS(code: string): { logs: string[]; result: string | null; error: string | null } {
+  // Block prototype chain escape vectors before execution
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(code)) {
+      return { logs: [], result: null, error: "Blocked: restricted syntax detected (prototype chain access)" }
+    }
+  }
+
+  const { logs, console } = createSandbox()
+
+  const blockedParams = BLOCKED_GLOBALS.join(", ")
+  const blockedValues = BLOCKED_GLOBALS.map(() => undefined)
+
+  try {
+    const wrappedCode = `"use strict"; ${code}`
+
+    // Create function with blocked globals shadowed to undefined
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const fn = new Function(
+      "console", "Math", "JSON", "Date", "Array", "Object", "String",
+      "Number", "Boolean", "RegExp", "Map", "Set", "Symbol", "Promise",
+      "parseInt", "parseFloat", "isNaN", "isFinite", "encodeURIComponent",
+      "decodeURIComponent", "setTimeout", "setInterval", "clearTimeout", "clearInterval",
+      blockedParams,
+      wrappedCode,
+    )
+
+    let result: unknown
+    let timedOut = false
+    const startTime = performance.now()
+
+    try {
+      result = fn(
+        console, Math, JSON, Date, Array, Object, String,
+        Number, Boolean, RegExp, Map, Set, Symbol, Promise,
+        parseInt, parseFloat, isNaN, isFinite, encodeURIComponent,
+        decodeURIComponent,
+        () => {}, () => {}, () => {}, () => {},
+        ...blockedValues,
+      )
+    } finally {
+      if (performance.now() - startTime > SANDBOX_TIMEOUT_MS) {
+        timedOut = true
+      }
+    }
+
+    if (timedOut) {
+      return { logs, result: null, error: `Execution timed out (>${SANDBOX_TIMEOUT_MS}ms)` }
+    }
+
+    const resultStr = result !== undefined ? formatValue(result, 0, true) : null
+    return { logs, result: resultStr, error: null }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return { logs, result: null, error: message }
+  }
+}
+
+const js: CommandHandler = (args, ctx) => {
+  const code = args.join(" ")
+  if (!code) {
+    ctx.addOutput([
+      { text: "Usage: js <code>", color: "#f44747" },
+      { text: "" },
+      { text: "Examples:", color: "#858585" },
+      { parts: [{ text: "  js ", color: "#4ec9b0" }, { text: "2 + 2" }] },
+      { parts: [{ text: "  js ", color: "#4ec9b0" }, { text: "console.log('hello')" }] },
+      { parts: [{ text: "  js ", color: "#4ec9b0" }, { text: "[1,2,3].map(x => x * 2)" }] },
+      { parts: [{ text: "  js ", color: "#4ec9b0" }, { text: "JSON.stringify({a: 1})" }] },
+      { parts: [{ text: "  js ", color: "#4ec9b0" }, { text: "Math.random()" }] },
+      { text: "" },
+      { text: "Runs in a sandboxed environment. No DOM/network access.", color: "#858585" },
+    ])
+    return
+  }
+
+  const { logs, result, error } = executeJS(code)
+
+  const output: OutputLine[] = []
+
+  for (const log of logs) {
+    output.push({ text: log, color: "#d4d4d4" })
+  }
+
+  if (error) {
+    output.push({ text: `Error: ${error}`, color: "#f44747" })
+  } else if (result !== null) {
+    output.push({ text: `→ ${result}`, color: "#b5cea8" })
+  }
+
+  if (output.length === 0) {
+    output.push({ text: "→ undefined", color: "#858585" })
+  }
+
+  ctx.addOutput(output)
+}
+
+const node: CommandHandler = js
 
 // --- Easter egg commands ---
 
@@ -559,6 +778,8 @@ export const commands: Record<string, CommandHandler> = {
   man,
   fortune,
   cowsay,
+  js,
+  node,
   sudo,
   vim,
   exit: exitCmd,
