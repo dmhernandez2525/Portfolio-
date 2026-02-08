@@ -20,6 +20,7 @@ const sections: ShortcutSection[] = [
       { label: "Close Tab", keys: "\u2318W" },
       { label: "Save", keys: "\u2318S" },
       { label: "Print", keys: "\u2318P" },
+      { label: "Settings", keys: "\u2318," },
       { label: "Exit to Gateway", keys: "\u2318Q" },
     ],
   },
@@ -31,6 +32,18 @@ const sections: ShortcutSection[] = [
       { label: "Full Screen", keys: "F11" },
       { label: "Zen Mode", keys: "\u2318K Z" },
       { label: "Command Palette", keys: "\u2318P" },
+      { label: "Zoom In", keys: "\u2318=" },
+      { label: "Zoom Out", keys: "\u2318-" },
+    ],
+  },
+  {
+    title: "Editor",
+    shortcuts: [
+      { label: "Run Code", keys: "\u2318\u21E7\u21B5" },
+      { label: "Rename File", keys: "F2" },
+      { label: "Toggle Vim Mode", keys: "Edit Menu" },
+      { label: "Toggle Minimap", keys: "View Menu" },
+      { label: "Toggle Word Wrap", keys: "View Menu" },
     ],
   },
   {
