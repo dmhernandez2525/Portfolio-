@@ -168,14 +168,24 @@ export const route35 = makeRoute('route_35', 'ROUTE 35', 14, 16,
 );
 
 export const route36 = makeRoute('route_36', 'ROUTE 36', 20, 10,
-  [{ direction: 'left', targetMap: 'route_35', offset: 0 }, { direction: 'right', targetMap: 'ecruteak_city', offset: 0 }],
+  [{ direction: 'left', targetMap: 'route_35', offset: 0 }, { direction: 'right', targetMap: 'route_37', offset: 0 }],
   [{ type: 'grass', entries: [
-    { speciesId: 29, minLevel: 13, maxLevel: 15, weight: 20 },
-    { speciesId: 32, minLevel: 13, maxLevel: 15, weight: 20 },
+    { speciesId: 29, minLevel: 13, maxLevel: 15, weight: 25 },
+    { speciesId: 32, minLevel: 13, maxLevel: 15, weight: 25 },
     { speciesId: 37, minLevel: 13, maxLevel: 15, weight: 15 },
     { speciesId: 58, minLevel: 13, maxLevel: 15, weight: 15 },
-    { speciesId: 185, minLevel: 20, maxLevel: 20, weight: 10 },
     { speciesId: 161, minLevel: 13, maxLevel: 15, weight: 20 },
+  ]}],
+);
+
+export const route37 = makeRoute('route_37', 'ROUTE 37', 14, 14,
+  [{ direction: 'down', targetMap: 'route_36', offset: 0 }, { direction: 'up', targetMap: 'ecruteak_city', offset: 0 }],
+  [{ type: 'grass', entries: [
+    { speciesId: 37, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 58, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20 },
   ]}],
 );
 
@@ -199,6 +209,27 @@ export const route39 = makeRoute('route_39', 'ROUTE 39', 14, 16,
     { speciesId: 241, minLevel: 16, maxLevel: 18, weight: 15 },
     { speciesId: 52, minLevel: 16, maxLevel: 18, weight: 25 },
     { speciesId: 56, minLevel: 16, maxLevel: 18, weight: 25 },
+  ]}],
+);
+
+export const route40 = makeRoute('route_40', 'ROUTE 40', 14, 16,
+  [{ direction: 'up', targetMap: 'olivine_city', offset: 0 }, { direction: 'down', targetMap: 'route_41', offset: 0 }],
+  [{ type: 'surf', entries: [
+    { speciesId: 72, minLevel: 20, maxLevel: 24, weight: 40 },
+    { speciesId: 73, minLevel: 22, maxLevel: 24, weight: 15 },
+    { speciesId: 170, minLevel: 20, maxLevel: 24, weight: 25 },
+    { speciesId: 129, minLevel: 20, maxLevel: 24, weight: 20 },
+  ]}],
+);
+
+export const route41 = makeRoute('route_41', 'ROUTE 41', 18, 18,
+  [{ direction: 'up', targetMap: 'route_40', offset: 0 }, { direction: 'down', targetMap: 'cianwood_city', offset: 0 }],
+  [{ type: 'surf', entries: [
+    { speciesId: 72, minLevel: 20, maxLevel: 24, weight: 35 },
+    { speciesId: 73, minLevel: 22, maxLevel: 24, weight: 15 },
+    { speciesId: 170, minLevel: 20, maxLevel: 24, weight: 20 },
+    { speciesId: 226, minLevel: 20, maxLevel: 24, weight: 15 },
+    { speciesId: 129, minLevel: 20, maxLevel: 24, weight: 15 },
   ]}],
 );
 
@@ -291,7 +322,7 @@ export const goldenrodCity = makeCity('goldenrod_city', 'GOLDENROD CITY', 24, 20
 
 export const ecruteakCity = makeCity('ecruteak_city', 'ECRUTEAK CITY', 20, 18,
   [{ direction: 'left', targetMap: 'route_38', offset: 0 }, { direction: 'right', targetMap: 'route_42', offset: 0 },
-   { direction: 'down', targetMap: 'route_36', offset: 0 }],
+   { direction: 'down', targetMap: 'route_37', offset: 0 }],
   [
     { x: 12, y: 8, targetMap: 'ecruteak_gym', targetX: 6, targetY: 11 },
     { x: 8, y: 8, targetMap: 'ecruteak_pokecenter', targetX: 3, targetY: 7 },
@@ -301,7 +332,7 @@ export const ecruteakCity = makeCity('ecruteak_city', 'ECRUTEAK CITY', 20, 18,
 );
 
 export const olivineCity = makeCity('olivine_city', 'OLIVINE CITY', 20, 18,
-  [{ direction: 'up', targetMap: 'route_39', offset: 0 }],
+  [{ direction: 'up', targetMap: 'route_39', offset: 0 }, { direction: 'down', targetMap: 'route_40', offset: 0 }],
   [
     { x: 12, y: 8, targetMap: 'olivine_gym', targetX: 6, targetY: 11 },
     { x: 8, y: 8, targetMap: 'olivine_pokecenter', targetX: 3, targetY: 7 },
@@ -311,7 +342,7 @@ export const olivineCity = makeCity('olivine_city', 'OLIVINE CITY', 20, 18,
 );
 
 export const cianwoodCity = makeCity('cianwood_city', 'CIANWOOD CITY', 18, 16,
-  [{ direction: 'right', targetMap: 'olivine_city', offset: 0 }],
+  [{ direction: 'up', targetMap: 'route_41', offset: 0 }],
   [
     { x: 11, y: 7, targetMap: 'cianwood_gym', targetX: 6, targetY: 11 },
     { x: 7, y: 7, targetMap: 'cianwood_pokecenter', targetX: 3, targetY: 7 },
@@ -349,6 +380,17 @@ export const lakeDomain = makeRoute('lake_of_rage', 'LAKE OF RAGE', 18, 16,
   ]}],
   [{ id: 'lake_sign', x: 9, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
      dialog: ['LAKE OF RAGE', 'Something strange is happening...'], isTrainer: false }],
+);
+
+export const cherrygroveCity = makeCity('cherrygrove_city', 'CHERRYGROVE CITY', 18, 14,
+  [{ direction: 'left', targetMap: 'route_29', offset: 0 }, { direction: 'up', targetMap: 'route_30', offset: 0 }],
+  [
+    { x: 11, y: 6, targetMap: 'cherrygrove_pokecenter', targetX: 3, targetY: 7 },
+  ],
+  [{ id: 'cherrygrove_sign', x: 9, y: 8, spriteId: 'sign', direction: 'down', movement: 'static',
+     dialog: ['CHERRYGROVE CITY', 'The City of Fragrant Flowers'], isTrainer: false },
+   { id: 'cherrygrove_guide', x: 6, y: 6, spriteId: 'old_man', direction: 'down', movement: 'static',
+     dialog: ['This is CHERRYGROVE CITY.', 'The sea is right here.', 'Want me to show you around?'], isTrainer: false }],
 );
 
 // --- Dungeons ---
@@ -420,6 +462,36 @@ export const mtSilver = makeRoute('mt_silver', 'MT. SILVER', 20, 24, [],
   ]}],
 );
 mtSilver.tilesetId = 'cave';
+mtSilver.warps = [
+  { x: 10, y: 1, targetMap: 'mt_silver_summit', targetX: 5, targetY: 9 },
+  { x: 10, y: 22, targetMap: 'route_28', targetX: 7, targetY: 1 },
+];
+
+// --- Transitional maps ---
+
+export const unionCaveEntrance = makeInterior('union_cave_entrance', 'UNION CAVE ENTRANCE', 10, 8, 'route_32', 7, 22);
+unionCaveEntrance.warps = [
+  { x: Math.floor(10 / 2), y: 7, targetMap: 'route_32', targetX: 7, targetY: 22 },
+  { x: Math.floor(10 / 2), y: 0, targetMap: 'union_cave', targetX: 8, targetY: 1 },
+];
+
+export const unionCaveExit = makeInterior('union_cave_exit', 'UNION CAVE EXIT', 10, 8, 'route_33', 1, 5);
+unionCaveExit.warps = [
+  { x: Math.floor(10 / 2), y: 7, targetMap: 'route_33', targetX: 1, targetY: 5 },
+  { x: Math.floor(10 / 2), y: 0, targetMap: 'union_cave', targetX: 8, targetY: 16 },
+];
+
+export const icePathEntrance = makeInterior('ice_path_entrance', 'ICE PATH ENTRANCE', 10, 8, 'route_44', 18, 5);
+icePathEntrance.warps = [
+  { x: Math.floor(10 / 2), y: 7, targetMap: 'route_44', targetX: 18, targetY: 5 },
+  { x: Math.floor(10 / 2), y: 0, targetMap: 'ice_path', targetX: 8, targetY: 1 },
+];
+
+export const mtSilverSummit = makeInterior('mt_silver_summit', 'MT. SILVER SUMMIT', 12, 10, 'mt_silver', 10, 1, [
+  { id: 'red', x: 6, y: 2, spriteId: 'red', direction: 'down', movement: 'static',
+    dialog: ['...'], isTrainer: true,
+    trainerData: { id: 'red', party: [] } },
+]);
 
 // --- Interiors ---
 
@@ -451,6 +523,7 @@ export const johtoInteriors: Record<string, GameMap> = {
       isTrainer: false },
   ]),
   // Pokemon Centers
+  cherrygrove_pokecenter: makePokecenter('cherrygrove_pokecenter', 'cherrygrove_city', 11, 7),
   violet_pokecenter: makePokecenter('violet_pokecenter', 'violet_city', 8, 9),
   azalea_pokecenter: makePokecenter('azalea_pokecenter', 'azalea_town', 7, 8),
   goldenrod_pokecenter: makePokecenter('goldenrod_pokecenter', 'goldenrod_city', 10, 10),

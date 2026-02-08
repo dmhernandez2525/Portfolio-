@@ -138,12 +138,24 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 29, minLevel: 13, maxLevel: 15, weight: 20 },  // Nidoran F
-        { speciesId: 32, minLevel: 13, maxLevel: 15, weight: 20 },  // Nidoran M
+        { speciesId: 29, minLevel: 13, maxLevel: 15, weight: 25 },  // Nidoran F
+        { speciesId: 32, minLevel: 13, maxLevel: 15, weight: 25 },  // Nidoran M
         { speciesId: 37, minLevel: 13, maxLevel: 15, weight: 15 },  // Vulpix
         { speciesId: 58, minLevel: 13, maxLevel: 15, weight: 15 },  // Growlithe
-        { speciesId: 185, minLevel: 13, maxLevel: 15, weight: 15 }, // Sudowoodo
-        { speciesId: 161, minLevel: 13, maxLevel: 15, weight: 15 }, // Sentret
+        { speciesId: 161, minLevel: 13, maxLevel: 15, weight: 20 }, // Sentret
+      ],
+    },
+  ],
+
+  route_37: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 37, minLevel: 14, maxLevel: 16, weight: 20 },  // Vulpix
+        { speciesId: 58, minLevel: 14, maxLevel: 16, weight: 20 },  // Growlithe
+        { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20 }, // Spinarak
+        { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20 }, // Ledyba
+        { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20 },  // Spearow
       ],
     },
   ],
@@ -173,6 +185,31 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
         { speciesId: 241, minLevel: 16, maxLevel: 18, weight: 15 }, // Miltank
         { speciesId: 52, minLevel: 16, maxLevel: 18, weight: 20 },  // Meowth
         { speciesId: 56, minLevel: 16, maxLevel: 18, weight: 20 },  // Mankey
+      ],
+    },
+  ],
+
+  route_40: [
+    {
+      type: 'surf',
+      entries: [
+        { speciesId: 72, minLevel: 20, maxLevel: 24, weight: 40 },  // Tentacool
+        { speciesId: 73, minLevel: 22, maxLevel: 24, weight: 15 },  // Tentacruel
+        { speciesId: 170, minLevel: 20, maxLevel: 24, weight: 25 }, // Chinchou
+        { speciesId: 129, minLevel: 20, maxLevel: 24, weight: 20 }, // Magikarp
+      ],
+    },
+  ],
+
+  route_41: [
+    {
+      type: 'surf',
+      entries: [
+        { speciesId: 72, minLevel: 20, maxLevel: 24, weight: 35 },  // Tentacool
+        { speciesId: 73, minLevel: 22, maxLevel: 24, weight: 15 },  // Tentacruel
+        { speciesId: 170, minLevel: 20, maxLevel: 24, weight: 20 }, // Chinchou
+        { speciesId: 226, minLevel: 20, maxLevel: 24, weight: 15 }, // Mantine
+        { speciesId: 129, minLevel: 20, maxLevel: 24, weight: 15 }, // Magikarp
       ],
     },
   ],
