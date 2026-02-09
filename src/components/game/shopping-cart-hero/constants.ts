@@ -15,13 +15,24 @@ export const HILL_END_X = 500;
 export const HILL_END_Y = 380;
 export const RAMP_WIDTH = 60;
 
+// Bezier control point for curved hill (gentle top, steep bottom)
+export const HILL_CONTROL_X = 200;
+export const HILL_CONTROL_Y = 120;
+
 // --- Marker posts ---
 export const MARKER_1_X = 300;  // "jump into cart" marker
 export const MARKER_2_X = 460;  // ramp approach marker
 
+// --- Power bar timing ---
+export const MARKER_TIMING_WINDOW = 40;   // +-40px around each marker
+export const MARKER1_SPEED_BONUS = 0.3;   // max speed boost from perfect marker 1 timing
+export const MARKER2_LAUNCH_BONUS = 0.5;  // max launch multiplier bonus from perfect marker 2
+
 // --- Physics ---
-export const RUN_ACCELERATION = 0.15;
-export const MAX_RUN_SPEED = 8;
+export const BASE_HILL_ACCEL = 0.02;     // gravity acceleration at top of hill (walking pace)
+export const MAX_HILL_ACCEL = 0.12;      // gravity acceleration at bottom of hill (fast)
+export const MAX_RUN_SPEED = 10;         // base max run speed (modified by wheel upgrades)
+export const RUN_DECEL = 0.05;           // deceleration when not pressing right
 export const GRAVITY = 0.38;
 export const AIR_DRAG = 0.9985;
 export const ROTATION_SPEED = 0.07;  // radians per frame
@@ -49,9 +60,9 @@ export const WHEEL_UPGRADES: UpgradeDef = {
   category: 'wheels',
   tiers: [
     { name: 'Junk Wheels', cost: 0, description: 'Rusty and barely round' },
-    { name: 'Round Wheels', cost: 200, description: '1.3x roll distance' },
-    { name: 'Metal Wheels', cost: 800, description: '1.6x roll distance' },
-    { name: 'Racing Wheels', cost: 2500, description: '2.0x roll distance' },
+    { name: 'Round Wheels', cost: 200, description: '1.3x speed & roll' },
+    { name: 'Metal Wheels', cost: 800, description: '1.6x speed & roll' },
+    { name: 'Racing Wheels', cost: 2500, description: '2.0x speed & roll' },
   ],
 };
 

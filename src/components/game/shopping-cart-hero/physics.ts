@@ -2,24 +2,28 @@
 // Shopping Cart Hero — Physics Engine
 // ============================================================================
 
-import type { CartState, RunnerState, TrickState, PlayerUpgrades, InputKeys } from './types';
+import type { CartState, RunnerState, TrickState, PlayerUpgrades, InputKeys, Particle } from './types';
 import {
   GRAVITY, AIR_DRAG, ROTATION_SPEED, BOUNCE_COEFFICIENT, ROLL_FRICTION,
-  MIN_BOUNCE_VEL, RUN_ACCELERATION, MAX_RUN_SPEED,
+  MIN_BOUNCE_VEL, BASE_HILL_ACCEL, MAX_HILL_ACCEL, MAX_RUN_SPEED, RUN_DECEL,
   HILL_START_X, HILL_START_Y, HILL_END_X, HILL_END_Y,
+  HILL_CONTROL_Y,
   RAMP_WIDTH, LAUNCH_ANGLE, LAUNCH_SPEED_MULT, FLAT_GROUND_Y,
-  MARKER_1_X, MARKER_2_X,
+  MARKER_1_X, MARKER_2_X, MARKER_TIMING_WINDOW, MARKER2_LAUNCH_BONUS,
   WHEEL_MULTIPLIERS, ROCKET_CONFIGS, ARMOR_CRASH_ANGLES,
   FLIP_POINTS, HANDSTAND_POINTS, SUPERMAN_POINTS,
 } from './constants';
 
-// --- Hill geometry helpers ---
+// --- Hill geometry helpers (quadratic bezier curve) ---
 
-function getHillY(x: number): number {
+export function getHillY(x: number): number {
   if (x < HILL_START_X) return HILL_START_Y;
   if (x > HILL_END_X) return FLAT_GROUND_Y;
   const t = (x - HILL_START_X) / (HILL_END_X - HILL_START_X);
-  return HILL_START_Y + t * (HILL_END_Y - HILL_START_Y);
+  const oneMinusT = 1 - t;
+  return (oneMinusT * oneMinusT * HILL_START_Y)
+       + (2 * oneMinusT * t * HILL_CONTROL_Y)
+       + (t * t * HILL_END_Y);
 }
 
 function getGroundY(x: number): number {
@@ -36,16 +40,34 @@ export function createRunner(): RunnerState {
     frame: 0,
     passedMarker1: false,
     passedMarker2: false,
+    marker1Power: 0,
+    marker2Power: 0,
+    inTimingWindow1: false,
+    inTimingWindow2: false,
+    marker1Locked: false,
+    marker2Locked: false,
   };
 }
 
-export function updateRunner(runner: RunnerState, keys: InputKeys): RunnerState {
+export function updateRunner(runner: RunnerState, keys: InputKeys, upgrades?: PlayerUpgrades): RunnerState {
   const next = { ...runner };
 
+  // Calculate hill progress (0 at top, 1 at bottom)
+  const hillProgress = Math.max(0, Math.min(1,
+    (next.pos.x - HILL_START_X) / (HILL_END_X - HILL_START_X),
+  ));
+
+  // Gravity-driven acceleration increases as runner descends the slope
+  const gravityAccel = BASE_HILL_ACCEL + (MAX_HILL_ACCEL - BASE_HILL_ACCEL) * hillProgress;
+
+  // Wheel upgrades increase max speed
+  const wheelMult = upgrades ? WHEEL_MULTIPLIERS[upgrades.wheels] : 1.0;
+  const effectiveMaxSpeed = MAX_RUN_SPEED * wheelMult;
+
   if (keys.right) {
-    next.speed = Math.min(next.speed + RUN_ACCELERATION, MAX_RUN_SPEED);
+    next.speed = Math.min(next.speed + gravityAccel, effectiveMaxSpeed);
   } else {
-    next.speed = Math.max(0, next.speed - 0.1);
+    next.speed = Math.max(0, next.speed - RUN_DECEL);
   }
 
   next.pos = { ...next.pos };
@@ -56,6 +78,13 @@ export function updateRunner(runner: RunnerState, keys: InputKeys): RunnerState 
 
   if (next.pos.x >= MARKER_1_X) next.passedMarker1 = true;
   if (next.pos.x >= MARKER_2_X) next.passedMarker2 = true;
+
+  // Timing window detection for power bars
+  const dist1 = Math.abs(next.pos.x - MARKER_1_X);
+  next.inTimingWindow1 = dist1 <= MARKER_TIMING_WINDOW && !next.marker1Locked;
+
+  const dist2 = Math.abs(next.pos.x - MARKER_2_X);
+  next.inTimingWindow2 = dist2 <= MARKER_TIMING_WINDOW && !next.marker2Locked;
 
   return next;
 }
@@ -79,7 +108,8 @@ export function createCart(): CartState {
 }
 
 export function launchCart(runner: RunnerState, upgrades: PlayerUpgrades): CartState {
-  const speed = runner.speed * LAUNCH_SPEED_MULT;
+  const launchBonus = 1.0 + runner.marker2Power * MARKER2_LAUNCH_BONUS;
+  const speed = runner.speed * LAUNCH_SPEED_MULT * launchBonus;
   const rocketConfig = ROCKET_CONFIGS[upgrades.rockets];
 
   return {
@@ -118,12 +148,13 @@ export function updateCartFlight(
   next.vel.x *= AIR_DRAG;
   next.vel.y *= AIR_DRAG;
 
-  // Rockets
-  if (next.rocketFuel > 0) {
+  // Rockets — player-controlled via SPACE key
+  if (keys.space && next.rocketFuel > 0) {
     next.rocketActive = true;
     const rocketConfig = ROCKET_CONFIGS[upgrades.rockets];
-    next.vel.x += Math.cos(next.angle) * rocketConfig.force * 0.3;
-    next.vel.y -= rocketConfig.force * 0.5;
+    // Directional thrust based on cart angle
+    next.vel.x += Math.cos(next.angle) * rocketConfig.force * 0.4;
+    next.vel.y += Math.sin(next.angle) * rocketConfig.force * 0.4 - rocketConfig.force * 0.3;
     next.rocketFuel--;
   } else {
     next.rocketActive = false;
@@ -287,6 +318,39 @@ export function updateTricks(
   if (next.comboTimer > 0) next.comboTimer--;
 
   return next;
+}
+
+// --- Particle system ---
+
+export function createLandingParticles(x: number, y: number, speed: number): Particle[] {
+  const count = Math.min(20, Math.floor(speed * 2));
+  const particles: Particle[] = [];
+  for (let i = 0; i < count; i++) {
+    const life = 30 + Math.random() * 20;
+    particles.push({
+      x,
+      y,
+      vx: (Math.random() - 0.5) * speed * 0.5,
+      vy: -Math.random() * 3 - 1,
+      life,
+      maxLife: life,
+      size: 2 + Math.random() * 3,
+      color: Math.random() > 0.5 ? '#8B7355' : '#6aae4e',
+    });
+  }
+  return particles;
+}
+
+export function updateParticles(particles: Particle[]): Particle[] {
+  return particles
+    .map(p => ({
+      ...p,
+      x: p.x + p.vx,
+      y: p.y + p.vy,
+      vy: p.vy + 0.1,
+      life: p.life - 1,
+    }))
+    .filter(p => p.life > 0);
 }
 
 // --- Distance / height tracking ---
