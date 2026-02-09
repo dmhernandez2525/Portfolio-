@@ -698,7 +698,7 @@ function drawHUD(
     const barY = 78;
     ctx.fillStyle = '#444';
     ctx.fillRect(20, barY, 160, 8);
-    ctx.fillStyle = fuelPct > 0.3 ? '#ff4444' : '#ff0000';
+    ctx.fillStyle = fuelPct > 0.6 ? '#44cc44' : fuelPct > 0.3 ? '#ffaa00' : '#ff4444';
     ctx.fillRect(20, barY, 160 * fuelPct, 8);
     ctx.strokeStyle = '#666';
     ctx.lineWidth = 1;

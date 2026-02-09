@@ -9,7 +9,7 @@ import {
   CANVAS_WIDTH, CANVAS_HEIGHT, DEFAULT_UPGRADES, FLAT_GROUND_Y,
   HILL_END_X, RAMP_WIDTH, HILL_START_X,
   MARKER_1_X, MARKER_2_X, MARKER_TIMING_WINDOW, MARKER1_SPEED_BONUS, MAX_RUN_SPEED,
-  WHEEL_UPGRADES, ROCKET_UPGRADES, ARMOR_UPGRADES,
+  WHEEL_MULTIPLIERS, WHEEL_UPGRADES, ROCKET_UPGRADES, ARMOR_UPGRADES,
   TRICK_DEFS, GROUPIE_COSTS, GROUPIE_MULTIPLIERS,
 } from './constants';
 import {
@@ -81,6 +81,10 @@ export function ShoppingCartHeroGame() {
     saveToLocalStorage(data);
   }, [activeProfile, saveGameData]);
 
+  // Ref to avoid stale closure in gameLoop → finishRun → saveData chain
+  const saveDataRef = useRef(saveData);
+  useEffect(() => { saveDataRef.current = saveData; }, [saveData]);
+
   const initialSave = useRef(loadLocalSave());
   const [phase, setPhase] = useState<GamePhase>('menu');
   const [money, setMoney] = useState(initialSave.current.money);
@@ -98,6 +102,10 @@ export function ShoppingCartHeroGame() {
     setTotalRuns(data.totalRuns);
     if (phase !== 'menu' && phase !== 'shop') {
       cancelAnimationFrame(animRef.current);
+      if (crashTimerRef.current) {
+        clearTimeout(crashTimerRef.current);
+        crashTimerRef.current = null;
+      }
       setPhase('menu');
     }
   }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -174,7 +182,7 @@ export function ShoppingCartHeroGame() {
         state.runner.marker1Locked = true;
 
         // Apply speed boost from marker 1 power
-        const wheelMult = state.upgrades ? (state.upgrades.wheels >= 0 ? [1.0, 1.3, 1.6, 2.0][state.upgrades.wheels] : 1.0) : 1.0;
+        const wheelMult = state.upgrades ? WHEEL_MULTIPLIERS[state.upgrades.wheels] ?? 1.0 : 1.0;
         state.runner.speed += state.runner.marker1Power * MARKER1_SPEED_BONUS * MAX_RUN_SPEED * wheelMult;
 
         state.cart.inCart = true;
@@ -311,11 +319,11 @@ export function ShoppingCartHeroGame() {
     setHighScore(newHighScore);
     setTotalRuns(newRuns);
     setUpgrades(newUpgrades);
-    saveData({ money: newMoney, highScore: newHighScore, upgrades: newUpgrades, totalRuns: newRuns });
+    saveDataRef.current({ money: newMoney, highScore: newHighScore, upgrades: newUpgrades, totalRuns: newRuns });
 
     state.phase = 'results';
     setPhase('results');
-  }, [saveData]);
+  }, []);
 
   // --- Phase transitions ---
 
