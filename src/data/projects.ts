@@ -33,7 +33,7 @@ export interface ProjectItem {
 
 export const projectsData: ProjectItem[] = [
   // ============================================
-  // TIER 1 - FLAGSHIP PROJECTS (7)
+  // TIER 1 - FLAGSHIP PROJECTS (8)
   // Enterprise-grade, production-ready systems
   // ============================================
   {
@@ -305,6 +305,31 @@ export const projectsData: ProjectItem[] = [
     featured: true,
     status: "development",
     metrics: "$2.3B market, 147 tx break-even"
+  },
+
+  {
+    id: "bread-of-heaven",
+    title: "Bread of Heaven",
+    tagline: "Gamified Bible Learning Platform",
+    description: "Structured Bible learning with Khan Academy-style modules and Duolingo-style engagement mechanics. Transformation-weighted XP rewards journaling and action steps at 2x the rate of passive reading. Built for individual learners, pastors, and churches with Sabbath Grace streak protection.",
+    category: "SaaS Platform",
+    tier: "flagship",
+    tech: ["Next.js 16", "Strapi 5", "TypeScript", "Tailwind CSS v4", "PostgreSQL", "Redis", "BullMQ"],
+    features: [
+      "Hear/Understand/Respond learning framework",
+      "Transformation-weighted XP with daily 200 XP cap",
+      "Sabbath Grace streak protection on rest days",
+      "Pastoral dashboards with church engagement metrics",
+      "Anti-gamification guardrails (no public rankings, no punitive mechanics)",
+      "BSB, KJV, WEB Bible translations with API.Bible Pro planned",
+      "Demo mode with learner and pastor role switching"
+    ],
+    highlights: ["Transformation > Information", "Sabbath Grace", "Church Integration"],
+    link: "https://bread-of-heaven-site.onrender.com",
+    github: "https://github.com/dmhernandez2525/bread-of-heaven",
+    featured: true,
+    status: "development",
+    metrics: "10 modules, 5 levels, 200 XP daily cap"
   },
 
   // ============================================
