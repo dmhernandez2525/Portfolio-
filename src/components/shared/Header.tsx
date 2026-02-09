@@ -6,6 +6,7 @@ import { useTheme } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utils"
 
 import { CreatureToggle } from "@/components/game/CreatureToggle"
+import { ProfileButton } from "@/components/profile/ProfileButton"
 import { useGamification } from "@/hooks/use-gamification"
 import {
   DropdownMenu,
@@ -257,6 +258,9 @@ export function Header() {
           {/* Creature Toggle */}
           <CreatureToggle />
 
+          {/* Profile */}
+          <ProfileButton />
+
           {/* Site Health */}
           <SiteHealthBar />
         </nav>
@@ -376,6 +380,7 @@ export function Header() {
             <div className="flex items-center gap-2">
               <SiteHealthBar />
               <CreatureToggle />
+              <ProfileButton />
             </div>
             <div className="flex items-center gap-2 text-sm font-mono px-3 py-1 rounded-full bg-secondary/50 border border-border">
               <span className="text-neon-pink">✨</span>

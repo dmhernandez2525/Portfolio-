@@ -20,8 +20,8 @@ export const MARKER_1_X = 300;  // "jump into cart" marker
 export const MARKER_2_X = 460;  // ramp approach marker
 
 // --- Physics ---
-export const RUN_ACCELERATION = 0.3;
-export const MAX_RUN_SPEED = 14;
+export const RUN_ACCELERATION = 0.15;
+export const MAX_RUN_SPEED = 8;
 export const GRAVITY = 0.38;
 export const AIR_DRAG = 0.9985;
 export const ROTATION_SPEED = 0.07;  // radians per frame

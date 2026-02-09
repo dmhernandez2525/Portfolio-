@@ -296,8 +296,8 @@ export function ShoppingCartHeroGame() {
   // --- UI ---
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
-      <div className="relative">
+    <div className="h-screen w-screen bg-gray-900 flex flex-col items-center justify-center overflow-hidden p-2">
+      <div className="relative max-h-[70vh] aspect-[8/5]">
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
@@ -332,13 +332,14 @@ export function ShoppingCartHeroGame() {
 
         {/* Shop overlay */}
         {phase === 'shop' && (
-          <div className="absolute inset-0 bg-gray-900/95 rounded-lg overflow-y-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white font-mono">UPGRADE SHOP</h2>
-              <div className="text-yellow-400 font-bold text-xl font-mono">${money}</div>
+          <div className="absolute inset-0 bg-gray-900/95 rounded-lg flex flex-col">
+            <div className="flex justify-between items-center p-4 pb-2">
+              <h2 className="text-xl font-bold text-white font-mono">UPGRADE SHOP</h2>
+              <div className="text-yellow-400 font-bold text-lg font-mono">${money}</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="flex-1 overflow-y-auto px-4">
+            <div className="grid grid-cols-2 gap-2 mb-3">
               {/* Wheels */}
               <ShopCategory
                 title="Wheels"
@@ -367,8 +368,8 @@ export function ShoppingCartHeroGame() {
               />
 
               {/* Tricks */}
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h3 className="text-lg font-bold text-white mb-3 font-mono">Tricks</h3>
+              <div className="bg-gray-800 rounded-lg p-3">
+                <h3 className="text-sm font-bold text-white mb-2 font-mono">Tricks</h3>
                 {TRICK_DEFS.map((trick, i) => {
                   const owned = upgrades[trick.id as keyof typeof upgrades];
                   return (
@@ -397,12 +398,12 @@ export function ShoppingCartHeroGame() {
             </div>
 
             {/* Groupies */}
-            <div className="bg-gray-800 rounded-lg p-4 mb-6">
-              <h3 className="text-lg font-bold text-white mb-3 font-mono">
+            <div className="bg-gray-800 rounded-lg p-3 mb-2">
+              <h3 className="text-sm font-bold text-white mb-2 font-mono">
                 Groupies ({upgrades.groupies}/3) — {GROUPIE_MULTIPLIERS[upgrades.groupies]}x multiplier
               </h3>
-              <p className="text-gray-400 text-xs mb-3 font-mono">Warning: Lost on crash!</p>
-              <div className="flex gap-3">
+              <p className="text-gray-400 text-[10px] mb-2 font-mono">Warning: Lost on crash!</p>
+              <div className="flex gap-2">
                 {GROUPIE_COSTS.map((cost, i) => {
                   const hired = upgrades.groupies > i;
                   const isNext = upgrades.groupies === i;
@@ -411,7 +412,7 @@ export function ShoppingCartHeroGame() {
                       key={i}
                       disabled={!isNext || money < cost}
                       onClick={() => handlePurchase(`groupie_${i}`)}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:text-gray-400 text-white text-sm rounded font-mono transition-colors"
+                      className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:text-gray-400 text-white text-xs rounded font-mono transition-colors"
                     >
                       {hired ? 'HIRED' : `Groupie ${i + 1} — $${cost}`}
                     </button>
@@ -419,11 +420,12 @@ export function ShoppingCartHeroGame() {
                 })}
               </div>
             </div>
+            </div>
 
-            <div className="flex justify-center">
+            <div className="p-4 pt-2 border-t border-gray-700">
               <button
                 onClick={startRun}
-                className="px-12 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-xl transition-colors font-mono"
+                className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-xl transition-colors font-mono"
               >
                 GO!
               </button>
@@ -519,8 +521,8 @@ function ShopCategory({
   onBuy: (tierIndex: number) => void;
 }) {
   return (
-    <div className="bg-gray-800 rounded-lg p-4">
-      <h3 className="text-lg font-bold text-white mb-3 font-mono">{title}</h3>
+    <div className="bg-gray-800 rounded-lg p-3">
+      <h3 className="text-sm font-bold text-white mb-2 font-mono">{title}</h3>
       {tiers.map((tier, i) => {
         const owned = currentTier >= i;
         const nextTier = i === currentTier + 1;
