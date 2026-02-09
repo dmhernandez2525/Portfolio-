@@ -2,13 +2,15 @@
 // Shopping Cart Hero — Canvas Renderer
 // ============================================================================
 
-import type { CartState, RunnerState, TrickState, PlayerUpgrades, GamePhase } from './types';
+import type { CartState, RunnerState, TrickState, PlayerUpgrades, GamePhase, Particle } from './types';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, COLORS,
   HILL_START_X, HILL_START_Y, HILL_END_X, HILL_END_Y,
-  RAMP_WIDTH, MARKER_1_X, MARKER_2_X, FLAT_GROUND_Y,
+  HILL_CONTROL_X, HILL_CONTROL_Y,
+  RAMP_WIDTH, MARKER_1_X, MARKER_2_X, MARKER_TIMING_WINDOW, FLAT_GROUND_Y,
+  ROCKET_CONFIGS,
 } from './constants';
-import { getDistance, getHeight } from './physics';
+import { getDistance, getHeight, getHillY } from './physics';
 
 // --- Main render ---
 
@@ -22,6 +24,7 @@ export function render(
   cameraX: number,
   frameCount: number,
   money: number,
+  particles: Particle[],
 ) {
   ctx.save();
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -37,19 +40,29 @@ export function render(
   drawRamp(ctx);
   drawMarkers(ctx);
 
-  if (phase === 'run' || phase === 'launch') {
+  if (phase === 'run') {
     drawRunner(ctx, runner);
+    drawPowerBar(ctx, MARKER_1_X, runner.pos.x, MARKER_TIMING_WINDOW, runner.marker1Locked, runner.marker1Power);
+    drawPowerBar(ctx, MARKER_2_X, runner.pos.x, MARKER_TIMING_WINDOW, runner.marker2Locked, runner.marker2Power);
+  }
+
+  if (phase === 'launch') {
+    drawRunnerInCart(ctx, runner);
+    drawPowerBar(ctx, MARKER_2_X, runner.pos.x, MARKER_TIMING_WINDOW, runner.marker2Locked, runner.marker2Power);
   }
 
   if (phase === 'flight' || phase === 'landing' || phase === 'results') {
     drawCart(ctx, cart, upgrades, tricks, frameCount);
   }
 
+  // Particles (world-space)
+  drawParticles(ctx, particles);
+
   ctx.restore();
 
   // HUD (screen-space)
   if (phase === 'flight' || phase === 'landing') {
-    drawHUD(ctx, cart, tricks, money);
+    drawHUD(ctx, cart, tricks, money, upgrades);
   }
 
   if (phase === 'flight' && tricks.comboTimer > 0) {
@@ -153,7 +166,7 @@ function drawGround(ctx: CanvasRenderingContext2D, cameraX: number) {
   ctx.fillRect(cameraX, FLAT_GROUND_Y + 10, CANVAS_WIDTH + 200, CANVAS_HEIGHT);
 }
 
-// --- Hill ---
+// --- Hill (quadratic bezier curve) ---
 
 function drawHill(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = COLORS.hill;
@@ -161,25 +174,24 @@ function drawHill(ctx: CanvasRenderingContext2D) {
   ctx.moveTo(0, CANVAS_HEIGHT);
   ctx.lineTo(0, HILL_START_Y);
   ctx.lineTo(HILL_START_X, HILL_START_Y);
-  ctx.lineTo(HILL_END_X, HILL_END_Y);
+  ctx.quadraticCurveTo(HILL_CONTROL_X, HILL_CONTROL_Y, HILL_END_X, HILL_END_Y);
   ctx.lineTo(HILL_END_X, CANVAS_HEIGHT);
   ctx.closePath();
   ctx.fill();
 
-  // Hill surface line
+  // Hill surface line (curved)
   ctx.strokeStyle = COLORS.hillDark;
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(HILL_START_X, HILL_START_Y);
-  ctx.lineTo(HILL_END_X, HILL_END_Y);
+  ctx.quadraticCurveTo(HILL_CONTROL_X, HILL_CONTROL_Y, HILL_END_X, HILL_END_Y);
   ctx.stroke();
 
-  // Grass tufts
+  // Grass tufts (placed along the bezier curve)
   ctx.strokeStyle = '#3d7a2a';
   ctx.lineWidth = 2;
   for (let x = HILL_START_X; x < HILL_END_X; x += 25) {
-    const t = (x - HILL_START_X) / (HILL_END_X - HILL_START_X);
-    const y = HILL_START_Y + t * (HILL_END_Y - HILL_START_Y);
+    const y = getHillY(x);
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x - 3, y - 6);
@@ -215,8 +227,7 @@ function drawRamp(ctx: CanvasRenderingContext2D) {
 function drawMarkers(ctx: CanvasRenderingContext2D) {
   const markers = [MARKER_1_X, MARKER_2_X];
   for (const mx of markers) {
-    const t = (mx - HILL_START_X) / (HILL_END_X - HILL_START_X);
-    const my = HILL_START_Y + t * (HILL_END_Y - HILL_START_Y);
+    const my = getHillY(mx);
 
     // Post
     ctx.strokeStyle = COLORS.marker;
@@ -234,6 +245,55 @@ function drawMarkers(ctx: CanvasRenderingContext2D) {
     ctx.lineTo(mx, my - 25);
     ctx.closePath();
     ctx.fill();
+  }
+}
+
+// --- Power bar at markers ---
+
+function drawPowerBar(
+  ctx: CanvasRenderingContext2D,
+  markerX: number,
+  runnerX: number,
+  windowSize: number,
+  locked: boolean,
+  power: number,
+) {
+  const dist = Math.abs(runnerX - markerX);
+  if (dist > windowSize && !locked) return;
+  // Don't show bar for markers already passed and not locked
+  if (runnerX > markerX + windowSize && !locked) return;
+
+  const barWidth = 50;
+  const barHeight = 8;
+  const barX = markerX - barWidth / 2;
+  const barY = getHillY(markerX) - 55;
+
+  // Background
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  if (locked) {
+    // Show achieved power (color-coded)
+    ctx.fillStyle = power > 0.8 ? '#00ff44' : power > 0.5 ? '#ffaa00' : '#ff4444';
+    ctx.fillRect(barX, barY, barWidth * power, barHeight);
+  } else if (dist <= windowSize) {
+    // Live bar showing current potential power
+    const currentPower = 1.0 - (dist / windowSize);
+    ctx.fillStyle = '#ffdd00';
+    ctx.fillRect(barX, barY, barWidth * currentPower, barHeight);
+  }
+
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+  // Label
+  if (locked) {
+    ctx.fillStyle = power > 0.8 ? '#00ff44' : '#ffffff';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    const label = power > 0.8 ? 'PERFECT!' : power > 0.5 ? 'GOOD' : 'OK';
+    ctx.fillText(label, markerX, barY - 3);
   }
 }
 
@@ -275,6 +335,63 @@ function drawRunner(ctx: CanvasRenderingContext2D, runner: RunnerState) {
   ctx.stroke();
 }
 
+// --- Runner in cart (launch phase) ---
+
+function drawRunnerInCart(ctx: CanvasRenderingContext2D, runner: RunnerState) {
+  const { x, y } = runner.pos;
+
+  ctx.strokeStyle = COLORS.cartDark;
+  ctx.lineWidth = 2;
+
+  // Small cart body (trapezoid)
+  ctx.fillStyle = COLORS.cart;
+  ctx.beginPath();
+  ctx.moveTo(x - 12, y - 2);
+  ctx.lineTo(x + 12, y - 2);
+  ctx.lineTo(x + 15, y + 10);
+  ctx.lineTo(x - 15, y + 10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Cart handle
+  ctx.beginPath();
+  ctx.moveTo(x - 12, y - 2);
+  ctx.lineTo(x - 16, y - 15);
+  ctx.stroke();
+
+  // Wheels
+  ctx.fillStyle = COLORS.cartWheel;
+  ctx.beginPath();
+  ctx.arc(x - 8, y + 12, 4, 0, Math.PI * 2);
+  ctx.arc(x + 8, y + 12, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Stickman sitting in cart
+  ctx.strokeStyle = COLORS.stickman;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(x, y - 16, 5, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(x, y - 11);
+  ctx.lineTo(x, y - 2);
+  ctx.stroke();
+
+  // Arms holding handle
+  ctx.beginPath();
+  ctx.moveTo(x, y - 8);
+  ctx.lineTo(x - 10, y - 6);
+  ctx.moveTo(x, y - 8);
+  ctx.lineTo(x + 6, y - 6);
+  ctx.stroke();
+}
+
 // --- Cart with stickman ---
 
 function drawCart(
@@ -288,19 +405,35 @@ function drawCart(
   ctx.translate(cart.pos.x, cart.pos.y);
   ctx.rotate(cart.angle);
 
-  // Cart body
+  // Cart body (trapezoid basket)
   ctx.fillStyle = COLORS.cart;
   ctx.strokeStyle = COLORS.cartDark;
   ctx.lineWidth = 2;
-  ctx.fillRect(-20, -15, 40, 20);
-  ctx.strokeRect(-20, -15, 40, 20);
+  ctx.beginPath();
+  ctx.moveTo(-18, -12);
+  ctx.lineTo(18, -12);
+  ctx.lineTo(22, 5);
+  ctx.lineTo(-22, 5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Cart basket grid lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 1;
+  for (let gy = -8; gy < 4; gy += 4) {
+    ctx.beginPath();
+    ctx.moveTo(-20, gy);
+    ctx.lineTo(20, gy);
+    ctx.stroke();
+  }
 
   // Cart handle
   ctx.strokeStyle = COLORS.cartDark;
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(-20, -15);
-  ctx.lineTo(-25, -30);
+  ctx.moveTo(-18, -12);
+  ctx.lineTo(-23, -28);
   ctx.stroke();
 
   // Wheels
@@ -519,11 +652,32 @@ function drawRocketFlame(ctx: CanvasRenderingContext2D, frame: number) {
   ctx.fill();
 }
 
+// --- Particles ---
+
+function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]) {
+  for (const p of particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
+}
+
 // --- HUD ---
 
-function drawHUD(ctx: CanvasRenderingContext2D, cart: CartState, tricks: TrickState, money: number) {
+function drawHUD(
+  ctx: CanvasRenderingContext2D,
+  cart: CartState,
+  tricks: TrickState,
+  money: number,
+  upgrades: PlayerUpgrades,
+) {
+  const hasFuel = upgrades.rockets > 0;
+  const hudHeight = hasFuel ? 100 : 80;
+
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-  roundRect(ctx, 10, 10, 200, 80, 8);
+  roundRect(ctx, 10, 10, 200, hudHeight, 8);
   ctx.fill();
 
   ctx.fillStyle = COLORS.text;
@@ -537,8 +691,27 @@ function drawHUD(ctx: CanvasRenderingContext2D, cart: CartState, tricks: TrickSt
   ctx.fillText(`Height: ${height}m`, 20, 48);
   ctx.fillText(`Tricks: ${tricks.trickPoints} pts`, 20, 66);
 
+  // Fuel gauge
+  if (hasFuel) {
+    const maxFuel = ROCKET_CONFIGS[upgrades.rockets].frames;
+    const fuelPct = maxFuel > 0 ? cart.rocketFuel / maxFuel : 0;
+    const barY = 78;
+    ctx.fillStyle = '#444';
+    ctx.fillRect(20, barY, 160, 8);
+    ctx.fillStyle = fuelPct > 0.6 ? '#44cc44' : fuelPct > 0.3 ? '#ffaa00' : '#ff4444';
+    ctx.fillRect(20, barY, 160 * fuelPct, 8);
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(20, barY, 160, 8);
+    ctx.fillStyle = '#aaa';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('FUEL', 22, barY + 7);
+  }
+
   // Money
   ctx.fillStyle = COLORS.money;
+  ctx.font = 'bold 14px monospace';
   ctx.textAlign = 'right';
   ctx.fillText(`$${money}`, CANVAS_WIDTH - 20, 30);
 }

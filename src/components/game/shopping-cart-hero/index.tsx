@@ -8,25 +8,28 @@ import type { GamePhase, GameState, InputKeys } from './types';
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT, DEFAULT_UPGRADES, FLAT_GROUND_Y,
   HILL_END_X, RAMP_WIDTH, HILL_START_X,
-  WHEEL_UPGRADES, ROCKET_UPGRADES, ARMOR_UPGRADES,
+  MARKER_1_X, MARKER_2_X, MARKER_TIMING_WINDOW, MARKER1_SPEED_BONUS, MAX_RUN_SPEED,
+  WHEEL_MULTIPLIERS, WHEEL_UPGRADES, ROCKET_UPGRADES, ARMOR_UPGRADES,
   TRICK_DEFS, GROUPIE_COSTS, GROUPIE_MULTIPLIERS,
 } from './constants';
 import {
   createRunner, updateRunner, createCart, launchCart,
   updateCartFlight, updateCartRolling, createTrickState, updateTricks,
-  getDistance, getHeight,
+  getDistance, getHeight, createLandingParticles, updateParticles, getHillY,
 } from './physics';
 import { render } from './renderer';
 import { calculateResult, purchaseUpgrade } from './shop';
+import { useProfile } from '@/context/profile-context';
 
 const SAVE_KEY = 'shopping-cart-hero-save';
 
-function loadSave(): { money: number; highScore: number; upgrades: typeof DEFAULT_UPGRADES; totalRuns: number } {
+type SaveData = { money: number; highScore: number; upgrades: typeof DEFAULT_UPGRADES; totalRuns: number };
+
+function loadLocalSave(): SaveData {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Validate shape before using
       if (typeof parsed.money === 'number' && typeof parsed.highScore === 'number' && parsed.upgrades) {
         return {
           money: parsed.money,
@@ -40,26 +43,85 @@ function loadSave(): { money: number; highScore: number; upgrades: typeof DEFAUL
   return { money: 0, highScore: 0, upgrades: { ...DEFAULT_UPGRADES }, totalRuns: 0 };
 }
 
-function saveToDisk(money: number, highScore: number, upgrades: typeof DEFAULT_UPGRADES, totalRuns: number) {
-  localStorage.setItem(SAVE_KEY, JSON.stringify({ money, highScore, upgrades, totalRuns }));
+function saveToLocalStorage(data: SaveData) {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(data));
 }
 
 export function ShoppingCartHeroGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const keysRef = useRef<InputKeys>({ left: false, right: false, up: false, down: false });
+  const keysRef = useRef<InputKeys>({ left: false, right: false, up: false, down: false, space: false });
   const stateRef = useRef<GameState | null>(null);
   const frameRef = useRef(0);
   const animRef = useRef<number>(0);
   const maxHeightRef = useRef(0);
   const crashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const initialSave = useRef(loadSave());
+  // Profile integration
+  const { activeProfile, saveGameData, loadGameData } = useProfile();
+
+  const loadSaveData = useCallback((): SaveData => {
+    if (activeProfile) {
+      const profileData = loadGameData<SaveData>('shopping-cart-hero');
+      if (profileData && typeof profileData.money === 'number') {
+        return {
+          money: profileData.money,
+          highScore: profileData.highScore,
+          upgrades: { ...DEFAULT_UPGRADES, ...profileData.upgrades },
+          totalRuns: typeof profileData.totalRuns === 'number' ? profileData.totalRuns : 0,
+        };
+      }
+    }
+    return loadLocalSave();
+  }, [activeProfile, loadGameData]);
+
+  const saveData = useCallback((data: SaveData) => {
+    if (activeProfile) {
+      saveGameData('shopping-cart-hero', data);
+    }
+    saveToLocalStorage(data);
+  }, [activeProfile, saveGameData]);
+
+  // Ref to avoid stale closure in gameLoop → finishRun → saveData chain
+  const saveDataRef = useRef(saveData);
+  useEffect(() => { saveDataRef.current = saveData; }, [saveData]);
+
+  const initialSave = useRef(loadLocalSave());
   const [phase, setPhase] = useState<GamePhase>('menu');
   const [money, setMoney] = useState(initialSave.current.money);
   const [highScore, setHighScore] = useState(initialSave.current.highScore);
   const [upgrades, setUpgrades] = useState(initialSave.current.upgrades);
   const [totalRuns, setTotalRuns] = useState(initialSave.current.totalRuns);
   const [lastResult, setLastResult] = useState<ReturnType<typeof calculateResult> | null>(null);
+
+  // Reload save data when profile changes
+  useEffect(() => {
+    const data = loadSaveData();
+    setMoney(data.money);
+    setHighScore(data.highScore);
+    setUpgrades(data.upgrades);
+    setTotalRuns(data.totalRuns);
+    if (phase !== 'menu' && phase !== 'shop') {
+      cancelAnimationFrame(animRef.current);
+      if (crashTimerRef.current) {
+        clearTimeout(crashTimerRef.current);
+        crashTimerRef.current = null;
+      }
+      setPhase('menu');
+    }
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // One-time migration: copy localStorage data to profile if profile is empty
+  useEffect(() => {
+    if (activeProfile) {
+      const profileData = loadGameData<SaveData>('shopping-cart-hero');
+      if (!profileData) {
+        const localData = loadLocalSave();
+        if (localData.money > 0 || localData.totalRuns > 0) {
+          saveGameData('shopping-cart-hero', localData);
+        }
+      }
+    }
+  }, [activeProfile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- Input handling ---
 
@@ -70,7 +132,8 @@ export function ShoppingCartHeroGame() {
       if (e.key === 'ArrowRight' || e.key === 'd') k.right = true;
       if (e.key === 'ArrowUp' || e.key === 'w') k.up = true;
       if (e.key === 'ArrowDown' || e.key === 's') k.down = true;
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      if (e.key === ' ' || e.code === 'Space') k.space = true;
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
         e.preventDefault();
       }
     };
@@ -80,6 +143,7 @@ export function ShoppingCartHeroGame() {
       if (e.key === 'ArrowRight' || e.key === 'd') k.right = false;
       if (e.key === 'ArrowUp' || e.key === 'w') k.up = false;
       if (e.key === 'ArrowDown' || e.key === 's') k.down = false;
+      if (e.key === ' ' || e.code === 'Space') k.space = false;
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -104,20 +168,40 @@ export function ShoppingCartHeroGame() {
     const keys = keysRef.current;
     frameRef.current++;
 
+    // Update particles every frame
+    state.particles = updateParticles(state.particles);
+
     // Phase-specific updates
     if (state.phase === 'run') {
-      state.runner = updateRunner(state.runner, keys);
+      state.runner = updateRunner(state.runner, keys, state.upgrades);
 
-      // Jump into cart at marker 1
-      if (keys.up && state.runner.passedMarker1 && !state.cart.inCart) {
+      // Marker 1: Jump into cart (timing mechanic)
+      if (keys.up && state.runner.inTimingWindow1 && !state.runner.marker1Locked) {
+        const dist = Math.abs(state.runner.pos.x - MARKER_1_X);
+        state.runner.marker1Power = 1.0 - (dist / MARKER_TIMING_WINDOW);
+        state.runner.marker1Locked = true;
+
+        // Apply speed boost from marker 1 power
+        const wheelMult = state.upgrades ? WHEEL_MULTIPLIERS[state.upgrades.wheels] ?? 1.0 : 1.0;
+        state.runner.speed += state.runner.marker1Power * MARKER1_SPEED_BONUS * MAX_RUN_SPEED * wheelMult;
+
+        state.cart.inCart = true;
         state.phase = 'launch';
         setPhase('launch');
       }
 
-      // Auto-launch if past ramp
+      // Auto-fail if runner passes timing window without pressing UP
+      if (state.runner.pos.x > MARKER_1_X + MARKER_TIMING_WINDOW && !state.runner.marker1Locked) {
+        state.runner.marker1Power = 0;
+        state.runner.marker1Locked = true;
+        state.cart.inCart = true;
+        state.phase = 'launch';
+        setPhase('launch');
+      }
+
+      // Missed the cart entirely (past ramp)
       if (state.runner.pos.x >= HILL_END_X + RAMP_WIDTH) {
         if (!state.cart.inCart) {
-          // Missed the cart - just reset
           state.phase = 'results';
           setPhase('results');
           const result = calculateResult(0, 0, 0, true, state.upgrades);
@@ -130,8 +214,21 @@ export function ShoppingCartHeroGame() {
     }
 
     if (state.phase === 'launch') {
-      state.runner = updateRunner(state.runner, keys);
+      state.runner = updateRunner(state.runner, keys, state.upgrades);
       state.cameraX = Math.max(0, state.runner.pos.x - 200);
+
+      // Marker 2: Ramp timing (power bar)
+      if (keys.up && state.runner.inTimingWindow2 && !state.runner.marker2Locked) {
+        const dist = Math.abs(state.runner.pos.x - MARKER_2_X);
+        state.runner.marker2Power = 1.0 - (dist / MARKER_TIMING_WINDOW);
+        state.runner.marker2Locked = true;
+      }
+
+      // Auto-fail marker 2 if passed without pressing
+      if (state.runner.pos.x > MARKER_2_X + MARKER_TIMING_WINDOW && !state.runner.marker2Locked) {
+        state.runner.marker2Power = 0;
+        state.runner.marker2Locked = true;
+      }
 
       if (state.runner.pos.x >= HILL_END_X + RAMP_WIDTH - 10) {
         state.cart = launchCart(state.runner, state.upgrades);
@@ -151,6 +248,13 @@ export function ShoppingCartHeroGame() {
       state.cameraX = Math.max(0, state.cart.pos.x - 300);
 
       if (state.cart.onGround) {
+        // Spawn landing particles
+        const speed = Math.abs(state.cart.vel.x) + Math.abs(state.cart.vel.y);
+        state.particles = [
+          ...state.particles,
+          ...createLandingParticles(state.cart.pos.x, state.cart.pos.y + 15, speed),
+        ];
+
         if (state.cart.crashed) {
           state.phase = 'landing';
           setPhase('landing');
@@ -179,6 +283,7 @@ export function ShoppingCartHeroGame() {
     render(
       ctx, state.phase, state.cart, state.runner, state.tricks,
       state.upgrades, state.cameraX, frameRef.current, state.money,
+      state.particles,
     );
 
     if (state.phase !== 'menu' && state.phase !== 'shop' && state.phase !== 'results') {
@@ -214,7 +319,7 @@ export function ShoppingCartHeroGame() {
     setHighScore(newHighScore);
     setTotalRuns(newRuns);
     setUpgrades(newUpgrades);
-    saveToDisk(newMoney, newHighScore, newUpgrades, newRuns);
+    saveDataRef.current({ money: newMoney, highScore: newHighScore, upgrades: newUpgrades, totalRuns: newRuns });
 
     state.phase = 'results';
     setPhase('results');
@@ -235,6 +340,7 @@ export function ShoppingCartHeroGame() {
       lastResult: null,
       cameraX: 0,
       groundY: FLAT_GROUND_Y,
+      particles: [],
     };
     stateRef.current = state;
     maxHeightRef.current = 0;
@@ -254,9 +360,9 @@ export function ShoppingCartHeroGame() {
     if (result.success) {
       setUpgrades(result.upgrades);
       setMoney(result.money);
-      saveToDisk(result.money, highScore, result.upgrades, totalRuns);
+      saveData({ money: result.money, highScore, upgrades: result.upgrades, totalRuns });
     }
-  }, [upgrades, money, highScore, totalRuns]);
+  }, [upgrades, money, highScore, totalRuns, saveData]);
 
   // --- Cleanup ---
 
@@ -282,14 +388,15 @@ export function ShoppingCartHeroGame() {
         money, highScore, totalRuns,
         upgrades: { ...upgrades },
         cart: createCart(),
-        runner: { ...createRunner(), pos: { x: HILL_START_X + 80, y: 0 }, speed: 0, frame: 0, passedMarker1: false, passedMarker2: false },
+        runner: { ...createRunner(), pos: { x: HILL_START_X + 80, y: 0 }, speed: 0, frame: 0, passedMarker1: false, passedMarker2: false, marker1Power: 0, marker2Power: 0, inTimingWindow1: false, inTimingWindow2: false, marker1Locked: false, marker2Locked: false },
         tricks: createTrickState(),
         lastResult: null,
         cameraX: 0,
         groundY: FLAT_GROUND_Y,
+        particles: [],
       };
-      state.runner.pos.y = 130;
-      render(ctx, 'run', state.cart, state.runner, state.tricks, state.upgrades, 0, 0, money);
+      state.runner.pos.y = getHillY(HILL_START_X + 80) - 20;
+      render(ctx, 'run', state.cart, state.runner, state.tricks, state.upgrades, 0, 0, money, []);
     }
   }, [phase, money, highScore, totalRuns, upgrades]);
 
@@ -326,7 +433,7 @@ export function ShoppingCartHeroGame() {
                 PLAY
               </button>
             </div>
-            <p className="text-gray-400 text-sm mt-6 font-mono">Arrow keys to play | RIGHT = run | UP = jump</p>
+            <p className="text-gray-400 text-sm mt-6 font-mono">Arrow keys to play | RIGHT = run | UP = jump | SPACE = rockets</p>
           </div>
         )}
 
@@ -493,8 +600,8 @@ export function ShoppingCartHeroGame() {
       {(phase === 'run' || phase === 'launch' || phase === 'flight') && (
         <div className="mt-4 text-gray-400 text-sm font-mono text-center">
           {phase === 'run' && 'Hold RIGHT to run → Press UP at orange marker to jump in cart'}
-          {phase === 'launch' && 'Running to ramp...'}
-          {phase === 'flight' && 'LEFT/RIGHT to rotate | DOWN = Handstand | UP = Superman'}
+          {phase === 'launch' && 'Press UP at the second marker for launch power!'}
+          {phase === 'flight' && 'LEFT/RIGHT rotate | SPACE = rockets | DOWN = Handstand | UP = Superman'}
         </div>
       )}
 

@@ -31,6 +31,23 @@ export interface RunnerState {
   frame: number;           // animation frame
   passedMarker1: boolean;
   passedMarker2: boolean;
+  marker1Power: number;      // 0-1, power achieved at marker 1
+  marker2Power: number;      // 0-1, power achieved at marker 2
+  inTimingWindow1: boolean;  // currently in marker 1 timing zone
+  inTimingWindow2: boolean;  // currently in marker 2 timing zone
+  marker1Locked: boolean;    // player already pressed UP for marker 1
+  marker2Locked: boolean;    // player already pressed UP for marker 2
+}
+
+export interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  color: string;
 }
 
 export interface TrickState {
@@ -88,6 +105,7 @@ export interface GameState {
   lastResult: RunResult | null;
   cameraX: number;         // horizontal scroll offset
   groundY: number;         // ground level at current camera position
+  particles: Particle[];
 }
 
 export interface InputKeys {
@@ -95,4 +113,5 @@ export interface InputKeys {
   right: boolean;
   up: boolean;
   down: boolean;
+  space: boolean;
 }
