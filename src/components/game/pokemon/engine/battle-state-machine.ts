@@ -199,6 +199,13 @@ export function advanceBattle(state: BattleState): BattleState {
       };
     },
 
+    switch_prompt: () => ({
+      ...state,
+      phase: 'switch_select' as BattlePhase,
+      textQueue: ['Choose a Pokemon!'],
+      currentText: 'Choose a Pokemon!',
+    }),
+
     catch_animate: () => {
       if (state.battleResult === 'caught') {
         return {

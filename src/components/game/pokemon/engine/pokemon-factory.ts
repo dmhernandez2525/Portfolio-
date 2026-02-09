@@ -5,6 +5,7 @@
 
 import type { Pokemon, PokemonStats, PokemonMove, Nature, SpeciesData, StatName } from './types';
 import { calculateStat, getExpForLevel, type GrowthRate } from './constants';
+import { getMoveData } from './battle-engine';
 
 const NATURES: Nature[] = [
   'hardy', 'lonely', 'brave', 'adamant', 'naughty',
@@ -62,11 +63,11 @@ export function createPokemon(species: SpeciesData, level: number): Pokemon {
     moveIds.push('tackle');
   }
 
-  const moves: PokemonMove[] = moveIds.map(id => ({
-    moveId: id,
-    pp: 35, // default; will be refined when move database lookup is available
-    maxPp: 35,
-  }));
+  const moves: PokemonMove[] = moveIds.map(id => {
+    const data = getMoveData(id);
+    const pp = data?.pp ?? 35;
+    return { moveId: id, pp, maxPp: pp };
+  });
 
   const exp = getExpForLevel(species.growthRate as GrowthRate, level);
 
