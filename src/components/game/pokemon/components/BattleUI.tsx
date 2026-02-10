@@ -40,6 +40,10 @@ export default function BattleUI({
 }: BattleUIProps) {
   const menuIndex = useRef(0);
 
+  useEffect(() => {
+    menuIndex.current = 0;
+  }, [state.phase]);
+
   // Render battle scene to canvas
   useEffect(() => {
     const ctx = canvasRef.current?.getContext('2d');
