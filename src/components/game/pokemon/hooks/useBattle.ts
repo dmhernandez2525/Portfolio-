@@ -2,7 +2,7 @@
 // Pokemon RPG — Battle Hook
 // ============================================================================
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { BattleState, Pokemon, TrainerDef, BattleType } from '../engine/types';
 import {
   createBattleState, advanceBattle, selectFight, selectItem,
@@ -13,6 +13,7 @@ import {
 export function useBattle() {
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const onEndRef = useRef<((result: string) => void) | null>(null);
+  const endTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startBattle = useCallback((config: {
     type: BattleType;
@@ -20,6 +21,10 @@ export function useBattle() {
     opponentParty: Pokemon[];
     trainerDef?: TrainerDef;
   }) => {
+    if (endTimeoutRef.current) {
+      clearTimeout(endTimeoutRef.current);
+      endTimeoutRef.current = null;
+    }
     const state = createBattleState(config);
     setBattleState(state);
   }, []);
@@ -35,14 +40,27 @@ export function useBattle() {
 
       // Check if battle is over
       if (next.phase === 'battle_end' && next.battleResult !== 'ongoing') {
-        setTimeout(() => {
+        if (endTimeoutRef.current) {
+          clearTimeout(endTimeoutRef.current);
+        }
+        endTimeoutRef.current = setTimeout(() => {
           onEndRef.current?.(next.battleResult);
           setBattleState(null);
+          endTimeoutRef.current = null;
         }, 500);
       }
 
       return next;
     });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (endTimeoutRef.current) {
+        clearTimeout(endTimeoutRef.current);
+        endTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const fight = useCallback(() => {
