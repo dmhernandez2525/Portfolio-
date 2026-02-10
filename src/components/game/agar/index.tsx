@@ -72,6 +72,7 @@ export function AgarGame() {
   const [highScore, setHighScore] = useState(() =>
     parseInt(localStorage.getItem("agar-highscore") || "0", 10)
   )
+  const [isNewHighScore, setIsNewHighScore] = useState(false)
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer?: boolean; isPlayer2?: boolean }[]>([])
 
   // Initialize food
@@ -176,6 +177,7 @@ export function AgarGame() {
     setWinner(null)
     setScore(0)
     setScore2(0)
+    setIsNewHighScore(false)
   }, [initializeFood, initializeAI, initializeViruses])
 
   // End game
@@ -195,7 +197,9 @@ export function AgarGame() {
           playerCellsRef.current.reduce((sum, cell) => sum + getMass(cell.radius), 0)
         )
 
-    if (finalScore > highScore && gameMode === "single") {
+    const didBeatHighScore = finalScore > highScore && gameMode === "single"
+    setIsNewHighScore(didBeatHighScore)
+    if (didBeatHighScore) {
       setHighScore(finalScore)
       localStorage.setItem("agar-highscore", finalScore.toString())
     }
@@ -1321,7 +1325,7 @@ export function AgarGame() {
                 <>
                   <h1 className="text-4xl font-bold text-red-500 mb-4">Game Over</h1>
                   <p className="text-xl text-white mb-2">Final Score: {score.toLocaleString()}</p>
-                  {score >= highScore && score > 0 && (
+                  {isNewHighScore && (
                     <p className="text-yellow-400 font-bold mb-4 animate-pulse">New High Score!</p>
                   )}
                 </>
