@@ -86,6 +86,9 @@ export function useBattle() {
   const cancel = useCallback(() => {
     setBattleState(prev => {
       if (!prev) return null;
+      if (prev.phase === 'switch_select' && prev.playerActive.pokemon.currentHp <= 0) {
+        return prev;
+      }
       if (prev.phase === 'move_select' || prev.phase === 'item_select' || prev.phase === 'switch_select') {
         return {
           ...prev,
