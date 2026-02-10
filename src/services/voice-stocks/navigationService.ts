@@ -20,6 +20,9 @@ const ROUTE_MAPPINGS: Record<string, { route: string; aliases: string[] }> = {
   'cookie-clicker': { route: '/cookie-clicker', aliases: ['cookie', 'clicker', 'cookie game'] },
   chess: { route: '/chess', aliases: ['chess game'] },
   agar: { route: '/agar', aliases: ['agar.io', 'agar game', 'agario'] },
+  pokemon: { route: '/pokemon', aliases: ['pokemon game', 'poke', 'pokémon'] },
+  'shopping-cart-hero': { route: '/shopping-cart-hero', aliases: ['shopping cart hero', 'cart hero', 'shopping cart'] },
+  'mafia-wars': { route: '/mafia-wars', aliases: ['mafia wars', 'mafia', 'mob'] },
   home: { route: '/', aliases: ['main', 'start', 'beginning', 'top'] },
 };
 
