@@ -434,7 +434,7 @@ export function AIAssistant() {
                 contents: [{
                   role: "user",
                   parts: [{ text: `Analyze this user request and determine if they want to navigate somewhere.
-Available pages: games, projects, philosophy, inventions, blog, social, tetris, snake, tanks, cookie-clicker, chess, agar, home
+Available pages: games, projects, philosophy, inventions, blog, social, falling-blocks, tetris, snake, tanks, cookie-clicker, chess, agar, pokemon, shopping-cart-hero, mafia-wars, home
 Available sections on home: hero, about, skills, experience, projects, contact
 
 User request: "${trimmedInput}"
