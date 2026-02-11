@@ -5,7 +5,7 @@
 import { useRef, useCallback } from 'react';
 import type { Player, Direction, GameMap } from '../engine/types';
 import { SCALED_TILE, PLAYER_SPEED, ENCOUNTER_RATE } from '../engine/constants';
-import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp } from '../engine/collision';
+import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp, getTileType } from '../engine/collision';
 import { setCameraTarget } from '../engine/camera';
 import type { Camera } from '../engine/types';
 
@@ -16,10 +16,14 @@ export interface OverworldState {
 
 export function useOverworld() {
   const stateRef = useRef<OverworldState | null>(null);
-  const encounterCallback = useRef<(() => void) | null>(null);
+  const encounterCallback = useRef<((encounterType?: 'grass' | 'surf' | 'fishing' | 'cave') => void) | null>(null);
   const warpCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
   const connectionCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
   const npcCallback = useRef<((npcId: string) => void) | null>(null);
+  const stepCallback = useRef<(() => void) | null>(null);
+  const surfCallback = useRef<(() => boolean) | null>(null);
+  const fieldMoveCallback = useRef<((move: 'cut' | 'strength') => boolean) | null>(null);
+  const stepCountRef = useRef(0);
 
   const init = useCallback((map: GameMap, startX: number, startY: number): Player => {
     const player: Player = {
@@ -46,7 +50,7 @@ export function useOverworld() {
     }
   }, []);
 
-  const onEncounter = useCallback((cb: () => void) => {
+  const onEncounter = useCallback((cb: (encounterType?: 'grass' | 'surf' | 'fishing' | 'cave') => void) => {
     encounterCallback.current = cb;
   }, []);
 
@@ -60,6 +64,42 @@ export function useOverworld() {
 
   const onNPCInteract = useCallback((cb: (npcId: string) => void) => {
     npcCallback.current = cb;
+  }, []);
+
+  const onStep = useCallback((cb: () => void) => {
+    stepCallback.current = cb;
+  }, []);
+
+  /** Register callback to check if player can surf (has badge + party has Surf). Returns true if allowed. */
+  const onSurfCheck = useCallback((cb: () => boolean) => {
+    surfCallback.current = cb;
+  }, []);
+
+  /** Register callback for field move checks (Cut, Strength). Returns true if party has the move. */
+  const onFieldMoveCheck = useCallback((cb: (move: 'cut' | 'strength') => boolean) => {
+    fieldMoveCallback.current = cb;
+  }, []);
+
+  /** Toggle biking on/off. */
+  const toggleBike = useCallback(() => {
+    const state = stateRef.current;
+    if (!state || state.player.isMoving || state.player.isSurfing) return;
+    state.player.isBiking = !state.player.isBiking;
+    state.player.speed = state.player.isBiking ? PLAYER_SPEED * 2 : PLAYER_SPEED;
+  }, []);
+
+  /** Use fishing rod: returns true if facing water (triggers encounter via callback). */
+  const useFishingRod = useCallback((): boolean => {
+    const state = stateRef.current;
+    if (!state || state.player.isMoving) return false;
+    const { player, currentMap } = state;
+    const facing = getAdjacentTile(player.tileX, player.tileY, player.direction);
+    const facingTile = getTileType(currentMap, facing.x, facing.y);
+    if (facingTile === 'surfable') {
+      encounterCallback.current?.('fishing');
+      return true;
+    }
+    return false;
   }, []);
 
   /** Check if the player is at a map edge and should transition via connection. */
@@ -134,6 +174,12 @@ export function useOverworld() {
         player.x = player.tileX * SCALED_TILE;
         player.y = player.tileY * SCALED_TILE;
 
+        // Step counter for friendship
+        stepCountRef.current++;
+        if (stepCountRef.current % 128 === 0) {
+          stepCallback.current?.();
+        }
+
         // Check for map connection (edge of map)
         if (checkConnection(player, currentMap)) {
           return player;
@@ -146,10 +192,18 @@ export function useOverworld() {
           return player;
         }
 
-        // Check for wild encounter in tall grass
-        if (isTallGrass(currentMap, player.tileX, player.tileY)) {
-          if (Math.random() < ENCOUNTER_RATE && encounterCallback.current) {
-            encounterCallback.current();
+        // Exit surf when stepping onto walkable land
+        if (player.isSurfing) {
+          const currentTile = getTileType(currentMap, player.tileX, player.tileY);
+          if (currentTile && currentTile !== 'surfable') {
+            player.isSurfing = false;
+          }
+        }
+
+        // Check for wild encounter in tall grass or while surfing
+        if (isTallGrass(currentMap, player.tileX, player.tileY) || player.isSurfing) {
+          if (Math.random() < ENCOUNTER_RATE && encounterCallback.current && !player.isBiking) {
+            encounterCallback.current(player.isSurfing ? 'surf' : 'grass');
             return player;
           }
         }
@@ -198,12 +252,36 @@ export function useOverworld() {
       }
     }
 
-    // A button: interact with NPC or sign in front
+    // A button: interact with NPC, surf prompt, field moves, or sign in front
     if (aPressed && !player.isMoving) {
       const facing = getAdjacentTile(player.tileX, player.tileY, player.direction);
       const npc = isNPCAtTile(currentMap.npcs, facing.x, facing.y);
       if (npc && npcCallback.current) {
         npcCallback.current(npc.id);
+      } else {
+        const facingTile = getTileType(currentMap, facing.x, facing.y);
+        if (!player.isSurfing && facingTile === 'surfable' && surfCallback.current) {
+          const canSurf = surfCallback.current();
+          if (canSurf) {
+            player.isSurfing = true;
+            player.tileX = facing.x;
+            player.tileY = facing.y;
+            player.x = facing.x * SCALED_TILE;
+            player.y = facing.y * SCALED_TILE;
+            player.isMoving = false;
+          }
+        } else if (facingTile === 'cuttable_tree' && fieldMoveCallback.current?.('cut')) {
+          // Remove the tree by changing tile to walkable
+          currentMap.collision[facing.y][facing.x] = 'walkable';
+        } else if (facingTile === 'boulder' && fieldMoveCallback.current?.('strength')) {
+          // Push boulder one tile in the player's facing direction
+          const beyond = getAdjacentTile(facing.x, facing.y, player.direction);
+          const beyondTile = getTileType(currentMap, beyond.x, beyond.y);
+          if (beyondTile === 'walkable') {
+            currentMap.collision[facing.y][facing.x] = 'walkable';
+            currentMap.collision[beyond.y][beyond.x] = 'boulder';
+          }
+        }
       }
     }
 
@@ -227,6 +305,11 @@ export function useOverworld() {
     onWarp,
     onConnection,
     onNPCInteract,
+    onStep,
+    onSurfCheck,
+    onFieldMoveCheck,
+    toggleBike,
+    useFishingRod,
     getState: () => stateRef.current,
   };
 }

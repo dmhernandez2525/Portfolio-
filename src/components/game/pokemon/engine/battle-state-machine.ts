@@ -11,6 +11,7 @@ import {
   createBattlePokemon, executeTurn, checkLevelUp,
   attemptCatch, getMoveData,
 } from './battle-engine';
+import { checkEvolution, evolvePokemon, getMovesForLevel, getSpeciesName } from './evolution-system';
 
 export interface BattleConfig {
   type: BattleType;
@@ -111,21 +112,90 @@ export function advanceBattle(state: BattleState): BattleState {
       };
     },
 
-    level_up: () => ({
-      ...state,
-      phase: 'battle_end' as BattlePhase,
-      battleResult: 'win',
-      textQueue: ['You won the battle!'],
-      currentText: 'You won the battle!',
-      pendingLevelUps: [],
-    }),
+    level_up: () => {
+      // Check for new moves to learn
+      const lu = state.pendingLevelUps[0];
+      if (lu && lu.newMoves.length > 0) {
+        const moveId = lu.newMoves[0];
+        const moveData = getMoveData(moveId);
+        const moveName = moveData?.name ?? moveId;
+        const pokeName = lu.pokemon.nickname ?? getSpeciesName(lu.pokemon.speciesId);
+
+        // Auto-learn if < 4 moves
+        if (lu.pokemon.moves.length < 4) {
+          lu.pokemon.moves.push({ moveId, pp: moveData?.pp ?? 10, maxPp: moveData?.pp ?? 10 });
+          const remainingMoves = lu.newMoves.slice(1);
+          return {
+            ...state,
+            pendingLevelUps: [{ ...lu, newMoves: remainingMoves }, ...state.pendingLevelUps.slice(1)],
+            textQueue: [`${pokeName} learned ${moveName}!`],
+            currentText: `${pokeName} learned ${moveName}!`,
+          };
+        }
+
+        // Prompt for move replacement (4 moves already)
+        return {
+          ...state,
+          phase: 'move_learn' as BattlePhase,
+          textQueue: [
+            `${pokeName} wants to learn ${moveName}!`,
+            `But ${pokeName} already knows 4 moves.`,
+            'Forget a move to learn it?',
+          ],
+          currentText: `${pokeName} wants to learn ${moveName}!`,
+        };
+      }
+
+      // Check for evolution
+      if (lu) {
+        const evoCheck = checkEvolution(lu.pokemon, 'level_up');
+        if (evoCheck.canEvolve && evoCheck.evolvesTo) {
+          const pokeName = lu.pokemon.nickname ?? getSpeciesName(lu.pokemon.speciesId);
+          return {
+            ...state,
+            phase: 'evolution_check' as BattlePhase,
+            pendingEvolution: { pokemon: lu.pokemon, evolvesTo: evoCheck.evolvesTo },
+            pendingLevelUps: state.pendingLevelUps.slice(1),
+            textQueue: [`What? ${pokeName} is evolving!`],
+            currentText: `What? ${pokeName} is evolving!`,
+          };
+        }
+      }
+
+      return {
+        ...state,
+        phase: 'battle_end' as BattlePhase,
+        battleResult: 'win',
+        textQueue: ['You won the battle!'],
+        currentText: 'You won the battle!',
+        pendingLevelUps: [],
+      };
+    },
 
     faint_check: () => {
+      // If player is mid-charge (Dig/Fly), auto-execute the turn
+      if (state.playerActive.chargingMove && state.playerActive.pokemon.currentHp > 0 && state.opponentActive.pokemon.currentHp > 0) {
+        const result = executeTurn(state, null, 'fight');
+        return {
+          ...state,
+          phase: 'faint_check' as BattlePhase,
+          turnNumber: state.turnNumber + 1,
+          expGained: result.expGained,
+          weather: result.newWeather ?? state.weather,
+          weatherTurns: result.newWeatherTurns ?? state.weatherTurns,
+          textQueue: result.messages,
+          currentText: result.messages[0] ?? '',
+        };
+      }
+
       // Opponent fainted
       if (state.opponentActive.pokemon.currentHp <= 0) {
         const expResult = checkLevelUp(state.playerActive.pokemon, state.expGained);
+        const newMoves = expResult.leveled
+          ? getMovesForLevel(state.playerActive.pokemon.speciesId, expResult.newLevel)
+          : [];
         const levelUps = expResult.leveled
-          ? [{ pokemon: state.playerActive.pokemon, newLevel: expResult.newLevel, newMoves: [] }]
+          ? [{ pokemon: state.playerActive.pokemon, newLevel: expResult.newLevel, newMoves }]
           : [];
 
         // Check if opponent has more pokemon (trainer battle)
@@ -161,6 +231,9 @@ export function advanceBattle(state: BattleState): BattleState {
 
       // Player fainted
       if (state.playerActive.pokemon.currentHp <= 0) {
+        // Friendship penalty on faint (-1)
+        state.playerActive.pokemon.friendship = Math.max(0, state.playerActive.pokemon.friendship - 1);
+
         const nextAlly = state.playerParty.find(p =>
           p.uid !== state.playerActive.pokemon.uid && p.currentHp > 0
         );
@@ -196,6 +269,42 @@ export function advanceBattle(state: BattleState): BattleState {
         phase: 'action_select' as BattlePhase,
         textQueue: ['What will you do?'],
         currentText: 'What will you do?',
+      };
+    },
+
+    evolution_check: () => {
+      // If there's a pending evolution, wait for UI to call applyEvolution or cancelEvolution
+      if (state.pendingEvolution) return state;
+      return {
+        ...state,
+        phase: 'battle_end' as BattlePhase,
+        battleResult: 'win',
+        textQueue: ['You won the battle!'],
+        currentText: 'You won the battle!',
+      };
+    },
+
+    move_learn: () => {
+      // Default: skip learning the move (player declined or auto-skip)
+      const lu = state.pendingLevelUps[0];
+      if (lu) {
+        const moveId = lu.newMoves[0];
+        const moveName = getMoveData(moveId)?.name ?? moveId;
+        const pokeName = lu.pokemon.nickname ?? getSpeciesName(lu.pokemon.speciesId);
+        const remainingMoves = lu.newMoves.slice(1);
+        return {
+          ...state,
+          phase: 'level_up' as BattlePhase,
+          pendingLevelUps: [{ ...lu, newMoves: remainingMoves }, ...state.pendingLevelUps.slice(1)],
+          textQueue: [`${pokeName} did not learn ${moveName}.`],
+          currentText: `${pokeName} did not learn ${moveName}.`,
+        };
+      }
+      return {
+        ...state,
+        phase: 'level_up' as BattlePhase,
+        textQueue: [''],
+        currentText: '',
       };
     },
 
@@ -292,6 +401,8 @@ export function executePlayerMove(state: BattleState, moveIndex: number): Battle
     phase: 'faint_check',
     turnNumber: state.turnNumber + 1,
     expGained: result.expGained,
+    weather: result.newWeather ?? state.weather,
+    weatherTurns: result.newWeatherTurns ?? state.weatherTurns,
     textQueue: result.messages,
     currentText: result.messages[0] ?? '',
   };
@@ -379,4 +490,85 @@ export function getAvailableSwitches(state: BattleState): Pokemon[] {
   return state.playerParty.filter(p =>
     p.uid !== state.playerActive.pokemon.uid && p.currentHp > 0
   );
+}
+
+// Replace a move with the pending new move (move_learn phase)
+export function learnMove(state: BattleState, replaceIndex: number): BattleState {
+  if (state.phase !== 'move_learn') return state;
+
+  const lu = state.pendingLevelUps[0];
+  if (!lu || lu.newMoves.length === 0) return state;
+
+  const newMoveId = lu.newMoves[0];
+  const newMoveData = getMoveData(newMoveId);
+  const pokeName = lu.pokemon.nickname ?? getSpeciesName(lu.pokemon.speciesId);
+  const newMoveName = newMoveData?.name ?? newMoveId;
+
+  if (replaceIndex >= 0 && replaceIndex < lu.pokemon.moves.length) {
+    const oldMove = getMoveData(lu.pokemon.moves[replaceIndex].moveId);
+    lu.pokemon.moves[replaceIndex] = {
+      moveId: newMoveId,
+      pp: newMoveData?.pp ?? 10,
+      maxPp: newMoveData?.pp ?? 10,
+    };
+    const remainingMoves = lu.newMoves.slice(1);
+    return {
+      ...state,
+      phase: 'level_up' as BattlePhase,
+      pendingLevelUps: [{ ...lu, newMoves: remainingMoves }, ...state.pendingLevelUps.slice(1)],
+      textQueue: [
+        `1, 2, and... Poof!`,
+        `${pokeName} forgot ${oldMove?.name ?? 'the old move'}.`,
+        `And... ${pokeName} learned ${newMoveName}!`,
+      ],
+      currentText: '1, 2, and... Poof!',
+    };
+  }
+
+  // -1 = decline to learn
+  const remainingMoves = lu.newMoves.slice(1);
+  return {
+    ...state,
+    phase: 'level_up' as BattlePhase,
+    pendingLevelUps: [{ ...lu, newMoves: remainingMoves }, ...state.pendingLevelUps.slice(1)],
+    textQueue: [`${pokeName} did not learn ${newMoveName}.`],
+    currentText: `${pokeName} did not learn ${newMoveName}.`,
+  };
+}
+
+// Skip learning the pending move (decline)
+export function skipMoveLearn(state: BattleState): BattleState {
+  return learnMove(state, -1);
+}
+
+// Apply pending evolution (player let it proceed)
+export function applyEvolution(state: BattleState): BattleState {
+  if (!state.pendingEvolution) return state;
+  const { pokemon, evolvesTo } = state.pendingEvolution;
+  const oldName = pokemon.nickname ?? getSpeciesName(pokemon.speciesId);
+  const evolved = evolvePokemon(pokemon, evolvesTo);
+  Object.assign(pokemon, evolved);
+  const newName = getSpeciesName(evolvesTo);
+  return {
+    ...state,
+    phase: 'battle_end' as BattlePhase,
+    battleResult: 'win',
+    pendingEvolution: null,
+    textQueue: [`${oldName} evolved into ${newName}!`, 'You won the battle!'],
+    currentText: `${oldName} evolved into ${newName}!`,
+  };
+}
+
+// Cancel pending evolution (player pressed B)
+export function cancelEvolution(state: BattleState): BattleState {
+  const pokeName = state.pendingEvolution?.pokemon.nickname
+    ?? (state.pendingEvolution ? getSpeciesName(state.pendingEvolution.pokemon.speciesId) : '');
+  return {
+    ...state,
+    phase: 'battle_end' as BattlePhase,
+    battleResult: 'win',
+    pendingEvolution: null,
+    textQueue: [`${pokeName} stopped evolving!`, 'You won the battle!'],
+    currentText: `${pokeName} stopped evolving!`,
+  };
 }

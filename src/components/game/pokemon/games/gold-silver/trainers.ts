@@ -162,6 +162,87 @@ export const champion: TrainerDef = {
   defeatDialog: ['...It\'s over.', 'You are the new POKeMON LEAGUE CHAMPION!'],
 };
 
+// --- Gym Trainers ---
+
+export const gymTrainers: Record<string, TrainerDef[]> = {
+  violet_gym: [
+    { id: 'violet_gym_1', name: 'Rod', class: 'Bird Keeper', spriteId: 'bird_keeper',
+      aiTier: 'basic', reward: 160, isGymLeader: false,
+      party: [{ speciesId: 21, level: 7 }, { speciesId: 16, level: 7 }], // Spearow, Pidgey
+      defeatDialog: ['My birds fell!'] },
+  ],
+  azalea_gym: [
+    { id: 'azalea_gym_1', name: 'Al', class: 'Bug Catcher', spriteId: 'bug_catcher',
+      aiTier: 'basic', reward: 240, isGymLeader: false,
+      party: [{ speciesId: 10, level: 12 }, { speciesId: 13, level: 12 }], // Caterpie, Weedle
+      defeatDialog: ['My bugs!'] },
+    { id: 'azalea_gym_2', name: 'Josh', class: 'Bug Catcher', spriteId: 'bug_catcher',
+      aiTier: 'basic', reward: 260, isGymLeader: false,
+      party: [{ speciesId: 167, level: 13 }], // Spinarak
+      defeatDialog: ['Ugh, my web fell apart!'] },
+  ],
+  goldenrod_gym: [
+    { id: 'goldenrod_gym_1', name: 'Samantha', class: 'Lass', spriteId: 'lass',
+      aiTier: 'basic', reward: 440, isGymLeader: false,
+      party: [{ speciesId: 35, level: 18 }, { speciesId: 39, level: 18 }], // Clefairy, Jigglypuff
+      defeatDialog: ['Oh no, I lost!'] },
+    { id: 'goldenrod_gym_2', name: 'Cathy', class: 'Beauty', spriteId: 'beauty',
+      aiTier: 'basic', reward: 460, isGymLeader: false,
+      party: [{ speciesId: 209, level: 19 }], // Snubbull
+      defeatDialog: ['That was rough!'] },
+  ],
+  ecruteak_gym: [
+    { id: 'ecruteak_gym_1', name: 'Jeffrey', class: 'Medium', spriteId: 'medium',
+      aiTier: 'basic', reward: 560, isGymLeader: false,
+      party: [{ speciesId: 92, level: 22 }, { speciesId: 93, level: 22 }], // Gastly, Haunter
+      defeatDialog: ['The spirits have abandoned me!'] },
+    { id: 'ecruteak_gym_2', name: 'Martha', class: 'Medium', spriteId: 'medium',
+      aiTier: 'basic', reward: 580, isGymLeader: false,
+      party: [{ speciesId: 92, level: 23 }], // Gastly
+      defeatDialog: ['Noo, my Gastly!'] },
+  ],
+  olivine_gym: [
+    { id: 'olivine_gym_1', name: 'Connie', class: 'Lass', spriteId: 'lass',
+      aiTier: 'basic', reward: 640, isGymLeader: false,
+      party: [{ speciesId: 81, level: 28 }], // Magnemite
+      defeatDialog: ['JASMINE will avenge me!'] },
+  ],
+  cianwood_gym: [
+    { id: 'cianwood_gym_1', name: 'Yoshi', class: 'Black Belt', spriteId: 'blackbelt',
+      aiTier: 'basic', reward: 660, isGymLeader: false,
+      party: [{ speciesId: 66, level: 27 }, { speciesId: 57, level: 27 }], // Machop, Primeape
+      defeatDialog: ['Your fighting spirit is strong!'] },
+    { id: 'cianwood_gym_2', name: 'Lao', class: 'Black Belt', spriteId: 'blackbelt',
+      aiTier: 'basic', reward: 680, isGymLeader: false,
+      party: [{ speciesId: 236, level: 28 }], // Tyrogue
+      defeatDialog: ['What a punch!'] },
+  ],
+  mahogany_gym: [
+    { id: 'mahogany_gym_1', name: 'Zach', class: 'Skier', spriteId: 'skier',
+      aiTier: 'basic', reward: 720, isGymLeader: false,
+      party: [{ speciesId: 220, level: 30 }, { speciesId: 86, level: 30 }], // Swinub, Seel
+      defeatDialog: ['Brrr, I\u0027m frozen!'] },
+    { id: 'mahogany_gym_2', name: 'Douglas', class: 'Boarder', spriteId: 'boarder',
+      aiTier: 'basic', reward: 740, isGymLeader: false,
+      party: [{ speciesId: 87, level: 31 }], // Dewgong
+      defeatDialog: ['The ice cracked under me!'] },
+  ],
+  blackthorn_gym: [
+    { id: 'blackthorn_gym_1', name: 'Paul', class: 'Cooltrainer', spriteId: 'cooltrainer',
+      aiTier: 'smart', reward: 800, isGymLeader: false,
+      party: [{ speciesId: 148, level: 34 }, { speciesId: 117, level: 34 }], // Dragonair, Seadra
+      defeatDialog: ['Dragon tamers are rare...'] },
+    { id: 'blackthorn_gym_2', name: 'Fran', class: 'Cooltrainer', spriteId: 'cooltrainer_f',
+      aiTier: 'smart', reward: 820, isGymLeader: false,
+      party: [{ speciesId: 148, level: 35 }], // Dragonair
+      defeatDialog: ['CLAIR is even stronger!'] },
+    { id: 'blackthorn_gym_3', name: 'Mike', class: 'Dragon Tamer', spriteId: 'dragon_tamer',
+      aiTier: 'smart', reward: 840, isGymLeader: false,
+      party: [{ speciesId: 147, level: 33 }, { speciesId: 147, level: 33 }], // Dratini x2
+      defeatDialog: ['My dragons fell!'] },
+  ],
+};
+
 // --- Sample route trainers ---
 
 export const routeTrainers: Record<string, TrainerDef[]> = {

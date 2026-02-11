@@ -48,8 +48,9 @@ export const ACCURACY_STAGE_MULTIPLIERS: Record<number, number> = {
   [4]: 7 / 3, [5]: 8 / 3, [6]: 9 / 3,
 };
 
-// --- Type effectiveness chart ---
-// Row = attacking type, Col = defending type
+// --- Type effectiveness chart (CANONICAL SOURCE) ---
+// This is the single source of truth for type effectiveness.
+// data/type-chart.json is deprecated and should not be used.
 // 0 = immune, 0.5 = not very effective, 1 = normal, 2 = super effective
 
 const TYPES: PokemonType[] = [
@@ -165,6 +166,18 @@ export function getNatureModifier(nature: Nature, stat: StatName): number {
   if (mod.plus === stat) return 1.1;
   if (mod.minus === stat) return 0.9;
   return 1.0;
+}
+
+const STAT_LABELS: Record<StatName, string> = {
+  hp: 'HP', attack: 'Atk', defense: 'Def',
+  spAttack: 'SpA', spDefense: 'SpD', speed: 'Spe',
+};
+
+export function getNatureInfo(nature: Nature): { name: string; label: string } {
+  const mod = NATURE_MODIFIERS[nature];
+  const name = nature.charAt(0).toUpperCase() + nature.slice(1);
+  if (!mod.plus || !mod.minus) return { name, label: name };
+  return { name, label: `${name} (+${STAT_LABELS[mod.plus]}, -${STAT_LABELS[mod.minus]})` };
 }
 
 // --- Stat calculation (Gen 3 formula) ---

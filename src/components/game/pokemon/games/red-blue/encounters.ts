@@ -2,7 +2,8 @@
 // Red/Blue — Wild Encounter Tables
 // ============================================================================
 
-import type { WildEncounterZone } from '../../engine/types';
+import type { WildEncounterZone, WildEncounterEntry } from '../../engine/types';
+import { getTimeOfDay } from '../../engine/time-system';
 
 // Encounter tables per map
 export const kantoEncounters: Record<string, WildEncounterZone[]> = {
@@ -193,22 +194,27 @@ export function rollWildEncounter(
   const zone = zones.find(z => z.type === encounterType);
   if (!zone || zone.entries.length === 0) return null;
 
-  const totalWeight = zone.entries.reduce((sum, e) => sum + e.weight, 0);
+  // Filter entries by time of day (entries without timeOfDay are always available)
+  const timeOfDay = getTimeOfDay();
+  const entries = zone.entries.filter(e => !e.timeOfDay || e.timeOfDay === timeOfDay);
+  if (entries.length === 0) return null;
+
+  const totalWeight = entries.reduce((sum, e) => sum + e.weight, 0);
   let roll = Math.random() * totalWeight;
 
-  for (const entry of zone.entries) {
+  for (const entry of entries) {
     roll -= entry.weight;
     if (roll <= 0) {
-      const level = entry.minLevel + Math.floor(
-        Math.random() * (entry.maxLevel - entry.minLevel + 1)
-      );
-      return { speciesId: entry.speciesId, level };
+      return rollLevel(entry);
     }
   }
 
-  const last = zone.entries[zone.entries.length - 1];
-  return {
-    speciesId: last.speciesId,
-    level: last.minLevel + Math.floor(Math.random() * (last.maxLevel - last.minLevel + 1)),
-  };
+  return rollLevel(entries[entries.length - 1]);
+}
+
+function rollLevel(entry: WildEncounterEntry): { speciesId: number; level: number } {
+  const level = entry.minLevel + Math.floor(
+    Math.random() * (entry.maxLevel - entry.minLevel + 1)
+  );
+  return { speciesId: entry.speciesId, level };
 }

@@ -6,7 +6,8 @@ import type { GameMap } from '../../../engine/types';
 import { littlerootTown } from './littleroot-town';
 import {
   route101, route102, route103, route104, route106,
-  route110, route111, route113, route119, route120, route121, route122, route123,
+  route110, route111, route112, route113, route119, route120, route121, route122, route123,
+  route124, route126, route128,
   oldaleTown, petalburgCity, rustboroCity, dewfordTown,
   slateportCity, mauvilleCity, fallarborTown, lavaridgeTown,
   fortreeCity, lilycoveCity, mossdeepCity, sootopolisCity, everGrandeCity,
@@ -39,12 +40,16 @@ export const hoennMaps: Record<string, GameMap> = {
   route_106: route106,
   route_110: route110,
   route_111: route111,
+  route_112: route112,
   route_113: route113,
   route_119: route119,
   route_120: route120,
   route_121: route121,
   route_122: route122,
   route_123: route123,
+  route_124: route124,
+  route_126: route126,
+  route_128: route128,
 
   // Dungeons
   petalburg_woods: petalburgWoods,

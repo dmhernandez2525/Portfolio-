@@ -188,16 +188,7 @@ export function renderNPCs(
       ctx.imageSmoothingEnabled = false;
       const drawn = drawNPC(ctx, screen.x, screen.y, npc.direction, npc.spriteId, npc.isTrainer);
       ctx.imageSmoothingEnabled = true;
-      if (drawn) {
-        // Trainer exclamation indicator
-        if (npc.isTrainer) {
-          ctx.fillStyle = '#e04040';
-          ctx.font = 'bold 10px monospace';
-          ctx.textAlign = 'center';
-          ctx.fillText('!', screen.x + SCALED_TILE / 2, screen.y - 10);
-        }
-        continue;
-      }
+      if (drawn) continue;
     }
 
     // Procedural fallback
@@ -224,13 +215,7 @@ export function renderNPCs(
     );
     ctx.fill();
 
-    // Trainer exclamation indicator
-    if (npc.isTrainer) {
-      ctx.fillStyle = '#e04040';
-      ctx.font = 'bold 10px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('!', screen.x + SCALED_TILE / 2, screen.y - 2);
-    }
+    // Removed permanent trainer "!" (now shown only during alert in PokemonCanvas)
   }
 }
 
