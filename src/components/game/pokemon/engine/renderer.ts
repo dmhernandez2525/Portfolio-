@@ -36,7 +36,7 @@ export function renderOverworld(
   renderAboveLayer(ctx, map, camera);
 
   // Map name overlay (fade in/out)
-  renderMapName(ctx, map.name, frameCount);
+  renderMapName(ctx);
 }
 
 // --- Map name display ---
@@ -49,7 +49,7 @@ export function showMapName(name: string) {
   mapNameTimer = 120; // 2 seconds at 60fps
 }
 
-function renderMapName(ctx: CanvasRenderingContext2D, _name: string, _frame: number) {
+function renderMapName(ctx: CanvasRenderingContext2D) {
   if (mapNameTimer <= 0) return;
   mapNameTimer--;
 

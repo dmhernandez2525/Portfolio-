@@ -37,7 +37,7 @@ import { getActiveEvents as getKantoEvents } from '../games/red-blue/events';
 import { getActiveEvents as getJohtoEvents } from '../games/gold-silver/events';
 import { getActiveEvents as getHoennEvents } from '../games/ruby-sapphire/events';
 import type { StoryEvent } from '../engine/story-events';
-import { saveGame } from '../engine/save-manager';
+import { saveGame, formatPlayTime } from '../engine/save-manager';
 import MenuOverlay from './MenuOverlay';
 import PartyScreen from './PartyScreen';
 import BagScreen from './BagScreen';
@@ -165,6 +165,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   );
 
   const visitedTownsRef = useRef<Set<string>>(new Set());
+  const playTimeRef = useRef(0);
   const versionRef = useRef(version);
   versionRef.current = version;
 
@@ -654,7 +655,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       pokedex: pokedexRef.current,
       storyFlags: storyFlagsRef.current,
       currentMap: currentMapRef.current?.id ?? '',
-      playTime: 0,
+      playTime: playTimeRef.current,
       timestamp: Date.now(),
     });
     playSFX('save');
@@ -694,12 +695,13 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   }, [version]);
 
   // --- Game loop ---
-  useGameLoop((_dt, frameCount) => {
+  useGameLoop((dt, frameCount) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     const map = currentMapRef.current;
     if (!canvas || !ctx || !map) return;
     input.update();
+    playTimeRef.current += dt;
 
     if (screen === 'battle' && battle.battleState) return;
     if (screen === 'starter_select') return;
@@ -792,7 +794,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
             onSave={handleSave}
             playerName="RED"
             badges={badgesRef.current.length}
-            playTime="0:00"
+            playTime={formatPlayTime(playTimeRef.current)}
           />
         )}
 

@@ -78,7 +78,8 @@ function playTone(
   osc.type = type;
   osc.frequency.value = freq;
 
-  const target = gainNode ?? sfxGain!;
+  const target = gainNode ?? sfxGain;
+  if (!target) return;
   osc.connect(env);
   env.connect(target);
 
@@ -144,7 +145,7 @@ export function playBGM(track: BGMTrack): void {
     if (state.muted || state.currentTrack !== track) return;
     const note = def.notes[noteIdx % def.notes.length];
     const freq = NOTE_FREQ[note];
-    if (freq) playTone(freq, def.tempo / 1000, def.waveform, bgmGain!);
+    if (freq && bgmGain) playTone(freq, def.tempo / 1000, def.waveform, bgmGain);
     noteIdx++;
   };
 
@@ -184,7 +185,7 @@ export function playSFX(sfx: SFXType): void {
   };
 
   const def = sfxDefs[sfx];
-  if (def) playNotes(def.notes, def.dur, def.wave, sfxGain!);
+  if (def && sfxGain) playNotes(def.notes, def.dur, def.wave, sfxGain);
 }
 
 export function setMuted(muted: boolean): void {
