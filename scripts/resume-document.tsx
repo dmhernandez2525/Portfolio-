@@ -22,7 +22,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
 ]
 
 const SUMMARY =
-  "Full-stack engineer with 6+ years of experience building production-grade applications across React, Node.js, Python, and cloud platforms. From co-founding a software consultancy to developing secure DoD applications for Space Force and Navy, I bring a builder\u2019s mindset to every project. Passionate about shipping high-quality software, mentoring teams, and making complex systems accessible."
+  "Full-stack engineer with 10+ years of experience building production-grade applications across React, Node.js, Python, and cloud platforms. From co-founding a software consultancy to developing secure DoD applications for Space Force and Navy, I bring a builder\u2019s mindset to every project. Passionate about shipping high-quality software, mentoring teams, and making complex systems accessible."
 
 function Header() {
   return (

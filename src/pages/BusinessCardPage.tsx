@@ -51,7 +51,7 @@ export function BusinessCardPage() {
           transition={{ delay: 0.4 }}
           className="text-muted-foreground leading-relaxed mb-8 px-4"
         >
-          Full-stack engineer with 6+ years building production applications.
+          Full-stack engineer with 10+ years building production applications.
           From DoD platforms to co-founding a software consultancy — I ship code that matters.
           When I'm not coding, I'm welding, 3D printing, or building VR games.
         </motion.p>

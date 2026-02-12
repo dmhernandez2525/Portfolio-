@@ -29,7 +29,7 @@ export function AboutDialog({ onClose }: AboutDialogProps) {
 
           <div className="text-xs text-[#888] mb-6 text-center space-y-0.5">
             <p>28+ projects shipped</p>
-            <p>6+ years engineering</p>
+            <p>10+ years engineering</p>
             <p>16 easter eggs hidden</p>
           </div>
 
