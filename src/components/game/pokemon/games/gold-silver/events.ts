@@ -129,6 +129,34 @@ export const storyEvents: StoryEvent[] = [
     ],
     setsFlags: ['hall_of_fame_gs'],
   },
+
+  // --- Post-Game: Kanto Unlock ---
+  {
+    id: 'kanto_unlock',
+    trigger: 'map_enter',
+    mapId: 'new_bark_town',
+    requiredFlags: ['defeated_champion_gs'],
+    blockedByFlags: ['kanto_unlocked'],
+    dialog: [
+      'PROF. ELM calls!',
+      '"Congratulations! As Champion, the S.S. Ticket',
+      'lets you travel to KANTO!"',
+      'The route to KANTO is now open!',
+    ],
+    setsFlags: ['kanto_unlocked'],
+  },
+
+  // --- Post-Game: Red on Mt. Silver ---
+  {
+    id: 'red_encounter',
+    trigger: 'interact',
+    npcId: 'red_mt_silver',
+    requiredFlags: ['kanto_unlocked'],
+    blockedByFlags: ['defeated_red'],
+    dialog: ['...'],
+    battle: { trainerId: 'red_mt_silver' },
+    setsFlags: ['defeated_red'],
+  },
 ];
 
 export function getActiveEvents(

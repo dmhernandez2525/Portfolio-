@@ -10,7 +10,8 @@ import type {
 } from '../engine/types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, SCALED_TILE, PC_BOX_COUNT, PC_BOX_SIZE } from '../engine/constants';
 import { createCamera, updateCamera, setCameraTarget } from '../engine/camera';
-import { renderOverworld, showMapName, renderNightTint } from '../engine/renderer';
+import { renderOverworld, showMapName, renderNightTint, renderBattleTransition, renderWarpFade, resetHpAnimation } from '../engine/renderer';
+import { playBGM, stopBGM, playSFX, mapMusicToTrack, getTrackForBattle } from '../engine/audio-manager';
 import { getTimeOfDay } from '../engine/time-system';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { useInput } from '../hooks/useInput';
@@ -139,6 +140,8 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   const [activeMenu, setActiveMenu] = useState<ActiveMenu>('none');
   const [screen, setScreen] = useState<'overworld' | 'battle' | 'starter_select'>('overworld');
   const [bagVersion, setBagVersion] = useState(0);
+  const battleTransitionRef = useRef<number>(0); // 0 = none, 0..1 = animating
+  const warpFadeRef = useRef<number>(0); // 0 = none, 0..1 = animating
 
   const currentMapRef = useRef<GameMap | null>(null);
   const partyRef = useRef<Pokemon[]>([]);
@@ -234,6 +237,11 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
     currentTrainerRef.current = trainer;
     for (const op of opponentParty) markPokedex(op.speciesId, false);
+
+    resetHpAnimation();
+    const isGym = trainer.isGymLeader;
+    const isChamp = trainer.id === ALL_TRAINERS[version].champion.id;
+    playBGM(getTrackForBattle(true, isGym, isChamp));
 
     battle.startBattle({
       type: 'trainer',
@@ -357,6 +365,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     cam.x = cam.targetX;
     cam.y = cam.targetY;
     showMapName(map.name);
+    playBGM(mapMusicToTrack(map.music));
     // Track visited towns for Fly
     if (mapId.includes('_city') || mapId.includes('_town')) {
       visitedTownsRef.current.add(mapId);
@@ -407,11 +416,16 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       if (!wildSpecies) return;
       const wildPokemon = createPokemon(wildSpecies, result.level);
       markPokedex(result.speciesId, false);
+      resetHpAnimation();
+      playBGM(getTrackForBattle(false, false, false));
       battle.startBattle({ type: 'wild', playerParty: partyRef.current, opponentParty: [wildPokemon] });
       setScreen('battle');
     });
 
-    overworld.onWarp((mapId, x, y) => loadMapRef.current?.(mapId, x, y));
+    overworld.onWarp((mapId, x, y) => {
+      playSFX('select');
+      loadMapRef.current?.(mapId, x, y);
+    });
     overworld.onConnection((mapId, x, y) => loadMapRef.current?.(mapId, x, y));
 
     // Friendship gain from walking (+1 per 128 steps to lead Pokemon)
@@ -456,6 +470,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
           pkmn.status = null;
           for (const move of pkmn.moves) move.pp = move.maxPp;
         }
+        playSFX('heal');
         setDialogText([
           'Welcome to our POKeMON CENTER!',
           "We'll restore your POKeMON to full health.",
@@ -505,6 +520,13 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   useEffect(() => {
     battle.onBattleEnd((result, opponentParty) => {
       setScreen('overworld');
+      // Restore overworld music
+      const map = currentMapRef.current;
+      if (map) playBGM(mapMusicToTrack(map.music));
+
+      if (result === 'win') playSFX('level_up');
+      if (result === 'caught') playSFX('catch');
+
       const trainer = currentTrainerRef.current;
 
       if (result === 'caught' && opponentParty.length > 0) {
@@ -633,6 +655,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       playTime: 0,
       timestamp: Date.now(),
     });
+    playSFX('save');
     setIsPaused(false);
     setActiveMenu('none');
     setDialogText(['Game saved!']);
@@ -765,7 +788,6 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
             onParty={() => setActiveMenu('party')}
             onBag={() => setActiveMenu('bag')}
             onSave={handleSave}
-            onOption={() => {}}
             playerName="RED"
             badges={badgesRef.current.length}
             playTime="0:00"

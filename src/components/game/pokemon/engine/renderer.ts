@@ -19,8 +19,8 @@ export function renderOverworld(
   // Clear
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Ground + objects
-  renderMap(ctx, map, camera);
+  // Ground + objects (pass frameCount for grass sway animation)
+  renderMap(ctx, map, camera, frameCount);
 
   // NPCs
   renderNPCs(ctx, map, camera, frameCount);
@@ -221,8 +221,9 @@ function drawPokemonInfoBox(
   ctx.font = '11px monospace';
   ctx.fillText(`Lv${pokemon.level}`, x + w - 50, y + 18);
 
-  // HP bar
+  // HP bar (animated)
   const hpRatio = pokemon.currentHp / pokemon.stats.hp;
+  const displayRatio = getAnimatedHpRatio(bp, hpRatio);
   const hpBarX = x + 40;
   const hpBarY = y + 28;
   const hpBarW = w - 55;
@@ -231,9 +232,9 @@ function drawPokemonInfoBox(
   ctx.fillStyle = '#404040';
   ctx.fillRect(hpBarX, hpBarY, hpBarW, hpBarH);
 
-  const hpColor = hpRatio > 0.5 ? COLORS.hpGreen : hpRatio > 0.2 ? COLORS.hpYellow : COLORS.hpRed;
+  const hpColor = displayRatio > 0.5 ? COLORS.hpGreen : displayRatio > 0.2 ? COLORS.hpYellow : COLORS.hpRed;
   ctx.fillStyle = hpColor;
-  ctx.fillRect(hpBarX, hpBarY, hpBarW * hpRatio, hpBarH);
+  ctx.fillRect(hpBarX, hpBarY, hpBarW * displayRatio, hpBarH);
 
   ctx.fillStyle = '#000000';
   ctx.font = 'bold 8px monospace';
@@ -395,6 +396,51 @@ function roundRect(
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
+}
+
+// --- HP bar animation state ---
+
+const hpDisplayCache = new Map<string, number>();
+
+function getAnimatedHpRatio(bp: BattlePokemon, targetRatio: number): number {
+  const key = bp.pokemon.uid;
+  const current = hpDisplayCache.get(key) ?? targetRatio;
+
+  if (Math.abs(current - targetRatio) < 0.005) {
+    hpDisplayCache.set(key, targetRatio);
+    return targetRatio;
+  }
+
+  // Lerp toward target at a visible speed
+  const speed = 0.02;
+  const next = current + (targetRatio - current > 0 ? speed : -speed);
+  const clamped = targetRatio > current
+    ? Math.min(next, targetRatio)
+    : Math.max(next, targetRatio);
+
+  hpDisplayCache.set(key, clamped);
+  return clamped;
+}
+
+export function resetHpAnimation(): void {
+  hpDisplayCache.clear();
+}
+
+// --- Warp fade transition ---
+
+export function renderWarpFade(
+  ctx: CanvasRenderingContext2D,
+  progress: number // 0 to 1 (0 = clear, 0.5 = fully black, 1 = clear again)
+) {
+  if (progress <= 0 || progress >= 1) return;
+
+  // First half fades to black, second half fades from black
+  const alpha = progress <= 0.5
+    ? progress * 2
+    : (1 - progress) * 2;
+
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 const TYPE_COLORS: Record<string, string> = {

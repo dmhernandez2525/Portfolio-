@@ -122,6 +122,52 @@ export const storyEvents: StoryEvent[] = [
     ],
     setsFlags: ['hall_of_fame_rs'],
   },
+
+  // --- Post-Game: Legendary Encounters ---
+  {
+    id: 'groudon_encounter',
+    trigger: 'interact',
+    npcId: 'groudon_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_groudon'],
+    dialog: ['The ground trembles violently...', 'GROUDON appeared!'],
+    givesPokemon: { speciesId: 383, level: 45 },
+    setsFlags: ['caught_groudon'],
+  },
+  {
+    id: 'kyogre_encounter',
+    trigger: 'interact',
+    npcId: 'kyogre_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_kyogre'],
+    dialog: ['A massive wave of energy surges...', 'KYOGRE appeared!'],
+    givesPokemon: { speciesId: 382, level: 45 },
+    setsFlags: ['caught_kyogre'],
+  },
+  {
+    id: 'rayquaza_encounter',
+    trigger: 'interact',
+    npcId: 'rayquaza_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_rayquaza'],
+    dialog: ['An immense dragon descends from the clouds...', 'RAYQUAZA appeared!'],
+    givesPokemon: { speciesId: 384, level: 70 },
+    setsFlags: ['caught_rayquaza'],
+  },
+
+  // --- Post-Game: Battle Tower ---
+  {
+    id: 'battle_tower_open',
+    trigger: 'map_enter',
+    mapId: 'battle_tower',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: [],
+    dialog: [
+      'Welcome to the BATTLE TOWER!',
+      'Challenge trainers in consecutive battles!',
+      'Your POKeMON will be set to Level 50.',
+    ],
+  },
 ];
 
 export function getActiveEvents(

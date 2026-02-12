@@ -9,6 +9,9 @@ import { SCALED_TILE, COLORS } from './constants';
 import { worldToScreen, isOnScreen } from './camera';
 import { isSpritesReady, drawTile, drawPlayer, drawNPC } from './sprites';
 
+// Frame counter for grass sway animation (updated by renderMap)
+let grassFrame = 0;
+
 // Map tile IDs to colors for procedural fallback rendering
 const TILE_COLORS: Record<number, string> = {
   0: 'transparent',
@@ -90,14 +93,16 @@ function renderTileDetail(
   const s = SCALED_TILE;
 
   switch (tileId) {
-    case 3: // tall grass — draw grass blade pattern
+    case 3: // tall grass with sway animation
       ctx.fillStyle = COLORS.tallGrassLight;
       for (let i = 0; i < 4; i++) {
         const gx = sx + 4 + i * 7;
         const gy = sy + 6;
-        ctx.fillRect(gx, gy, 2, 10);
-        ctx.fillRect(gx - 1, gy + 2, 1, 6);
-        ctx.fillRect(gx + 2, gy + 2, 1, 6);
+        // Sway offset based on tile position and global frame counter
+        const swayOffset = Math.sin((sx + sy + i) * 0.1 + grassFrame * 0.06) * 1.5;
+        ctx.fillRect(gx + swayOffset, gy, 2, 10);
+        ctx.fillRect(gx - 1 + swayOffset * 0.5, gy + 2, 1, 6);
+        ctx.fillRect(gx + 2 + swayOffset * 0.5, gy + 2, 1, 6);
       }
       break;
 
@@ -144,8 +149,11 @@ function renderTileDetail(
 export function renderMap(
   ctx: CanvasRenderingContext2D,
   map: GameMap,
-  camera: Camera
+  camera: Camera,
+  frameCount: number = 0
 ) {
+  grassFrame = frameCount;
+
   // Background fill (grass base)
   ctx.fillStyle = COLORS.grass;
   ctx.fillRect(0, 0, camera.viewportWidth, camera.viewportHeight);
