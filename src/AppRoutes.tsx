@@ -17,6 +17,8 @@ import { Projects } from "@/components/sections/Projects"
 import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
 import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
+import { AIExperience } from "@/components/sections/AIExperience"
+import { AIDevelopmentPage } from "@/pages/AIDevelopmentPage"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -28,6 +30,7 @@ import { AgarGame } from "@/components/game/agar"
 import { MafiaWarsGame } from "@/components/game/mafia-wars"
 import { PokemonGame } from "@/components/game/pokemon"
 import { ShoppingCartHeroGame } from "@/components/game/shopping-cart-hero"
+import { CocGame } from "@/components/game/coc-game"
 import { Philosophy } from "@/pages/Philosophy"
 import { Inventions } from "@/pages/Inventions"
 import { Blog } from "@/pages/Blog"
@@ -47,6 +50,7 @@ const Home = () => (
       <Skills />
       <Experience />
       <Projects />
+      <AIExperience />
       <GlobeSection />
       <AskAboutMe />
       <Contact />
@@ -64,6 +68,7 @@ function CreativeRoutes() {
         <Route path="/social" element={<Social />} />
         <Route path="/games" element={<Games />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/ai-development" element={<AIDevelopmentPage />} />
         <Route path="/game" element={<FallingBlocksGame />} />
         <Route path="/tetris" element={<TetrisGame />} />
         <Route path="/snake" element={<SnakeGame />} />
@@ -74,6 +79,7 @@ function CreativeRoutes() {
         <Route path="/mafia-wars" element={<MafiaWarsGame />} />
         <Route path="/pokemon" element={<PokemonGame />} />
         <Route path="/shopping-cart-hero" element={<ShoppingCartHeroGame />} />
+        <Route path="/coc" element={<CocGame />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

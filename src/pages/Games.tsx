@@ -171,6 +171,20 @@ const games: Game[] = [
     yearPlayed: "2009-2011",
     funFact: "The original was a Flash game I played endlessly during class. The physics of crashing was always funnier than landing safely.",
     features: ["Physics-based launch and flight", "Upgrade shop (wheels, rockets, armor)", "Trick system (handstands, flips, superman)", "Groupie score multipliers", "Procedural stickman animation", "High score tracking"]
+  },
+  {
+    id: "coc",
+    title: "Clash of Clans",
+    description: "Build your village, train troops, and battle in this single-player strategy game!",
+    longDescription: "A full single-player recreation of the mobile strategy classic. Build and upgrade 14+ building types, train troops from Barbarians to Dragons, research upgrades in the Lab, deploy spells, unlock heroes, complete a 90-level goblin campaign, and manage your clan. Features a complete battle engine with targeting AI, loot calculation, and trophy system.",
+    thumbnail: "/game-coc.svg",
+    category: "strategy",
+    link: "/coc",
+    isExternal: false,
+    isBuiltIn: true,
+    isOriginal: true,
+    funFact: "This game has 23 JSON data files totaling 30,000+ lines of real Clash of Clans balance data.",
+    features: ["Isometric village builder", "Battle engine with targeting AI", "90-level campaign", "Spell and hero system", "Clan perks and castle troops", "Achievement tracking"]
   }
 ]
 
@@ -345,6 +359,11 @@ export function Games() {
                     <Play className="w-3 h-3" /> Pokemon
                   </Button>
                 </Link>
+                <Link to="/coc">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Clash of Clans
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           )}
@@ -391,6 +410,7 @@ export function Games() {
                     {game.id === "snake" && "🐍"}
                     {game.id === "mafia-wars" && "🔫"}
                     {game.id === "pokemon" && "⚡"}
+                    {game.id === "coc" && "🏰"}
                   </div>
                   {game.isExternal && (
                     <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-black/50 px-2 py-1 rounded">

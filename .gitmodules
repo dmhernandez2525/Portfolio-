@@ -1,3 +1,6 @@
 [submodule "lib/voice-docs-app"]
 	path = lib/voice-docs-app
 	url = https://github.com/dmhernandez2525/voice-docs-app.git
+[submodule "lib/coc-game"]
+	path = lib/coc-game
+	url = https://github.com/dmhernandez2525/coc-game.git
