@@ -1,6 +1,10 @@
 // ============================================================================
 // Red/Blue - Trainer Definitions
 // ============================================================================
+// ID convention: plain lowercase for characters unique to this game.
+// Characters appearing across games with different roles get a suffix:
+//   _e4 = Elite Four member, _champion = Champion.
+// e.g. lance (E4 here) vs lance_champion (Champion in Gold/Silver).
 
 import type { TrainerDef } from '../../engine/types';
 

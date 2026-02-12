@@ -1,6 +1,10 @@
 // ============================================================================
 // Gold/Silver - Trainer Definitions
 // ============================================================================
+// ID convention: plain lowercase for characters unique to this game.
+// Characters appearing across games with different roles get a suffix:
+//   _e4 = Elite Four member, _champion = Champion.
+// e.g. koga_e4 (E4 here) vs koga (Gym Leader in Red/Blue).
 
 import type { TrainerDef } from '../../engine/types';
 
