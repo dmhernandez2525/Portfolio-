@@ -1395,6 +1395,218 @@ export const portfolioMaturitySpectrum: MaturityTier[] = [
 export const enterpriseOutlier = `enterprise-template-system accounts for: 12 CI workflows, 142,627 lines of test code, 16 SDDs, Terraform infrastructure, AWS ECR/ECS, k6 load testing, Lighthouse audits, multi-browser E2E, and the only comprehensive security scanning in the portfolio. It represents the "target state" that other projects aspire to reach.`
 
 // ============================================
+// ENVIRONMENT & SECRETS MANAGEMENT
+// ============================================
+
+export interface EnvStat {
+  metric: string
+  value: string
+  detail: string
+}
+
+export const envStats: EnvStat[] = [
+  { metric: "Total .env files", value: "45", detail: "Across 30+ projects" },
+  { metric: ".env.example templates", value: "32", detail: "Documented configuration" },
+  { metric: "Unique env variables", value: "325+", detail: "Across all projects" },
+  { metric: "DEMO_MODE projects", value: "10", detail: "Portfolio-ready showcase" },
+  { metric: "Cloud providers", value: "15+", detail: "PostgreSQL, Stripe, Clerk, AWS, Cloudflare, etc." },
+  { metric: "AI/LLM providers", value: "4", detail: "OpenAI, Anthropic, Google/Gemini, Ollama" },
+]
+
+export interface CloudServiceUsage {
+  service: string
+  projects: number
+  examples: string
+}
+
+export const cloudServiceUsage: CloudServiceUsage[] = [
+  { service: "PostgreSQL", projects: 15, examples: "Primary database (Supabase, local, cloud)" },
+  { service: "Stripe", projects: 8, examples: "rave-collective, FocusFlow, ChoreChamp, baked-by-chrissy" },
+  { service: "Clerk Auth", projects: 6, examples: "rave-collective, FocusFlow, codereview-ai, made-with-love" },
+  { service: "OpenAI / Anthropic", projects: 6, examples: "codereview-ai, SpecTree, chronoscribe, patent-intelligence" },
+  { service: "Redis", projects: 5, examples: "FocusFlow, codereview-ai, ChoreChamp, Learning-Hall" },
+  { service: "AWS S3", projects: 4, examples: "FocusFlow, codereview-ai, ChoreChamp, Learning-Hall" },
+  { service: "Cloudflare R2", projects: 3, examples: "rave-collective, Learning-Hall, enterprise-template-system" },
+  { service: "Ollama (Local)", projects: 2, examples: "chronoscribe (qwen2.5:72b), Jarvis-Voice-Assistant" },
+]
+
+export const envCategories = [
+  { category: "Authentication & Security", count: 45, examples: "Clerk, NextAuth, Better-Auth, JWT, encryption keys" },
+  { category: "Database Configuration", count: 20, examples: "PostgreSQL, SQLite, Redis connection strings" },
+  { category: "Cloud Storage", count: 20, examples: "AWS S3, Cloudflare R2, Cloudinary" },
+  { category: "AI/LLM Services", count: 15, examples: "OpenAI, Anthropic, Google, Ollama model configs" },
+  { category: "Payment Processing", count: 10, examples: "Stripe keys, webhook secrets, price IDs" },
+  { category: "Email Services", count: 10, examples: "SendGrid, Resend, SMTP/Mailgun" },
+]
+
+export const byokPatternDescription = `Learning-Hall implements tenant-specific storage with BYOK: DEFAULT_STORAGE_PROVIDER, DEFAULT_STORAGE_ACCESS_KEY, STORAGE_ENCRYPTION_KEY. User-provided credentials are encrypted at rest with AES-256, never stored in plaintext.`
+
+// ============================================
+// SECURITY IMPLEMENTATIONS
+// ============================================
+
+export interface SecurityStat {
+  category: string
+  filesFound: string
+  occurrences: string
+  topProjects: string
+}
+
+export const securityStats: SecurityStat[] = [
+  { category: "Auth Middleware", filesFound: "103", occurrences: "230+", topProjects: "ChoreChamp, Comfort-Order, Enterprise-Template-System" },
+  { category: "RBAC / Permissions", filesFound: "132", occurrences: "566+", topProjects: "Comfort-Order (venue-rbac), Enterprise-Template-System (clubhouse-rbac)" },
+  { category: "Zod Validation", filesFound: "241+", occurrences: "4,020+", topProjects: "Nearly universal in modern projects" },
+  { category: "Encryption / Crypto", filesFound: "128", occurrences: "772+", topProjects: "LifeContextCompiler (AES-256-GCM), genomeforge (HIPAA)" },
+  { category: "JWT Handling", filesFound: "97", occurrences: "397+", topProjects: "interestingandbeyond, bread-of-heaven, niche-selection-app" },
+  { category: "CORS Configuration", filesFound: "61", occurrences: "23+", topProjects: "FocusFlow, ChoreChamp, rapidbooth" },
+  { category: "Webhook Verification", filesFound: "32", occurrences: "15+", topProjects: "Stripe webhooks across 8 projects" },
+  { category: "CSP / Helmet", filesFound: "14", occurrences: "29+", topProjects: "FocusFlow (comprehensive), rave-collective" },
+  { category: "Prisma (SQL Prevention)", filesFound: "88", occurrences: "473+", topProjects: "interestingandbeyond, rave-collective, baked-by-chrissy" },
+  { category: "Security Headers", filesFound: "31", occurrences: "N/A", topProjects: "24 render.yaml + 7 application-level configs" },
+]
+
+export const securityHighlights = [
+  { label: "Custom RBAC Plugins", detail: "Comfort-Order (venue-rbac) and Enterprise-Template-System (clubhouse-rbac) have full Strapi RBAC plugins with useRBAC hooks and RoleProtectedRoute wrappers" },
+  { label: "Client-Side Encryption", detail: "LifeContextCompiler: AES-256-GCM with PBKDF2 key derivation. Data encrypted in browser before transmission. 44 encrypt references in dedicated encryption package" },
+  { label: "HIPAA-Compliant Encryption", detail: "genomeforge: Dedicated encryption package for health data. 30+ encrypt references with compliance-grade implementation" },
+  { label: "Webhook Signing", detail: "15+ projects verify Stripe webhook signatures via stripe.webhooks.constructEvent. Mux webhooks in rave-collective" },
+]
+
+// ============================================
+// TYPESCRIPT & ARCHITECTURE PATTERNS
+// ============================================
+
+export interface TypeScriptPatternStat {
+  pattern: string
+  filesFound: string
+  highlight: string
+}
+
+export const typescriptPatternStats: TypeScriptPatternStat[] = [
+  { pattern: "Zod Schemas", filesFound: "241", highlight: "Dynamic schema generation in Comfort-Order: fieldSchemaToZod() converts metadata configs to runtime validation" },
+  { pattern: "Generic Types (<T>)", filesFound: "2,358", highlight: "Ubiquitous across store creators, hooks, API clients, tRPC procedures" },
+  { pattern: "Custom React Hooks", filesFound: "30+", highlight: "SpecTree: useCostTracking, useStreamingCompletion, useRegenerationFeedback, useActivityLogger" },
+  { pattern: "Context Providers", filesFound: "141", highlight: "bread-of-heaven: SSR-safe demo mode with role-based data, localStorage persistence" },
+  { pattern: "Zustand Stores", filesFound: "30+", highlight: "ChoreChamp: 5 stores (auth, household, notification, sync, theme). coc-game: 50+ actions" },
+  { pattern: "tRPC Routers", filesFound: "20+", highlight: "rave-collective: loyalty, rewards, wholesale, trend-prediction, ab-testing, demand-forecasting" },
+  { pattern: "Prisma Schemas", filesFound: "9", highlight: "7 projects with full ORM integration" },
+  { pattern: "Middleware Files", filesFound: "20+", highlight: "tRPC middleware composition with role-based auth, logging, context augmentation" },
+  { pattern: "WebSocket References", filesFound: "50", highlight: "Game engines, voice assistant, terminal components" },
+]
+
+export const stateManagementPreference = `Clear preference for Zustand over Redux in modern projects. Multiple-store pattern observed: ChoreChamp uses 5 dedicated stores (auth, household, notification, sync, theme). genomeforge uses 6 stores across desktop and mobile. coc-game has a single massive store with 50+ actions.`
+
+// ============================================
+// MONOREPO & ARCHITECTURE
+// ============================================
+
+export interface MonorepoStat {
+  metric: string
+  value: string
+  detail: string
+}
+
+export const monorepoStats: MonorepoStat[] = [
+  { metric: "Turborepo Projects", value: "10", detail: "rapidbooth, Comfort-Order, writeforge, LifeContextCompiler, enterprise-template-system, ChoreChamp, genomeforge, FocusFlow, global-todo, interestingandbeyond" },
+  { metric: "Workspace Projects", value: "8", detail: "npm/yarn workspaces with shared packages" },
+  { metric: "Total Monorepo Packages", value: "40", detail: "Across all monorepos" },
+  { metric: "Client/Server Projects", value: "11", detail: "SpecTree, bread-of-heaven, codereview-ai, etc." },
+  { metric: "Microservice Dirs", value: "3", detail: "SpecTree, asset-management-template, codereview-ai" },
+  { metric: "tsconfig Files", value: "84", detail: "Root + workspace-specific configurations" },
+  { metric: "ESLint Configs", value: "20+", detail: "Mix of .eslintrc and flat config formats" },
+  { metric: "Path Alias Projects", value: "9+", detail: "@/* imports with tsconfig paths" },
+]
+
+export interface MonorepoProject {
+  project: string
+  packages: number
+  highlights: string
+}
+
+export const largestMonorepos: MonorepoProject[] = [
+  { project: "genomeforge", packages: 11, highlights: "AI providers, a11y, i18n, encryption, database abstraction" },
+  { project: "LifeContextCompiler", packages: 8, highlights: "Encryption, recording, family management, security" },
+  { project: "enterprise-template-system", packages: 7, highlights: "4 app ecosystems (platform, demo, enterprise, rocket-rollout)" },
+  { project: "writeforge", packages: 6, highlights: "Writing tools, language processing, editor plugins" },
+  { project: "ChoreChamp", packages: 6, highlights: "Gamification, mobile, web, shared packages" },
+  { project: "Comfort-Order", packages: 4, highlights: "Dashboard, client, strapi, microservice" },
+]
+
+// ============================================
+// ACCESSIBILITY & UX PATTERNS
+// ============================================
+
+export interface AccessibilityStat {
+  pattern: string
+  filesFound: string
+  topProjects: string
+}
+
+export const accessibilityStats: AccessibilityStat[] = [
+  { pattern: "ARIA Attributes", filesFound: "747", topProjects: "Comfort-Order (45+), Enterprise-Template-System (40+), SpecTree (35+)" },
+  { pattern: "Keyboard Navigation", filesFound: "106", topProjects: "Comfort-Order (25+), Enterprise-Template-System (20+), SpecTree (15+)" },
+  { pattern: "Screen Reader Support", filesFound: "193", topProjects: "genomeforge (dedicated a11y package), Enterprise-Template-System" },
+  { pattern: "Focus Management", filesFound: "40", topProjects: "Comfort-Order, Enterprise-Template-System, SpecTree" },
+  { pattern: "Framer Motion Animations", filesFound: "230", topProjects: "SpecTree (45), Comfort-Order (30), Portfolio (25)" },
+  { pattern: "Dark Mode / Themes", filesFound: "100+", topProjects: "Job-Harmony, Tattoo-Generator, Learning-Hall" },
+  { pattern: "Loading States (Skeleton)", filesFound: "100+", topProjects: "SpecTree, Comfort-Order, ChoreChamp" },
+  { pattern: "Toast/Notifications", filesFound: "80", topProjects: "Enterprise-Component-Library, Learning-Hall, ChoreChamp" },
+  { pattern: "i18n Support", filesFound: "60", topProjects: "Learning-Hall (I18nProvider, LanguageSwitcher, TranslatedText)" },
+  { pattern: "PWA / Offline Support", filesFound: "60", topProjects: "ChoreChamp (OfflineIndicator, InstallPrompt, PWAProvider)" },
+]
+
+export const accessibilityHighlight = `genomeforge has a dedicated packages/a11y/ with aria.ts, announcer.ts, and types.ts modules for screen reader announcements. ChoreChamp has the most comprehensive PWA implementation: OfflineIndicator, OfflineFallback, UpdateNotification, InstallPrompt, and PWAProvider components.`
+
+// ============================================
+// PERFORMANCE OPTIMIZATION
+// ============================================
+
+export interface PerformanceStat {
+  pattern: string
+  filesFound: string
+  occurrences: string
+  topProjects: string
+}
+
+export const performanceStats: PerformanceStat[] = [
+  { pattern: "Dynamic Imports", filesFound: "298", occurrences: "2,000+", topProjects: "enterprise-template-system (117), Comfort-Order (73)" },
+  { pattern: "Caching Patterns", filesFound: "329", occurrences: "900+", topProjects: "enterprise-template-system (104), Comfort-Order (76), rave-collective (29)" },
+  { pattern: "Connection Pooling", filesFound: "84", occurrences: "264", topProjects: "rave-collective (700+ line ConnectionPool class)" },
+  { pattern: "Database Indexing", filesFound: "17 schemas", occurrences: "447 indexes", topProjects: "rave-collective (338 indexes), made-with-love (18), baked-by-chrissy (18)" },
+  { pattern: "Bundle Optimization", filesFound: "24 configs", occurrences: "44", topProjects: "Comfort-Order (manualChunks), difflocal (vendor splitting)" },
+]
+
+export const performanceHighlights = [
+  { label: "Connection Pool Manager", detail: "rave-collective: 700+ line production-grade ConnectionPool with FIFO/LIFO queue strategies, priority-based acquisition, 11+ tracked metrics (acquire times, creation errors, validation failures)" },
+  { label: "Multi-Layer LRU Cache", detail: "Learning-Hall: TTL support, stale-while-revalidate, LRU eviction. bread-of-heaven: Redis with graceful fallback to in-memory cache" },
+  { label: "Database Indexing at Scale", detail: "rave-collective Prisma schema alone has 338 @@index declarations for optimized lookups across the entire data model" },
+  { label: "Smart Bundle Chunking", detail: "Comfort-Order: manualChunks separating vendor, visualization, and app code. Multi-pass Terser minification for production builds" },
+]
+
+// ============================================
+// ERROR HANDLING & RESILIENCE
+// ============================================
+
+export interface ResilienceStat {
+  pattern: string
+  count: string
+  detail: string
+}
+
+export const resilienceStats: ResilienceStat[] = [
+  { pattern: "Try-Catch Blocks", count: "116", detail: "Across 48 files, heaviest in voice/AI features" },
+  { pattern: "Fallback Implementations", count: "37 files", detail: "Feature detection, settings fallback, graceful degradation" },
+  { pattern: "Timeout/Interval Operations", count: "203", detail: "Async flow control for animations, voice, and timers" },
+  { pattern: "Browser Capability Checks", count: "19 files", detail: "Web API feature detection (microphone, speech, permissions)" },
+  { pattern: "Error Boundary Components", count: "2", detail: "Production-grade with error ID, stack trace, 3 recovery actions" },
+  { pattern: "Console Error/Warn Logging", count: "52 calls", detail: "Manual logging across 24 files (no Sentry/LogRocket)" },
+  { pattern: "PerformanceMonitor", count: "1 singleton", detail: "Long task detection (>50ms), layout shift, memory monitoring" },
+  { pattern: "Permission Manager", count: "1 singleton", detail: "Microphone permission status, graceful API degradation" },
+]
+
+export const resilienceDescription = `Error handling concentrates in voice recognition, speech synthesis, and AI assistant features (8-10 try-catch blocks each). The pattern is consistent: detect capability, attempt operation, catch and fallback gracefully. No external error tracking (Sentry/LogRocket), relying instead on structured console logging with descriptive messages.`
+
+// ============================================
 // LESSONS LEARNED
 // ============================================
 
