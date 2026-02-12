@@ -7,6 +7,7 @@
 // e.g. koga_e4 (E4 here) vs koga (Gym Leader in Red/Blue).
 
 import type { TrainerDef } from '../../engine/types';
+import { redBattle } from '../../engine/postgame';
 
 // --- Johto Gym Leaders ---
 
@@ -282,4 +283,5 @@ export const routeTrainers: Record<string, TrainerDef[]> = {
       defeatDialog: ['Wow, you beat my water POKeMON!'],
     },
   ],
+  mt_silver_summit: [redBattle],
 };

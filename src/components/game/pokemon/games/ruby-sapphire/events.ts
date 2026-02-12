@@ -146,6 +146,7 @@ export const storyEvents: StoryEvent[] = [
   },
 
   // --- Post-Game: Battle Tower ---
+  // Battle Tower trainer pool: see engine/postgame.ts (battleTowerTrainers)
   {
     id: 'battle_tower_open',
     trigger: 'map_enter',

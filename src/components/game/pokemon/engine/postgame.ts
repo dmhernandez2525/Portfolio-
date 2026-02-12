@@ -2,6 +2,14 @@
 // Pokemon RPG Engine - Post-Game Content
 // ============================================================================
 // Legendary encounters, post-game unlocks, and Battle Tower definitions.
+//
+// Architecture: This module provides NPC placement data and encounter tables.
+// The corresponding StoryEvent triggers (interaction logic, flag checks) live
+// in each game's events.ts file. The two are complementary:
+//   - postgame.ts  = WHERE legendaries appear (NPC defs, map placement)
+//   - events.ts    = WHEN/HOW encounters trigger (story flags, dialog)
+//
+// Battle Tower trainers are defined here but await a gameplay loop.
 
 import type { TrainerDef, NPCDef, WildEncounterZone } from './types';
 
