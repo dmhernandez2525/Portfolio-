@@ -564,7 +564,47 @@ victoryRoad.warps = [
 const moltresEncounter = kantoLegendaries.find(l => l.id === 'moltres');
 if (moltresEncounter) victoryRoad.npcs.push(moltresEncounter.npc);
 
-// TODO: Articuno (seafoam_islands_b4f) and Zapdos (power_plant) need their maps created
+// Seafoam Islands B4F: Articuno encounter location
+export const seafoamIslandsB4F: GameMap = makeRoute(
+  'seafoam_islands_b4f', 'SEAFOAM ISLANDS B4F', 16, 16,
+  [],
+  [{ type: 'cave', entries: [
+    { speciesId: 86, minLevel: 30, maxLevel: 34, weight: 25 },
+    { speciesId: 87, minLevel: 32, maxLevel: 36, weight: 10 },
+    { speciesId: 90, minLevel: 30, maxLevel: 34, weight: 20 },
+    { speciesId: 91, minLevel: 34, maxLevel: 38, weight: 10 },
+    { speciesId: 116, minLevel: 30, maxLevel: 34, weight: 20 },
+    { speciesId: 117, minLevel: 32, maxLevel: 36, weight: 10 },
+    { speciesId: 41, minLevel: 30, maxLevel: 34, weight: 5 },
+  ]}],
+);
+seafoamIslandsB4F.tilesetId = 'cave';
+seafoamIslandsB4F.warps = [
+  { x: 1, y: 1, targetMap: 'route_20', targetX: 5, targetY: 5 },
+];
+const articunoEncounter = kantoLegendaries.find(l => l.id === 'articuno');
+if (articunoEncounter) seafoamIslandsB4F.npcs.push(articunoEncounter.npc);
+
+// Power Plant: Zapdos encounter location
+export const powerPlant: GameMap = makeRoute(
+  'power_plant', 'POWER PLANT', 20, 16,
+  [],
+  [{ type: 'cave', entries: [
+    { speciesId: 81, minLevel: 30, maxLevel: 35, weight: 25 },
+    { speciesId: 82, minLevel: 33, maxLevel: 37, weight: 10 },
+    { speciesId: 100, minLevel: 30, maxLevel: 35, weight: 25 },
+    { speciesId: 101, minLevel: 33, maxLevel: 37, weight: 10 },
+    { speciesId: 25, minLevel: 30, maxLevel: 35, weight: 15 },
+    { speciesId: 26, minLevel: 33, maxLevel: 37, weight: 5 },
+    { speciesId: 125, minLevel: 33, maxLevel: 37, weight: 10 },
+  ]}],
+);
+powerPlant.tilesetId = 'cave';
+powerPlant.warps = [
+  { x: 1, y: 14, targetMap: 'route_10', targetX: 10, targetY: 5 },
+];
+const zapdosEncounter = kantoLegendaries.find(l => l.id === 'zapdos');
+if (zapdosEncounter) powerPlant.npcs.push(zapdosEncounter.npc);
 
 export const ceruleanCave: GameMap = makeRoute(
   'cerulean_cave', 'CERULEAN CAVE', 20, 20,
