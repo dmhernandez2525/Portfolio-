@@ -19,6 +19,16 @@ export type VolatileStatus = 'confusion' | 'flinch' | 'leech_seed' | 'infatuatio
 
 export type Weather = 'clear' | 'rain' | 'sun' | 'sandstorm' | 'hail';
 
+export type FieldEffectType = 'reflect' | 'light_screen' | 'stealth_rock' | 'spikes' | 'toxic_spikes';
+
+export interface FieldEffects {
+  reflect: number;        // turns remaining (0 = inactive)
+  lightScreen: number;    // turns remaining (0 = inactive)
+  stealthRock: boolean;
+  spikesLayers: number;   // 0-3
+  toxicSpikesLayers: number; // 0-2
+}
+
 export type Nature =
   | 'hardy' | 'lonely' | 'brave' | 'adamant' | 'naughty'
   | 'bold' | 'docile' | 'relaxed' | 'impish' | 'lax'
@@ -225,6 +235,8 @@ export interface MoveEffect {
   curesStatus?: boolean;    // for items: also cures status conditions
   setWeather?: Weather;     // weather-setting moves (Rain Dance, Sunny Day, etc.)
   protect?: boolean;        // Protect/Detect: blocks all moves this turn
+  fieldEffect?: FieldEffectType;  // sets a field effect on target's side
+  clearHazards?: boolean;   // Rapid Spin: clears hazards on user's side
 }
 
 // --- Item data ---
@@ -306,6 +318,8 @@ export interface BattleState {
   opponentActive: BattlePokemon;
   weather: Weather;
   weatherTurns: number;
+  playerFieldEffects: FieldEffects;
+  opponentFieldEffects: FieldEffects;
   turnNumber: number;
   textQueue: string[];
   currentText: string;
