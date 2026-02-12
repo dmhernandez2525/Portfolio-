@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Inventory / Bag System
+// Pokemon RPG Engine - Inventory / Bag System
 // ============================================================================
 
 import type { BagItem, BagCategory, ItemData, Pokemon } from './types';

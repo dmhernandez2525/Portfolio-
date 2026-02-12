@@ -1,5 +1,5 @@
 // ============================================================================
-// Viridian City — First city with PokeMart and late-game Gym
+// Viridian City - First city with PokeMart and late-game Gym
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

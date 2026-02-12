@@ -1,5 +1,5 @@
 // ============================================================================
-// Kanto Interior Maps — Shared indoor spaces
+// Kanto Interior Maps - Shared indoor spaces
 // ============================================================================
 
 import type { GameMap, Direction, NPCDef } from '../../../engine/types';

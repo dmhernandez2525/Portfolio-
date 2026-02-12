@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Master Game State Hook
+// Pokemon RPG - Master Game State Hook
 // ============================================================================
 
 import { useReducer, useCallback } from 'react';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Battle State Machine
+// Pokemon RPG Engine - Battle State Machine
 // ============================================================================
 // Manages the full battle flow from intro through victory/defeat.
 
@@ -280,7 +280,7 @@ export function advanceBattle(state: BattleState): BattleState {
         };
       }
 
-      // Neither fainted — back to action select
+      // Neither fainted - back to action select
       return {
         ...state,
         phase: 'action_select' as BattlePhase,
@@ -339,7 +339,7 @@ export function advanceBattle(state: BattleState): BattleState {
           phase: 'battle_end' as BattlePhase,
         };
       }
-      // Didn't catch — opponent attacks
+      // Didn't catch - opponent attacks
       return {
         ...state,
         phase: 'action_select' as BattlePhase,
@@ -434,7 +434,7 @@ export function executeSwitchPokemon(state: BattleState, partyIndex: number): Ba
 
   const result = executeTurn(
     { ...state, playerActive: newActive },
-    null, 'switch', undefined, partyIndex
+    null, 'switch'
   );
 
   return {

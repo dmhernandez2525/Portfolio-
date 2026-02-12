@@ -1,5 +1,5 @@
 // ============================================================================
-// Red/Blue — Trainer Definitions
+// Red/Blue - Trainer Definitions
 // ============================================================================
 
 import type { TrainerDef } from '../../engine/types';

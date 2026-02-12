@@ -1,5 +1,5 @@
 // ============================================================================
-// New Bark Town — Starting town for Gold/Silver
+// New Bark Town - Starting town for Gold/Silver
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

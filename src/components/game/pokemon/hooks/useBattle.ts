@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Battle Hook
+// Pokemon RPG - Battle Hook
 // ============================================================================
 
 import { useState, useCallback, useRef, useEffect } from 'react';

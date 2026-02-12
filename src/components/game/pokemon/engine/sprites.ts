@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Retro Pixel Sprite System
+// Pokemon RPG Engine - Retro Pixel Sprite System
 // ============================================================================
 // Generates GBC-style pixel art sprites programmatically using offscreen
 // canvases. Falls back to procedural rendering if sprites aren't ready.

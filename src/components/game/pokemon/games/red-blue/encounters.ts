@@ -1,5 +1,5 @@
 // ============================================================================
-// Red/Blue — Wild Encounter Tables
+// Red/Blue - Wild Encounter Tables
 // ============================================================================
 
 import type { WildEncounterZone, WildEncounterEntry } from '../../engine/types';

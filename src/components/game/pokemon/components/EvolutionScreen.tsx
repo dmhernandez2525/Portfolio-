@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Evolution Animation Screen
+// Pokemon RPG - Evolution Animation Screen
 // ============================================================================
 
 import { useState, useEffect, useRef } from 'react';

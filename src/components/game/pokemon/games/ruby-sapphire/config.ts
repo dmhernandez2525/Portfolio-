@@ -1,5 +1,5 @@
 // ============================================================================
-// Ruby/Sapphire — Game Configuration
+// Ruby/Sapphire - Game Configuration
 // ============================================================================
 
 import type { GameConfig, PokemonType } from '../../engine/types';

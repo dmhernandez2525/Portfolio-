@@ -34,6 +34,8 @@ export const kantoLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['A powerful psychic presence...', 'MEWTWO appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
   {
@@ -49,6 +51,8 @@ export const kantoLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['A majestic icy bird...', 'ARTICUNO appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
   {
@@ -64,6 +68,8 @@ export const kantoLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['Electric energy crackles in the air...', 'ZAPDOS appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
   {
@@ -79,6 +85,8 @@ export const kantoLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['Intense heat radiates from within...', 'MOLTRES appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
 ];
@@ -98,6 +106,8 @@ export const hoennLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['The ground trembles violently...', 'GROUDON appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
   {
@@ -113,6 +123,8 @@ export const hoennLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['A massive wave of energy surges...', 'KYOGRE appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
   {
@@ -128,6 +140,8 @@ export const hoennLegendaries: StaticEncounter[] = [
       direction: 'down',
       dialog: ['An immense dragon descends from the clouds...', 'RAYQUAZA appeared!'],
       spriteId: 'legendary',
+      movement: 'static',
+      isTrainer: false,
     },
   },
 ];

@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Camera System
+// Pokemon RPG Engine - Camera System
 // ============================================================================
 
 import type { Camera } from './types';

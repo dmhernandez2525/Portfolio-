@@ -88,6 +88,7 @@ function playTone(
 
   osc.start(t);
   osc.stop(t + duration);
+  bgmOscillators.push(osc);
 }
 
 function playNotes(
@@ -240,4 +241,16 @@ export function getTrackForBattle(
   if (isGymLeader) return 'battle_gym';
   if (isTrainer) return 'battle_trainer';
   return 'battle_wild';
+}
+
+export function cleanup(): void {
+  stopBGM();
+  if (audioCtx) {
+    audioCtx.close().catch(() => { /* ignore close errors */ });
+    audioCtx = null;
+  }
+  masterGain = null;
+  bgmGain = null;
+  sfxGain = null;
+  state.currentTrack = null;
 }

@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Pokemon Factory
+// Pokemon RPG Engine - Pokemon Factory
 // ============================================================================
 // Creates Pokemon instances from species data + level.
 

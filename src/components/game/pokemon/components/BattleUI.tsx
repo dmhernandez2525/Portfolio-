@@ -1,11 +1,11 @@
 // ============================================================================
-// Pokemon RPG — Battle UI Component
+// Pokemon RPG - Battle UI Component
 // ============================================================================
 
 import { useEffect, useRef } from 'react';
 import type { BattleState, BagItem, InputState } from '../engine/types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from '../engine/constants';
-import { renderBattle } from '../engine/renderer';
+import { renderBattle, roundRect } from '../engine/renderer';
 import { getItemData } from '../engine/inventory-system';
 
 interface BattleUIProps {
@@ -508,16 +508,3 @@ function drawSwitchMenu(ctx: CanvasRenderingContext2D, state: BattleState, selec
   });
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}

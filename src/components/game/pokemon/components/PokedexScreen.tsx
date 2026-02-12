@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Pokedex Screen
+// Pokemon RPG - Pokedex Screen
 // ============================================================================
 
 import type { PokedexEntry } from '../engine/types';

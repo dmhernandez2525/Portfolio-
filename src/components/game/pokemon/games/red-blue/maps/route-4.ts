@@ -1,5 +1,5 @@
 // ============================================================================
-// Route 4 — Mt. Moon exit to Cerulean City
+// Route 4 - Mt. Moon exit to Cerulean City
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

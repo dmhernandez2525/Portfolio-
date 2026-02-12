@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Evolution System
+// Pokemon RPG Engine - Evolution System
 // ============================================================================
 
 import type { Pokemon, SpeciesData, EvolutionCondition } from './types';

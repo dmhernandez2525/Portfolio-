@@ -1,5 +1,5 @@
 // ============================================================================
-// Route 3 — Pewter City to Mt. Moon entrance
+// Route 3 - Pewter City to Mt. Moon entrance
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

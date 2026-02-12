@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Battle Engine
+// Pokemon RPG Engine - Battle Engine
 // ============================================================================
 // Handles damage calculation, type effectiveness, status effects,
 // accuracy checks, critical hits, stat stages, and catch mechanics.
@@ -131,7 +131,6 @@ export function executeTurn(
   playerMoveIndex: number | null,
   playerAction: 'fight' | 'item' | 'switch' | 'run',
   itemId?: string,
-  _switchIndex?: number,
 ): TurnResult {
   const messages: string[] = [];
   let playerDamageDealt = 0;
@@ -173,7 +172,7 @@ export function executeTurn(
   // Handle item use
   if (playerAction === 'item' && itemId) {
     messages.push(`Used ${itemId}!`);
-    // Item effects handled by caller — here we just note the action
+    // Item effects handled by caller - here we just note the action
     // Opponent still gets to attack
     const oppResult = executeMove(opponentBp, playerBp, selectOpponentMove(opponentBp, playerBp, state), messages);
     opponentDamageDealt = oppResult.damage;
@@ -192,7 +191,7 @@ export function executeTurn(
     return { messages, playerFirst: false, playerDamageDealt, opponentDamageDealt, playerFainted, opponentFainted, expGained, caughtPokemon, ranAway };
   }
 
-  // Fight — determine turn order
+  // Fight - determine turn order
   const playerMove = playerMoveIndex !== null ? playerPoke.moves[playerMoveIndex] : null;
   const opponentMove = selectOpponentMove(opponentBp, playerBp, state);
 
@@ -735,7 +734,7 @@ function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages:
     messages.push(`${prefix} ${name} is hurt by poison!`);
   }
 
-  // Bad poison (toxic) — escalating damage
+  // Bad poison (toxic) - escalating damage
   if (poke.status === 'bad_poison') {
     bp.toxicCounter++;
     const dmg = Math.max(1, Math.floor(poke.stats.hp * bp.toxicCounter / 16));
@@ -743,7 +742,7 @@ function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages:
     messages.push(`${prefix} ${name} is hurt by poison!`);
   }
 
-  // Leech Seed — drains HP and heals the other Pokemon
+  // Leech Seed - drains HP and heals the other Pokemon
   if (bp.volatileStatuses.has('leech_seed')) {
     const dmg = Math.max(1, Math.floor(poke.stats.hp / 8));
     poke.currentHp = Math.max(0, poke.currentHp - dmg);
@@ -751,7 +750,7 @@ function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages:
     messages.push(`${prefix} ${name}'s health is sapped by Leech Seed!`);
   }
 
-  // Sandstorm damage — 1/16 to non-Rock/Ground/Steel
+  // Sandstorm damage - 1/16 to non-Rock/Ground/Steel
   if (weather === 'sandstorm') {
     const types = (getSpeciesData(poke.speciesId)?.types ?? []) as PokemonType[];
     if (!types.includes('rock') && !types.includes('ground') && !types.includes('steel')) {
@@ -761,7 +760,7 @@ function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages:
     }
   }
 
-  // Hail damage — 1/16 to non-Ice
+  // Hail damage - 1/16 to non-Ice
   if (weather === 'hail') {
     const types = (getSpeciesData(poke.speciesId)?.types ?? []) as PokemonType[];
     if (!types.includes('ice')) {

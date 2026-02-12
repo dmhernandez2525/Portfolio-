@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Time-of-Day System (Gen 2+)
+// Pokemon RPG Engine - Time-of-Day System (Gen 2+)
 // ============================================================================
 
 export type TimeOfDay = 'morning' | 'day' | 'night';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Route 2 — Connects Viridian City to Viridian Forest / Pewter City
+// Route 2 - Connects Viridian City to Viridian Forest / Pewter City
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

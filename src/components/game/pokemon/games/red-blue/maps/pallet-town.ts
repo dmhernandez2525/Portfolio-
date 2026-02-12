@@ -1,5 +1,5 @@
 // ============================================================================
-// Pallet Town — Starting map for Red/Blue
+// Pallet Town - Starting map for Red/Blue
 // ============================================================================
 // 20x18 tiles. Layout:
 //   Row 0-2:  Trees (border)

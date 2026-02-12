@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Game Loop Hook (60fps RAF)
+// Pokemon RPG - Game Loop Hook (60fps RAF)
 // ============================================================================
 
 import { useRef, useEffect, useCallback } from 'react';

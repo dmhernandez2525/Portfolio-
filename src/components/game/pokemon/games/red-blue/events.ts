@@ -1,21 +1,11 @@
 // ============================================================================
-// Red/Blue — Story Events & Cutscenes
+// Red/Blue - Story Events & Cutscenes
 // ============================================================================
 
-export interface StoryEvent {
-  id: string;
-  trigger: 'map_enter' | 'interact' | 'flag_check';
-  mapId?: string;
-  npcId?: string;
-  requiredFlags?: string[];
-  blockedByFlags?: string[];
-  dialog: string[];
-  setsFlags?: string[];
-  givesItem?: { itemId: string; quantity: number };
-  givesPokemon?: { speciesId: number; level: number };
-  starterSelection?: boolean;
-  battle?: { trainerId: string };
-}
+import type { StoryEvent } from '../../engine/story-events';
+import { getActiveEvents as filterEvents } from '../../engine/story-events';
+
+export type { StoryEvent };
 
 export const storyEvents: StoryEvent[] = [
   // --- Opening sequence ---
@@ -184,19 +174,11 @@ export const storyEvents: StoryEvent[] = [
   },
 ];
 
-// Helper to find applicable events
 export function getActiveEvents(
   trigger: StoryEvent['trigger'],
   flags: Record<string, boolean>,
   mapId?: string,
   npcId?: string,
 ): StoryEvent[] {
-  return storyEvents.filter(event => {
-    if (event.trigger !== trigger) return false;
-    if (event.mapId && event.mapId !== mapId) return false;
-    if (event.npcId && event.npcId !== npcId) return false;
-    if (event.requiredFlags?.some(f => !flags[f])) return false;
-    if (event.blockedByFlags?.some(f => flags[f])) return false;
-    return true;
-  });
+  return filterEvents(storyEvents, trigger, flags, mapId, npcId);
 }

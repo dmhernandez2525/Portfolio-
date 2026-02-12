@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Collision Detection
+// Pokemon RPG Engine - Collision Detection
 // ============================================================================
 
 import type { TileType, Direction, GameMap, NPCDef } from './types';

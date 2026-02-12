@@ -1,5 +1,5 @@
 // ============================================================================
-// Gold/Silver — Wild Encounter Tables
+// Gold/Silver - Wild Encounter Tables
 // ============================================================================
 
 import type { WildEncounterZone } from '../../engine/types';

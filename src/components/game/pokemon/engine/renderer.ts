@@ -1,9 +1,10 @@
 // ============================================================================
-// Pokemon RPG Engine — Main Renderer
+// Pokemon RPG Engine - Main Renderer
 // ============================================================================
 
 import type { Camera, GameMap, Player, BattleState, BattlePokemon } from './types';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from './constants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS, getExpForLevel, MAX_LEVEL } from './constants';
+import { getSpeciesData } from './battle-engine';
 import { renderMap, renderAboveLayer, renderNPCs, renderPlayer } from './tilemap';
 import { drawPokemonSprite, getShinySparkles, drawShinySparkles } from './sprites';
 
@@ -25,7 +26,7 @@ export function renderOverworld(
   // NPCs
   renderNPCs(ctx, map, camera, frameCount);
 
-  // Player — pixel position is already interpolated by the movement system
+  // Player - pixel position is already interpolated by the movement system
   const playerPixelX = player.x;
   const playerPixelY = player.y;
 
@@ -153,7 +154,7 @@ function drawBattlePokemon(
   const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack, pokemon.isShiny);
 
   if (!spriteDrawn) {
-    // Procedural fallback — colored shape based on type
+    // Procedural fallback - colored shape based on type
     const primaryType = bp.types?.[0] ?? 'normal';
     const typeColor = TYPE_COLORS[primaryType] ?? TYPE_COLORS['normal'];
     ctx.fillStyle = typeColor;
@@ -251,8 +252,15 @@ function drawPokemonInfoBox(
     ctx.fillStyle = '#404040';
     ctx.fillRect(x + 8, expBarY, w - 16, 5);
     ctx.fillStyle = COLORS.expBar;
-    // Simplified exp display
-    const expRatio = 0.5; // placeholder
+    let expRatio = 1;
+    if (pokemon.level < MAX_LEVEL) {
+      const species = getSpeciesData(pokemon.speciesId);
+      const growthRate = (species?.growthRate ?? 'medium_fast') as Parameters<typeof getExpForLevel>[0];
+      const currentLevelExp = getExpForLevel(growthRate, pokemon.level);
+      const nextLevelExp = getExpForLevel(growthRate, pokemon.level + 1);
+      const range = nextLevelExp - currentLevelExp;
+      expRatio = range > 0 ? Math.max(0, Math.min(1, (pokemon.exp - currentLevelExp) / range)) : 1;
+    }
     ctx.fillRect(x + 8, expBarY, (w - 16) * expRatio, 5);
   }
 
@@ -377,7 +385,7 @@ export function renderDialog(
 
 // --- Utility ---
 
-function roundRect(
+export function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,

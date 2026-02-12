@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Core Type Definitions
+// Pokemon RPG Engine - Core Type Definitions
 // ============================================================================
 
 // --- Primitive types ---

@@ -1,5 +1,5 @@
 // ============================================================================
-// Gold/Silver — Trainer Definitions
+// Gold/Silver - Trainer Definitions
 // ============================================================================
 
 import type { TrainerDef } from '../../engine/types';

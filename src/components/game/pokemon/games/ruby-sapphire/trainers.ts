@@ -1,5 +1,5 @@
 // ============================================================================
-// Ruby/Sapphire — Trainer Definitions
+// Ruby/Sapphire - Trainer Definitions
 // ============================================================================
 
 import type { TrainerDef } from '../../engine/types';

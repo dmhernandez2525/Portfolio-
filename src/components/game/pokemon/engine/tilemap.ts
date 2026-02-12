@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Tilemap Renderer
+// Pokemon RPG Engine - Tilemap Renderer
 // ============================================================================
 // Renders maps using retro pixel sprites from the sprite atlas.
 // Falls back to procedural colored rectangles if sprites aren't loaded.
@@ -106,7 +106,7 @@ function renderTileDetail(
       }
       break;
 
-    case 4: // water — wave lines
+    case 4: // water - wave lines
       ctx.strokeStyle = COLORS.waterDark;
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -116,7 +116,7 @@ function renderTileDetail(
       ctx.stroke();
       break;
 
-    case 5: // tree — trunk + canopy
+    case 5: // tree - trunk + canopy
       ctx.fillStyle = COLORS.treeTrunk;
       ctx.fillRect(sx + s / 2 - 3, sy + s / 2, 6, s / 2);
       ctx.fillStyle = COLORS.tree;
@@ -125,7 +125,7 @@ function renderTileDetail(
       ctx.fill();
       break;
 
-    case 8: // door — dark rectangle with frame
+    case 8: // door - dark rectangle with frame
       ctx.strokeStyle = '#402010';
       ctx.lineWidth = 2;
       ctx.strokeRect(sx + 4, sy + 2, s - 8, s - 4);
@@ -343,18 +343,24 @@ export function renderCollisionDebug(
     ledge_down: 'rgba(200, 200, 0, 0.3)',
     ledge_left: 'rgba(200, 200, 0, 0.3)',
     ledge_right: 'rgba(200, 200, 0, 0.3)',
+    cuttable_tree: 'rgba(0, 150, 0, 0.4)',
+    boulder: 'rgba(150, 100, 50, 0.4)',
   };
 
+  const savedAlpha = ctx.globalAlpha;
   ctx.globalAlpha = 0.4;
-  for (let y = startTileY; y < endTileY; y++) {
-    for (let x = startTileX; x < endTileX; x++) {
-      const tile = map.collision[y]?.[x];
-      if (!tile) continue;
+  try {
+    for (let y = startTileY; y < endTileY; y++) {
+      for (let x = startTileX; x < endTileX; x++) {
+        const tile = map.collision[y]?.[x];
+        if (!tile) continue;
 
-      const screen = worldToScreen(camera, x * SCALED_TILE, y * SCALED_TILE);
-      ctx.fillStyle = collisionColors[tile] || 'rgba(128, 128, 128, 0.3)';
-      ctx.fillRect(screen.x, screen.y, SCALED_TILE, SCALED_TILE);
+        const screen = worldToScreen(camera, x * SCALED_TILE, y * SCALED_TILE);
+        ctx.fillStyle = collisionColors[tile] || 'rgba(128, 128, 128, 0.3)';
+        ctx.fillRect(screen.x, screen.y, SCALED_TILE, SCALED_TILE);
+      }
     }
+  } finally {
+    ctx.globalAlpha = savedAlpha;
   }
-  ctx.globalAlpha = 1;
 }

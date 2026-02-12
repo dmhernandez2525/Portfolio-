@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Main Canvas Component
+// Pokemon RPG - Main Canvas Component
 // ============================================================================
 
 import { useRef, useEffect, useCallback, useState } from 'react';
@@ -36,7 +36,7 @@ import { gymLeaders as hoennGymLeaders, eliteFour as hoennEliteFour, champion as
 import { getActiveEvents as getKantoEvents } from '../games/red-blue/events';
 import { getActiveEvents as getJohtoEvents } from '../games/gold-silver/events';
 import { getActiveEvents as getHoennEvents } from '../games/ruby-sapphire/events';
-import type { StoryEvent } from '../games/red-blue/events';
+import type { StoryEvent } from '../engine/story-events';
 import { saveGame } from '../engine/save-manager';
 import MenuOverlay from './MenuOverlay';
 import PartyScreen from './PartyScreen';
@@ -165,6 +165,8 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   );
 
   const visitedTownsRef = useRef<Set<string>>(new Set());
+  const versionRef = useRef(version);
+  versionRef.current = version;
 
   const input = useInput();
   const overworld = useOverworld();
@@ -401,7 +403,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       { itemId: 'potion', quantity: 5 },
     ];
 
-    const start = VERSION_START[version];
+    const start = VERSION_START[versionRef.current];
     loadMapRef.current?.(start.mapId, start.startX, start.startY);
     setScreen('starter_select');
 
@@ -452,7 +454,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       const map = currentMapRef.current;
       if (!map) return;
       // Check for story event on this NPC first
-      const events = VERSION_EVENTS[version].getActiveEvents('interact', storyFlagsRef.current, map.id, npcId);
+      const events = VERSION_EVENTS[versionRef.current].getActiveEvents('interact', storyFlagsRef.current, map.id, npcId);
       if (events.length > 0) {
         const event = events[0];
         setDialogText(event.dialog);
@@ -514,7 +516,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       setDialogText(npc.dialog);
       setDialogIndex(0);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // --- Handle battle end ---
   useEffect(() => {
@@ -645,7 +647,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       rivalName: 'BLUE',
       player: p,
       party: partyRef.current,
-      pcBoxes: [],
+      pcBoxes: pcBoxesRef.current,
       bag: bagRef.current,
       money: moneyRef.current,
       badges: badgesRef.current,
