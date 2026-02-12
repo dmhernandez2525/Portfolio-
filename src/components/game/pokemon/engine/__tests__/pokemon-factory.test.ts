@@ -263,4 +263,45 @@ describe('createPokemon', () => {
 
     expect(pokemon.nickname).toBe('Bulbasaur');
   });
+
+  it('falls back to tackle when no moves are available in the learnset', () => {
+    const species: SpeciesData = {
+      ...makeBulbasaurSpecies(),
+      learnset: [], // empty learnset
+    };
+    const pokemon = createPokemon(species, 5);
+
+    expect(pokemon.moves).toHaveLength(1);
+    expect(pokemon.moves[0].moveId).toBe('tackle');
+    expect(pokemon.moves[0].pp).toBe(35);
+    expect(pokemon.moves[0].maxPp).toBe(35);
+  });
+
+  it('defaults pp to 35 when getMoveData returns null for an unknown move', () => {
+    const species: SpeciesData = {
+      ...makeBulbasaurSpecies(),
+      learnset: [
+        { level: 1, moveId: 'unknown_move_xyz' },
+      ],
+    };
+    const pokemon = createPokemon(species, 5);
+
+    expect(pokemon.moves).toHaveLength(1);
+    expect(pokemon.moves[0].moveId).toBe('unknown_move_xyz');
+    expect(pokemon.moves[0].pp).toBe(35);
+    expect(pokemon.moves[0].maxPp).toBe(35);
+  });
+
+  it('falls back to tackle when all learnset moves are above the pokemon level', () => {
+    const species: SpeciesData = {
+      ...makeBulbasaurSpecies(),
+      learnset: [
+        { level: 50, moveId: 'razor_leaf' },
+      ],
+    };
+    const pokemon = createPokemon(species, 5);
+
+    expect(pokemon.moves).toHaveLength(1);
+    expect(pokemon.moves[0].moveId).toBe('tackle');
+  });
 });

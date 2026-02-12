@@ -240,6 +240,32 @@ describe('updateNPC', () => {
     vi.restoreAllMocks();
   });
 
+  it('should not move a wandering NPC into a tile another NPC is moving toward', () => {
+    // Force direction = right, so target = (6,5). Another NPC is moving toward (6,5).
+    vi.spyOn(Math, 'random').mockReturnValue(0.75); // index 3 = 'right'
+    const npc = makeNPC({ movement: 'wander' });
+    const state = makeNPCState({ moveCooldown: 0 });
+    const movingNPC = makeNPCState({
+      npcId: 'other',
+      x: 7,
+      y: 5,
+      isMoving: true,
+      targetX: 6,
+      targetY: 5,
+    });
+    const allStates = new Map<string, NPCState>();
+    allStates.set('npc-1', state);
+    allStates.set('other', movingNPC);
+
+    const result = updateNPC(npc, state, map, 0, 0, allStates);
+
+    // NPC should turn but not start moving into the tile another NPC is heading toward
+    expect(result.isMoving).toBe(false);
+    expect(result.direction).toBe('right');
+
+    vi.restoreAllMocks();
+  });
+
   it('should not move a wandering NPC into an unwalkable tile', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0); // 'up', target = (5,4)
     const blockedMap = makeMap();
@@ -268,6 +294,62 @@ describe('updateNPC', () => {
     expect(result.isMoving).toBe(true);
     expect(result.targetX).toBe(6);
     expect(result.targetY).toBe(5);
+  });
+
+  it('should set direction to left when patrol target is to the left', () => {
+    const patrolPath = [
+      { x: 5, y: 5 },
+      { x: 3, y: 5 },
+    ];
+    const npc = makeNPC({ movement: 'patrol', patrolPath });
+    const state = makeNPCState({ moveCooldown: 0, patrolIndex: 0 });
+    const result = updateNPC(npc, state, map, 0, 0, emptyStates);
+
+    expect(result.direction).toBe('left');
+    expect(result.isMoving).toBe(true);
+  });
+
+  it('should set direction to up when patrol target is above', () => {
+    const patrolPath = [
+      { x: 5, y: 5 },
+      { x: 5, y: 3 },
+    ];
+    const npc = makeNPC({ movement: 'patrol', patrolPath });
+    const state = makeNPCState({ moveCooldown: 0, patrolIndex: 0 });
+    const result = updateNPC(npc, state, map, 0, 0, emptyStates);
+
+    expect(result.direction).toBe('up');
+    expect(result.isMoving).toBe(true);
+  });
+
+  it('should set direction to down when patrol target is below (dx === 0, dy > 0)', () => {
+    const patrolPath = [
+      { x: 5, y: 5 },
+      { x: 5, y: 7 },
+    ];
+    const npc = makeNPC({ movement: 'patrol', patrolPath });
+    const state = makeNPCState({ moveCooldown: 0, patrolIndex: 0 });
+    const result = updateNPC(npc, state, map, 0, 0, emptyStates);
+
+    expect(result.direction).toBe('down');
+    expect(result.isMoving).toBe(true);
+  });
+
+  it('should set cooldown when patrol tile is blocked', () => {
+    const patrolPath = [
+      { x: 5, y: 5 },
+      { x: 5, y: 7 },
+    ];
+    const blockedMap = makeMap();
+    // Block the tile the NPC would step into (5,6)
+    blockedMap.collision[6][5] = 'blocked';
+
+    const npc = makeNPC({ movement: 'patrol', patrolPath });
+    const state = makeNPCState({ moveCooldown: 0, patrolIndex: 0 });
+    const result = updateNPC(npc, state, blockedMap, 0, 0, emptyStates);
+
+    expect(result.isMoving).toBe(false);
+    expect(result.moveCooldown).toBe(60);
   });
 
   it('should update patrolIndex when reaching the waypoint tile', () => {

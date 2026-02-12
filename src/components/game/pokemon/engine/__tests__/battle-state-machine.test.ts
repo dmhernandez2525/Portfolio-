@@ -48,6 +48,16 @@ vi.mock('../battle-engine', () => ({
     caught: true,
     messages: ['The ball shook three times...', 'Gotcha!'],
   })),
+  createFieldEffects: vi.fn(() => ({
+    reflect: 0,
+    lightScreen: 0,
+    stealthRock: false,
+    spikesLayers: 0,
+    toxicSpikesLayers: 0,
+  })),
+  applyEntryHazards: vi.fn(),
+  applyOnSwitchIn: vi.fn(),
+  getAbilitySwitchInWeather: vi.fn(() => null),
   getMoveData: vi.fn((moveId: string) => {
     const db: Record<string, MoveData> = {
       tackle: {
@@ -115,7 +125,7 @@ import {
   cancelEvolution,
 } from '../battle-state-machine';
 import { createBattlePokemon, executeTurn, checkLevelUp, attemptCatch, getMoveData } from '../battle-engine';
-import { checkEvolution, evolvePokemon } from '../evolution-system';
+import { checkEvolution, evolvePokemon, getMovesForLevel } from '../evolution-system';
 
 // ============================================================================
 // Helper factories
@@ -467,6 +477,46 @@ describe('advanceBattle', () => {
 // ============================================================================
 
 describe('advanceBattle - faint_check', () => {
+  it('auto-executes charge move when player has a chargingMove active', () => {
+    const playerPokemon = makePokemon({ uid: 'player-001', nickname: 'Bulba', currentHp: 80 });
+    const opponentPokemon = makePokemon({ uid: 'opp-001', speciesId: 4, nickname: 'Charmy', currentHp: 60 });
+
+    const playerActive = vi.mocked(createBattlePokemon)(playerPokemon);
+    playerActive.chargingMove = 'dig';
+
+    vi.mocked(executeTurn).mockReturnValueOnce({
+      messages: ['Bulba came up from underground!', 'It hit hard!'],
+      playerFirst: true,
+      playerDamageDealt: 40,
+      opponentDamageDealt: 10,
+      playerFainted: false,
+      opponentFainted: false,
+      expGained: 30,
+      caughtPokemon: null,
+      ranAway: false,
+      newWeather: 'rain' as Weather,
+      newWeatherTurns: 5,
+    });
+
+    const state = makeBattleState({
+      phase: 'faint_check',
+      playerActive,
+      opponentActive: vi.mocked(createBattlePokemon)(opponentPokemon),
+      turnNumber: 2,
+      textQueue: ['single'],
+      currentText: 'single',
+    });
+
+    const next = advanceBattle(state);
+    expect(next.phase).toBe('faint_check');
+    expect(next.turnNumber).toBe(3);
+    expect(next.expGained).toBe(30);
+    expect(next.weather).toBe('rain');
+    expect(next.weatherTurns).toBe(5);
+    expect(next.currentText).toBe('Bulba came up from underground!');
+    expect(executeTurn).toHaveBeenCalledWith(state, null, 'fight');
+  });
+
   it('transitions to action_select when neither side fainted', () => {
     const state = makeBattleState({
       phase: 'faint_check',
@@ -1066,6 +1116,71 @@ describe('learnMove', () => {
     const next = learnMove(state, 0);
     expect(next).toBe(state);
   });
+
+  it('falls back to default pp when getMoveData returns null for the new move', () => {
+    const pokemon = makePokemon({
+      uid: 'p1', nickname: 'Bulba',
+      moves: [
+        makeMove({ moveId: 'tackle' }),
+        makeMove({ moveId: 'scratch' }),
+        makeMove({ moveId: 'ember' }),
+        makeMove({ moveId: 'vine_whip' }),
+      ],
+    });
+
+    const state = makeBattleState({
+      phase: 'move_learn',
+      pendingLevelUps: [{ pokemon, newLevel: 20, newMoves: ['unknown_move'] }],
+    });
+
+    const next = learnMove(state, 1);
+    expect(next.phase).toBe('level_up');
+    // The replaced move should have fallback pp of 10
+    expect(pokemon.moves[1].moveId).toBe('unknown_move');
+    expect(pokemon.moves[1].pp).toBe(10);
+    expect(pokemon.moves[1].maxPp).toBe(10);
+  });
+
+  it('falls back to "the old move" text when getMoveData returns null for the replaced move', () => {
+    const pokemon = makePokemon({
+      uid: 'p1', nickname: 'Bulba',
+      moves: [
+        makeMove({ moveId: 'tackle' }),
+        makeMove({ moveId: 'nonexistent_old' }),
+        makeMove({ moveId: 'ember' }),
+        makeMove({ moveId: 'vine_whip' }),
+      ],
+    });
+
+    const state = makeBattleState({
+      phase: 'move_learn',
+      pendingLevelUps: [{ pokemon, newLevel: 20, newMoves: ['razor_leaf'] }],
+    });
+
+    const next = learnMove(state, 1);
+    expect(next.phase).toBe('level_up');
+    expect(next.textQueue).toContain('Bulba forgot the old move.');
+  });
+
+  it('uses species name when pokemon has no nickname for move replacement', () => {
+    const pokemon = makePokemon({
+      uid: 'p1', nickname: undefined, speciesId: 1,
+      moves: [
+        makeMove({ moveId: 'tackle' }),
+        makeMove({ moveId: 'scratch' }),
+        makeMove({ moveId: 'ember' }),
+        makeMove({ moveId: 'vine_whip' }),
+      ],
+    });
+
+    const state = makeBattleState({
+      phase: 'move_learn',
+      pendingLevelUps: [{ pokemon, newLevel: 20, newMoves: ['razor_leaf'] }],
+    });
+
+    const next = learnMove(state, 0);
+    expect(next.textQueue).toContain('And... Bulbasaur learned Razor Leaf!');
+  });
 });
 
 // ============================================================================
@@ -1125,6 +1240,18 @@ describe('applyEvolution', () => {
     const next = applyEvolution(state);
     expect(next).toBe(state);
   });
+
+  it('uses species name as old name when pokemon has no nickname', () => {
+    const pokemon = makePokemon({ uid: 'p1', speciesId: 1, nickname: undefined });
+
+    const state = makeBattleState({
+      phase: 'evolution_check',
+      pendingEvolution: { pokemon, evolvesTo: 2 },
+    });
+
+    const next = applyEvolution(state);
+    expect(next.currentText).toContain('Bulbasaur evolved into Ivysaur');
+  });
 });
 
 // ============================================================================
@@ -1157,5 +1284,187 @@ describe('cancelEvolution', () => {
 
     const next = cancelEvolution(state);
     expect(next.currentText).toContain('Bulbasaur stopped evolving');
+  });
+
+  it('produces empty name when there is no pending evolution', () => {
+    const state = makeBattleState({
+      phase: 'evolution_check',
+      pendingEvolution: null,
+    });
+
+    const next = cancelEvolution(state);
+    expect(next.phase).toBe('battle_end');
+    expect(next.battleResult).toBe('win');
+    expect(next.currentText).toBe(' stopped evolving!');
+  });
+});
+
+// ============================================================================
+// advanceBattle - faint_check: Exp. Share branch (lines 209-215)
+// ============================================================================
+
+describe('advanceBattle - faint_check Exp. Share', () => {
+  it('grants shared EXP to party members holding exp-share', () => {
+    const p1 = makePokemon({ uid: 'player-001', nickname: 'Bulba', currentHp: 100 });
+    const p2 = makePokemon({ uid: 'player-002', speciesId: 7, nickname: 'Squirt', currentHp: 80, heldItem: 'exp-share' });
+    const opponent = makePokemon({ uid: 'opp-001', speciesId: 4, currentHp: 0, nickname: 'Charmy' });
+
+    vi.mocked(checkLevelUp)
+      .mockReturnValueOnce({ leveled: false, newLevel: 50 })   // main active
+      .mockReturnValueOnce({ leveled: false, newLevel: 50 });   // exp-share recipient
+
+    const state = makeBattleState({
+      phase: 'faint_check',
+      playerParty: [p1, p2],
+      playerActive: vi.mocked(createBattlePokemon)(p1),
+      opponentParty: [opponent],
+      opponentActive: vi.mocked(createBattlePokemon)(opponent),
+      expGained: 100,
+      textQueue: ['single'],
+      currentText: 'single',
+    });
+
+    const next = advanceBattle(state);
+    expect(next.phase).toBe('exp_gain');
+    // checkLevelUp should be called for p1 (active) and p2 (exp-share holder)
+    expect(checkLevelUp).toHaveBeenCalledTimes(2);
+    expect(checkLevelUp).toHaveBeenCalledWith(p2, 50); // 50% of 100
+  });
+
+  it('skips fainted party members for Exp. Share', () => {
+    const p1 = makePokemon({ uid: 'player-001', nickname: 'Bulba', currentHp: 100 });
+    const p2 = makePokemon({ uid: 'player-002', speciesId: 7, nickname: 'Squirt', currentHp: 0, heldItem: 'exp-share' });
+    const opponent = makePokemon({ uid: 'opp-001', speciesId: 4, currentHp: 0, nickname: 'Charmy' });
+
+    vi.mocked(checkLevelUp).mockReturnValue({ leveled: false, newLevel: 50 });
+
+    const state = makeBattleState({
+      phase: 'faint_check',
+      playerParty: [p1, p2],
+      playerActive: vi.mocked(createBattlePokemon)(p1),
+      opponentParty: [opponent],
+      opponentActive: vi.mocked(createBattlePokemon)(opponent),
+      expGained: 100,
+      textQueue: ['single'],
+      currentText: 'single',
+    });
+
+    advanceBattle(state);
+    // checkLevelUp should only be called once (for active pokemon), not for fainted exp-share holder
+    expect(checkLevelUp).toHaveBeenCalledTimes(1);
+  });
+
+  it('adds level ups from Exp. Share recipients to pending level ups', () => {
+    const p1 = makePokemon({ uid: 'player-001', nickname: 'Bulba', currentHp: 100 });
+    const p2 = makePokemon({ uid: 'player-002', speciesId: 7, nickname: 'Squirt', currentHp: 80, heldItem: 'exp-share' });
+    const opponent = makePokemon({ uid: 'opp-001', speciesId: 4, currentHp: 0, nickname: 'Charmy' });
+
+    vi.mocked(checkLevelUp)
+      .mockReturnValueOnce({ leveled: false, newLevel: 50 })  // active pokemon
+      .mockReturnValueOnce({ leveled: true, newLevel: 16 });   // exp-share recipient levels up
+
+    vi.mocked(getMovesForLevel).mockReturnValueOnce(['vine_whip']);
+
+    const state = makeBattleState({
+      phase: 'faint_check',
+      playerParty: [p1, p2],
+      playerActive: vi.mocked(createBattlePokemon)(p1),
+      opponentParty: [opponent],
+      opponentActive: vi.mocked(createBattlePokemon)(opponent),
+      expGained: 100,
+      textQueue: ['single'],
+      currentText: 'single',
+    });
+
+    const next = advanceBattle(state);
+    expect(next.phase).toBe('exp_gain');
+    expect(next.pendingLevelUps).toHaveLength(1);
+    expect(next.pendingLevelUps[0].pokemon.uid).toBe('player-002');
+    expect(next.pendingLevelUps[0].newLevel).toBe(16);
+  });
+});
+
+// ============================================================================
+// advanceBattle - move_learn fallback (line 329)
+// ============================================================================
+
+describe('advanceBattle - move_learn fallback with empty pendingLevelUps', () => {
+  it('returns to level_up with empty text when no pending level ups exist', () => {
+    const state = makeBattleState({
+      phase: 'move_learn',
+      pendingLevelUps: [],
+      textQueue: ['single'],
+      currentText: 'single',
+    });
+
+    const next = advanceBattle(state);
+    expect(next.phase).toBe('level_up');
+    expect(next.currentText).toBe('');
+  });
+});
+
+// ============================================================================
+// executeSwitchPokemon - Natural Cure (line 442-443)
+// ============================================================================
+
+describe('executeSwitchPokemon - Natural Cure', () => {
+  it('cures status when switching out a pokemon with natural_cure ability', () => {
+    const p1 = makePokemon({
+      uid: 'player-001', nickname: 'Bulba', currentHp: 50,
+      ability: 'natural_cure', status: 'poison',
+    });
+    const p2 = makePokemon({ uid: 'player-002', speciesId: 7, nickname: 'Squirt', currentHp: 90 });
+
+    vi.mocked(executeTurn).mockReturnValueOnce({
+      messages: ['Opponent attacks!'],
+      playerFirst: false,
+      playerDamageDealt: 0,
+      opponentDamageDealt: 10,
+      playerFainted: false,
+      opponentFainted: false,
+      expGained: 0,
+      caughtPokemon: null,
+      ranAway: false,
+    });
+
+    const state = makeBattleState({
+      phase: 'switch_select',
+      playerParty: [p1, p2],
+      playerActive: vi.mocked(createBattlePokemon)(p1),
+    });
+
+    executeSwitchPokemon(state, 1);
+    // Natural Cure should have cleared the poison status on the switching-out pokemon
+    expect(p1.status).toBeNull();
+  });
+
+  it('does not cure status when switching out a pokemon without natural_cure', () => {
+    const p1 = makePokemon({
+      uid: 'player-001', nickname: 'Bulba', currentHp: 50,
+      ability: 'overgrow', status: 'poison',
+    });
+    const p2 = makePokemon({ uid: 'player-002', speciesId: 7, nickname: 'Squirt', currentHp: 90 });
+
+    vi.mocked(executeTurn).mockReturnValueOnce({
+      messages: ['Opponent attacks!'],
+      playerFirst: false,
+      playerDamageDealt: 0,
+      opponentDamageDealt: 10,
+      playerFainted: false,
+      opponentFainted: false,
+      expGained: 0,
+      caughtPokemon: null,
+      ranAway: false,
+    });
+
+    const state = makeBattleState({
+      phase: 'switch_select',
+      playerParty: [p1, p2],
+      playerActive: vi.mocked(createBattlePokemon)(p1),
+    });
+
+    executeSwitchPokemon(state, 1);
+    // Status should remain since ability is not natural_cure
+    expect(p1.status).toBe('poison');
   });
 });

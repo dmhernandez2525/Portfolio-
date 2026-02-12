@@ -28,6 +28,7 @@ import {
   vermilionCity, lavenderTown, celadonCity,
   fuchsiaCity, saffronCity, cinnabarIsland,
   rockTunnel, victoryRoad, ceruleanCave, safariZone,
+  seafoamIslandsB4F, powerPlant,
 } from './later-routes';
 
 // All maps indexed by ID
@@ -78,6 +79,8 @@ export const kantoMaps: Record<string, GameMap> = {
   victory_road: victoryRoad,
   cerulean_cave: ceruleanCave,
   safari_zone: safariZone,
+  seafoam_islands_b4f: seafoamIslandsB4F,
+  power_plant: powerPlant,
 
   // Interiors (Pokemon Centers, Marts, Gyms, Elite Four, etc.)
   ...kantoInteriors,
