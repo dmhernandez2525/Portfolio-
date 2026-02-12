@@ -17,7 +17,7 @@ import { useInput } from '../hooks/useInput';
 import { useOverworld } from '../hooks/useOverworld';
 import { useBattle } from '../hooks/useBattle';
 import { initSprites } from '../engine/sprites';
-import { setSpeciesDatabase, setMoveDatabase } from '../engine/battle-engine';
+import { setSpeciesDatabase, setMoveDatabase, getMoveData } from '../engine/battle-engine';
 import { createPokemon } from '../engine/pokemon-factory';
 import { rollWildEncounter } from '../games/red-blue/encounters';
 import { kantoMaps } from '../games/red-blue/maps';
@@ -43,6 +43,7 @@ import BagScreen from './BagScreen';
 import PokedexScreen from './PokedexScreen';
 import ShopScreen from './ShopScreen';
 import PCStorageScreen from './PCStorageScreen';
+import MoveTutorScreen from './MoveTutorScreen';
 import MobileControls from './MobileControls';
 import DialogBox from './DialogBox';
 import BattleUI from './BattleUI';
@@ -55,7 +56,7 @@ import movesData from '../data/moves.json';
 import itemsData from '../data/items.json';
 
 type LoadMapFn = (mapId: string, startX: number, startY: number) => void;
-type ActiveMenu = 'none' | 'party' | 'bag' | 'pokedex' | 'party_item_target' | 'shop' | 'pc';
+type ActiveMenu = 'none' | 'party' | 'bag' | 'pokedex' | 'party_item_target' | 'shop' | 'pc' | 'move_deleter' | 'move_reminder';
 
 // --- Static data setup ---
 const VERSION_START: Record<GameVersion, { mapId: string; startX: number; startY: number }> = {
@@ -480,6 +481,20 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
         return;
       }
 
+      // Move Deleter NPC
+      if (npc.isMoveDeleter) {
+        setActiveMenu('move_deleter');
+        setIsPaused(true);
+        return;
+      }
+
+      // Move Reminder NPC
+      if (npc.isMoveReminder) {
+        setActiveMenu('move_reminder');
+        setIsPaused(true);
+        return;
+      }
+
       // Default NPC dialog
       setDialogText(npc.dialog);
       setDialogIndex(0);
@@ -497,6 +512,25 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
         markPokedex(caught.speciesId, true);
         if (partyRef.current.length < 6) {
           partyRef.current = [...partyRef.current, caught];
+        } else {
+          // Party full: send to first available PC box slot
+          let sent = false;
+          for (const box of pcBoxesRef.current) {
+            const emptySlot = box.pokemon.findIndex(p => p === null);
+            if (emptySlot >= 0) {
+              box.pokemon[emptySlot] = caught;
+              sent = true;
+              setDialogText([
+                `${caught.nickname ?? getSpeciesName(caught.speciesId)} was sent to ${box.name}!`,
+              ]);
+              setDialogIndex(0);
+              break;
+            }
+          }
+          if (!sent) {
+            setDialogText(['All PC boxes are full! The Pokemon could not be stored.']);
+            setDialogIndex(0);
+          }
         }
       }
 
@@ -789,6 +823,32 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
               if (!pkmn) return;
               pcBoxesRef.current[boxIdx].pokemon[slot] = null;
               partyRef.current = [...partyRef.current, pkmn];
+            }}
+            onBack={() => { setActiveMenu('none'); setIsPaused(false); }}
+          />
+        )}
+        {screen === 'overworld' && (activeMenu === 'move_deleter' || activeMenu === 'move_reminder') && (
+          <MoveTutorScreen
+            party={partyRef.current}
+            mode={activeMenu === 'move_deleter' ? 'deleter' : 'reminder'}
+            speciesDatabase={speciesMap}
+            hasHeartScale={bagRef.current.some(i => i.itemId === 'heart-scale' && i.quantity > 0)}
+            onDeleteMove={(partyIdx, moveIdx) => {
+              const pkmn = partyRef.current[partyIdx];
+              if (pkmn.moves.length <= 1) return;
+              pkmn.moves = pkmn.moves.filter((_, i) => i !== moveIdx);
+              setActiveMenu('none');
+              setIsPaused(false);
+            }}
+            onRelearnMove={(partyIdx, moveId) => {
+              const pkmn = partyRef.current[partyIdx];
+              if (pkmn.moves.length >= 4) return;
+              const moveData = getMoveData(moveId);
+              if (!moveData) return;
+              pkmn.moves.push({ moveId, pp: moveData.pp, maxPp: moveData.pp });
+              bagRef.current = removeItem(bagRef.current, 'heart-scale');
+              setActiveMenu('none');
+              setIsPaused(false);
             }}
             onBack={() => { setActiveMenu('none'); setIsPaused(false); }}
           />

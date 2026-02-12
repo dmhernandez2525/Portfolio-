@@ -741,5 +741,13 @@
     "description": "A folding bicycle that enables much faster movement than walking.",
     "price": 0,
     "isKeyItem": true
+  },
+  {
+    "id": "heart-scale",
+    "name": "Heart Scale",
+    "category": "items",
+    "description": "A pretty, heart-shaped scale that is rare and valuable. It is coveted by a certain move maniac.",
+    "price": 100,
+    "isKeyItem": false
   }
 ]

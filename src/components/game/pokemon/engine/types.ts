@@ -96,6 +96,8 @@ export interface NPCDef {
   heals?: boolean;          // Nurse NPCs in Pokemon Centers
   shopItems?: string[];     // Mart clerk NPCs with item inventory
   isPC?: boolean;           // PC terminal in Pokemon Centers
+  isMoveDeleter?: boolean;  // Move Deleter NPC
+  isMoveReminder?: boolean; // Move Reminder NPC (costs Heart Scale)
 }
 
 export interface GameMap {
@@ -180,6 +182,7 @@ export interface Pokemon {
   friendship: number;
   isShiny: boolean;
   ability?: string;             // Gen 3: assigned ability
+  heldItem?: string;            // held item ID
   originalTrainer: string;
   caughtBall: string;
 }

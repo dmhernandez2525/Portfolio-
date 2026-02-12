@@ -198,6 +198,23 @@ export function advanceBattle(state: BattleState): BattleState {
           ? [{ pokemon: state.playerActive.pokemon, newLevel: expResult.newLevel, newMoves }]
           : [];
 
+        // Exp. Share: non-participating party members holding exp-share get 50% EXP
+        const expShareAmount = Math.floor(state.expGained * 0.5);
+        if (expShareAmount > 0) {
+          for (const partyMon of state.playerParty) {
+            if (partyMon.uid === state.playerActive.pokemon.uid) continue;
+            if (partyMon.currentHp <= 0) continue;
+            const hasExpShare = partyMon.heldItem === 'exp-share';
+            if (hasExpShare) {
+              const shareResult = checkLevelUp(partyMon, expShareAmount);
+              if (shareResult.leveled) {
+                const shareMoves = getMovesForLevel(partyMon.speciesId, shareResult.newLevel);
+                levelUps.push({ pokemon: partyMon, newLevel: shareResult.newLevel, newMoves: shareMoves });
+              }
+            }
+          }
+        }
+
         // Check if opponent has more pokemon (trainer battle)
         const nextOpponent = state.opponentParty.find(p =>
           p.uid !== state.opponentActive.pokemon.uid && p.currentHp > 0

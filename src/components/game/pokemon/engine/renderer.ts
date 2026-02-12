@@ -5,7 +5,7 @@
 import type { Camera, GameMap, Player, BattleState, BattlePokemon } from './types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from './constants';
 import { renderMap, renderAboveLayer, renderNPCs, renderPlayer } from './tilemap';
-import { drawPokemonSprite } from './sprites';
+import { drawPokemonSprite, getShinySparkles, drawShinySparkles } from './sprites';
 
 // --- Overworld rendering ---
 
@@ -149,8 +149,8 @@ function drawBattlePokemon(
     ctx.globalAlpha = 0.3;
   }
 
-  // Try to draw PokeAPI sprite first
-  const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack);
+  // Try to draw PokeAPI sprite first (shiny variant if applicable)
+  const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack, pokemon.isShiny);
 
   if (!spriteDrawn) {
     // Procedural fallback — colored shape based on type
@@ -185,6 +185,12 @@ function drawBattlePokemon(
   }
 
   ctx.globalAlpha = 1;
+
+  // Shiny sparkle effect (plays during the first 60 frames of battle)
+  if (pokemon.isShiny && frame < 60) {
+    const sparkles = getShinySparkles(x, y + bounceY, size, frame);
+    drawShinySparkles(ctx, sparkles);
+  }
 }
 
 function drawPokemonInfoBox(
