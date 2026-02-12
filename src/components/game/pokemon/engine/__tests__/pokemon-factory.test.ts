@@ -3,8 +3,8 @@
 // moves, abilities, shininess, and unique IDs.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { SpeciesData, Pokemon, PokemonStats, StatName } from '../types';
-import { calculateStat, getNatureModifier } from '../constants';
+import type { SpeciesData, Pokemon, StatName } from '../types';
+import { calculateStat } from '../constants';
 
 // -- Mock battle-engine's getMoveData --
 

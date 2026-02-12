@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { describe, it, expect } from 'vitest';
-import type { GameMap, NPCDef, TileType, Direction } from '../types';
+import type { GameMap, NPCDef, TileType } from '../types';
 import {
   isTileWalkable,
   canCrossLedge,

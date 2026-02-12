@@ -22,7 +22,7 @@ export default function MoveTutorScreen({
   onDeleteMove, onRelearnMove, onBack,
 }: MoveTutorScreenProps) {
   const [selectedPokemon, setSelectedPokemon] = useState<number | null>(null);
-  const [selectedMove, setSelectedMove] = useState<number | null>(null);
+  const [_selectedMove, _setSelectedMove] = useState<number | null>(null);
 
   // Step 1: Select a Pokemon
   if (selectedPokemon === null) {

@@ -171,6 +171,7 @@ function makeMart(id: string, exitMap: string, exitX: number, exitY: number, sho
 export const viridianMart = makeMart('viridian_mart', 'viridian_city', 14, 10, KANTO_BASE_SHOP);
 export const pewterMart = makeMart('pewter_mart', 'pewter_city', 16, 13, KANTO_BASE_SHOP);
 export const ceruleanMart = makeMart('cerulean_mart', 'cerulean_city', 16, 13, KANTO_MID_SHOP);
+export const saffronMart = makeMart('saffron_mart', 'saffron_city', 16, 13, KANTO_LATE_SHOP);
 
 // --- Gyms ---
 function makeGym(
@@ -465,6 +466,7 @@ export const kantoInteriors: Record<string, GameMap> = {
   viridian_mart: viridianMart,
   pewter_mart: pewterMart,
   cerulean_mart: ceruleanMart,
+  saffron_mart: saffronMart,
   pewter_gym: pewterGym,
   cerulean_gym: ceruleanGym,
   vermilion_gym: vermilionGym,

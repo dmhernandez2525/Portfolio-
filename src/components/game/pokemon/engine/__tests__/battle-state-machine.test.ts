@@ -115,7 +115,7 @@ import {
   cancelEvolution,
 } from '../battle-state-machine';
 import { createBattlePokemon, executeTurn, checkLevelUp, attemptCatch, getMoveData } from '../battle-engine';
-import { checkEvolution, evolvePokemon, getMovesForLevel, getSpeciesName } from '../evolution-system';
+import { checkEvolution, evolvePokemon } from '../evolution-system';
 
 // ============================================================================
 // Helper factories
@@ -163,9 +163,9 @@ function makeBattleState(overrides: Partial<BattleState> = {}): BattleState {
     type: 'wild',
     phase: 'action_select',
     playerParty: [playerPokemon],
-    playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(playerPokemon),
+    playerActive: vi.mocked(createBattlePokemon)(playerPokemon),
     opponentParty: [opponentPokemon],
-    opponentActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(opponentPokemon),
+    opponentActive: vi.mocked(createBattlePokemon)(opponentPokemon),
     weather: 'clear' as Weather,
     weatherTurns: 0,
     turnNumber: 1,
@@ -485,7 +485,7 @@ describe('advanceBattle - faint_check', () => {
     const state = makeBattleState({
       phase: 'faint_check',
       opponentParty: [opponent],
-      opponentActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(opponent),
+      opponentActive: vi.mocked(createBattlePokemon)(opponent),
       expGained: 100,
       textQueue: ['single'],
       currentText: 'single',
@@ -504,7 +504,7 @@ describe('advanceBattle - faint_check', () => {
       phase: 'faint_check',
       type: 'trainer',
       opponentParty: [opp1, opp2],
-      opponentActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(opp1),
+      opponentActive: vi.mocked(createBattlePokemon)(opp1),
       textQueue: ['single'],
       currentText: 'single',
     });
@@ -522,7 +522,7 @@ describe('advanceBattle - faint_check', () => {
     const state = makeBattleState({
       phase: 'faint_check',
       playerParty: [p1, p2],
-      playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(p1),
+      playerActive: vi.mocked(createBattlePokemon)(p1),
       textQueue: ['single'],
       currentText: 'single',
     });
@@ -539,7 +539,7 @@ describe('advanceBattle - faint_check', () => {
     const state = makeBattleState({
       phase: 'faint_check',
       playerParty: [p1],
-      playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(p1),
+      playerActive: vi.mocked(createBattlePokemon)(p1),
       textQueue: ['single'],
       currentText: 'single',
     });
@@ -960,7 +960,7 @@ describe('getPlayerMoves', () => {
       moves: [makeMove({ moveId: 'unknown_move' })],
     });
     const state = makeBattleState({
-      playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(pokemon),
+      playerActive: vi.mocked(createBattlePokemon)(pokemon),
     });
 
     const moves = getPlayerMoves(state);
@@ -980,7 +980,7 @@ describe('getAvailableSwitches', () => {
 
     const state = makeBattleState({
       playerParty: [p1, p2, p3],
-      playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(p1),
+      playerActive: vi.mocked(createBattlePokemon)(p1),
     });
 
     const switches = getAvailableSwitches(state);
@@ -992,7 +992,7 @@ describe('getAvailableSwitches', () => {
     const p1 = makePokemon({ uid: 'player-001', currentHp: 100 });
     const state = makeBattleState({
       playerParty: [p1],
-      playerActive: (createBattlePokemon as ReturnType<typeof vi.fn>)(p1),
+      playerActive: vi.mocked(createBattlePokemon)(p1),
     });
 
     const switches = getAvailableSwitches(state);
