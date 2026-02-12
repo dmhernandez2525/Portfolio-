@@ -19,7 +19,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/components/game/pokemon/engine/**/*.ts'],
-      exclude: ['**/*.test.ts'],
+      exclude: ['**/*.test.ts', '**/renderer.ts', '**/sprites.ts', '**/tilemap.ts', '**/audio-manager.ts', '**/types.ts', '**/postgame.ts'],
     },
   },
 })

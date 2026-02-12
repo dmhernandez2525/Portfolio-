@@ -7,6 +7,7 @@ import {
   checkEvolution,
   evolvePokemon,
   getMovesForLevel,
+  getStarterMoves,
   getSpeciesName,
   setEvolutionDatabase,
 } from '../evolution-system';
@@ -108,6 +109,78 @@ function makeEeveeSpecies(): SpeciesData {
   };
 }
 
+function makeHappinessSpecies(): SpeciesData {
+  return {
+    id: 35,
+    name: 'Clefairy',
+    types: ['fairy'],
+    baseStats: { hp: 70, attack: 45, defense: 48, spAttack: 60, spDefense: 65, speed: 35 },
+    baseExp: 113,
+    catchRate: 150,
+    growthRate: 'fast',
+    learnset: [{ level: 1, moveId: 'pound' }],
+    evolvesTo: [
+      { speciesId: 36, condition: { type: 'happiness' } },
+    ],
+    spriteId: 'clefairy',
+    generation: 1,
+  };
+}
+
+function makeHappinessDaySpecies(): SpeciesData {
+  return {
+    id: 133,
+    name: 'HappyDay',
+    types: ['normal'],
+    baseStats: { hp: 55, attack: 55, defense: 50, spAttack: 45, spDefense: 65, speed: 55 },
+    baseExp: 65,
+    catchRate: 45,
+    growthRate: 'medium_fast',
+    learnset: [{ level: 1, moveId: 'tackle' }],
+    evolvesTo: [
+      { speciesId: 196, condition: { type: 'happiness_day' } },
+    ],
+    spriteId: 'eevee',
+    generation: 2,
+  };
+}
+
+function makeHappinessNightSpecies(): SpeciesData {
+  return {
+    id: 134,
+    name: 'HappyNight',
+    types: ['normal'],
+    baseStats: { hp: 55, attack: 55, defense: 50, spAttack: 45, spDefense: 65, speed: 55 },
+    baseExp: 65,
+    catchRate: 45,
+    growthRate: 'medium_fast',
+    learnset: [{ level: 1, moveId: 'tackle' }],
+    evolvesTo: [
+      { speciesId: 197, condition: { type: 'happiness_night' } },
+    ],
+    spriteId: 'eevee',
+    generation: 2,
+  };
+}
+
+function makeTradeSpecies(): SpeciesData {
+  return {
+    id: 64,
+    name: 'Kadabra',
+    types: ['psychic'],
+    baseStats: { hp: 40, attack: 35, defense: 30, spAttack: 120, spDefense: 70, speed: 105 },
+    baseExp: 140,
+    catchRate: 100,
+    growthRate: 'medium_slow',
+    learnset: [{ level: 1, moveId: 'confusion' }],
+    evolvesTo: [
+      { speciesId: 65, condition: { type: 'trade' } },
+    ],
+    spriteId: 'kadabra',
+    generation: 1,
+  };
+}
+
 function makePokemon(overrides: Partial<Pokemon> = {}): Pokemon {
   return {
     uid: 'test-uid-001',
@@ -203,6 +276,86 @@ describe('checkEvolution', () => {
     expect(result.canEvolve).toBe(false);
   });
 
+  it('handles trade evolution', () => {
+    setEvolutionDatabase([makeTradeSpecies()]);
+    const pokemon = makePokemon({ speciesId: 64 });
+    const result = checkEvolution(pokemon, 'trade');
+
+    expect(result.canEvolve).toBe(true);
+    expect(result.evolvesTo).toBe(65);
+  });
+
+  it('rejects trade evolution when trigger is level_up', () => {
+    setEvolutionDatabase([makeTradeSpecies()]);
+    const pokemon = makePokemon({ speciesId: 64, level: 50 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(false);
+  });
+
+  it('handles happiness evolution when friendship is high enough', () => {
+    setEvolutionDatabase([makeHappinessSpecies()]);
+    const pokemon = makePokemon({ speciesId: 35, friendship: 220 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(true);
+    expect(result.evolvesTo).toBe(36);
+  });
+
+  it('rejects happiness evolution when friendship is too low', () => {
+    setEvolutionDatabase([makeHappinessSpecies()]);
+    const pokemon = makePokemon({ speciesId: 35, friendship: 100 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(false);
+  });
+
+  it('handles happiness_day evolution when daytime and friendship high', async () => {
+    const { isDaytime } = vi.mocked(await import('../time-system'));
+    isDaytime.mockReturnValue(true);
+
+    setEvolutionDatabase([makeHappinessDaySpecies()]);
+    const pokemon = makePokemon({ speciesId: 133, friendship: 220 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(true);
+    expect(result.evolvesTo).toBe(196);
+  });
+
+  it('rejects happiness_day evolution at night', async () => {
+    const { isDaytime } = vi.mocked(await import('../time-system'));
+    isDaytime.mockReturnValue(false);
+
+    setEvolutionDatabase([makeHappinessDaySpecies()]);
+    const pokemon = makePokemon({ speciesId: 133, friendship: 220 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(false);
+  });
+
+  it('handles happiness_night evolution when nighttime and friendship high', async () => {
+    const { isNighttime } = vi.mocked(await import('../time-system'));
+    isNighttime.mockReturnValue(true);
+
+    setEvolutionDatabase([makeHappinessNightSpecies()]);
+    const pokemon = makePokemon({ speciesId: 134, friendship: 220 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(true);
+    expect(result.evolvesTo).toBe(197);
+  });
+
+  it('rejects happiness_night evolution during daytime', async () => {
+    const { isNighttime } = vi.mocked(await import('../time-system'));
+    isNighttime.mockReturnValue(false);
+
+    setEvolutionDatabase([makeHappinessNightSpecies()]);
+    const pokemon = makePokemon({ speciesId: 134, friendship: 220 });
+    const result = checkEvolution(pokemon, 'level_up');
+
+    expect(result.canEvolve).toBe(false);
+  });
+
   it('returns canEvolve: false when species has no evolutions', () => {
     // Add a species with no evolvesTo
     setEvolutionDatabase([
@@ -265,6 +418,29 @@ describe('getMovesForLevel', () => {
 
   it('returns empty array for unknown species', () => {
     const moves = getMovesForLevel(9999, 1);
+    expect(moves).toEqual([]);
+  });
+});
+
+describe('getStarterMoves', () => {
+  beforeEach(() => {
+    setEvolutionDatabase([makeBulbasaurSpecies()]);
+  });
+
+  it('returns up to 4 most recent moves at or below the level', () => {
+    // Bulbasaur learnset: lv1 tackle, lv1 growl, lv7 leech_seed, lv13 vine_whip, lv20 razor_leaf
+    const moves = getStarterMoves(1, 20);
+    expect(moves).toHaveLength(4);
+    expect(moves[0]).toBe('razor_leaf'); // lv20 (most recent first)
+  });
+
+  it('returns fewer than 4 if not enough moves learned', () => {
+    const moves = getStarterMoves(1, 1);
+    expect(moves).toEqual(['tackle', 'growl']);
+  });
+
+  it('returns empty for unknown species', () => {
+    const moves = getStarterMoves(9999, 10);
     expect(moves).toEqual([]);
   });
 });

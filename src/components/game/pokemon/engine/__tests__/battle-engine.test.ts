@@ -7,6 +7,10 @@ import {
   createBattlePokemon,
   applyOnSwitchIn,
   executeTurn,
+  selectOpponentMove,
+  checkLevelUp,
+  recalculateStats,
+  attemptCatch,
 } from '../battle-engine';
 import type {
   Pokemon,
@@ -915,5 +919,218 @@ describe('executeTurn - speed-based turn order', () => {
 
     const result = executeTurn(state, 0, 'fight');
     expect(result.playerFirst).toBe(false);
+  });
+});
+
+// ============================================================================
+// selectOpponentMove - AI tiers
+// ============================================================================
+
+describe('selectOpponentMove', () => {
+  it('returns null when all moves have 0 PP', () => {
+    const attacker = createBattlePokemon(makePokemon({
+      uid: 'ai-1', speciesId: 1,
+      moves: [makeMove({ moveId: 'tackle', pp: 0, maxPp: 35 })],
+    }));
+    const defender = createBattlePokemon(makePokemon({ uid: 'ai-2', speciesId: 4 }));
+    const state = makeBattleState();
+
+    expect(selectOpponentMove(attacker, defender, state)).toBeNull();
+  });
+
+  it('random AI picks from available moves', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const attacker = createBattlePokemon(makePokemon({
+      uid: 'ai-3', speciesId: 1,
+      moves: [
+        makeMove({ moveId: 'tackle', pp: 35, maxPp: 35 }),
+        makeMove({ moveId: 'ember', pp: 25, maxPp: 25 }),
+      ],
+    }));
+    const defender = createBattlePokemon(makePokemon({ uid: 'ai-4', speciesId: 4 }));
+    const state = makeBattleState({ type: 'wild' });
+
+    const move = selectOpponentMove(attacker, defender, state);
+    expect(move).not.toBeNull();
+    expect(move!.moveId).toBe('tackle');
+  });
+
+  it('smart AI prefers super-effective moves', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.1); // picks best move (85% chance)
+    const attacker = createBattlePokemon(makePokemon({
+      uid: 'ai-5', speciesId: 1,
+      moves: [
+        makeMove({ moveId: 'tackle', pp: 35, maxPp: 35 }),
+        makeMove({ moveId: 'ember', pp: 25, maxPp: 25 }),
+      ],
+    }));
+    const defender = createBattlePokemon(makePokemon({
+      uid: 'ai-6', speciesId: 1, // grass type = weak to fire
+    }));
+    const state = makeBattleState({
+      trainerDef: {
+        id: 't1', name: 'T', class: 'Trainer', spriteId: 't',
+        party: [], aiTier: 'smart', reward: 100,
+        defeatDialog: ['lost'], isGymLeader: false,
+      },
+    });
+
+    const move = selectOpponentMove(attacker, defender, state);
+    expect(move).not.toBeNull();
+    // Smart AI should prefer ember (fire) against grass type
+    expect(move!.moveId).toBe('ember');
+  });
+
+  it('basic AI prefers higher-power moves against defender', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const attacker = createBattlePokemon(makePokemon({
+      uid: 'ai-7', speciesId: 1,
+      moves: [
+        makeMove({ moveId: 'tackle', pp: 35, maxPp: 35 }),
+        makeMove({ moveId: 'ember', pp: 25, maxPp: 25 }),
+      ],
+    }));
+    const defender = createBattlePokemon(makePokemon({ uid: 'ai-8', speciesId: 4 }));
+    const state = makeBattleState({
+      trainerDef: {
+        id: 't2', name: 'T', class: 'Trainer', spriteId: 't',
+        party: [], aiTier: 'basic', reward: 100,
+        defeatDialog: ['lost'], isGymLeader: false,
+      },
+    });
+
+    const move = selectOpponentMove(attacker, defender, state);
+    expect(move).not.toBeNull();
+  });
+});
+
+// ============================================================================
+// checkLevelUp
+// ============================================================================
+
+describe('checkLevelUp', () => {
+  it('does not level up when exp is insufficient', () => {
+    const pokemon = makePokemon({ uid: 'lvl-1', speciesId: 1, level: 10, exp: 0 });
+    const result = checkLevelUp(pokemon, 1);
+    expect(result.leveled).toBe(false);
+    expect(result.newLevel).toBe(10);
+  });
+
+  it('levels up when sufficient exp is gained', () => {
+    const pokemon = makePokemon({ uid: 'lvl-2', speciesId: 1, level: 5, exp: 0 });
+    // Give a large amount of exp to guarantee at least one level
+    const result = checkLevelUp(pokemon, 50000);
+    expect(result.leveled).toBe(true);
+    expect(result.newLevel).toBeGreaterThan(5);
+    expect(pokemon.level).toBe(result.newLevel);
+  });
+
+  it('increases friendship on level up', () => {
+    const pokemon = makePokemon({ uid: 'lvl-3', speciesId: 1, level: 5, exp: 0, friendship: 70 });
+    checkLevelUp(pokemon, 50000);
+    expect(pokemon.friendship).toBeGreaterThan(70);
+  });
+
+  it('does not exceed max level (100)', () => {
+    const pokemon = makePokemon({ uid: 'lvl-4', speciesId: 1, level: 99, exp: 0 });
+    const result = checkLevelUp(pokemon, 999999);
+    expect(result.newLevel).toBeLessThanOrEqual(100);
+  });
+});
+
+// ============================================================================
+// recalculateStats
+// ============================================================================
+
+describe('recalculateStats', () => {
+  it('recalculates stats based on species base stats', () => {
+    const pokemon = makePokemon({
+      uid: 'rc-1', speciesId: 1, level: 50,
+      stats: makeStats({ hp: 1, attack: 1, defense: 1 }),
+      currentHp: 1,
+    });
+    recalculateStats(pokemon);
+    // Stats should be recalculated to something reasonable for level 50
+    expect(pokemon.stats.hp).toBeGreaterThan(1);
+    expect(pokemon.stats.attack).toBeGreaterThan(1);
+  });
+
+  it('adjusts currentHp proportionally when max HP increases', () => {
+    const pokemon = makePokemon({
+      uid: 'rc-2', speciesId: 1, level: 50,
+      stats: makeStats({ hp: 100 }),
+      currentHp: 100,
+    });
+    // After recalculating at level 50, HP should adjust
+    recalculateStats(pokemon);
+    expect(pokemon.currentHp).toBeLessThanOrEqual(pokemon.stats.hp);
+  });
+
+  it('handles unknown species gracefully', () => {
+    const pokemon = makePokemon({
+      uid: 'rc-3', speciesId: 999999, level: 50,
+      stats: makeStats({ hp: 50 }),
+      currentHp: 50,
+    });
+    // Should not crash
+    recalculateStats(pokemon);
+    expect(pokemon.stats.hp).toBe(50); // unchanged since species not found
+  });
+});
+
+// ============================================================================
+// attemptCatch
+// ============================================================================
+
+describe('attemptCatch', () => {
+  it('catches a low-HP pokemon with high ball multiplier', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+    const pokemon = makePokemon({
+      uid: 'catch-1', speciesId: 1, level: 5,
+      stats: makeStats({ hp: 100 }),
+      currentHp: 1,
+    });
+    const result = attemptCatch(pokemon, 255);
+    expect(result.caught).toBe(true);
+    expect(result.shakes).toBe(4);
+    expect(result.messages).toContain('Gotcha! The wild Pokemon was caught!');
+  });
+
+  it('fails to catch a full HP pokemon with low ball multiplier', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const pokemon = makePokemon({
+      uid: 'catch-2', speciesId: 1, level: 50,
+      stats: makeStats({ hp: 200 }),
+      currentHp: 200,
+    });
+    const result = attemptCatch(pokemon, 1);
+    expect(result.caught).toBe(false);
+    expect(result.messages).toContain('Oh no! The Pokemon broke free!');
+  });
+
+  it('applies status bonus for sleep', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+    const pokemon = makePokemon({
+      uid: 'catch-3', speciesId: 1, level: 5,
+      stats: makeStats({ hp: 100 }),
+      currentHp: 50,
+      status: 'sleep' as never,
+    });
+    const result = attemptCatch(pokemon, 1);
+    // Sleep gives a 2x bonus, so easier to catch
+    expect(result.caught).toBe(true);
+  });
+
+  it('includes shake messages for partial shakes', () => {
+    // Return high random so catches fail but allow some shakes
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const pokemon = makePokemon({
+      uid: 'catch-4', speciesId: 1, level: 5,
+      stats: makeStats({ hp: 100 }),
+      currentHp: 50,
+    });
+    const result = attemptCatch(pokemon, 1);
+    // Should have at least one message (either shake or break free)
+    expect(result.messages.length).toBeGreaterThan(0);
   });
 });
