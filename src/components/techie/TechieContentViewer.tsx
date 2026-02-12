@@ -49,7 +49,7 @@ function ReadmeContent() {
       <div className="text-[#608b4e]">{`# Daniel Hernandez`}</div>
       <div className="text-[#608b4e]">{`## Senior Software Engineer`}</div>
       <div className="text-[#ce9178] mt-4">
-        Full-stack engineer with 6+ years building production-grade applications.
+        Full-stack engineer with 10+ years building production-grade applications.
         From co-founding a software consultancy to developing secure DoD applications
         for Space Force and Navy.
       </div>

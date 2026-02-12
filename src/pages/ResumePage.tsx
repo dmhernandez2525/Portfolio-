@@ -85,7 +85,7 @@ export function ResumePage() {
         <motion.section {...fadeIn} transition={{ delay: 0.15 }} className="mb-10 print:mb-6">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 border-b border-border pb-1">Summary</h2>
           <p className="text-foreground leading-relaxed">
-            Full-stack engineer with 6+ years of experience building production-grade applications across React, Node.js, Python, and cloud platforms.
+            Full-stack engineer with 10+ years of experience building production-grade applications across React, Node.js, Python, and cloud platforms.
             From co-founding a software consultancy to developing secure DoD applications for Space Force and Navy, I bring a builder's mindset to every project.
             Passionate about shipping high-quality software, mentoring teams, and making complex systems accessible.
           </p>

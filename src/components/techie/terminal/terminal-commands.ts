@@ -585,7 +585,7 @@ const curl: CommandHandler = (args, ctx) => {
       { text: "# Daniel Hernandez", color: "#608b4e" },
       { text: "## Senior Software Engineer", color: "#608b4e" },
       { text: "" },
-      { text: "Full-stack engineer with 6+ years building production-grade applications.", color: "#ce9178" },
+      { text: "Full-stack engineer with 10+ years building production-grade applications.", color: "#ce9178" },
       { text: "From co-founding a software consultancy to developing secure DoD applications." },
       { text: "" },
       { text: 'Try: open README.md', color: "#858585" },
