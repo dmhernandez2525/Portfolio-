@@ -93,8 +93,11 @@ export const aiStats: AIStat[] = [
   { label: "Projects with AI Prompts", value: "77+", description: "Each with structured agent prompt infrastructure" },
   { label: "Production AI Products", value: "11", description: "Shipped, working AI-powered applications" },
   { label: "Reusable Prompt Patterns", value: "10", description: "Battle-tested across dozens of projects" },
-  { label: "Claude Code Sessions", value: "273", description: "Consolidated, recoverable development sessions" },
+  { label: "Total AI Sessions", value: "560+", description: "Across Claude, Gemini, Codex, Cursor, and ChatGPT" },
   { label: "Enterprise Prompts", value: "36", description: "Production prompts from client work (836KB)" },
+  { label: "Conversation Data", value: "19.7 GB", description: "Raw AI interaction data across all tools" },
+  { label: "Git Commits", value: "4,442", description: "Across 53 repositories spanning 2019-2026" },
+  { label: "Market Research Reports", value: "11", description: "Full competitive intelligence with validated unit economics" },
   { label: "Test Coverage", value: "97.7%", description: "Research Agent branch coverage" },
 ]
 
@@ -567,11 +570,26 @@ export const gitWorkflow = [
 // ============================================
 
 export const aiTools: AITool[] = [
-  { name: "Claude Code", stats: "273 sessions, 590KB history, 738+ todos", purpose: "Primary development agent for code generation, architecture, debugging, and autonomous multi-phase builds" },
-  { name: "GitHub Copilot", stats: "Multiple versions installed", purpose: "IDE-level code completion and inline suggestions during manual coding" },
-  { name: "Cursor", stats: "24,407 files (~436MB context)", purpose: "AI IDE with full project context awareness for targeted edits" },
-  { name: "Gemini / Google AI", stats: "235MB working data", purpose: "Research, search, and exploration tasks" },
+  { name: "Claude Code CLI", stats: "330 sessions, 9.1 GB data, 4,050 history commands", purpose: "Primary development agent. Largest session: 1.53 GB. Peak: 15 simultaneous instances. Autonomous multi-phase builds with --dangerously-skip-permissions." },
+  { name: "Gemini CLI", stats: "41 sessions, 613 MB brain data", purpose: "Portfolio-specific work (games, visual features). Built Mafia Wars recreation (245 MB session, 10 phases), portfolio rebuild (111 MB, 17 phases). Identical code standards enforced via GEMINI.md." },
+  { name: "OpenAI Codex CLI", stats: "44 sessions, 248 MB, model gpt-5.2-codex", purpose: "Bulk parallel processing. Peak day: 12 sessions in one day across patent-intelligence, TreasureTrail, ChoreChamp, SpecTree, save-a-stray, ink-synthesis." },
+  { name: "Cursor IDE", stats: "49 workspace roots, 2.2 GB data, AI tracking DB", purpose: "AI-native VS Code fork with full project context. MCP integration for Render deployment management." },
+  { name: "GitHub Copilot Chat", stats: "5 versions installed (VS Code + Cursor)", purpose: "IDE-level code completion, inline suggestions, and chat-based assistance during manual coding." },
+  { name: "ChatGPT Desktop", stats: "macOS app with 69 extensions", purpose: "Supplementary research and exploration. Conversation exports backed up to Google Drive." },
+  { name: "Ollama", stats: "5 models, 187 GB+, up to 72B parameters", purpose: "Local model server for privacy-first development. Models: qwen2.5 (7B/32B/72B), dolphin-mistral:7b, qwen2.5-coder:32b." },
 ]
+
+export const toolDiversificationStrategy = `Each AI tool serves a specific role in the workflow:
+- Claude Code: Heavy development, orchestration, multi-phase autonomous builds
+- Gemini CLI: Portfolio work, games, visual features, image generation
+- Codex CLI: Bulk parallel processing of multiple projects simultaneously
+- Cursor: IDE-integrated AI for targeted edits with full project context
+- ChatGPT: Supplementary research and exploration
+- Ollama: Privacy-first local inference, offline development capability`
+
+export const crossAgentVerification = `A recurring methodology: give one AI's output to another AI for independent verification.
+"I gave this prompt to another AI, can you go through and double check they did everything."
+This creates a multi-model quality assurance loop similar to human code review, catching model-specific blind spots.`
 
 export const claudeCodeConfig = `13 configuration files totaling ~101KB of rules and context:
 - Global CLAUDE.md (22KB): Master ruleset for all projects
@@ -580,7 +598,9 @@ export const claudeCodeConfig = `13 configuration files totaling ~101KB of rules
   - Prompt/SDD rules, testing/memories, integration
   - Render infrastructure management
 - Project-specific: Jarvis (5.5KB), Dev Environment (1.7KB)
-- Memory file: Persistent learnings across sessions`
+- Session hooks: auto-logging via session-logger.sh
+- Memory file: Persistent learnings across sessions
+- 378 shell snapshots, 915 debug logs, 842 todo directories`
 
 // ============================================
 // PRACTICAL USE CASES
@@ -694,6 +714,209 @@ export const advancedPatterns = [
   { name: "Granularity Guidelines", description: "User Stories scoped to '~1 week of work', Tasks scoped to '~1 day of work'. Consistent sizing produces predictable AI-generated work items." },
   { name: "Multi-Step Prompt Chains", description: "Sequential prompt chains where each level builds on previous outputs: Epic, then Feature, then User Story, then Task. Progressive refinement at each level." },
 ]
+
+// ============================================
+// FORBIDDEN PATTERNS (Zero-Tolerance Code Standards)
+// ============================================
+
+export interface ForbiddenPattern {
+  category: string
+  severity: string
+  patterns: string[]
+  detection: string
+}
+
+export const forbiddenPatterns: ForbiddenPattern[] = [
+  {
+    category: "TypeScript Violations",
+    severity: "CRITICAL",
+    patterns: ["any", "as any", "@ts-ignore", "@ts-expect-error", "@ts-nocheck", "Function", "Object", "{} as type", "React.FC<{}>", "Promise<any>", "useState() without type"],
+    detection: "grep -rn \":s*any\" --include=\"*.ts\" --include=\"*.tsx\" src/",
+  },
+  {
+    category: "ESLint Violations",
+    severity: "CRITICAL",
+    patterns: ["eslint-disable", "eslint-disable-next-line", "eslint-disable-line"],
+    detection: "grep -rn \"eslint-disable\" --include=\"*.ts\" --include=\"*.tsx\" src/",
+  },
+  {
+    category: "Console Violations",
+    severity: "HIGH",
+    patterns: ["console.log()", "console.error()", "console.warn()", "console.info()"],
+    detection: "grep -rn \"console\\.\" --include=\"*.ts\" --include=\"*.tsx\" src/",
+  },
+  {
+    category: "Empty Implementations",
+    severity: "HIGH",
+    patterns: ["onClick={() => {}}", "onSubmit={() => {}}", "catch(e) {} (swallowed errors)"],
+    detection: "grep -rn \"catch.*{}\" --include=\"*.ts\" --include=\"*.tsx\" src/",
+  },
+  {
+    category: "Comment Violations",
+    severity: "MEDIUM",
+    patterns: ["TODO: without ticket", "FIXME: without ticket", "HACK:", "PLACEHOLDER", "// AI generated this"],
+    detection: "grep -rn \"TODO\\|FIXME\\|HACK\\|PLACEHOLDER\" src/",
+  },
+  {
+    category: "Git Violations",
+    severity: "CRITICAL",
+    patterns: ["Push to main directly", "--force push", "--amend on pushed commits", "Co-Authored-By: Claude", "Generated with Claude Code"],
+    detection: "Branch protection rules + CI pipeline enforcement",
+  },
+]
+
+export const forbiddenPatternsDescription = `A zero-tolerance enforcement system across all 77+ projects. Automated detection via detect_violations.sh with severity levels (CRITICAL/HIGH/MEDIUM). CI pipeline blocks merging if any CRITICAL violation is detected. 185KB TypeScript Strict Mode Checklist with 1,200+ type safety checkboxes ensures comprehensive coverage.`
+
+// ============================================
+// 8-STEP DEVELOPMENT LIFECYCLE
+// ============================================
+
+export interface LifecycleStep {
+  step: number
+  name: string
+  tool: string
+  output: string
+  description: string
+}
+
+export const developmentLifecycle: LifecycleStep[] = [
+  { step: 1, name: "Generate Prompts", tool: "Claude Code CLI", output: "RESEARCH_PROMPT.md, BUILD_PROMPT.md", description: "Master meta-prompt generates all sub-prompts needed for the project" },
+  { step: 2, name: "Research", tool: "Claude.ai (Web)", output: "Session outputs (multi-session)", description: "Competitive intelligence via web search. Continuation-first approach ensures context preservation." },
+  { step: 3, name: "Compile Research", tool: "Claude.ai or CLI", output: "COMPILED_RESEARCH.md", description: "Combine all sessions into single document with gap analysis and deduplication" },
+  { step: 4, name: "Build Project", tool: "Claude Code CLI", output: "Project scaffold, ROADMAP.md, SDDs", description: "Two-phase initialization: verify understanding, then scaffold. Creates AGENT_PROMPT.md." },
+  { step: 5, name: "Iterative Development", tool: "Claude Code CLI", output: "Feature branches, PRs", description: "Mass feature builds with branch chaining. Each feature on its own branch/PR." },
+  { step: 6, name: "3-Pass Code Review", tool: "Claude Code CLI", output: "Review comments, fix PRs", description: "Pass 1: Critical bugs/security. Pass 2: Edge cases/async. Pass 3: Integration/regression." },
+  { step: 7, name: "Quality Gate", tool: "Claude Code CLI", output: "Verification report", description: "No placeholders, portfolio-presentable, 80%+ coverage, all pipelines pass, docs complete." },
+  { step: 8, name: "Merge & Deploy", tool: "Claude Code CLI", output: "Production deployment", description: "Merge PRs, deploy to Render/Vercel/AWS. Demo mode enabled for portfolio showcase." },
+]
+
+// ============================================
+// MULTI-AGENT ORCHESTRATION
+// ============================================
+
+export const multiAgentSystem = `4 concurrent AI agent work slots (A, B, C, D) with atomic directory-based locking.
+Agents claim slots before starting work. Conflict detection prevents overwrites.
+Append-only commit logs create an audit trail. Setup automated to ~5 seconds via shell scripts.
+
+Architecture:
+- epic-setup.sh: Creates folder structure, templates, tracking files in seconds
+- bug-setup.sh: Automated bug handling with coordination templates
+- smart-dispatcher.sh: Routes tasks to available agent slots
+- agent-helpers.sh: Shared utilities for all agents
+- Heartbeat monitoring: Detects stalled agents and reclaims slots`
+
+export const multiAgentWorkSlots = [
+  { slot: "A", status: "Primary", description: "Main development work, feature implementation" },
+  { slot: "B", status: "Secondary", description: "Parallel feature work, independent tasks" },
+  { slot: "C", status: "Support", description: "Documentation, testing, review tasks" },
+  { slot: "D", status: "Reserve", description: "Bug fixes, hotfixes, overflow tasks" },
+]
+
+// ============================================
+// MARKET RESEARCH & VALIDATION
+// ============================================
+
+export interface MarketResearch {
+  project: string
+  market: string
+  keyInsight: string
+  pricing: string
+  differentiator: string
+}
+
+export const marketResearchReports: MarketResearch[] = [
+  { project: "RapidBooth", market: "SMB Website Builder", keyInsight: "No competitor combines field sales + AI intake + 30-minute delivery", pricing: "$30/month (40-67% gross margin)", differentiator: "In-person sales + conversational AI + instant delivery" },
+  { project: "Patent Intelligence", market: "$1-2B Patent Analytics", keyInsight: "EPO released free patent data; incumbents charge $20K-100K+/yr", pricing: "$49-299/month tiered", differentiator: "Semantic search across 200M+ patents at 1/100th the cost" },
+  { project: "Baked by Chrissy", market: "$3.2B Home Baker Gap", keyInsight: "Bakers use 4-6 disconnected programs per order; 39.5% unsure if profitable", pricing: "$15-25/month", differentiator: "Image upload in ordering flow (no competitor offers this)" },
+  { project: "ChoreChamp", market: "$542M Parenting Apps", keyInsight: "7-day streak = 3.6x retention; kids lose interest in 2-4 weeks with competitors", pricing: "$9.99/month or $59.99/year", differentiator: "First neurodivergent-friendly family chore app" },
+  { project: "GenomeForge", market: "Genetic Analysis (23andMe bankruptcy)", keyInsight: "23andMe bankruptcy + 6.9M data breach creating privacy anxiety", pricing: "$29-49 one-time", differentiator: "DNA never leaves user's device (architecturally impossible for competitors)" },
+  { project: "ReadForge", market: "$2B+ TTS Market", keyInsight: "Speechify charges $139/yr with 150K word limit; reverts to robotic voices", pricing: "Freemium", differentiator: "Kokoro-82M ranked #1 on TTS Arena, runs 100% locally" },
+  { project: "WriteForge", market: "$3B+ Writing Assistant", keyInsight: "Privacy is #1 complaint about Grammarly (described as 'essentially a keylogger')", pricing: "Freemium", differentiator: "100% local processing, BYOK AI, system-wide access" },
+  { project: "TreasureTrail", market: "$2-4B Estate/Yard Sales", keyInsight: "EstateSales.NET acquired for $40M (2023); 60-70% of buyers are resellers", pricing: "$49/month B2B", differentiator: "VROOM route optimization (no competitors have this)" },
+  { project: "Rave Collective", market: "$2.3B Festival Fashion (8.4% CAGR)", keyInsight: "Etsy exodus: active sellers dropped 27%, fees at 20-25%", pricing: "10% platform fee (50-60% lower than Etsy)", differentiator: "UV/blacklight preview (industry-first in any e-commerce)" },
+  { project: "Learning Hall", market: "$28.6B LMS (20% CAGR)", keyInsight: "Teachable stores in 'unique format that can't be opened by any other software'", pricing: "Competitive with Teachable ($29-139/mo)", differentiator: "BYOS (Bring Your Own Storage) is a genuine market gap" },
+  { project: "Research Agent", market: "AI Research Tools", keyInsight: "83.9% of context tokens in agent loops come from tool observations", pricing: "$0.06-0.15/session (96-97% cost reduction vs naive)", differentiator: "Crash-resilient, locally-run deep research with checkpoint resumption" },
+]
+
+// ============================================
+// CAREER CONTEXT
+// ============================================
+
+export interface CareerEntry {
+  period: string
+  role: string
+  company: string
+  highlights: string[]
+}
+
+export const careerTimeline: CareerEntry[] = [
+  { period: "Early", role: "Entrepreneur", company: "Various Ventures", highlights: ["Lawn care, snow removal, door-to-door sales", "Real estate: bought first properties before having a driver's license", "Phones For Fast Cash: 500+ device repairs over 4 years", "Flying Colors Paintball: business acquisition and operations"] },
+  { period: "2019", role: "Teaching Assistant", company: "Lake Land College", highlights: ["Tutored HTML, CSS, JavaScript, Python", "Comfort Order vision born (Thanksgiving 2019)"] },
+  { period: "2020", role: "App Academy Graduate", company: "App Academy", highlights: ["<3% acceptance rate, 60-80 hour weeks", "Full-stack web development intensive"] },
+  { period: "2020-2022", role: "Full-Stack Engineer", company: "Charter Communications", highlights: ["Built POC generating production-grade code from user interactions", "Enterprise-scale development experience"] },
+  { period: "2021-2024", role: "Co-Founder & Principal Engineer", company: "Tailored Technologies", highlights: ["Golf industry client work (PGA, SMC)", "36 production prompts (836KB) forged under real production pressure", "15 Strapi plugins, 7+ independent contractor agreements", "19 weekly PGA status reports, 421 meeting recordings"] },
+  { period: "2022-2023", role: "Enterprise Engineer", company: "First American", highlights: ["Enterprise microservices, AWS serverless"] },
+  { period: "2023", role: "Senior Developer", company: "Mesirow Financial", highlights: ["Wealth management modernization", "30% performance improvement"] },
+  { period: "2024-2026", role: "Senior Software Engineer", company: "BrainGu", highlights: ["DoD applications for Space Force, Air Force, Navy", "5 DoD applications with secure AI integration"] },
+]
+
+// ============================================
+// SDD-FIRST DEVELOPMENT
+// ============================================
+
+export const sddFirstDescription = `Software Design Documents (SDDs) are created BEFORE writing any code. This is enforced through automatic triggers.`
+
+export const sddTriggers = [
+  "New features with 3+ components or files",
+  "Complex functionality requiring database changes",
+  "API integrations or new endpoints",
+  "Multi-step workflows or business processes",
+  "Reusable systems or shared libraries",
+  "User interfaces with multiple views or states",
+]
+
+export const sddNoPLaceholders = `"TBD", "See implementation for details", empty sections, "Details to follow", and incomplete tables are NEVER acceptable in SDDs. Every section must be filled with actionable, specific content before implementation begins.`
+
+// ============================================
+// QUALITY CHECKLISTS
+// ============================================
+
+export const qualityChecklists = [
+  { name: "PRE_COMMIT", purpose: "Run before every commit. Checks file size (<300 lines), forbidden patterns, type safety." },
+  { name: "PRE_MR", purpose: "Run before creating a merge/pull request. Validates documentation, test coverage, code standards." },
+  { name: "CODE_REVIEW", purpose: "3-pass review checklist. Critical bugs, edge cases, then integration verification." },
+  { name: "DOCUMENTATION", purpose: "Ensures README, ARCHITECTURE, ROADMAP, and SDDs are all current." },
+  { name: "AI_WORK_VALIDATION", purpose: "Validates AI-generated code meets all human-authored standards." },
+  { name: "MIGRATION", purpose: "Checklist for database migrations, API changes, and breaking changes." },
+]
+
+// ============================================
+// DOCUMENT HIERARCHY
+// ============================================
+
+export const documentHierarchy = [
+  { level: 1, name: "~/.claude/CLAUDE.md", description: "Global rules: git workflow, forbidden patterns, testing requirements, service naming, demo mode" },
+  { level: 2, name: "AI_DEV_DOCS_MASTER/", description: "Consolidated reference library. 159 source files compressed to 23 outputs (92% compression ratio)" },
+  { level: 3, name: "_@agent-prompts/", description: "Meta-prompt system: PROJECT_GENERATOR, PROMPTS_REFERENCE, WORKFLOW_GUIDE, START_HERE_TEMPLATE, 8 knowledge base docs" },
+  { level: 4, name: "Project-Workflow-Prompts/", description: "Individual step files (Step 1 through Step 8 of the development lifecycle)" },
+  { level: 5, name: "Per-project .claude/", description: "Project-specific rules (enterprise-template-system has 8 specialized files)" },
+  { level: 6, name: "Per-project CLAUDE.md", description: "Project-level overrides (Jarvis, dev-environment-setup)" },
+  { level: 7, name: "Per-project docs/", description: "ARCHITECTURE.md, ROADMAP.md, sdd/ directories found across 35+ projects" },
+]
+
+// ============================================
+// GOOGLE DRIVE ARCHIVE
+// ============================================
+
+export const googleDriveStats = {
+  totalItems: "702,165",
+  totalSize: "626.71 GB",
+  emailsExported: "63,316 RFC822 files (~4.68 GB) from 10+ accounts",
+  meetingRecordings: "421 recordings (91.01 GB)",
+  transcriptions: "46 VTT transcription files",
+  backupArchives: "ran.zip (156.81 GB), Personal projects.zip (22.19 GB)",
+  allAiWork: "40,408 items, 836 MB of AI development artifacts",
+}
 
 // ============================================
 // LESSONS LEARNED

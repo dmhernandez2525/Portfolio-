@@ -5,7 +5,8 @@ import {
   ArrowLeft, Brain, Bot, Shield, Mic, Terminal, Layers, Sparkles,
   ChevronDown, ChevronRight, Code2, Zap, BookOpen, Wrench,
   GitBranch, CheckCircle, Monitor, Lightbulb, ArrowRight, Lock,
-  Server,
+  Server, RotateCw, TrendingUp, Users, Ban, Briefcase,
+  FileText, HardDrive,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -44,6 +45,21 @@ import {
   enterprisePatterns,
   advancedPatterns,
   lessonsLearned,
+  forbiddenPatterns,
+  forbiddenPatternsDescription,
+  developmentLifecycle,
+  multiAgentSystem,
+  multiAgentWorkSlots,
+  marketResearchReports,
+  careerTimeline,
+  sddFirstDescription,
+  sddTriggers,
+  sddNoPLaceholders,
+  qualityChecklists,
+  documentHierarchy,
+  googleDriveStats,
+  toolDiversificationStrategy,
+  crossAgentVerification,
 } from "@/data/ai-development"
 
 // ============================================
@@ -168,15 +184,21 @@ function StatCard({ label, value, description }: { label: string; value: string;
 
 const tocSections = [
   { id: "journey", label: "The Journey", icon: BookOpen },
+  { id: "career", label: "Career Context", icon: Briefcase },
   { id: "ecosystem", label: "The Ecosystem", icon: Layers },
   { id: "agent-prompts", label: "Agent Prompt System", icon: Terminal },
+  { id: "lifecycle", label: "Development Lifecycle", icon: RotateCw },
   { id: "prompt-patterns", label: "10 Prompt Patterns", icon: Code2 },
   { id: "ai-projects", label: "11 AI Products", icon: Sparkles },
+  { id: "market-research", label: "Market Research", icon: TrendingUp },
   { id: "multi-llm", label: "Multi-LLM Strategy", icon: Bot },
   { id: "voice-first", label: "Voice-First AI", icon: Mic },
   { id: "privacy-first", label: "Privacy-First", icon: Shield },
   { id: "cross-machine", label: "Cross-Machine Workflow", icon: Monitor },
+  { id: "multi-agent", label: "Multi-Agent Orchestration", icon: Users },
   { id: "quality", label: "Quality Engineering", icon: CheckCircle },
+  { id: "forbidden", label: "Forbidden Patterns", icon: Ban },
+  { id: "doc-hierarchy", label: "Document Hierarchy", icon: FileText },
   { id: "tools", label: "AI Coding Tools", icon: Wrench },
   { id: "use-cases", label: "Practical Use Cases", icon: Zap },
   { id: "enterprise", label: "Enterprise Patterns", icon: Server },
@@ -304,6 +326,38 @@ export function AIDevelopmentPage() {
           </CollapsibleSection>
 
           {/* ============================================ */}
+          {/* SECTION: Career Context */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Career Context" icon={Briefcase} id="career">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              The AI development expertise didn't emerge in isolation. It was built on a foundation of
+              entrepreneurship, enterprise engineering, and production-pressure client work.
+            </p>
+
+            <div className="space-y-4">
+              {careerTimeline.map((entry, i) => (
+                <div key={i} className="p-4 rounded-lg border border-border/50 bg-muted/10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Badge variant="outline" className="font-mono text-xs shrink-0">{entry.period}</Badge>
+                    <div>
+                      <span className="font-bold">{entry.role}</span>
+                      <span className="text-muted-foreground"> at {entry.company}</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-1 ml-1">
+                    {entry.highlights.map((highlight, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <ChevronRight className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                        {highlight}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
           {/* SECTION: The Ecosystem */}
           {/* ============================================ */}
           <CollapsibleSection title="The 'Apps That Build Apps' Ecosystem" icon={Layers} id="ecosystem" defaultOpen={true}>
@@ -379,6 +433,37 @@ export function AIDevelopmentPage() {
           </CollapsibleSection>
 
           {/* ============================================ */}
+          {/* SECTION: 8-Step Development Lifecycle */}
+          {/* ============================================ */}
+          <CollapsibleSection title="8-Step Development Lifecycle" icon={RotateCw} id="lifecycle">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Every project follows this standardized pipeline from idea to deployment.
+              Each step has a dedicated tool, a defined output, and a clear handoff to the next step.
+            </p>
+
+            <div className="space-y-3">
+              {developmentLifecycle.map((step, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 rounded-lg border border-border/50 bg-muted/10">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                    {step.step}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="font-bold">{step.name}</span>
+                      <Badge variant="outline" className="text-xs">{step.tool}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                    <div className="text-xs text-muted-foreground/70 mt-1 font-mono">Output: {step.output}</div>
+                  </div>
+                  {i < developmentLifecycle.length - 1 && (
+                    <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0 mt-3 hidden md:block" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
           {/* SECTION: 10 Prompt Patterns */}
           {/* ============================================ */}
           <CollapsibleSection title="10 Battle-Tested Prompt Patterns" icon={Code2} id="prompt-patterns">
@@ -424,6 +509,41 @@ export function AIDevelopmentPage() {
             <div className="space-y-4">
               {aiProjects.map((project) => (
                 <AIProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Market Research & Validation */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Market Research & Validation" icon={TrendingUp} id="market-research">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              11 full competitive intelligence reports with validated unit economics, pricing models,
+              and market gap analysis. Each project is backed by real research, not assumptions.
+            </p>
+
+            <div className="space-y-3">
+              {marketResearchReports.map((report, i) => (
+                <div key={i} className="p-4 rounded-lg border border-border/50 bg-muted/10">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="font-bold">{report.project}</span>
+                    <Badge variant="outline" className="text-xs">{report.market}</Badge>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">Key Insight</span>
+                      <p className="text-muted-foreground mt-0.5">{report.keyInsight}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-green-400">Pricing</span>
+                      <p className="text-muted-foreground mt-0.5">{report.pricing}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">Differentiator</span>
+                      <p className="text-muted-foreground mt-0.5">{report.differentiator}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </CollapsibleSection>
@@ -539,6 +659,24 @@ export function AIDevelopmentPage() {
           </CollapsibleSection>
 
           {/* ============================================ */}
+          {/* SECTION: Multi-Agent Orchestration */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Multi-Agent Orchestration" icon={Users} id="multi-agent">
+            <p className="text-muted-foreground mb-6 leading-relaxed whitespace-pre-line">{multiAgentSystem}</p>
+
+            <h3 className="text-lg font-bold mb-3">4 Concurrent Work Slots</h3>
+            <DataTable
+              headers={["Slot", "Status", "Description"]}
+              rows={multiAgentWorkSlots.map(s => [s.slot, s.status, s.description])}
+            />
+
+            <div className="mt-6 p-4 rounded-lg border border-blue-500/30 bg-blue-500/5">
+              <h4 className="font-semibold mb-2">Cross-Agent Verification</h4>
+              <p className="text-sm text-muted-foreground">{crossAgentVerification}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
           {/* SECTION: Quality Engineering */}
           {/* ============================================ */}
           <CollapsibleSection title="Quality Engineering Standards" icon={CheckCircle} id="quality">
@@ -562,7 +700,7 @@ export function AIDevelopmentPage() {
             </ul>
 
             <h3 className="text-lg font-bold mt-8 mb-3">Git Workflow</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 mb-8">
               {gitWorkflow.map((rule, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                   <GitBranch className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
@@ -570,6 +708,97 @@ export function AIDevelopmentPage() {
                 </li>
               ))}
             </ul>
+
+            <h3 className="text-lg font-bold mt-8 mb-3">6 Quality Checklists</h3>
+            <div className="grid md:grid-cols-2 gap-3">
+              {qualityChecklists.map((checklist, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <span className="font-mono text-sm font-bold text-primary">{checklist.name}</span>
+                  <p className="text-xs text-muted-foreground mt-1">{checklist.purpose}</p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Forbidden Patterns */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Forbidden Patterns & Zero-Tolerance Standards" icon={Ban} id="forbidden">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{forbiddenPatternsDescription}</p>
+
+            <div className="space-y-4">
+              {forbiddenPatterns.map((fp, i) => (
+                <div key={i} className="p-4 rounded-lg border border-border/50 bg-muted/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-bold">{fp.category}</span>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${
+                        fp.severity === "CRITICAL" ? "border-red-500/50 text-red-400" :
+                        fp.severity === "HIGH" ? "border-orange-500/50 text-orange-400" :
+                        "border-yellow-500/50 text-yellow-400"
+                      }`}
+                    >
+                      {fp.severity}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {fp.patterns.map((pattern, j) => (
+                      <code key={j} className="text-xs px-2 py-0.5 rounded bg-red-500/10 text-red-300 font-mono">{pattern}</code>
+                    ))}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono">Detection: {fp.detection}</div>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Document Hierarchy */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Document Hierarchy & Configuration" icon={FileText} id="doc-hierarchy">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              A 7-layer documentation system ensures consistent rules, from global standards
+              down to per-project specifics. Higher layers override lower ones.
+            </p>
+
+            <div className="space-y-3 mb-8">
+              {documentHierarchy.map((doc, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/20 border border-border/30">
+                  <Badge variant="outline" className="shrink-0 font-mono text-xs">L{doc.level}</Badge>
+                  <div>
+                    <span className="font-mono text-sm font-semibold">{doc.name}</span>
+                    <p className="text-sm text-muted-foreground mt-0.5">{doc.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="text-lg font-bold mb-3">SDD-First Development</h3>
+            <p className="text-muted-foreground mb-4 text-sm">{sddFirstDescription}</p>
+            <div className="grid md:grid-cols-2 gap-3 mb-4">
+              {sddTriggers.map((trigger, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <ChevronRight className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                  {trigger}
+                </div>
+              ))}
+            </div>
+            <div className="p-4 rounded-lg border border-red-500/30 bg-red-500/5">
+              <h4 className="font-semibold text-sm mb-1">No Placeholders Allowed</h4>
+              <p className="text-xs text-muted-foreground">{sddNoPLaceholders}</p>
+            </div>
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Google Drive Archive</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {Object.entries(googleDriveStats).map(([key, value]) => (
+                <div key={key} className="p-3 rounded-lg bg-muted/20 border border-border/30 text-center">
+                  <HardDrive className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
+                  <div className="text-sm font-bold text-foreground">{value}</div>
+                  <div className="text-xs text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                </div>
+              ))}
+            </div>
           </CollapsibleSection>
 
           {/* ============================================ */}
@@ -587,6 +816,9 @@ export function AIDevelopmentPage() {
                 </div>
               ))}
             </div>
+
+            <h3 className="text-lg font-bold mb-3">Tool Diversification Strategy</h3>
+            <p className="text-sm text-muted-foreground mb-4 whitespace-pre-line">{toolDiversificationStrategy}</p>
 
             <h3 className="text-lg font-bold mb-3">Claude Code Configuration</h3>
             <CodeBlock code={claudeCodeConfig} title="Configuration Infrastructure" />
@@ -635,7 +867,7 @@ export function AIDevelopmentPage() {
               ))}
             </div>
 
-            <h3 className="text-lg font-bold mb-3">Advanced Prompt Engineering Patterns</h3>
+            <h3 className="text-lg font-bold mt-8 mb-3">Advanced Prompt Engineering Patterns</h3>
             <div className="grid md:grid-cols-2 gap-3">
               {advancedPatterns.map((pattern, i) => (
                 <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
