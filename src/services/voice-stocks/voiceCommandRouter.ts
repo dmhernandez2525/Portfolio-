@@ -147,6 +147,10 @@ export class VoiceCommandRouter {
 **Navigation:**
 - "Go to projects" - Navigate to a page
 - "Go to games" - Open the games section
+- "Go to falling blocks" - Open Falling Blocks
+- "Go to pokemon" - Open the Pokemon game
+- "Go to shopping cart hero" - Open the Shopping Cart Hero game
+- "Go to mafia wars" - Open the Mafia Wars game
 - "Show me skills" - Jump to skills section
 - "Scroll down/up" - Scroll the page
 
