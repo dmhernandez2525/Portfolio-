@@ -709,5 +709,37 @@
     "price": 3000,
     "isKeyItem": false,
     "effect": { "type": "tm", "move": "attract", "moveType": "normal", "power": 0, "accuracy": 100, "isHM": false }
+  },
+  {
+    "id": "old-rod",
+    "name": "Old Rod",
+    "category": "key_items",
+    "description": "An old and beat-up fishing rod. Use it at any body of water to fish for wild Pokemon.",
+    "price": 0,
+    "isKeyItem": true
+  },
+  {
+    "id": "good-rod",
+    "name": "Good Rod",
+    "category": "key_items",
+    "description": "A new, good-quality fishing rod. Use it at any body of water to fish for wild Pokemon.",
+    "price": 0,
+    "isKeyItem": true
+  },
+  {
+    "id": "super-rod",
+    "name": "Super Rod",
+    "category": "key_items",
+    "description": "An awesome, high-tech fishing rod. Use it at any body of water to fish for wild Pokemon.",
+    "price": 0,
+    "isKeyItem": true
+  },
+  {
+    "id": "bicycle",
+    "name": "Bicycle",
+    "category": "key_items",
+    "description": "A folding bicycle that enables much faster movement than walking.",
+    "price": 0,
+    "isKeyItem": true
   }
 ]

@@ -65,6 +65,12 @@
         "level": 36,
         "moveId": "solar_beam"
       }
+    ],
+    "evYield": {
+      "spAttack": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -133,6 +139,13 @@
         "level": 42,
         "moveId": "solar_beam"
       }
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "spDefense": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -193,6 +206,13 @@
         "level": 56,
         "moveId": "sludge_bomb"
       }
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "spDefense": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -256,6 +276,12 @@
         "level": 37,
         "moveId": "fire_spin"
       }
+    ],
+    "evYield": {
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -323,6 +349,13 @@
         "level": 48,
         "moveId": "fire_blast"
       }
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -387,6 +420,13 @@
         "level": 54,
         "moveId": "fire_spin"
       }
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -454,6 +494,12 @@
         "level": 36,
         "moveId": "hydro_pump"
       }
+    ],
+    "evYield": {
+      "defense": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -521,6 +567,13 @@
         "level": 40,
         "moveId": "hydro_pump"
       }
+    ],
+    "evYield": {
+      "defense": 1,
+      "spDefense": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -584,6 +637,13 @@
         "level": 48,
         "moveId": "flash_cannon"
       }
+    ],
+    "evYield": {
+      "spDefense": 2,
+      "defense": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -627,7 +687,10 @@
         "level": 9,
         "moveId": "bug_bite"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 11,
@@ -670,7 +733,11 @@
         "level": 1,
         "moveId": "string_shot"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "hp": 1
+    }
   },
   {
     "id": 12,
@@ -726,7 +793,11 @@
         "level": 30,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "spDefense": 1
+    }
   },
   {
     "id": 13,
@@ -770,7 +841,10 @@
         "level": 9,
         "moveId": "bug_bite"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 14,
@@ -814,7 +888,11 @@
         "level": 1,
         "moveId": "string_shot"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "hp": 1
+    }
   },
   {
     "id": 15,
@@ -870,7 +948,11 @@
         "level": 40,
         "moveId": "swords_dance"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2,
+      "spDefense": 1
+    }
   },
   {
     "id": 16,
@@ -926,7 +1008,10 @@
         "level": 25,
         "moveId": "aerial_ace"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 17,
@@ -990,7 +1075,11 @@
         "level": 43,
         "moveId": "agility"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "hp": 1
+    }
   },
   {
     "id": 18,
@@ -1050,7 +1139,11 @@
         "level": 52,
         "moveId": "agility"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2,
+      "hp": 1
+    }
   },
   {
     "id": 19,
@@ -1105,7 +1198,10 @@
         "level": 27,
         "moveId": "crunch"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 20,
@@ -1160,7 +1256,10 @@
         "level": 40,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 21,
@@ -1216,7 +1315,10 @@
         "level": 25,
         "moveId": "drill_peck"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 22,
@@ -1272,7 +1374,11 @@
         "level": 41,
         "moveId": "brave_bird"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "attack": 1
+    }
   },
   {
     "id": 23,
@@ -1327,7 +1433,10 @@
         "level": 28,
         "moveId": "poison_jab"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 24,
@@ -1382,7 +1491,11 @@
         "level": 44,
         "moveId": "sludge_bomb"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 25,
@@ -1408,7 +1521,7 @@
         "speciesId": 26,
         "condition": {
           "type": "item",
-          "item": "thunder_stone"
+          "item": "thunder-stone"
         }
       }
     ],
@@ -1449,6 +1562,12 @@
         "level": 42,
         "moveId": "thunder"
       }
+    ],
+    "evYield": {
+      "speed": 2
+    },
+    "abilities": [
+      "static"
     ]
   },
   {
@@ -1496,6 +1615,13 @@
         "level": 1,
         "moveId": "thunder"
       }
+    ],
+    "evYield": {
+      "speed": 2,
+      "attack": 1
+    },
+    "abilities": [
+      "static"
     ]
   },
   {
@@ -1555,7 +1681,10 @@
         "level": 30,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 28,
@@ -1610,7 +1739,11 @@
         "level": 40,
         "moveId": "swords_dance"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "attack": 1
+    }
   },
   {
     "id": 29,
@@ -1665,7 +1798,10 @@
         "level": 23,
         "moveId": "sludge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 30,
@@ -1691,7 +1827,7 @@
         "speciesId": 31,
         "condition": {
           "type": "item",
-          "item": "moon_stone"
+          "item": "moon-stone"
         }
       }
     ],
@@ -1724,7 +1860,11 @@
         "level": 35,
         "moveId": "crunch"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "defense": 1
+    }
   },
   {
     "id": 31,
@@ -1776,7 +1916,11 @@
         "level": 43,
         "moveId": "crunch"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2,
+      "defense": 1
+    }
   },
   {
     "id": 32,
@@ -1831,7 +1975,10 @@
         "level": 23,
         "moveId": "sludge"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 33,
@@ -1857,7 +2004,7 @@
         "speciesId": 34,
         "condition": {
           "type": "item",
-          "item": "moon_stone"
+          "item": "moon-stone"
         }
       }
     ],
@@ -1890,7 +2037,11 @@
         "level": 35,
         "moveId": "body_slam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 34,
@@ -1942,7 +2093,11 @@
         "level": 50,
         "moveId": "outrage"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2,
+      "spAttack": 1
+    }
   },
   {
     "id": 35,
@@ -1968,7 +2123,7 @@
         "speciesId": 36,
         "condition": {
           "type": "item",
-          "item": "moon_stone"
+          "item": "moon-stone"
         }
       }
     ],
@@ -2001,7 +2156,11 @@
         "level": 31,
         "moveId": "moonlight"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "spDefense": 1
+    }
   },
   {
     "id": 36,
@@ -2048,7 +2207,11 @@
         "level": 1,
         "moveId": "light_screen"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2,
+      "spDefense": 1
+    }
   },
   {
     "id": 37,
@@ -2074,7 +2237,7 @@
         "speciesId": 38,
         "condition": {
           "type": "item",
-          "item": "fire_stone"
+          "item": "fire-stone"
         }
       }
     ],
@@ -2107,7 +2270,10 @@
         "level": 29,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 38,
@@ -2150,7 +2316,11 @@
         "level": 1,
         "moveId": "will_o_wisp"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1,
+      "speed": 1
+    }
   },
   {
     "id": 39,
@@ -2176,7 +2346,7 @@
         "speciesId": 40,
         "condition": {
           "type": "item",
-          "item": "moon_stone"
+          "item": "moon-stone"
         }
       }
     ],
@@ -2205,7 +2375,10 @@
         "level": 24,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2
+    }
   },
   {
     "id": 40,
@@ -2248,7 +2421,10 @@
         "level": 1,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 3
+    }
   },
   {
     "id": 41,
@@ -2304,7 +2480,10 @@
         "level": 25,
         "moveId": "aerial_ace"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 42,
@@ -2360,7 +2539,11 @@
         "level": 43,
         "moveId": "brave_bird"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "attack": 1
+    }
   },
   {
     "id": 43,
@@ -2420,7 +2603,10 @@
         "level": 30,
         "moveId": "giga_drain"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 44,
@@ -2447,7 +2633,7 @@
         "speciesId": 45,
         "condition": {
           "type": "item",
-          "item": "leaf_stone"
+          "item": "leaf-stone"
         }
       }
     ],
@@ -2484,7 +2670,11 @@
         "level": 39,
         "moveId": "petal_dance"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "spDefense": 1
+    }
   },
   {
     "id": 45,
@@ -2536,7 +2726,11 @@
         "level": 1,
         "moveId": "sludge_bomb"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "spDefense": 1
+    }
   },
   {
     "id": 46,
@@ -2596,7 +2790,10 @@
         "level": 31,
         "moveId": "spore"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 47,
@@ -2652,7 +2849,10 @@
         "level": 39,
         "moveId": "x_scissor"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 48,
@@ -2712,7 +2912,10 @@
         "level": 33,
         "moveId": "psybeam"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 49,
@@ -2768,7 +2971,11 @@
         "level": 45,
         "moveId": "signal_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 50,
@@ -2827,7 +3034,10 @@
         "level": 41,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 51,
@@ -2882,7 +3092,10 @@
         "level": 47,
         "moveId": "stone_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 52,
@@ -2937,7 +3150,10 @@
         "level": 33,
         "moveId": "pursuit"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 53,
@@ -2988,7 +3204,10 @@
         "level": 42,
         "moveId": "body_slam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 54,
@@ -3047,7 +3266,10 @@
         "level": 28,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 55,
@@ -3102,7 +3324,11 @@
         "level": 48,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 56,
@@ -3157,7 +3383,10 @@
         "level": 27,
         "moveId": "cross_chop"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 57,
@@ -3212,7 +3441,11 @@
         "level": 44,
         "moveId": "focus_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 58,
@@ -3238,7 +3471,7 @@
         "speciesId": 59,
         "condition": {
           "type": "item",
-          "item": "fire_stone"
+          "item": "fire-stone"
         }
       }
     ],
@@ -3275,7 +3508,10 @@
         "level": 37,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 59,
@@ -3322,7 +3558,11 @@
         "level": 1,
         "moveId": "extreme_speed"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 60,
@@ -3377,7 +3617,10 @@
         "level": 25,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 61,
@@ -3403,7 +3646,7 @@
         "speciesId": 62,
         "condition": {
           "type": "item",
-          "item": "water_stone"
+          "item": "water-stone"
         }
       }
     ],
@@ -3436,7 +3679,10 @@
         "level": 35,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 62,
@@ -3488,7 +3734,11 @@
         "level": 1,
         "moveId": "focus_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2,
+      "hp": 1
+    }
   },
   {
     "id": 63,
@@ -3523,7 +3773,10 @@
         "level": 1,
         "moveId": "confusion"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 64,
@@ -3577,7 +3830,10 @@
         "level": 36,
         "moveId": "calm_mind"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2
+    }
   },
   {
     "id": 65,
@@ -3628,7 +3884,11 @@
         "level": 42,
         "moveId": "focus_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "speed": 1
+    }
   },
   {
     "id": 66,
@@ -3687,7 +3947,10 @@
         "level": 31,
         "moveId": "cross_chop"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 67,
@@ -3749,7 +4012,10 @@
         "level": 44,
         "moveId": "sky_uppercut"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 68,
@@ -3808,7 +4074,10 @@
         "level": 52,
         "moveId": "focus_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 3
+    }
   },
   {
     "id": 69,
@@ -3868,7 +4137,10 @@
         "level": 26,
         "moveId": "sludge"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 70,
@@ -3895,7 +4167,7 @@
         "speciesId": 71,
         "condition": {
           "type": "item",
-          "item": "leaf_stone"
+          "item": "leaf-stone"
         }
       }
     ],
@@ -3928,7 +4200,11 @@
         "level": 33,
         "moveId": "sludge_bomb"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 71,
@@ -3976,7 +4252,11 @@
         "level": 1,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2,
+      "spAttack": 1
+    }
   },
   {
     "id": 72,
@@ -4040,7 +4320,10 @@
         "level": 37,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 73,
@@ -4096,7 +4379,10 @@
         "level": 46,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 2
+    }
   },
   {
     "id": 74,
@@ -4160,7 +4446,10 @@
         "level": 31,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 75,
@@ -4223,7 +4512,10 @@
         "level": 37,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 76,
@@ -4283,7 +4575,10 @@
         "level": 50,
         "moveId": "explosion"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 3
+    }
   },
   {
     "id": 77,
@@ -4350,7 +4645,10 @@
         "level": 43,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 78,
@@ -4409,7 +4707,11 @@
         "level": 50,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "attack": 1
+    }
   },
   {
     "id": 79,
@@ -4469,7 +4771,10 @@
         "level": 30,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 80,
@@ -4525,7 +4830,11 @@
         "level": 46,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 81,
@@ -4585,7 +4894,10 @@
         "level": 26,
         "moveId": "thunderbolt"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 82,
@@ -4645,7 +4957,10 @@
         "level": 46,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2
+    }
   },
   {
     "id": 83,
@@ -4701,7 +5016,10 @@
         "level": 31,
         "moveId": "brave_bird"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 84,
@@ -4757,7 +5075,10 @@
         "level": 29,
         "moveId": "drill_peck"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 85,
@@ -4813,7 +5134,11 @@
         "level": 45,
         "moveId": "brave_bird"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 86,
@@ -4872,7 +5197,10 @@
         "level": 31,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 87,
@@ -4928,7 +5256,11 @@
         "level": 42,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1,
+      "hp": 1
+    }
   },
   {
     "id": 88,
@@ -4987,7 +5319,10 @@
         "level": 33,
         "moveId": "toxic"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 89,
@@ -5042,7 +5377,11 @@
         "level": 46,
         "moveId": "poison_jab"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "attack": 1
+    }
   },
   {
     "id": 90,
@@ -5068,7 +5407,7 @@
         "speciesId": 91,
         "condition": {
           "type": "item",
-          "item": "water_stone"
+          "item": "water-stone"
         }
       }
     ],
@@ -5101,7 +5440,10 @@
         "level": 33,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 91,
@@ -5153,7 +5495,10 @@
         "level": 1,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 92,
@@ -5209,6 +5554,12 @@
         "level": 28,
         "moveId": "dream_eater"
       }
+    ],
+    "evYield": {
+      "spAttack": 1
+    },
+    "abilities": [
+      "levitate"
     ]
   },
   {
@@ -5268,6 +5619,12 @@
         "level": 39,
         "moveId": "dark_pulse"
       }
+    ],
+    "evYield": {
+      "spAttack": 2
+    },
+    "abilities": [
+      "levitate"
     ]
   },
   {
@@ -5324,6 +5681,12 @@
         "level": 48,
         "moveId": "sludge_bomb"
       }
+    ],
+    "evYield": {
+      "spAttack": 3
+    },
+    "abilities": [
+      "levitate"
     ]
   },
   {
@@ -5380,7 +5743,10 @@
         "level": 38,
         "moveId": "stone_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 96,
@@ -5439,7 +5805,10 @@
         "level": 29,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 97,
@@ -5494,7 +5863,10 @@
         "level": 40,
         "moveId": "dream_eater"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 2
+    }
   },
   {
     "id": 98,
@@ -5553,7 +5925,10 @@
         "level": 27,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 99,
@@ -5612,7 +5987,10 @@
         "level": 44,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 100,
@@ -5671,7 +6049,10 @@
         "level": 29,
         "moveId": "light_screen"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 101,
@@ -5726,7 +6107,10 @@
         "level": 44,
         "moveId": "explosion"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 102,
@@ -5753,7 +6137,7 @@
         "speciesId": 103,
         "condition": {
           "type": "item",
-          "item": "leaf_stone"
+          "item": "leaf-stone"
         }
       }
     ],
@@ -5786,7 +6170,10 @@
         "level": 30,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 103,
@@ -5838,7 +6225,10 @@
         "level": 1,
         "moveId": "leaf_blade"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2
+    }
   },
   {
     "id": 104,
@@ -5901,7 +6291,10 @@
         "level": 27,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 105,
@@ -5960,7 +6353,10 @@
         "level": 37,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 106,
@@ -6015,7 +6411,11 @@
         "level": 31,
         "moveId": "megahorn"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "spDefense": 1
+    }
   },
   {
     "id": 107,
@@ -6070,7 +6470,11 @@
         "level": 31,
         "moveId": "cross_chop"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1,
+      "attack": 1
+    }
   },
   {
     "id": 108,
@@ -6117,7 +6521,10 @@
         "level": 25,
         "moveId": "rest"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 109,
@@ -6180,7 +6587,10 @@
         "level": 38,
         "moveId": "toxic"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 110,
@@ -6239,7 +6649,10 @@
         "level": 48,
         "moveId": "explosion"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 111,
@@ -6299,7 +6712,10 @@
         "level": 37,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 112,
@@ -6359,7 +6775,11 @@
         "level": 55,
         "moveId": "megahorn"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "defense": 1
+    }
   },
   {
     "id": 113,
@@ -6414,7 +6834,10 @@
         "level": 30,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 114,
@@ -6473,7 +6896,10 @@
         "level": 43,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 115,
@@ -6532,7 +6958,10 @@
         "level": 43,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 116,
@@ -6591,7 +7020,10 @@
         "level": 36,
         "moveId": "dragon_pulse"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 117,
@@ -6646,7 +7078,11 @@
         "level": 48,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 118,
@@ -6705,7 +7141,10 @@
         "level": 31,
         "moveId": "surf"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 119,
@@ -6760,7 +7199,10 @@
         "level": 41,
         "moveId": "megahorn"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 120,
@@ -6786,7 +7228,7 @@
         "speciesId": 121,
         "condition": {
           "type": "item",
-          "item": "water_stone"
+          "item": "water-stone"
         }
       }
     ],
@@ -6823,7 +7265,10 @@
         "level": 33,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 121,
@@ -6879,7 +7324,10 @@
         "level": 1,
         "moveId": "ice_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 122,
@@ -6926,7 +7374,10 @@
         "level": 29,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 123,
@@ -6982,7 +7433,10 @@
         "level": 31,
         "moveId": "swords_dance"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 124,
@@ -7038,7 +7492,10 @@
         "level": 42,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2
+    }
   },
   {
     "id": 125,
@@ -7093,7 +7550,11 @@
         "level": 42,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 126,
@@ -7148,7 +7609,11 @@
         "level": 41,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "attack": 1
+    }
   },
   {
     "id": 127,
@@ -7203,7 +7668,10 @@
         "level": 37,
         "moveId": "megahorn"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 128,
@@ -7258,7 +7726,10 @@
         "level": 41,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 129,
@@ -7297,7 +7768,10 @@
         "level": 15,
         "moveId": "flail"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 130,
@@ -7357,6 +7831,12 @@
         "level": 53,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "attack": 2
+    },
+    "abilities": [
+      "intimidate"
     ]
   },
   {
@@ -7421,6 +7901,12 @@
         "level": 49,
         "moveId": "blizzard"
       }
+    ],
+    "evYield": {
+      "hp": 1
+    },
+    "abilities": [
+      "water_absorb"
     ]
   },
   {
@@ -7448,7 +7934,10 @@
         "level": 1,
         "moveId": "tackle"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 133,
@@ -7474,21 +7963,33 @@
         "speciesId": 134,
         "condition": {
           "type": "item",
-          "item": "water_stone"
+          "item": "water-stone"
         }
       },
       {
         "speciesId": 135,
         "condition": {
           "type": "item",
-          "item": "thunder_stone"
+          "item": "thunder-stone"
         }
       },
       {
         "speciesId": 136,
         "condition": {
           "type": "item",
-          "item": "fire_stone"
+          "item": "fire-stone"
+        }
+      },
+      {
+        "speciesId": 196,
+        "condition": {
+          "type": "happiness_day"
+        }
+      },
+      {
+        "speciesId": 197,
+        "condition": {
+          "type": "happiness_night"
         }
       }
     ],
@@ -7517,7 +8018,10 @@
         "level": 30,
         "moveId": "take_down"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 134,
@@ -7576,7 +8080,10 @@
         "level": 48,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2
+    }
   },
   {
     "id": 135,
@@ -7635,7 +8142,10 @@
         "level": 48,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 136,
@@ -7694,7 +8204,10 @@
         "level": 48,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 137,
@@ -7745,7 +8258,10 @@
         "level": 32,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 138,
@@ -7809,7 +8325,10 @@
         "level": 40,
         "moveId": "rock_slide"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 139,
@@ -7869,7 +8388,11 @@
         "level": 48,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 140,
@@ -7933,7 +8456,10 @@
         "level": 31,
         "moveId": "rock_slide"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 141,
@@ -7997,7 +8523,11 @@
         "level": 48,
         "moveId": "stone_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "defense": 1
+    }
   },
   {
     "id": 142,
@@ -8061,7 +8591,10 @@
         "level": 57,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 143,
@@ -8124,6 +8657,12 @@
         "level": 49,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "hp": 1
+    },
+    "abilities": [
+      "thick_fat"
     ]
   },
   {
@@ -8184,7 +8723,10 @@
         "level": 50,
         "moveId": "fly"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 145,
@@ -8244,7 +8786,10 @@
         "level": 50,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 146,
@@ -8304,7 +8849,10 @@
         "level": 50,
         "moveId": "fly"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 147,
@@ -8367,7 +8915,10 @@
         "level": 33,
         "moveId": "dragon_pulse"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 148,
@@ -8430,7 +8981,10 @@
         "level": 41,
         "moveId": "outrage"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 149,
@@ -8498,6 +9052,12 @@
         "level": 67,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "attack": 3
+    },
+    "abilities": [
+      "inner_focus"
     ]
   },
   {
@@ -8557,6 +9117,12 @@
         "level": 77,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "spAttack": 1
+    },
+    "abilities": [
+      "pressure"
     ]
   },
   {
@@ -8604,6 +9170,9 @@
         "level": 50,
         "moveId": "calm_mind"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   }
 ]

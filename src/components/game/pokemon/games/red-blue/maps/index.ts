@@ -27,6 +27,7 @@ import {
   pewterGym, ceruleanGym, vermilionGym, celadonGym,
   fuchsiaGym, saffronGym, cinnabarGym, viridianGym,
   indigoPlateau,
+  e4Room1Kanto, e4Room2Kanto, e4Room3Kanto, e4Room4Kanto, championRoomKanto,
 } from './interiors';
 
 // Later routes & cities
@@ -113,6 +114,13 @@ export const kantoMaps: Record<string, GameMap> = {
   saffron_gym: saffronGym,
   cinnabar_gym: cinnabarGym,
   viridian_gym: viridianGym,
+
+  // Elite Four Chambers
+  e4_room_1_kanto: e4Room1Kanto,
+  e4_room_2_kanto: e4Room2Kanto,
+  e4_room_3_kanto: e4Room3Kanto,
+  e4_room_4_kanto: e4Room4Kanto,
+  champion_room_kanto: championRoomKanto,
 
   // Dungeons
   viridian_forest: viridianForest,

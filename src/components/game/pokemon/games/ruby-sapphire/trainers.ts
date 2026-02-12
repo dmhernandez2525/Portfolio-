@@ -169,6 +169,95 @@ export const champion: TrainerDef = {
   defeatDialog: ['That was time well spent!', 'Congratulations! You are the new CHAMPION!'],
 };
 
+// --- Gym Trainers ---
+
+export const gymTrainers: Record<string, TrainerDef[]> = {
+  rustboro_gym: [
+    { id: 'rustboro_gym_1', name: 'Marc', class: 'Youngster', spriteId: 'youngster',
+      aiTier: 'basic', reward: 200, isGymLeader: false,
+      party: [{ speciesId: 74, level: 12 }, { speciesId: 299, level: 12 }], // Geodude, Nosepass
+      defeatDialog: ['My rocks crumbled!'] },
+    { id: 'rustboro_gym_2', name: 'Tommy', class: 'Youngster', spriteId: 'youngster',
+      aiTier: 'basic', reward: 220, isGymLeader: false,
+      party: [{ speciesId: 74, level: 13 }], // Geodude
+      defeatDialog: ['That was rock solid!'] },
+  ],
+  dewford_gym: [
+    { id: 'dewford_gym_1', name: 'Takao', class: 'Black Belt', spriteId: 'blackbelt',
+      aiTier: 'basic', reward: 320, isGymLeader: false,
+      party: [{ speciesId: 66, level: 15 }, { speciesId: 296, level: 15 }], // Machop, Makuhita
+      defeatDialog: ['Your technique is sharp!'] },
+  ],
+  mauville_gym: [
+    { id: 'mauville_gym_1', name: 'Kirk', class: 'Guitarist', spriteId: 'guitarist',
+      aiTier: 'basic', reward: 460, isGymLeader: false,
+      party: [{ speciesId: 309, level: 21 }, { speciesId: 81, level: 21 }], // Electrike, Magnemite
+      defeatDialog: ['You rocked me!'] },
+    { id: 'mauville_gym_2', name: 'Shawn', class: 'Guitarist', spriteId: 'guitarist',
+      aiTier: 'basic', reward: 480, isGymLeader: false,
+      party: [{ speciesId: 100, level: 22 }], // Voltorb
+      defeatDialog: ['My amp blew out!'] },
+  ],
+  lavaridge_gym: [
+    { id: 'lavaridge_gym_1', name: 'Eli', class: 'Kindler', spriteId: 'kindler',
+      aiTier: 'basic', reward: 560, isGymLeader: false,
+      party: [{ speciesId: 322, level: 25 }, { speciesId: 218, level: 25 }], // Numel, Slugma
+      defeatDialog: ['The heat got to me!'] },
+    { id: 'lavaridge_gym_2', name: 'Jeff', class: 'Kindler', spriteId: 'kindler',
+      aiTier: 'basic', reward: 580, isGymLeader: false,
+      party: [{ speciesId: 77, level: 26 }], // Ponyta
+      defeatDialog: ['You cooled me off!'] },
+  ],
+  petalburg_gym: [
+    { id: 'petalburg_gym_1', name: 'Randall', class: 'Cooltrainer', spriteId: 'cooltrainer',
+      aiTier: 'basic', reward: 620, isGymLeader: false,
+      party: [{ speciesId: 289, level: 28 }], // Slaking
+      defeatDialog: ['I slacked off too much!'] },
+    { id: 'petalburg_gym_2', name: 'Mary', class: 'Cooltrainer', spriteId: 'cooltrainer_f',
+      aiTier: 'basic', reward: 640, isGymLeader: false,
+      party: [{ speciesId: 264, level: 28 }, { speciesId: 288, level: 28 }], // Linoone, Vigoroth
+      defeatDialog: ['You outpaced me!'] },
+  ],
+  fortree_gym: [
+    { id: 'fortree_gym_1', name: 'Jared', class: 'Bird Keeper', spriteId: 'bird_keeper',
+      aiTier: 'basic', reward: 700, isGymLeader: false,
+      party: [{ speciesId: 333, level: 31 }, { speciesId: 277, level: 31 }], // Swablu, Swellow
+      defeatDialog: ['My birds fell from the sky!'] },
+    { id: 'fortree_gym_2', name: 'Ashley', class: 'Bird Keeper', spriteId: 'bird_keeper',
+      aiTier: 'basic', reward: 720, isGymLeader: false,
+      party: [{ speciesId: 279, level: 32 }], // Pelipper
+      defeatDialog: ['The wind shifted!'] },
+  ],
+  mossdeep_gym: [
+    { id: 'mossdeep_gym_1', name: 'Virgil', class: 'Psychic', spriteId: 'psychic',
+      aiTier: 'basic', reward: 780, isGymLeader: false,
+      party: [{ speciesId: 337, level: 36 }, { speciesId: 338, level: 36 }], // Lunatone, Solrock
+      defeatDialog: ['The stars didn\u0027t align!'] },
+    { id: 'mossdeep_gym_2', name: 'Hannah', class: 'Psychic', spriteId: 'psychic',
+      aiTier: 'basic', reward: 800, isGymLeader: false,
+      party: [{ speciesId: 326, level: 37 }], // Grumpig
+      defeatDialog: ['My psychic link broke!'] },
+    { id: 'mossdeep_gym_3', name: 'Nate', class: 'Psychic', spriteId: 'psychic',
+      aiTier: 'smart', reward: 820, isGymLeader: false,
+      party: [{ speciesId: 344, level: 38 }], // Claydol
+      defeatDialog: ['I couldn\u0027t read your mind!'] },
+  ],
+  sootopolis_gym: [
+    { id: 'sootopolis_gym_1', name: 'Andrea', class: 'Beauty', spriteId: 'beauty',
+      aiTier: 'basic', reward: 860, isGymLeader: false,
+      party: [{ speciesId: 370, level: 39 }, { speciesId: 119, level: 39 }], // Luvdisc, Seaking
+      defeatDialog: ['WALLACE is even more graceful!'] },
+    { id: 'sootopolis_gym_2', name: 'Crissy', class: 'Beauty', spriteId: 'beauty',
+      aiTier: 'basic', reward: 880, isGymLeader: false,
+      party: [{ speciesId: 340, level: 40 }], // Whiscash
+      defeatDialog: ['The current swept me away!'] },
+    { id: 'sootopolis_gym_3', name: 'Brianna', class: 'Lady', spriteId: 'lady',
+      aiTier: 'smart', reward: 900, isGymLeader: false,
+      party: [{ speciesId: 121, level: 41 }], // Starmie
+      defeatDialog: ['What elegance in battle!'] },
+  ],
+};
+
 // --- Sample route trainers ---
 
 export const routeTrainers: Record<string, TrainerDef[]> = {

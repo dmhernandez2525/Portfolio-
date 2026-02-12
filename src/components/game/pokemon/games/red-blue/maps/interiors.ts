@@ -2,7 +2,7 @@
 // Kanto Interior Maps — Shared indoor spaces
 // ============================================================================
 
-import type { GameMap } from '../../../engine/types';
+import type { GameMap, Direction, NPCDef } from '../../../engine/types';
 
 const FL = 1; // floor
 const WL = 9; // wall
@@ -128,6 +128,14 @@ function makePokecenter(id: string, exitMap: string, exitX: number, exitY: numbe
       movement: 'static',
       dialog: ['Welcome to our POKeMON CENTER!', 'We heal your POKeMON to', 'full health!', '...Your POKeMON are fully healed!'],
       isTrainer: false,
+      heals: true,
+    },
+    {
+      id: `${id}_pc`, x: 1, y: 1, spriteId: 'pc', direction: 'down',
+      movement: 'static',
+      dialog: ['Accessed the PC!'],
+      isTrainer: false,
+      isPC: true,
     },
   ]);
 }
@@ -144,20 +152,25 @@ export const cinnabarPokecenter = makePokecenter('cinnabar_pokecenter', 'cinnaba
 export const indigoPokecenter = makePokecenter('indigo_pokecenter', 'indigo_plateau', 3, 13);
 
 // --- PokeMarts ---
-function makeMart(id: string, exitMap: string, exitX: number, exitY: number): GameMap {
+const KANTO_BASE_SHOP = ['poke-ball', 'potion', 'antidote', 'parlyz-heal', 'awakening'];
+const KANTO_MID_SHOP = [...KANTO_BASE_SHOP, 'great-ball', 'super-potion', 'revive', 'repel', 'escape-rope'];
+const KANTO_LATE_SHOP = [...KANTO_MID_SHOP, 'ultra-ball', 'hyper-potion', 'max-repel', 'full-heal'];
+
+function makeMart(id: string, exitMap: string, exitX: number, exitY: number, shopItems: string[]): GameMap {
   return makeInterior(id, 'POKeMON MART', 8, 8, exitMap, exitX, exitY, [
     {
       id: `${id}_clerk`, x: 1, y: 2, spriteId: 'clerk', direction: 'right',
       movement: 'static',
       dialog: ['Welcome! How may I help you?'],
       isTrainer: false,
+      shopItems,
     },
   ]);
 }
 
-export const viridianMart = makeMart('viridian_mart', 'viridian_city', 14, 10);
-export const pewterMart = makeMart('pewter_mart', 'pewter_city', 16, 13);
-export const ceruleanMart = makeMart('cerulean_mart', 'cerulean_city', 16, 13);
+export const viridianMart = makeMart('viridian_mart', 'viridian_city', 14, 10, KANTO_BASE_SHOP);
+export const pewterMart = makeMart('pewter_mart', 'pewter_city', 16, 13, KANTO_BASE_SHOP);
+export const ceruleanMart = makeMart('cerulean_mart', 'cerulean_city', 16, 13, KANTO_MID_SHOP);
 
 // --- Gyms ---
 function makeGym(
@@ -222,6 +235,66 @@ export const viridianGym = makeGym(
   'viridian_gym', 'VIRIDIAN GYM', 'viridian_city', 3, 5,
   'giovanni', 'GIOVANNI', 6, 2,
   ['So! You have come all the way', 'to challenge me.', 'I am GIOVANNI, the leader of', 'TEAM ROCKET!', 'For your Pokemon\u0027s sake,', 'I hope you are ready!'],
+);
+
+// --- Gym Trainers ---
+function gymTrainer(id: string, x: number, y: number, dir: Direction, dialog: string[], los: number): NPCDef {
+  return {
+    id, x, y, spriteId: id, direction: dir,
+    movement: 'static', dialog,
+    isTrainer: true, trainerData: { id, party: [] },
+    lineOfSight: los,
+  };
+}
+
+// Pewter Gym: 1 trainer (Jr. Trainer)
+pewterGym.npcs.push(
+  gymTrainer('pewter_gym_1', 4, 6, 'right', ['Stop right there!', 'BROCK is up ahead!', 'You have to beat me first!'], 3),
+);
+
+// Cerulean Gym: 2 trainers
+ceruleanGym.npcs.push(
+  gymTrainer('cerulean_gym_1', 3, 7, 'right', ['My WATER POKeMON are', 'ready to battle!'], 3),
+  gymTrainer('cerulean_gym_2', 9, 5, 'left', ['You want to challenge MISTY?', 'You have to get past me!'], 3),
+);
+
+// Vermilion Gym: 2 trainers
+vermilionGym.npcs.push(
+  gymTrainer('vermilion_gym_1', 3, 7, 'right', ['LT. SURGE set up traps!', 'You gotta find the switch!'], 3),
+  gymTrainer('vermilion_gym_2', 9, 5, 'left', ['LT. SURGE is gonna shock you!'], 3),
+);
+
+// Celadon Gym: 3 trainers
+celadonGym.npcs.push(
+  gymTrainer('celadon_gym_1', 3, 8, 'right', ['This GYM is full of women!', 'Are you ready?'], 3),
+  gymTrainer('celadon_gym_2', 9, 6, 'left', ['My GRASS POKeMON will', 'put you to sleep!'], 3),
+  gymTrainer('celadon_gym_3', 6, 4, 'down', ['ERIKA is right behind me!', 'But you have to beat me first!'], 2),
+);
+
+// Fuchsia Gym: 2 trainers
+fuchsiaGym.npcs.push(
+  gymTrainer('fuchsia_gym_1', 4, 7, 'right', ['The POISONOUS NINJA MASTER', 'awaits you!'], 3),
+  gymTrainer('fuchsia_gym_2', 8, 4, 'down', ['My POKeMON are full of poison!', 'Watch out!'], 3),
+);
+
+// Saffron Gym: 3 trainers
+saffronGym.npcs.push(
+  gymTrainer('saffron_gym_1', 3, 8, 'right', ['SABRINA\u0027s power is', 'beyond comprehension!'], 3),
+  gymTrainer('saffron_gym_2', 9, 6, 'left', ['Can you solve the warp puzzles?'], 3),
+  gymTrainer('saffron_gym_3', 6, 4, 'down', ['SABRINA foresaw your coming!', 'She is not impressed!'], 2),
+);
+
+// Cinnabar Gym: 2 trainers
+cinnabarGym.npcs.push(
+  gymTrainer('cinnabar_gym_1', 3, 7, 'right', ['BLAINE\u0027s fire burns hot!', 'Can you take the heat?'], 3),
+  gymTrainer('cinnabar_gym_2', 9, 5, 'left', ['Answer the quiz or battle me!'], 3),
+);
+
+// Viridian Gym: 3 trainers
+viridianGym.npcs.push(
+  gymTrainer('viridian_gym_1', 3, 8, 'right', ['This GYM has been closed', 'for a long time!', 'The LEADER is very powerful!'], 3),
+  gymTrainer('viridian_gym_2', 9, 6, 'left', ['Our LEADER is the strongest', 'in all of KANTO!'], 3),
+  gymTrainer('viridian_gym_3', 6, 4, 'down', ['GIOVANNI will crush you!'], 2),
 );
 
 // --- Pewter Museum ---
@@ -320,4 +393,56 @@ export const indigoPlateau: GameMap = makeInterior(
       isTrainer: false,
     },
   ],
+);
+// Add warp from Indigo Plateau to E4 Room 1
+indigoPlateau.warps.push({ x: 6, y: 0, targetMap: 'e4_room_1_kanto', targetX: 5, targetY: 9 });
+
+// --- Elite Four Chambers (Kanto) ---
+function makeE4Chamber(
+  id: string, name: string,
+  trainerId: string, trainerDialog: string[],
+  exitMap: string, exitX: number, exitY: number,
+): GameMap {
+  return makeInterior(id, name, 10, 10, exitMap, exitX, exitY, [
+    {
+      id: trainerId, x: 5, y: 3, spriteId: trainerId, direction: 'down',
+      movement: 'static', dialog: trainerDialog,
+      isTrainer: true, trainerData: { id: trainerId, party: [] },
+      lineOfSight: 4,
+    },
+  ]);
+}
+
+export const e4Room1Kanto = makeE4Chamber(
+  'e4_room_1_kanto', 'LORELEI', 'lorelei',
+  ['Welcome to the POKeMON LEAGUE!', 'I am LORELEI of the ELITE FOUR!', 'Prepare for battle!'],
+  'indigo_plateau', 6, 1,
+);
+e4Room1Kanto.warps.push({ x: 5, y: 0, targetMap: 'e4_room_2_kanto', targetX: 5, targetY: 9 });
+
+export const e4Room2Kanto = makeE4Chamber(
+  'e4_room_2_kanto', 'BRUNO', 'bruno',
+  ['I am BRUNO of the ELITE FOUR!', 'My fighting POKeMON will', 'crush you!'],
+  'e4_room_1_kanto', 5, 1,
+);
+e4Room2Kanto.warps.push({ x: 5, y: 0, targetMap: 'e4_room_3_kanto', targetX: 5, targetY: 9 });
+
+export const e4Room3Kanto = makeE4Chamber(
+  'e4_room_3_kanto', 'AGATHA', 'agatha',
+  ['I am AGATHA of the ELITE FOUR!', 'I hear you are quite the', 'trainer. Let me see!'],
+  'e4_room_2_kanto', 5, 1,
+);
+e4Room3Kanto.warps.push({ x: 5, y: 0, targetMap: 'e4_room_4_kanto', targetX: 5, targetY: 9 });
+
+export const e4Room4Kanto = makeE4Chamber(
+  'e4_room_4_kanto', 'LANCE', 'lance',
+  ['I am LANCE, the last of the', 'ELITE FOUR!', 'I have been waiting for you!'],
+  'e4_room_3_kanto', 5, 1,
+);
+e4Room4Kanto.warps.push({ x: 5, y: 0, targetMap: 'champion_room_kanto', targetX: 5, targetY: 9 });
+
+export const championRoomKanto = makeE4Chamber(
+  'champion_room_kanto', 'CHAMPION', 'blue',
+  ['So, you are finally here!', 'I am the POKeMON LEAGUE CHAMPION!', 'Or I was, until now...'],
+  'e4_room_4_kanto', 5, 1,
 );

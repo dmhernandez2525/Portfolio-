@@ -2,7 +2,7 @@
 // Pokemon RPG — Evolution Animation Screen
 // ============================================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface EvolutionScreenProps {
   fromSpeciesId: number;
@@ -10,21 +10,42 @@ interface EvolutionScreenProps {
   fromName: string;
   toName: string;
   onComplete: () => void;
+  onCancel: () => void;
 }
 
 export default function EvolutionScreen({
-  fromSpeciesId, toSpeciesId, fromName, toName, onComplete,
+  fromSpeciesId, toSpeciesId, fromName, toName, onComplete, onCancel,
 }: EvolutionScreenProps) {
-  const [phase, setPhase] = useState<'start' | 'evolving' | 'done'>('start');
+  const [phase, setPhase] = useState<'start' | 'evolving' | 'done' | 'cancelled'>('start');
   const [flashOpacity, setFlashOpacity] = useState(0);
+  const cancelledRef = useRef(false);
+
+  // B-button cancellation: listen for Escape or X key during start/evolving phases
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.key === 'Escape' || e.key === 'x' || e.key === 'X') && !cancelledRef.current && phase !== 'done') {
+        cancelledRef.current = true;
+        setPhase('cancelled');
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [phase]);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('evolving'), 2000);
+    const t1 = setTimeout(() => {
+      if (!cancelledRef.current) setPhase('evolving');
+    }, 2000);
 
     let interval: ReturnType<typeof setInterval> | null = null;
     const t2 = setTimeout(() => {
+      if (cancelledRef.current) return;
       let count = 0;
       interval = setInterval(() => {
+        if (cancelledRef.current) {
+          if (interval) clearInterval(interval);
+          return;
+        }
         setFlashOpacity(o => o > 0.5 ? 0 : 1);
         count++;
         if (count >= 10) {
@@ -82,6 +103,19 @@ export default function EvolutionScreen({
             <button
               onClick={onComplete}
               className="px-6 py-2 bg-green-600 text-white font-mono text-sm font-bold rounded hover:bg-green-500"
+            >
+              OK
+            </button>
+          </>
+        )}
+        {phase === 'cancelled' && (
+          <>
+            <p className="font-mono text-white text-sm mb-4">
+              {fromName} stopped evolving!
+            </p>
+            <button
+              onClick={onCancel}
+              className="px-6 py-2 bg-yellow-600 text-white font-mono text-sm font-bold rounded hover:bg-yellow-500"
             >
               OK
             </button>

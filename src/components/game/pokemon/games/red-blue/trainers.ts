@@ -166,6 +166,99 @@ export const champion: TrainerDef = {
   defeatDialog: ['NO! That can\'t be!', 'You are the new CHAMPION!'],
 };
 
+// --- Gym Trainers ---
+
+export const gymTrainers: Record<string, TrainerDef[]> = {
+  pewter_gym: [
+    { id: 'pewter_gym_1', name: 'Liam', class: 'Jr. Trainer', spriteId: 'youngster',
+      aiTier: 'basic', reward: 200, isGymLeader: false,
+      party: [{ speciesId: 74, level: 11 }, { speciesId: 27, level: 10 }], // Geodude, Sandshrew
+      defeatDialog: ['You beat me!'] },
+  ],
+  cerulean_gym: [
+    { id: 'cerulean_gym_1', name: 'Diana', class: 'Swimmer', spriteId: 'swimmer_f',
+      aiTier: 'basic', reward: 340, isGymLeader: false,
+      party: [{ speciesId: 118, level: 16 }, { speciesId: 54, level: 16 }], // Goldeen, Psyduck
+      defeatDialog: ['You\u0027re too strong!'] },
+    { id: 'cerulean_gym_2', name: 'Parker', class: 'Swimmer', spriteId: 'swimmer',
+      aiTier: 'basic', reward: 360, isGymLeader: false,
+      party: [{ speciesId: 116, level: 17 }, { speciesId: 90, level: 17 }], // Horsea, Shellder
+      defeatDialog: ['I got washed away!'] },
+  ],
+  vermilion_gym: [
+    { id: 'vermilion_gym_1', name: 'Gordon', class: 'Sailor', spriteId: 'sailor',
+      aiTier: 'basic', reward: 500, isGymLeader: false,
+      party: [{ speciesId: 100, level: 21 }, { speciesId: 81, level: 21 }], // Voltorb, Magnemite
+      defeatDialog: ['Shocking defeat!'] },
+    { id: 'vermilion_gym_2', name: 'Buzz', class: 'Engineer', spriteId: 'engineer',
+      aiTier: 'basic', reward: 520, isGymLeader: false,
+      party: [{ speciesId: 25, level: 22 }], // Pikachu
+      defeatDialog: ['I got zapped instead!'] },
+  ],
+  celadon_gym: [
+    { id: 'celadon_gym_1', name: 'Tamia', class: 'Lass', spriteId: 'lass',
+      aiTier: 'basic', reward: 560, isGymLeader: false,
+      party: [{ speciesId: 43, level: 26 }, { speciesId: 70, level: 26 }], // Oddish, Weepinbell
+      defeatDialog: ['Oh no, my flowers!'] },
+    { id: 'celadon_gym_2', name: 'Bridget', class: 'Beauty', spriteId: 'beauty',
+      aiTier: 'basic', reward: 580, isGymLeader: false,
+      party: [{ speciesId: 114, level: 27 }], // Tangela
+      defeatDialog: ['That was thorny!'] },
+    { id: 'celadon_gym_3', name: 'Lisa', class: 'Jr. Trainer', spriteId: 'lass',
+      aiTier: 'basic', reward: 600, isGymLeader: false,
+      party: [{ speciesId: 2, level: 28 }], // Ivysaur
+      defeatDialog: ['You overpowered me!'] },
+  ],
+  fuchsia_gym: [
+    { id: 'fuchsia_gym_1', name: 'Nob', class: 'Juggler', spriteId: 'juggler',
+      aiTier: 'basic', reward: 680, isGymLeader: false,
+      party: [{ speciesId: 109, level: 34 }, { speciesId: 88, level: 34 }], // Koffing, Grimer
+      defeatDialog: ['My poison tricks failed!'] },
+    { id: 'fuchsia_gym_2', name: 'Aya', class: 'Tamer', spriteId: 'tamer',
+      aiTier: 'basic', reward: 700, isGymLeader: false,
+      party: [{ speciesId: 24, level: 35 }, { speciesId: 49, level: 35 }], // Arbok, Venomoth
+      defeatDialog: ['Impressive technique!'] },
+  ],
+  saffron_gym: [
+    { id: 'saffron_gym_1', name: 'Johan', class: 'Psychic', spriteId: 'psychic',
+      aiTier: 'basic', reward: 760, isGymLeader: false,
+      party: [{ speciesId: 64, level: 36 }, { speciesId: 122, level: 36 }], // Kadabra, Mr. Mime
+      defeatDialog: ['I didn\u0027t foresee this!'] },
+    { id: 'saffron_gym_2', name: 'Tyron', class: 'Psychic', spriteId: 'psychic',
+      aiTier: 'basic', reward: 780, isGymLeader: false,
+      party: [{ speciesId: 97, level: 37 }], // Hypno
+      defeatDialog: ['My mind control failed!'] },
+    { id: 'saffron_gym_3', name: 'Marcel', class: 'Channeler', spriteId: 'channeler',
+      aiTier: 'basic', reward: 800, isGymLeader: false,
+      party: [{ speciesId: 124, level: 38 }], // Jynx
+      defeatDialog: ['The spirits are upset!'] },
+  ],
+  cinnabar_gym: [
+    { id: 'cinnabar_gym_1', name: 'Erik', class: 'Super Nerd', spriteId: 'nerd',
+      aiTier: 'basic', reward: 840, isGymLeader: false,
+      party: [{ speciesId: 126, level: 40 }, { speciesId: 77, level: 40 }], // Magmar, Ponyta
+      defeatDialog: ['Too hot to handle!'] },
+    { id: 'cinnabar_gym_2', name: 'Avery', class: 'Burglar', spriteId: 'burglar',
+      aiTier: 'basic', reward: 860, isGymLeader: false,
+      party: [{ speciesId: 38, level: 41 }], // Ninetales
+      defeatDialog: ['I got burned!'] },
+  ],
+  viridian_gym: [
+    { id: 'viridian_gym_1', name: 'Yuji', class: 'Black Belt', spriteId: 'blackbelt',
+      aiTier: 'basic', reward: 920, isGymLeader: false,
+      party: [{ speciesId: 111, level: 42 }, { speciesId: 105, level: 42 }], // Rhyhorn, Marowak
+      defeatDialog: ['Your technique is flawless!'] },
+    { id: 'viridian_gym_2', name: 'Warren', class: 'Tamer', spriteId: 'tamer',
+      aiTier: 'basic', reward: 940, isGymLeader: false,
+      party: [{ speciesId: 28, level: 43 }, { speciesId: 51, level: 43 }], // Sandslash, Dugtrio
+      defeatDialog: ['The ground shook under me!'] },
+    { id: 'viridian_gym_3', name: 'Cole', class: 'Cooltrainer', spriteId: 'cooltrainer',
+      aiTier: 'smart', reward: 960, isGymLeader: false,
+      party: [{ speciesId: 34, level: 44 }], // Nidoking
+      defeatDialog: ['GIOVANNI will avenge me!'] },
+  ],
+};
+
 // --- Route trainers (sampling) ---
 
 export const routeTrainers: Record<string, TrainerDef[]> = {

@@ -4,6 +4,7 @@
 
 import type { Pokemon, SpeciesData, EvolutionCondition } from './types';
 import { getSpeciesData, recalculateStats } from './battle-engine';
+import { isDaytime, isNighttime } from './time-system';
 
 // --- Species data lookup for evolution chains ---
 
@@ -58,6 +59,18 @@ export function checkEvolution(pokemon: Pokemon, trigger: 'level_up' | 'item' | 
 
       case 'happiness':
         if (trigger === 'level_up' && pokemon.friendship >= 220) {
+          return { canEvolve: true, evolvesTo: evo.speciesId, condition: cond };
+        }
+        break;
+
+      case 'happiness_day':
+        if (trigger === 'level_up' && pokemon.friendship >= 220 && isDaytime()) {
+          return { canEvolve: true, evolvesTo: evo.speciesId, condition: cond };
+        }
+        break;
+
+      case 'happiness_night':
+        if (trigger === 'level_up' && pokemon.friendship >= 220 && isNighttime()) {
           return { canEvolve: true, evolvesTo: evo.speciesId, condition: cond };
         }
         break;

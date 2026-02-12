@@ -36,7 +36,7 @@ export type GameVersion = 'red-blue' | 'gold-silver' | 'ruby-sapphire';
 
 // --- Tile/Map types ---
 
-export type TileType = 'walkable' | 'blocked' | 'surfable' | 'tall_grass' | 'ledge_down' | 'ledge_left' | 'ledge_right';
+export type TileType = 'walkable' | 'blocked' | 'surfable' | 'tall_grass' | 'ledge_down' | 'ledge_left' | 'ledge_right' | 'cuttable_tree' | 'boulder';
 
 export interface TilesetDef {
   id: string;
@@ -67,6 +67,7 @@ export interface WildEncounterEntry {
   minLevel: number;
   maxLevel: number;
   weight: number;           // encounter chance weight
+  timeOfDay?: 'morning' | 'day' | 'night';  // Gen 2: restrict to specific time
 }
 
 export interface WildEncounterZone {
@@ -92,6 +93,9 @@ export interface NPCDef {
   isTrainer: boolean;
   trainerData?: NPCTrainerData | TrainerDef;
   lineOfSight?: number;     // tiles of LOS for trainers
+  heals?: boolean;          // Nurse NPCs in Pokemon Centers
+  shopItems?: string[];     // Mart clerk NPCs with item inventory
+  isPC?: boolean;           // PC terminal in Pokemon Centers
 }
 
 export interface GameMap {
@@ -130,7 +134,7 @@ export interface LearnsetEntry {
 }
 
 export interface EvolutionCondition {
-  type: 'level' | 'item' | 'trade' | 'happiness';
+  type: 'level' | 'item' | 'trade' | 'happiness' | 'happiness_day' | 'happiness_night';
   level?: number;
   item?: string;
 }
@@ -147,6 +151,8 @@ export interface SpeciesData {
   evolvesTo?: { speciesId: number; condition: EvolutionCondition }[];
   spriteId: string;
   generation: 1 | 2 | 3;
+  evYield?: Partial<BaseStats>;  // EV yield when defeated (e.g., { attack: 1 })
+  abilities?: string[];           // Gen 3: possible abilities (e.g., ['blaze'])
 }
 
 export interface PokemonStats {
@@ -173,6 +179,7 @@ export interface Pokemon {
   status: StatusCondition;
   friendship: number;
   isShiny: boolean;
+  ability?: string;             // Gen 3: assigned ability
   originalTrainer: string;
   caughtBall: string;
 }
@@ -196,6 +203,10 @@ export interface MoveData {
   priority: number;
   effect?: MoveEffect;
   description: string;
+  critStage?: number;        // extra crit stages (Slash = 1, etc.)
+  isMultiTurn?: boolean;     // Solar Beam, Dig, Fly: charge then execute
+  chargeMessage?: string;    // e.g. "took in sunlight!", "dug underground!", "flew up high!"
+  semiInvulnerable?: 'underground' | 'flying';  // during charge turn
 }
 
 export interface MoveEffect {
@@ -209,6 +220,8 @@ export interface MoveEffect {
   drain?: number;           // fraction of damage drained
   recoil?: number;          // fraction of damage as recoil
   curesStatus?: boolean;    // for items: also cures status conditions
+  setWeather?: Weather;     // weather-setting moves (Rain Dance, Sunny Day, etc.)
+  protect?: boolean;        // Protect/Detect: blocks all moves this turn
 }
 
 // --- Item data ---
@@ -273,9 +286,12 @@ export interface BattlePokemon {
   evasionStage: number;    // -6 to +6
   volatileStatuses: Set<VolatileStatus>;
   isProtected: boolean;
+  protectCount: number;     // consecutive Protect uses (halves success each time)
   sleepTurns: number;
   confusionTurns: number;
   toxicCounter: number;
+  chargingMove: { moveId: string; turnsLeft: number } | null;
+  semiInvulnerable: 'underground' | 'flying' | null;
 }
 
 export interface BattleState {

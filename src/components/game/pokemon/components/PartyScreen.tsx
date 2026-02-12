@@ -3,7 +3,7 @@
 // ============================================================================
 
 import type { Pokemon } from '../engine/types';
-import { COLORS } from '../engine/constants';
+import { COLORS, getNatureInfo } from '../engine/constants';
 
 interface PartyScreenProps {
   party: Pokemon[];
@@ -45,10 +45,22 @@ export default function PartyScreen({ party, onSelect, onBack, mode }: PartyScre
                 <span className="font-mono text-white text-xs font-bold truncate">
                   {poke.nickname ?? `#${poke.speciesId}`}
                 </span>
-                <span className="font-mono text-white/70 text-[10px]">
-                  Lv{poke.level}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-white/50 text-[8px]">
+                    {getNatureInfo(poke.nature).label}
+                  </span>
+                  <span className="font-mono text-white/70 text-[10px]">
+                    Lv{poke.level}
+                  </span>
+                </div>
               </div>
+
+              {/* Ability */}
+              {poke.ability && (
+                <span className="font-mono text-[8px] text-yellow-300/60">
+                  {poke.ability.charAt(0).toUpperCase() + poke.ability.slice(1).replace(/_/g, ' ')}
+                </span>
+              )}
 
               {/* HP bar */}
               <div className="flex items-center gap-2 mt-1">

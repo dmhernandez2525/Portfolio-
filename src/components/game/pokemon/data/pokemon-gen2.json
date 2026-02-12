@@ -60,6 +60,12 @@
         "level": 26,
         "moveId": "solar_beam"
       }
+    ],
+    "evYield": {
+      "defense": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -127,6 +133,13 @@
         "level": 40,
         "moveId": "solar_beam"
       }
+    ],
+    "evYield": {
+      "defense": 1,
+      "spDefense": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -190,6 +203,13 @@
         "level": 54,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "defense": 2,
+      "spDefense": 1
+    },
+    "abilities": [
+      "overgrow"
     ]
   },
   {
@@ -253,6 +273,12 @@
         "level": 31,
         "moveId": "fire_spin"
       }
+    ],
+    "evYield": {
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -320,6 +346,13 @@
         "level": 42,
         "moveId": "overheat"
       }
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -383,6 +416,13 @@
         "level": 55,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "spAttack": 2,
+      "speed": 1
+    },
+    "abilities": [
+      "blaze"
     ]
   },
   {
@@ -446,6 +486,12 @@
         "level": 27,
         "moveId": "crunch"
       }
+    ],
+    "evYield": {
+      "attack": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -513,6 +559,13 @@
         "level": 38,
         "moveId": "hydro_pump"
       }
+    ],
+    "evYield": {
+      "attack": 1,
+      "defense": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -576,6 +629,13 @@
         "level": 52,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "attack": 2,
+      "defense": 1
+    },
+    "abilities": [
+      "torrent"
     ]
   },
   {
@@ -635,7 +695,10 @@
         "level": 22,
         "moveId": "rest"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 162,
@@ -694,7 +757,11 @@
         "level": 42,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1,
+      "hp": 1
+    }
   },
   {
     "id": 163,
@@ -754,7 +821,10 @@
         "level": 21,
         "moveId": "aerial_ace"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 164,
@@ -818,7 +888,11 @@
         "level": 47,
         "moveId": "dream_eater"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "spDefense": 1
+    }
   },
   {
     "id": 165,
@@ -878,7 +952,10 @@
         "level": 22,
         "moveId": "aerial_ace"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 166,
@@ -938,7 +1015,10 @@
         "level": 40,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 2
+    }
   },
   {
     "id": 167,
@@ -998,7 +1078,10 @@
         "level": 22,
         "moveId": "agility"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 168,
@@ -1058,7 +1141,10 @@
         "level": 44,
         "moveId": "x_scissor"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 169,
@@ -1122,6 +1208,12 @@
         "level": 50,
         "moveId": "brave_bird"
       }
+    ],
+    "evYield": {
+      "speed": 1
+    },
+    "abilities": [
+      "inner_focus"
     ]
   },
   {
@@ -1186,7 +1278,10 @@
         "level": 27,
         "moveId": "thunderbolt"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 171,
@@ -1250,7 +1345,10 @@
         "level": 45,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2
+    }
   },
   {
     "id": 172,
@@ -1304,7 +1402,10 @@
         "level": 18,
         "moveId": "spark"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 173,
@@ -1358,7 +1459,10 @@
         "level": 17,
         "moveId": "light_screen"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 174,
@@ -1408,7 +1512,10 @@
         "level": 13,
         "moveId": "body_slam"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 175,
@@ -1462,7 +1569,10 @@
         "level": 17,
         "moveId": "ancient_power"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 176,
@@ -1526,7 +1636,10 @@
         "level": 47,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 2
+    }
   },
   {
     "id": 177,
@@ -1586,7 +1699,10 @@
         "level": 25,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 178,
@@ -1650,7 +1766,11 @@
         "level": 50,
         "moveId": "dream_eater"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "speed": 1
+    }
   },
   {
     "id": 179,
@@ -1709,7 +1829,10 @@
         "level": 25,
         "moveId": "thunderbolt"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 180,
@@ -1776,7 +1899,11 @@
         "level": 39,
         "moveId": "thunder"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1,
+      "hp": 1
+    }
   },
   {
     "id": 181,
@@ -1839,7 +1966,10 @@
         "level": 51,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 3
+    }
   },
   {
     "id": 182,
@@ -1898,7 +2028,10 @@
         "level": 50,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 183,
@@ -1957,7 +2090,10 @@
         "level": 20,
         "moveId": "aqua_tail"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2
+    }
   },
   {
     "id": 184,
@@ -2016,7 +2152,10 @@
         "level": 40,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 3
+    }
   },
   {
     "id": 185,
@@ -2075,7 +2214,10 @@
         "level": 43,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 186,
@@ -2134,7 +2276,10 @@
         "level": 55,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 187,
@@ -2194,7 +2339,10 @@
         "level": 18,
         "moveId": "leech_seed"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 188,
@@ -2262,7 +2410,10 @@
         "level": 33,
         "moveId": "aerial_ace"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 2
+    }
   },
   {
     "id": 189,
@@ -2326,7 +2477,10 @@
         "level": 44,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 3
+    }
   },
   {
     "id": 190,
@@ -2381,7 +2535,10 @@
         "level": 32,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 191,
@@ -2407,7 +2564,7 @@
         "speciesId": 192,
         "condition": {
           "type": "item",
-          "item": "sun_stone"
+          "item": "sun-stone"
         }
       }
     ],
@@ -2440,7 +2597,10 @@
         "level": 21,
         "moveId": "sunny_day"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 192,
@@ -2499,7 +2659,10 @@
         "level": 46,
         "moveId": "solar_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 2
+    }
   },
   {
     "id": 193,
@@ -2555,7 +2718,10 @@
         "level": 33,
         "moveId": "agility"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 194,
@@ -2615,7 +2781,10 @@
         "level": 21,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 195,
@@ -2675,7 +2844,11 @@
         "level": 42,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "attack": 1
+    }
   },
   {
     "id": 196,
@@ -2734,6 +2907,12 @@
         "level": 43,
         "moveId": "shadow_ball"
       }
+    ],
+    "evYield": {
+      "spAttack": 1
+    },
+    "abilities": [
+      "synchronize"
     ]
   },
   {
@@ -2793,6 +2972,12 @@
         "level": 43,
         "moveId": "nasty_plot"
       }
+    ],
+    "evYield": {
+      "spDefense": 1
+    },
+    "abilities": [
+      "synchronize"
     ]
   },
   {
@@ -2849,7 +3034,10 @@
         "level": 33,
         "moveId": "shadow_ball"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 199,
@@ -2913,7 +3101,10 @@
         "level": 50,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 200,
@@ -2972,7 +3163,10 @@
         "level": 32,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 201,
@@ -3007,7 +3201,10 @@
         "level": 10,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 202,
@@ -3050,7 +3247,10 @@
         "level": 25,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 2
+    }
   },
   {
     "id": 203,
@@ -3110,7 +3310,10 @@
         "level": 32,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 204,
@@ -3169,7 +3372,10 @@
         "level": 23,
         "moveId": "explosion"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 205,
@@ -3233,7 +3439,10 @@
         "level": 48,
         "moveId": "x_scissor"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 206,
@@ -3292,7 +3501,10 @@
         "level": 30,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 207,
@@ -3352,7 +3564,10 @@
         "level": 33,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 208,
@@ -3420,7 +3635,10 @@
         "level": 56,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 209,
@@ -3479,7 +3697,10 @@
         "level": 21,
         "moveId": "body_slam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 210,
@@ -3542,7 +3763,10 @@
         "level": 49,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 211,
@@ -3606,7 +3830,10 @@
         "level": 33,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 212,
@@ -3674,6 +3901,12 @@
         "level": 49,
         "moveId": "iron_tail"
       }
+    ],
+    "evYield": {
+      "attack": 1
+    },
+    "abilities": [
+      "swarm"
     ]
   },
   {
@@ -3734,7 +3967,10 @@
         "level": 29,
         "moveId": "stone_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 214,
@@ -3798,6 +4034,12 @@
         "level": 43,
         "moveId": "swords_dance"
       }
+    ],
+    "evYield": {
+      "attack": 1
+    },
+    "abilities": [
+      "swarm"
     ]
   },
   {
@@ -3862,7 +4104,10 @@
         "level": 38,
         "moveId": "ice_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 216,
@@ -3925,7 +4170,10 @@
         "level": 27,
         "moveId": "body_slam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 217,
@@ -3988,7 +4236,10 @@
         "level": 50,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 2
+    }
   },
   {
     "id": 218,
@@ -4051,7 +4302,10 @@
         "level": 26,
         "moveId": "fire_blast"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 219,
@@ -4119,7 +4373,10 @@
         "level": 56,
         "moveId": "overheat"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 2
+    }
   },
   {
     "id": 220,
@@ -4183,7 +4440,10 @@
         "level": 28,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 221,
@@ -4247,7 +4507,11 @@
         "level": 48,
         "moveId": "stone_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1,
+      "attack": 1
+    }
   },
   {
     "id": 222,
@@ -4311,7 +4575,10 @@
         "level": 33,
         "moveId": "recover"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 223,
@@ -4374,7 +4641,10 @@
         "level": 25,
         "moveId": "hydro_pump"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 224,
@@ -4437,7 +4707,11 @@
         "level": 44,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "spAttack": 1
+    }
   },
   {
     "id": 225,
@@ -4493,7 +4767,10 @@
         "level": 30,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 226,
@@ -4557,7 +4834,10 @@
         "level": 55,
         "moveId": "fly"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 1
+    }
   },
   {
     "id": 227,
@@ -4621,6 +4901,12 @@
         "level": 42,
         "moveId": "brave_bird"
       }
+    ],
+    "evYield": {
+      "defense": 1
+    },
+    "abilities": [
+      "keen_eye"
     ]
   },
   {
@@ -4685,7 +4971,10 @@
         "level": 25,
         "moveId": "flamethrower"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 229,
@@ -4753,6 +5042,12 @@
         "level": 50,
         "moveId": "nasty_plot"
       }
+    ],
+    "evYield": {
+      "spAttack": 2
+    },
+    "abilities": [
+      "early_bird"
     ]
   },
   {
@@ -4821,7 +5116,10 @@
         "level": 57,
         "moveId": "outrage"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 231,
@@ -4884,7 +5182,10 @@
         "level": 25,
         "moveId": "earthquake"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 232,
@@ -4951,7 +5252,11 @@
         "level": 50,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1,
+      "defense": 1
+    }
   },
   {
     "id": 233,
@@ -5014,7 +5319,10 @@
         "level": 50,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 234,
@@ -5073,7 +5381,10 @@
         "level": 39,
         "moveId": "psychic"
       }
-    ]
+    ],
+    "evYield": {
+      "attack": 1
+    }
   },
   {
     "id": 235,
@@ -5120,7 +5431,10 @@
         "level": 41,
         "moveId": "substitute"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 236,
@@ -5189,7 +5503,10 @@
         "level": 17,
         "moveId": "seismic_toss"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 237,
@@ -5252,7 +5569,10 @@
         "level": 43,
         "moveId": "double_edge"
       }
-    ]
+    ],
+    "evYield": {
+      "spDefense": 2
+    }
   },
   {
     "id": 238,
@@ -5312,7 +5632,10 @@
         "level": 18,
         "moveId": "ice_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 239,
@@ -5371,7 +5694,10 @@
         "level": 21,
         "moveId": "thunderbolt"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 240,
@@ -5430,7 +5756,10 @@
         "level": 21,
         "moveId": "confuse_ray"
       }
-    ]
+    ],
+    "evYield": {
+      "speed": 1
+    }
   },
   {
     "id": 241,
@@ -5493,7 +5822,10 @@
         "level": 40,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 242,
@@ -5556,7 +5888,10 @@
         "level": 50,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 243,
@@ -5623,7 +5958,10 @@
         "level": 71,
         "moveId": "extreme_speed"
       }
-    ]
+    ],
+    "evYield": {
+      "spAttack": 1
+    }
   },
   {
     "id": 244,
@@ -5690,7 +6028,10 @@
         "level": 71,
         "moveId": "extreme_speed"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   },
   {
     "id": 245,
@@ -5757,7 +6098,10 @@
         "level": 71,
         "moveId": "blizzard"
       }
-    ]
+    ],
+    "evYield": {
+      "defense": 1
+    }
   },
   {
     "id": 246,
@@ -5821,6 +6165,12 @@
         "level": 28,
         "moveId": "rock_slide"
       }
+    ],
+    "evYield": {
+      "attack": 1
+    },
+    "abilities": [
+      "guts"
     ]
   },
   {
@@ -5889,6 +6239,12 @@
         "level": 44,
         "moveId": "stone_edge"
       }
+    ],
+    "evYield": {
+      "attack": 2
+    },
+    "abilities": [
+      "shed_skin"
     ]
   },
   {
@@ -5961,6 +6317,12 @@
         "level": 70,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "attack": 3
+    },
+    "abilities": [
+      "sand_stream"
     ]
   },
   {
@@ -6033,6 +6395,12 @@
         "level": 65,
         "moveId": "hyper_beam"
       }
+    ],
+    "evYield": {
+      "spDefense": 1
+    },
+    "abilities": [
+      "pressure"
     ]
   },
   {
@@ -6105,6 +6473,12 @@
         "level": 65,
         "moveId": "overheat"
       }
+    ],
+    "evYield": {
+      "spDefense": 1
+    },
+    "abilities": [
+      "pressure"
     ]
   },
   {
@@ -6173,6 +6547,9 @@
         "level": 73,
         "moveId": "hyper_beam"
       }
-    ]
+    ],
+    "evYield": {
+      "hp": 1
+    }
   }
 ]

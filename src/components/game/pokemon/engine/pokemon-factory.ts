@@ -71,6 +71,11 @@ export function createPokemon(species: SpeciesData, level: number): Pokemon {
 
   const exp = getExpForLevel(species.growthRate as GrowthRate, level);
 
+  // Assign ability from species' ability list (Gen 3)
+  const ability = species.abilities?.length
+    ? species.abilities[Math.floor(Math.random() * species.abilities.length)]
+    : undefined;
+
   return {
     uid: generateUid(),
     speciesId: species.id,
@@ -83,6 +88,7 @@ export function createPokemon(species: SpeciesData, level: number): Pokemon {
     stats,
     currentHp: stats.hp,
     moves,
+    ability,
     status: null,
     friendship: 70,
     isShiny: Math.random() < 1 / 8192,

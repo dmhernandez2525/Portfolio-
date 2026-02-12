@@ -11,7 +11,7 @@ import {
   violetCity, azaleaTown, goldenrodCity, ecruteakCity, olivineCity,
   cianwoodCity, mahoganyTown, blackthornCity, lakeDomain,
   cherrygroveCity,
-  sproutTower, unionCave, ilexForest, icePath, mtSilver,
+  sproutTower, unionCave, ilexForest, icePath, mtSilver, route28,
   unionCaveEntrance, unionCaveExit, icePathEntrance, mtSilverSummit,
   johtoInteriors,
 } from './johto-maps';
@@ -49,6 +49,8 @@ export const johtoMaps: Record<string, GameMap> = {
   route_44: route44,
   route_45: route45,
   route_46: route46,
+
+  route_28: route28,
 
   // Dungeons
   sprout_tower: sproutTower,

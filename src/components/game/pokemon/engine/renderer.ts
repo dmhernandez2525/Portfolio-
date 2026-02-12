@@ -63,6 +63,21 @@ function renderMapName(ctx: CanvasRenderingContext2D, _name: string, _frame: num
   ctx.globalAlpha = 1;
 }
 
+// --- Night tint overlay (Gen 2 only) ---
+
+export function renderNightTint(ctx: CanvasRenderingContext2D, timeOfDay: 'morning' | 'day' | 'night') {
+  if (timeOfDay === 'day') return;
+  if (timeOfDay === 'morning') {
+    // Subtle warm tint for morning
+    ctx.fillStyle = 'rgba(255, 200, 100, 0.08)';
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    return;
+  }
+  // Night: blue overlay
+  ctx.fillStyle = 'rgba(20, 30, 80, 0.35)';
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
 // --- Battle rendering (procedural, no sprites needed) ---
 
 export function renderBattle(

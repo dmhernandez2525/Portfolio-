@@ -2,7 +2,7 @@
 // Johto Maps — Routes, Cities, Dungeons, and Interiors
 // ============================================================================
 
-import type { GameMap } from '../../../engine/types';
+import type { GameMap, Direction, NPCDef } from '../../../engine/types';
 
 const T = 5, G = 1, P = 2, TG = 3, W = 4, B = 6, R = 7, D = 8;
 const S = 16, FL = 14;
@@ -100,6 +100,8 @@ export const route29 = makeRoute('route_29', 'ROUTE 29', 20, 12,
     { speciesId: 161, minLevel: 2, maxLevel: 5, weight: 35 },
     { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 15 },
     { speciesId: 19, minLevel: 3, maxLevel: 4, weight: 15 },
+    { speciesId: 163, minLevel: 2, maxLevel: 5, weight: 30, timeOfDay: 'night' },
+    { speciesId: 167, minLevel: 2, maxLevel: 5, weight: 20, timeOfDay: 'night' },
   ]}],
 );
 
@@ -110,6 +112,8 @@ export const route30 = makeRoute('route_30', 'ROUTE 30', 14, 20,
     { speciesId: 10, minLevel: 3, maxLevel: 5, weight: 20 },
     { speciesId: 60, minLevel: 4, maxLevel: 5, weight: 15 },
     { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 35 },
+    { speciesId: 163, minLevel: 3, maxLevel: 5, weight: 25, timeOfDay: 'night' },
+    { speciesId: 165, minLevel: 3, maxLevel: 5, weight: 25, timeOfDay: 'morning' },
   ]}],
 );
 
@@ -120,6 +124,8 @@ export const route31 = makeRoute('route_31', 'ROUTE 31', 20, 10,
     { speciesId: 69, minLevel: 4, maxLevel: 6, weight: 25 },
     { speciesId: 187, minLevel: 5, maxLevel: 6, weight: 25 },
     { speciesId: 60, minLevel: 4, maxLevel: 6, weight: 20 },
+    { speciesId: 163, minLevel: 4, maxLevel: 6, weight: 25, timeOfDay: 'night' },
+    { speciesId: 165, minLevel: 4, maxLevel: 6, weight: 25, timeOfDay: 'morning' },
   ]}],
 );
 
@@ -153,6 +159,7 @@ export const route34 = makeRoute('route_34', 'ROUTE 34', 14, 18,
     { speciesId: 183, minLevel: 10, maxLevel: 12, weight: 25 },
     { speciesId: 132, minLevel: 10, maxLevel: 10, weight: 10 },
     { speciesId: 16, minLevel: 10, maxLevel: 12, weight: 10 },
+    { speciesId: 163, minLevel: 10, maxLevel: 12, weight: 20, timeOfDay: 'night' },
   ]}],
 );
 
@@ -183,9 +190,10 @@ export const route37 = makeRoute('route_37', 'ROUTE 37', 14, 14,
   [{ type: 'grass', entries: [
     { speciesId: 37, minLevel: 14, maxLevel: 16, weight: 20 },
     { speciesId: 58, minLevel: 14, maxLevel: 16, weight: 20 },
-    { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20 },
-    { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'night' },
+    { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'morning' },
     { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20 },
+    { speciesId: 163, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'night' },
   ]}],
 );
 
@@ -467,6 +475,23 @@ mtSilver.warps = [
   { x: 10, y: 22, targetMap: 'route_28', targetX: 7, targetY: 1 },
 ];
 
+// Route 28: Connects Indigo Plateau area to Mt. Silver
+export const route28 = makeRoute('route_28', 'ROUTE 28', 16, 14,
+  [{ direction: 'down', targetMap: 'route_27', offset: 0 }],
+  [{ type: 'grass', entries: [
+    { speciesId: 101, minLevel: 39, maxLevel: 42, weight: 15 }, // Electrode
+    { speciesId: 42, minLevel: 39, maxLevel: 42, weight: 15 },  // Golbat
+    { speciesId: 178, minLevel: 39, maxLevel: 42, weight: 15 }, // Xatu
+    { speciesId: 47, minLevel: 39, maxLevel: 42, weight: 15 },  // Parasect
+    { speciesId: 64, minLevel: 39, maxLevel: 42, weight: 15 },  // Kadabra
+    { speciesId: 195, minLevel: 39, maxLevel: 42, weight: 15 }, // Quagsire
+    { speciesId: 225, minLevel: 39, maxLevel: 42, weight: 10 }, // Delibird
+  ]}],
+);
+route28.warps = [
+  { x: 7, y: 0, targetMap: 'mt_silver', targetX: 10, targetY: 23 },
+];
+
 // --- Transitional maps ---
 
 export const unionCaveEntrance = makeInterior('union_cave_entrance', 'UNION CAVE ENTRANCE', 10, 8, 'route_32', 7, 22);
@@ -499,7 +524,16 @@ function makePokecenter(id: string, exitMap: string, exitX: number, exitY: numbe
   return makeInterior(id, 'POKeMON CENTER', 10, 8, exitMap, exitX, exitY, [
     { id: `${id}_nurse`, x: 5, y: 1, spriteId: 'nurse', direction: 'down', movement: 'static',
       dialog: ['Welcome to our POKeMON CENTER!', 'We heal your POKeMON to full health!', '...Your POKeMON are fully healed!'],
-      isTrainer: false },
+      isTrainer: false, heals: true },
+    { id: `${id}_pc`, x: 1, y: 1, spriteId: 'pc', direction: 'down', movement: 'static',
+      dialog: ['Accessed the PC!'], isTrainer: false, isPC: true },
+  ]);
+}
+
+function makeMart(id: string, exitMap: string, exitX: number, exitY: number, shopItems: string[]): GameMap {
+  return makeInterior(id, 'POKeMON MART', 8, 8, exitMap, exitX, exitY, [
+    { id: `${id}_clerk`, x: 1, y: 2, spriteId: 'clerk', direction: 'right', movement: 'static',
+      dialog: ['Welcome! How may I help you?'], isTrainer: false, shopItems },
   ]);
 }
 
@@ -509,6 +543,35 @@ function makeGym(id: string, name: string, exitMap: string, exitX: number, exitY
     { id: leaderId, x: 6, y: 2, spriteId: leaderId, direction: 'down', movement: 'static',
       dialog: leaderDialog, isTrainer: true, trainerData: { id: leaderId, party: [] } },
   ]);
+}
+
+function makeE4Chamber(id: string, name: string, trainerId: string, dialog: string[],
+  exitMap: string, exitX: number, exitY: number): GameMap {
+  return makeInterior(id, name, 10, 10, exitMap, exitX, exitY, [
+    { id: trainerId, x: 5, y: 3, spriteId: trainerId, direction: 'down',
+      movement: 'static', dialog, isTrainer: true,
+      trainerData: { id: trainerId, party: [] }, lineOfSight: 4 },
+  ]);
+}
+
+function makeE4Chambers(region: string,
+  e4: { id: string; dialog: string[] }[],
+  champ: { id: string; dialog: string[] },
+): Record<string, GameMap> {
+  const maps: Record<string, GameMap> = {};
+  const prefix = region;
+  for (let i = 0; i < e4.length; i++) {
+    const prevMap = i === 0 ? `indigo_plateau_${prefix}` : `e4_room_${i}_${prefix}`;
+    const mapId = `e4_room_${i + 1}_${prefix}`;
+    const nextMap = i < e4.length - 1 ? `e4_room_${i + 2}_${prefix}` : `champion_room_${prefix}`;
+    const m = makeE4Chamber(mapId, e4[i].id.toUpperCase(), e4[i].id, e4[i].dialog, prevMap, 5, 1);
+    m.warps.push({ x: 5, y: 0, targetMap: nextMap, targetX: 5, targetY: 9 });
+    maps[mapId] = m;
+  }
+  const champMap = makeE4Chamber(`champion_room_${prefix}`, 'CHAMPION', champ.id, champ.dialog,
+    `e4_room_${e4.length}_${prefix}`, 5, 1);
+  maps[`champion_room_${prefix}`] = champMap;
+  return maps;
 }
 
 export const johtoInteriors: Record<string, GameMap> = {
@@ -532,6 +595,15 @@ export const johtoInteriors: Record<string, GameMap> = {
   cianwood_pokecenter: makePokecenter('cianwood_pokecenter', 'cianwood_city', 7, 8),
   mahogany_pokecenter: makePokecenter('mahogany_pokecenter', 'mahogany_town', 6, 7),
   blackthorn_pokecenter: makePokecenter('blackthorn_pokecenter', 'blackthorn_city', 8, 9),
+  // PokeMarts
+  cherrygrove_mart: makeMart('cherrygrove_mart', 'cherrygrove_city', 15, 7,
+    ['poke-ball', 'potion', 'antidote', 'parlyz-heal']),
+  violet_mart: makeMart('violet_mart', 'violet_city', 14, 9,
+    ['poke-ball', 'potion', 'antidote', 'parlyz-heal', 'awakening', 'escape-rope']),
+  azalea_mart: makeMart('azalea_mart', 'azalea_town', 13, 8,
+    ['poke-ball', 'potion', 'antidote', 'parlyz-heal', 'repel', 'escape-rope']),
+  goldenrod_mart: makeMart('goldenrod_mart', 'goldenrod_city', 16, 10,
+    ['poke-ball', 'great-ball', 'potion', 'super-potion', 'antidote', 'parlyz-heal', 'awakening', 'repel', 'escape-rope', 'revive']),
   // Gyms
   violet_gym: makeGym('violet_gym', 'VIOLET GYM', 'violet_city', 12, 9, 'falkner',
     ['I\u0027m FALKNER, the VIOLET CITY', 'GYM LEADER!', 'People say you can\u0027t win against', 'FLYING type Pokemon with just', 'normal POKeMON. I\u0027ll show them!']),
@@ -549,4 +621,80 @@ export const johtoInteriors: Record<string, GameMap> = {
     ['I\u0027ve been training POKeMON', 'since before you were born.', 'Show me what young trainers', 'are made of!']),
   blackthorn_gym: makeGym('blackthorn_gym', 'BLACKTHORN GYM', 'blackthorn_city', 12, 9, 'clair',
     ['I am CLAIR.', 'The world\u0027s best DRAGON master.', 'I can\u0027t be defeated!']),
+  // Pokemon League entrance
+  indigo_plateau_johto: (() => {
+    const m = makeInterior('indigo_plateau_johto', 'INDIGO PLATEAU', 12, 10, 'route_26', 6, 8, [
+      { id: 'indigo_guard_gs', x: 6, y: 3, spriteId: 'guard', direction: 'down', movement: 'static',
+        dialog: ['Welcome to the POKeMON LEAGUE!', 'The ELITE FOUR await!'], isTrainer: false },
+    ]);
+    m.warps.push({ x: 6, y: 0, targetMap: 'e4_room_1_johto', targetX: 5, targetY: 9 });
+    return m;
+  })(),
+  // Elite Four Chambers
+  ...makeE4Chambers('johto',
+    [
+      { id: 'will', dialog: ['I am WILL of the ELITE FOUR!', 'I have trained all over the world!', 'Let me demonstrate my power!'] },
+      { id: 'koga_e4', dialog: ['I am KOGA of the ELITE FOUR!', 'My toxic techniques will', 'leave you speechless!'] },
+      { id: 'bruno_e4', dialog: ['I am BRUNO of the ELITE FOUR!', 'We will grind you down', 'with our superior power!'] },
+      { id: 'karen', dialog: ['I am KAREN of the ELITE FOUR!', 'Strong or weak POKeMON...', 'it is the trainer that matters!'] },
+    ],
+    { id: 'lance_champion', dialog: ['I am LANCE, the CHAMPION!', 'I have been waiting for a truly', 'powerful challenger!'] },
+  ),
 };
+
+// --- Gym Trainers ---
+function gymTrainer(id: string, x: number, y: number, dir: Direction, dialog: string[], los: number): NPCDef {
+  return {
+    id, x, y, spriteId: id, direction: dir,
+    movement: 'static', dialog,
+    isTrainer: true, trainerData: { id, party: [] },
+    lineOfSight: los,
+  };
+}
+
+// Violet Gym: 1 trainer
+johtoInteriors.violet_gym.npcs.push(
+  gymTrainer('violet_gym_1', 4, 6, 'right', ['My FLYING POKeMON will', 'blow you away!'], 3),
+);
+
+// Azalea Gym: 2 trainers
+johtoInteriors.azalea_gym.npcs.push(
+  gymTrainer('azalea_gym_1', 3, 7, 'right', ['BUG POKeMON are', 'underestimated!'], 3),
+  gymTrainer('azalea_gym_2', 9, 5, 'left', ['You should study BUG POKeMON!'], 3),
+);
+
+// Goldenrod Gym: 2 trainers
+johtoInteriors.goldenrod_gym.npcs.push(
+  gymTrainer('goldenrod_gym_1', 4, 7, 'right', ['WHITNEY is super strong!', 'Her MILTANK is scary!'], 3),
+  gymTrainer('goldenrod_gym_2', 8, 5, 'left', ['Normal types are tougher', 'than you think!'], 3),
+);
+
+// Ecruteak Gym: 2 trainers
+johtoInteriors.ecruteak_gym.npcs.push(
+  gymTrainer('ecruteak_gym_1', 3, 7, 'right', ['GHOST POKeMON cannot be', 'hit by NORMAL moves!'], 3),
+  gymTrainer('ecruteak_gym_2', 9, 5, 'left', ['MORTY can see the unseen!'], 3),
+);
+
+// Olivine Gym: 1 trainer
+johtoInteriors.olivine_gym.npcs.push(
+  gymTrainer('olivine_gym_1', 4, 6, 'right', ['JASMINE is very shy...', 'but strong!'], 3),
+);
+
+// Cianwood Gym: 2 trainers
+johtoInteriors.cianwood_gym.npcs.push(
+  gymTrainer('cianwood_gym_1', 3, 7, 'right', ['CHUCK trains under waterfalls!', 'His FIGHTING POKeMON are tough!'], 3),
+  gymTrainer('cianwood_gym_2', 9, 5, 'left', ['Can you handle the power?'], 3),
+);
+
+// Mahogany Gym: 2 trainers
+johtoInteriors.mahogany_gym.npcs.push(
+  gymTrainer('mahogany_gym_1', 4, 7, 'right', ['The ice is slippery here!', 'Be careful!'], 3),
+  gymTrainer('mahogany_gym_2', 8, 4, 'down', ['PRYCE has decades of', 'experience!'], 2),
+);
+
+// Blackthorn Gym: 3 trainers
+johtoInteriors.blackthorn_gym.npcs.push(
+  gymTrainer('blackthorn_gym_1', 3, 8, 'right', ['DRAGON POKeMON are the', 'strongest type!'], 3),
+  gymTrainer('blackthorn_gym_2', 9, 6, 'left', ['CLAIR is the strongest', 'GYM LEADER in JOHTO!'], 3),
+  gymTrainer('blackthorn_gym_3', 6, 4, 'down', ['Can you tame DRAGONS?'], 2),
+);
