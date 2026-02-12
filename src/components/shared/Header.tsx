@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightbulb, Brain, BookOpen, Share2, Gamepad2, ChevronDown, Download } from "lucide-react"
+import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightbulb, Brain, BookOpen, Share2, Gamepad2, ChevronDown, Download, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utils"
@@ -47,6 +47,7 @@ const navStructure = {
       { name: "Skills", path: "/#skills", icon: Wrench },
       { name: "Experience", path: "/#experience", icon: Briefcase },
       { name: "Inventions", path: "/inventions", icon: Lightbulb },
+      { name: "AI Development", path: "/ai-development", icon: Bot },
     ]
   }
 }
@@ -70,6 +71,7 @@ const allNavItems = [
   { name: "Social", path: "/social", icon: Share2 },
   { name: "Philosophy", path: "/philosophy", icon: Brain },
   { name: "Inventions", path: "/inventions", icon: Lightbulb },
+  { name: "AI Development", path: "/ai-development", icon: Bot },
   { name: "Contact", path: "/#contact", icon: Mail },
 ]
 
