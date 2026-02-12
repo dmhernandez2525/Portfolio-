@@ -17,9 +17,7 @@ import type {
   PokemonStats,
   PokemonMove,
   MoveData,
-  BattlePokemon,
   BattleState,
-  StatusCondition,
   PokemonType,
 } from '../types';
 

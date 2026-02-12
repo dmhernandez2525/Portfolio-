@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { GameSave, GameVersion } from '../types';
+import type { GameSave } from '../types';
 import {
   saveGame,
   loadGame,

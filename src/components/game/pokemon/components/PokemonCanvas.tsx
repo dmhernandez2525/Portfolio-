@@ -10,8 +10,8 @@ import type {
 } from '../engine/types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, SCALED_TILE, PC_BOX_COUNT, PC_BOX_SIZE } from '../engine/constants';
 import { createCamera, updateCamera, setCameraTarget } from '../engine/camera';
-import { renderOverworld, showMapName, renderNightTint, renderBattleTransition, renderWarpFade, resetHpAnimation } from '../engine/renderer';
-import { playBGM, stopBGM, playSFX, mapMusicToTrack, getTrackForBattle } from '../engine/audio-manager';
+import { renderOverworld, showMapName, renderNightTint, resetHpAnimation } from '../engine/renderer';
+import { playBGM, playSFX, mapMusicToTrack, getTrackForBattle } from '../engine/audio-manager';
 import { getTimeOfDay } from '../engine/time-system';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { useInput } from '../hooks/useInput';
@@ -139,9 +139,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [activeMenu, setActiveMenu] = useState<ActiveMenu>('none');
   const [screen, setScreen] = useState<'overworld' | 'battle' | 'starter_select'>('overworld');
-  const [bagVersion, setBagVersion] = useState(0);
-  const battleTransitionRef = useRef<number>(0); // 0 = none, 0..1 = animating
-  const warpFadeRef = useRef<number>(0); // 0 = none, 0..1 = animating
+  const [, setBagVersion] = useState(0);
 
   const currentMapRef = useRef<GameMap | null>(null);
   const partyRef = useRef<Pokemon[]>([]);
@@ -381,15 +379,6 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   }, [overworld, checkMapEvents]);
 
   loadMapRef.current = loadMap;
-
-  const flyTo = useCallback((mapId: string) => {
-    const map = resolveMap(mapId);
-    if (!map) return;
-    const centerX = Math.floor(map.width / 2);
-    const centerY = Math.floor(map.height / 2);
-    loadMap(mapId, centerX, centerY);
-    setScreen('overworld');
-  }, [loadMap]);
 
   // --- Initialization ---
   useEffect(() => {
