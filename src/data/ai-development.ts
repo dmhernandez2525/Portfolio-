@@ -1106,6 +1106,295 @@ export const additionalFindings = {
 }
 
 // ============================================
+// TESTING INFRASTRUCTURE
+// ============================================
+
+export interface TestingStats {
+  metric: string
+  value: string
+}
+
+export const testingInfraStats: TestingStats[] = [
+  { metric: "Total test files", value: "2,918" },
+  { metric: "Total test lines of code", value: "559,535" },
+  { metric: "Average lines per test file", value: "192" },
+  { metric: "Projects with test suites", value: "30+" },
+  { metric: "Unit test files (.test)", value: "2,465" },
+  { metric: "E2E test files (.spec)", value: "383" },
+  { metric: "Integration test suites", value: "10+" },
+]
+
+export interface TestDistribution {
+  language: string
+  files: string
+  percentage: string
+}
+
+export const testDistribution: TestDistribution[] = [
+  { language: "TypeScript React (.tsx)", files: "1,737", percentage: "59.5%" },
+  { language: "TypeScript (.ts)", files: "569", percentage: "19.5%" },
+  { language: "Python (.py)", files: "398", percentage: "13.6%" },
+  { language: "JavaScript (.js)", files: "174", percentage: "6.0%" },
+  { language: "JavaScript React (.jsx)", files: "40", percentage: "1.4%" },
+]
+
+export interface TopTestedProject {
+  project: string
+  testFiles: string
+  lines: string
+  framework: string
+}
+
+export const topTestedProjects: TopTestedProject[] = [
+  { project: "enterprise-template-system", testFiles: "492", lines: "142,627", framework: "Playwright + Vitest" },
+  { project: "enterprise-component-library", testFiles: "1,280", lines: "104,505", framework: "Jest + Vitest" },
+  { project: "SpecTree", testFiles: "333", lines: "92,354", framework: "Vitest + Jest" },
+  { project: "rave-collective", testFiles: "119", lines: "57,862", framework: "Vitest" },
+  { project: "Comfort-Order", testFiles: "204", lines: "48,982", framework: "Playwright + Vitest" },
+  { project: "coc-game", testFiles: "25", lines: "18,148", framework: "Vitest (game AI)" },
+  { project: "Ordering-and-tracking-application", testFiles: "99", lines: "16,325", framework: "Vitest + Jest" },
+  { project: "bread-of-heaven", testFiles: "38", lines: "4,061", framework: "Vitest" },
+]
+
+export interface TestFramework {
+  name: string
+  projects: string
+  purpose: string
+}
+
+export const testFrameworks: TestFramework[] = [
+  { name: "Vitest", projects: "15+ (primary)", purpose: "Modern TypeScript testing with coverage" },
+  { name: "Jest", projects: "6 (legacy)", purpose: "Node.js and older projects" },
+  { name: "Playwright", projects: "2", purpose: "Multi-browser E2E testing" },
+  { name: "Pytest", projects: "6+", purpose: "Python project testing" },
+  { name: "Codecov", projects: "12", purpose: "Coverage reporting and tracking" },
+  { name: "SonarCloud", projects: "6", purpose: "Code quality analysis" },
+]
+
+export const testingBlindSpot = `18 projects integrate AI/LLM packages, but zero have dedicated AI output validation tests. No tests exist for prompt injection, model output validation, embedding accuracy, token budget enforcement, or LLM response schema compliance. The AI integration layer is the least-tested part of the stack.`
+
+// ============================================
+// CI/CD WORKFLOW PATTERNS
+// ============================================
+
+export interface CICDStats {
+  metric: string
+  value: string
+}
+
+export const cicdStats: CICDStats[] = [
+  { metric: "Total workflow files", value: "45" },
+  { metric: "Total workflow lines", value: "6,122" },
+  { metric: "Average workflow size", value: "136 lines" },
+  { metric: "Repos with GitHub Actions", value: "46" },
+  { metric: "CodeRabbit configs (91%)", value: "42" },
+  { metric: "Dependabot configs (89%)", value: "41" },
+  { metric: "Codecov configs (28%)", value: "13" },
+]
+
+export interface CICDTier {
+  tier: string
+  repos: string
+  percentage: string
+  description: string
+}
+
+export const cicdTiers: CICDTier[] = [
+  { tier: "Tier 1 - Basic", repos: "35", percentage: "76%", description: "Checkout, Install, Lint, Type check, Test, Build. Average 40-60 lines." },
+  { tier: "Tier 2 - Intermediate", repos: "10", percentage: "22%", description: "Tier 1 + Codecov upload + Render deployment. Matrix strategies for Node versions. Average 80-120 lines." },
+  { tier: "Tier 3 - Sophisticated", repos: "1", percentage: "2%", description: "enterprise-template-system: 12 workflows (6,122 lines), Turbo monorepo, AWS ECR/ECS/Terraform, k6 load testing, Lighthouse audits, multi-browser E2E, Slack notifications, auto-rollback." },
+]
+
+export const cicdZeroAISteps = `Despite 18 projects integrating AI/LLM packages, there are zero prompt validation steps, zero model output testing, zero token budget enforcement, zero AI attribution scanning (em dash detection, "Co-Authored-By" detection), and zero automated checks for forbidden AI patterns in any CI pipeline. All AI quality enforcement is done through agent instructions (CLAUDE.md), not CI automation.`
+
+// ============================================
+// DEPENDENCY ECOSYSTEM
+// ============================================
+
+export interface DependencyCategory {
+  category: string
+  count: string
+}
+
+export const dependencyScale: DependencyCategory[] = [
+  { category: "Node.js package.json files", count: "74" },
+  { category: "Python dependency files", count: "18" },
+  { category: "Swift Package.swift files", count: "1+" },
+  { category: "Projects with AI/LLM packages", count: "18 (33%)" },
+]
+
+export interface AIPackage {
+  name: string
+  projectsUsing: string
+  version: string
+}
+
+export const aiPackages: AIPackage[] = [
+  { name: "@anthropic-ai/sdk", projectsUsing: "4", version: "v0.30.0 - v0.71.2" },
+  { name: "openai", projectsUsing: "4", version: "v4.24.1 - v6.16.0" },
+  { name: "@google/generative-ai", projectsUsing: "3", version: "v0.1.3 - v0.24.1" },
+  { name: "litellm", projectsUsing: "1 (Research Agent)", version: ">= 1.50" },
+  { name: "langgraph", projectsUsing: "1 (Research Agent)", version: ">= 1.0" },
+  { name: "chromadb", projectsUsing: "1 (Research Agent)", version: ">= 1.4" },
+  { name: "@mlc-ai/web-llm", projectsUsing: "1 (WriteForge)", version: ">= 0.2.0" },
+  { name: "sentence-transformers", projectsUsing: "1 (Patent Intelligence)", version: ">= 2.3.0" },
+  { name: "pgvector", projectsUsing: "1 (Patent Intelligence)", version: ">= 0.2.4" },
+  { name: "openai-whisper", projectsUsing: "1 (Jarvis)", version: "N/A" },
+  { name: "ollama", projectsUsing: "2 (Jarvis, Chronoscribe)", version: "Local runtime" },
+  { name: "tiktoken", projectsUsing: "1 (Research Agent)", version: ">= 0.8" },
+  { name: "tavily-python", projectsUsing: "1 (Research Agent)", version: ">= 0.5" },
+]
+
+export interface UILibraryUsage {
+  library: string
+  projects: string
+}
+
+export const uiLibraryUsage: UILibraryUsage[] = [
+  { library: "Radix UI", projects: "35+" },
+  { library: "React Hook Form", projects: "30+" },
+  { library: "TailwindCSS", projects: "40+" },
+  { library: "Zod", projects: "30+" },
+  { library: "Framer Motion", projects: "15+" },
+  { library: "React Query", projects: "15+" },
+]
+
+export const proprietaryPackages = [
+  { name: "@writeforge/core-llm", project: "WriteForge", purpose: "Browser-based LLM abstraction via WebLLM" },
+  { name: "@lcc/llm", project: "LifeContextCompiler", purpose: "LLM integration for context compilation" },
+  { name: "@repo/typescript-config", project: "Shared config", purpose: "Cross-project TypeScript configuration" },
+]
+
+export const deepestAIStack = `Research Agent has the deepest AI dependency graph: litellm (100+ LLM providers), langgraph (agent orchestration), chromadb (vector RAG), tiktoken (cost estimation), tavily-python (web search), trafilatura + crawl4ai (scraping), sentence-transformers (local embeddings), torch (local inference).`
+
+// ============================================
+// INFRASTRUCTURE & DEPLOYMENT
+// ============================================
+
+export interface InfraResource {
+  resource: string
+  count: string
+}
+
+export const infraScale: InfraResource[] = [
+  { resource: "Dockerfiles", count: "78" },
+  { resource: "docker-compose files", count: "65" },
+  { resource: "render.yaml configs", count: "49" },
+  { resource: "Prisma schema files", count: "8" },
+  { resource: "Database migration files", count: "33" },
+  { resource: "Zod schema files", count: "13" },
+  { resource: "API route files", count: "984" },
+]
+
+export interface DatabaseUsage {
+  database: string
+  projects: string
+  useCase: string
+}
+
+export const databaseUsage: DatabaseUsage[] = [
+  { database: "PostgreSQL", projects: "10+", useCase: "Primary relational DB" },
+  { database: "pgvector", projects: "2", useCase: "Vector embeddings (Patent Intelligence, Research Agent)" },
+  { database: "Redis", projects: "8+", useCase: "Caching, job queues (BullMQ)" },
+  { database: "MongoDB", projects: "8+", useCase: "Document storage" },
+  { database: "SQLite", projects: "3+", useCase: "Local/embedded (GenomeForge, archive DB)" },
+  { database: "ChromaDB", projects: "1", useCase: "Vector DB for RAG (Research Agent)" },
+]
+
+export interface APIFramework {
+  framework: string
+  projects: string
+  useCase: string
+}
+
+export const apiFrameworks: APIFramework[] = [
+  { framework: "Express.js", projects: "25+", useCase: "Primary Node.js backend" },
+  { framework: "FastAPI", projects: "8", useCase: "Python APIs (Research Agent, Patent Intelligence)" },
+  { framework: "Next.js API routes", projects: "20+", useCase: "Full-stack React apps" },
+  { framework: "Hono", projects: "2", useCase: "Lightweight edge APIs" },
+  { framework: "Strapi 5", projects: "5+", useCase: "Headless CMS (enterprise-template, CodeReview AI)" },
+]
+
+// ============================================
+// SDD COVERAGE DETAILS
+// ============================================
+
+export interface SDDProject {
+  project: string
+  sddFiles: string
+  phases: string
+}
+
+export const sddCoverageDetails: SDDProject[] = [
+  { project: "enterprise-template-system", sddFiles: "16", phases: "CMS, theme, nav, footer, RBAC, media, testing, config" },
+  { project: "treasuretrail", sddFiles: "16", phases: "4 phases (auth, maps, routes, sync, B2B, analytics)" },
+  { project: "patent-intelligence", sddFiles: "9", phases: "10 phases (search, EPO, similarity, citations, white space)" },
+  { project: "chronoscribe", sddFiles: "10", phases: "3 phases (watch, OCR, analysis, timeline, categorization)" },
+  { project: "baked-by-chrissy", sddFiles: "8", phases: "10 phases (portfolio, menu, orders, payments, admin)" },
+  { project: "save-a-stray", sddFiles: "8", phases: "2 phases (auth, GraphQL, real-time, search, analytics)" },
+  { project: "SpecTree", sddFiles: "5+", phases: "4 phases (drag-drop, AI backend, exports)" },
+  { project: "research-agent", sddFiles: "5", phases: "1 phase (orchestration, search, checkpoint, synthesis)" },
+  { project: "writeforge", sddFiles: "5", phases: "4 phases (LanguageTool, extension, desktop, LLM)" },
+]
+
+export const sddStats = {
+  totalFiles: "77",
+  architectureMdFiles: "37",
+  roadmapMdFiles: "47",
+  projectsWithSddDirs: "24",
+  sddTemplatesFound: "6",
+  namingConventions: "Sequential (SDD-001) and Feature-based (F1.1)",
+}
+
+// ============================================
+// PROMPT INFRASTRUCTURE SCALE
+// ============================================
+
+export interface PromptInfraMetric {
+  resource: string
+  count: string
+  totalSize: string
+}
+
+export const promptInfraScale: PromptInfraMetric[] = [
+  { resource: "Total markdown files in _@agent-prompts", count: "317", totalSize: "7.86 MB" },
+  { resource: "START_HERE.md files", count: "58", totalSize: "51,598 lines (avg 1,761/file)" },
+  { resource: "AGENT_PROMPT.md files", count: "25", totalSize: "11,841 lines (avg 905/file)" },
+  { resource: "BUILD_PROMPT.md files", count: "23", totalSize: "14,750 lines (avg 1,247/file)" },
+  { resource: "COMPILED_RESEARCH.md files", count: "11", totalSize: "35,310 lines (avg 3,210/file)" },
+  { resource: "WORK_LOG.md files", count: "25", totalSize: "1,717 lines (avg 69/file)" },
+  { resource: "Research session files", count: "75", totalSize: "In research/sessions/ directories" },
+  { resource: "Projects with prompt infrastructure", count: "62", totalSize: "Under _@agent-prompts" },
+]
+
+export const largestCompiledResearch = [
+  { project: "ChoreChamp", lines: "~3,800", size: "148 KB" },
+  { project: "TreasureTrail", lines: "~3,000", size: "118 KB" },
+  { project: "Rave Collective", lines: "~2,700", size: "106 KB" },
+]
+
+// ============================================
+// TEMPLATE-DRIVEN CONSISTENCY
+// ============================================
+
+export const templateConsistencyDescription = `The PROJECT_GENERATOR_PROMPT doesn't just generate code structure. It also produces consistent infrastructure: 45 near-identical CI workflows, 42 identical CodeRabbit configs, 41 identical Dependabot configs, 13 identical Codecov configs, 24 SDD directory structures, and 58 START_HERE.md onboarding docs. This is "infrastructure as prompt output."`
+
+export interface MaturityTier {
+  tier: string
+  percentage: string
+  description: string
+}
+
+export const portfolioMaturitySpectrum: MaturityTier[] = [
+  { tier: "Nascent", percentage: "20%", description: "Basic CI, no tests, minimal docs" },
+  { tier: "Standard", percentage: "60%", description: "Template-based CI + CodeRabbit + Dependabot + Codecov" },
+  { tier: "Advanced", percentage: "18%", description: "Full test suites + SDDs + compiled research + comprehensive docs" },
+  { tier: "Enterprise", percentage: "2%", description: "Full AWS infra + security scanning + performance testing + multi-env deploys" },
+]
+
+export const enterpriseOutlier = `enterprise-template-system accounts for: 12 CI workflows, 142,627 lines of test code, 16 SDDs, Terraform infrastructure, AWS ECR/ECS, k6 load testing, Lighthouse audits, multi-browser E2E, and the only comprehensive security scanning in the portfolio. It represents the "target state" that other projects aspire to reach.`
+
+// ============================================
 // LESSONS LEARNED
 // ============================================
 

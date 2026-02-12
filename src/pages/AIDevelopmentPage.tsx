@@ -8,6 +8,7 @@ import {
   Server, RotateCw, TrendingUp, Users, Ban, Briefcase,
   FileText, HardDrive, Gauge, Smartphone, Share2,
   AlertTriangle, DollarSign, Video,
+  TestTube2, Workflow, Package, Database, FolderTree, BarChart3,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -76,6 +77,29 @@ import {
   enforcementGapsDescription,
   additionalFindings,
   tutorialRecordingsDescription,
+  testingInfraStats,
+  testDistribution,
+  topTestedProjects,
+  testFrameworks,
+  testingBlindSpot,
+  cicdStats,
+  cicdTiers,
+  cicdZeroAISteps,
+  dependencyScale,
+  aiPackages,
+  uiLibraryUsage,
+  proprietaryPackages,
+  deepestAIStack,
+  infraScale,
+  databaseUsage,
+  apiFrameworks,
+  sddCoverageDetails,
+  sddStats,
+  promptInfraScale,
+  largestCompiledResearch,
+  templateConsistencyDescription,
+  portfolioMaturitySpectrum,
+  enterpriseOutlier,
 } from "@/data/ai-development"
 
 // ============================================
@@ -221,6 +245,12 @@ const tocSections = [
   { id: "native-apps", label: "Native macOS Apps", icon: Smartphone },
   { id: "spectree-exports", label: "SpecTree Exports", icon: FileText },
   { id: "cost-optimization", label: "Cost Optimization", icon: DollarSign },
+  { id: "testing-infra", label: "Testing Infrastructure", icon: TestTube2 },
+  { id: "cicd-patterns", label: "CI/CD Patterns", icon: Workflow },
+  { id: "dependencies", label: "Dependency Ecosystem", icon: Package },
+  { id: "infra-deploy", label: "Infrastructure", icon: Database },
+  { id: "sdd-coverage", label: "SDD Coverage", icon: FolderTree },
+  { id: "prompt-infra", label: "Prompt Infrastructure", icon: BarChart3 },
   { id: "enforcement-gaps", label: "Enforcement Gaps", icon: AlertTriangle },
   { id: "use-cases", label: "Practical Use Cases", icon: Zap },
   { id: "enterprise", label: "Enterprise Patterns", icon: Server },
@@ -950,6 +980,217 @@ export function AIDevelopmentPage() {
               headers={["Technique", "Result", "Project"]}
               rows={costOptimizationPatterns.map(c => [c.technique, c.result, c.project])}
             />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Testing Infrastructure */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Testing Infrastructure (559K Lines)" icon={TestTube2} id="testing-infra">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              2,918 test files with 559,535 lines of test code across 30+ projects.
+              Strong commitment to testing, with a notable blind spot in AI/LLM output validation.
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">Testing Scale</h3>
+            <DataTable
+              headers={["Metric", "Value"]}
+              rows={testingInfraStats.map(s => [s.metric, s.value])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Distribution by Language</h3>
+            <DataTable
+              headers={["Language", "Files", "Percentage"]}
+              rows={testDistribution.map(d => [d.language, d.files, d.percentage])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Top Projects by Test Coverage</h3>
+            <DataTable
+              headers={["Project", "Test Files", "Lines", "Framework"]}
+              rows={topTestedProjects.map(p => [p.project, p.testFiles, p.lines, p.framework])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Testing Frameworks</h3>
+            <DataTable
+              headers={["Framework", "Projects", "Purpose"]}
+              rows={testFrameworks.map(f => [f.name, f.projects, f.purpose])}
+            />
+
+            <div className="mt-6 p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
+              <h4 className="font-semibold mb-2">AI Testing Blind Spot</h4>
+              <p className="text-sm text-muted-foreground">{testingBlindSpot}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: CI/CD Patterns */}
+          {/* ============================================ */}
+          <CollapsibleSection title="CI/CD Workflow Patterns (45 Workflows)" icon={Workflow} id="cicd-patterns">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              45 GitHub Actions workflows across 46 repos with 91% CodeRabbit adoption and 89% Dependabot adoption.
+              Template-driven consistency proves the prompt system produces reliable infrastructure.
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">CI/CD Scale</h3>
+            <DataTable
+              headers={["Metric", "Value"]}
+              rows={cicdStats.map(s => [s.metric, s.value])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Pipeline Sophistication Tiers</h3>
+            <div className="space-y-3">
+              {cicdTiers.map((tier, i) => (
+                <div key={i} className="p-4 rounded-lg border border-border/50 bg-muted/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-bold">{tier.tier}</span>
+                    <Badge variant="outline" className="text-xs">{tier.repos} repos ({tier.percentage})</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{tier.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg border border-red-500/30 bg-red-500/5">
+              <h4 className="font-semibold mb-2">Zero AI-Specific CI Steps</h4>
+              <p className="text-sm text-muted-foreground">{cicdZeroAISteps}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Dependency Ecosystem */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Dependency Ecosystem (14 AI Packages)" icon={Package} id="dependencies">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              74 Node.js packages, 18 Python packages, and 14 distinct AI/LLM packages across 18 projects (33% of the portfolio).
+              Three proprietary LLM integration packages built in-house.
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">Package Scale</h3>
+            <DataTable
+              headers={["Category", "Count"]}
+              rows={dependencyScale.map(d => [d.category, d.count])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">AI/LLM Package Usage</h3>
+            <DataTable
+              headers={["Package", "Projects Using", "Version"]}
+              rows={aiPackages.map(p => [p.name, p.projectsUsing, p.version])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Proprietary LLM Packages</h3>
+            <div className="space-y-3">
+              {proprietaryPackages.map((pkg, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <span className="font-mono text-sm font-semibold text-primary">{pkg.name}</span>
+                  <span className="text-sm text-muted-foreground"> ({pkg.project})</span>
+                  <p className="text-xs text-muted-foreground mt-1">{pkg.purpose}</p>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="text-lg font-bold mt-8 mb-3">UI Component Standardization</h3>
+            <DataTable
+              headers={["Library", "Projects Using"]}
+              rows={uiLibraryUsage.map(u => [u.library, u.projects])}
+            />
+
+            <div className="mt-6 p-4 rounded-lg border border-blue-500/30 bg-blue-500/5">
+              <h4 className="font-semibold mb-2">Deepest AI Stack: Research Agent</h4>
+              <p className="text-sm text-muted-foreground">{deepestAIStack}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Infrastructure & Deployment */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Infrastructure & Deployment (984 API Routes)" icon={Database} id="infra-deploy">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              78 Dockerfiles, 65 docker-compose files, 49 Render configs, 984 API route files,
+              6 database technologies, and 5 API frameworks. The infrastructure layer that supports the AI ecosystem.
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">Infrastructure Scale</h3>
+            <DataTable
+              headers={["Resource", "Count"]}
+              rows={infraScale.map(r => [r.resource, r.count])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Database Strategy (6 Technologies)</h3>
+            <DataTable
+              headers={["Database", "Projects", "Use Case"]}
+              rows={databaseUsage.map(d => [d.database, d.projects, d.useCase])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">API Frameworks (5 Frameworks)</h3>
+            <DataTable
+              headers={["Framework", "Projects", "Use Case"]}
+              rows={apiFrameworks.map(f => [f.framework, f.projects, f.useCase])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: SDD Coverage */}
+          {/* ============================================ */}
+          <CollapsibleSection title="SDD Coverage (77 Documents, 24 Projects)" icon={FolderTree} id="sdd-coverage">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              77 Software Design Documents across 24 projects with dedicated sdd/ directories.
+              37 ARCHITECTURE.md files and 47 ROADMAP.md files provide additional structural documentation.
+              Two naming conventions emerged: sequential (SDD-001) and feature-based (F1.1).
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">SDD Stats</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+              {Object.entries(sddStats).map(([key, value]) => (
+                <div key={key} className="p-3 rounded-lg bg-muted/20 border border-border/30 text-center">
+                  <div className="text-sm font-bold text-foreground">{value}</div>
+                  <div className="text-xs text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="text-lg font-bold mb-3">Most Comprehensive SDD Coverage</h3>
+            <DataTable
+              headers={["Project", "SDD Files", "Phases Covered"]}
+              rows={sddCoverageDetails.map(s => [s.project, s.sddFiles, s.phases])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Prompt Infrastructure Scale */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Prompt Infrastructure Scale (317 Files, 7.86 MB)" icon={BarChart3} id="prompt-infra">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              {templateConsistencyDescription}
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">Prompt File Metrics</h3>
+            <DataTable
+              headers={["Resource", "Count", "Total Size"]}
+              rows={promptInfraScale.map(p => [p.resource, p.count, p.totalSize])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Largest Compiled Research</h3>
+            <DataTable
+              headers={["Project", "Lines", "Size"]}
+              rows={largestCompiledResearch.map(r => [r.project, r.lines, r.size])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Portfolio Maturity Spectrum</h3>
+            <div className="space-y-3">
+              {portfolioMaturitySpectrum.map((tier, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-sm">{tier.tier}</span>
+                    <Badge variant="outline" className="text-xs">{tier.percentage}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{tier.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg border border-purple-500/30 bg-purple-500/5">
+              <h4 className="font-semibold mb-2">Enterprise Outlier</h4>
+              <p className="text-sm text-muted-foreground">{enterpriseOutlier}</p>
+            </div>
           </CollapsibleSection>
 
           {/* ============================================ */}
