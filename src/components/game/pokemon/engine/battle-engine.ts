@@ -7,6 +7,7 @@
 import type {
   Pokemon, PokemonMove, MoveData, BattlePokemon,
   StatName, PokemonType, MoveEffect, BattleState, Weather,
+  FieldEffects, FieldEffectType,
 } from './types';
 import {
   calculateDamage, getTypeEffectivenessMultiplier,
@@ -57,6 +58,37 @@ export function getSpeciesData(id: number): SpeciesLookup | null {
   return speciesDatabase[id] ?? null;
 }
 
+// --- Held item effect definitions ---
+
+interface HeldItemEffect {
+  /** Multiplier applied to a specific attack stat (Choice Band = 1.5x attack) */
+  boostStat?: StatName;
+  boostMultiplier?: number;
+  /** Multiplier applied to all damage dealt (Life Orb = 1.3x) */
+  damageMultiplier?: number;
+  /** Fraction of max HP as recoil after dealing damage (Life Orb = 0.1) */
+  recoilPercent?: number;
+  /** Fraction of max HP restored each turn (Leftovers = 1/16) */
+  endOfTurnHealFraction?: number;
+  /** Fraction of damage dealt restored as HP (Shell Bell = 1/8) */
+  drainFraction?: number;
+  /** Survive a KO at 1 HP if at full HP (Focus Sash). Item is consumed. */
+  surviveKO?: boolean;
+}
+
+const HELD_ITEM_EFFECTS: Record<string, HeldItemEffect> = {
+  'leftovers':   { endOfTurnHealFraction: 1 / 16 },
+  'choice-band': { boostStat: 'attack', boostMultiplier: 1.5 },
+  'life-orb':    { damageMultiplier: 1.3, recoilPercent: 0.1 },
+  'shell-bell':  { drainFraction: 1 / 8 },
+  'focus-sash':  { surviveKO: true },
+};
+
+function getHeldItemEffect(itemId: string | undefined): HeldItemEffect | null {
+  if (!itemId) return null;
+  return HELD_ITEM_EFFECTS[itemId] ?? null;
+}
+
 // --- Battle Pokemon helpers ---
 
 export function createBattlePokemon(pokemon: Pokemon): BattlePokemon {
@@ -78,19 +110,128 @@ export function createBattlePokemon(pokemon: Pokemon): BattlePokemon {
   };
 }
 
-// Apply switch-in ability effects (Intimidate, etc.)
+// --- Field effects helpers ---
+
+export function createFieldEffects(): FieldEffects {
+  return { reflect: 0, lightScreen: 0, stealthRock: false, spikesLayers: 0, toxicSpikesLayers: 0 };
+}
+
+/** Apply entry hazard damage when a Pokemon switches in */
+export function applyEntryHazards(
+  switchedIn: BattlePokemon,
+  fieldEffects: FieldEffects,
+  messages: string[]
+): void {
+  const poke = switchedIn.pokemon;
+  const name = poke.nickname ?? `#${poke.speciesId}`;
+  const types = switchedIn.types;
+
+  // Stealth Rock: type-effective damage based on Rock vs Pokemon's types
+  if (fieldEffects.stealthRock) {
+    const rockEff = getTypeEffectivenessMultiplier('rock', types as PokemonType[]);
+    const damage = Math.max(1, Math.floor(poke.stats.hp * rockEff / 8));
+    poke.currentHp = Math.max(0, poke.currentHp - damage);
+    messages.push(`Pointed stones dug into ${name}!`);
+  }
+
+  // Spikes: damage based on layers (1/8, 1/6, 1/4)
+  if (fieldEffects.spikesLayers > 0 && !types.includes('flying') && poke.ability !== 'levitate') {
+    const spikeDivisors = [8, 6, 4];
+    const divisor = spikeDivisors[Math.min(fieldEffects.spikesLayers, 3) - 1] ?? 8;
+    const damage = Math.max(1, Math.floor(poke.stats.hp / divisor));
+    poke.currentHp = Math.max(0, poke.currentHp - damage);
+    messages.push(`${name} was hurt by spikes!`);
+  }
+
+  // Toxic Spikes: poison on switch-in (1 layer = poison, 2 layers = badly poison)
+  if (fieldEffects.toxicSpikesLayers > 0 && !types.includes('flying') && poke.ability !== 'levitate') {
+    // Poison-types absorb Toxic Spikes (clearing them)
+    if (types.includes('poison')) {
+      fieldEffects.toxicSpikesLayers = 0;
+      messages.push(`${name} absorbed the toxic spikes!`);
+    } else if (poke.status === null && !types.includes('steel')) {
+      if (fieldEffects.toxicSpikesLayers >= 2) {
+        poke.status = 'bad_poison';
+        messages.push(`${name} was badly poisoned by toxic spikes!`);
+      } else {
+        poke.status = 'poison';
+        messages.push(`${name} was poisoned by toxic spikes!`);
+      }
+    }
+  }
+}
+
+// Apply switch-in ability effects
 export function applyOnSwitchIn(switchedIn: BattlePokemon, opponent: BattlePokemon, messages: string[]): void {
   const ability = switchedIn.pokemon.ability;
   if (!ability) return;
   const name = switchedIn.pokemon.nickname ?? `#${switchedIn.pokemon.speciesId}`;
-  if (ability === 'intimidate') {
-    const newStage = Math.max(-6, opponent.statStages.attack - 1);
-    if (newStage !== opponent.statStages.attack) {
-      opponent.statStages.attack = newStage;
-      const oppName = opponent.pokemon.nickname ?? `#${opponent.pokemon.speciesId}`;
-      messages.push(`${name}'s Intimidate lowered ${oppName}'s Attack!`);
-    }
+
+  const switchInHandlers: Record<string, () => void> = {
+    intimidate: () => {
+      const newStage = Math.max(-6, opponent.statStages.attack - 1);
+      if (newStage !== opponent.statStages.attack) {
+        opponent.statStages.attack = newStage;
+        const oppName = opponent.pokemon.nickname ?? `#${opponent.pokemon.speciesId}`;
+        messages.push(`${name}'s Intimidate lowered ${oppName}'s Attack!`);
+      }
+    },
+    drizzle: () => messages.push(`${name}'s Drizzle made it rain!`),
+    drought: () => messages.push(`${name}'s Drought intensified the sun!`),
+    sand_stream: () => messages.push(`${name}'s Sand Stream whipped up a sandstorm!`),
+    trace: () => {
+      if (opponent.pokemon.ability) {
+        switchedIn.pokemon.ability = opponent.pokemon.ability;
+        const oppName = opponent.pokemon.nickname ?? `#${opponent.pokemon.speciesId}`;
+        messages.push(`${name} traced ${oppName}'s ${opponent.pokemon.ability}!`);
+      }
+    },
+  };
+
+  switchInHandlers[ability]?.();
+}
+
+/** Returns weather set by a switch-in ability, if any */
+export function getAbilitySwitchInWeather(ability: string | undefined): Weather | null {
+  if (!ability) return null;
+  const weatherAbilities: Record<string, Weather> = {
+    drizzle: 'rain',
+    drought: 'sun',
+    sand_stream: 'sandstorm',
+  };
+  return weatherAbilities[ability] ?? null;
+}
+
+/**
+ * Check if an ability absorbs a move (Water Absorb, Volt Absorb, Flash Fire).
+ * Returns true if the move is absorbed (caller should skip damage).
+ */
+export function checkAbilityAbsorption(
+  defender: BattlePokemon,
+  moveType: PokemonType,
+  messages: string[]
+): boolean {
+  const ability = defender.pokemon.ability;
+  if (!ability) return false;
+  const defName = defender.pokemon.nickname ?? `#${defender.pokemon.speciesId}`;
+
+  if (ability === 'water_absorb' && moveType === 'water') {
+    const heal = Math.max(1, Math.floor(defender.pokemon.stats.hp / 4));
+    defender.pokemon.currentHp = Math.min(defender.pokemon.stats.hp, defender.pokemon.currentHp + heal);
+    messages.push(`${defName}'s Water Absorb restored HP!`);
+    return true;
   }
+  if (ability === 'volt_absorb' && moveType === 'electric') {
+    const heal = Math.max(1, Math.floor(defender.pokemon.stats.hp / 4));
+    defender.pokemon.currentHp = Math.min(defender.pokemon.stats.hp, defender.pokemon.currentHp + heal);
+    messages.push(`${defName}'s Volt Absorb restored HP!`);
+    return true;
+  }
+  if (ability === 'flash_fire' && moveType === 'fire') {
+    messages.push(`${defName}'s Flash Fire powered up its Fire-type moves!`);
+    return true;
+  }
+  return false;
 }
 
 function getEffectiveStat(bp: BattlePokemon, stat: StatName): number {
@@ -99,13 +240,26 @@ function getEffectiveStat(bp: BattlePokemon, stat: StatName): number {
   const mult = STAT_STAGE_MULTIPLIERS[stage] ?? 1;
   let value = Math.floor(base * mult);
 
-  // Status modifiers
-  if (stat === 'attack' && bp.pokemon.status === 'burn') {
+  // Status modifiers (Guts cancels the burn Attack penalty)
+  if (stat === 'attack' && bp.pokemon.status === 'burn' && bp.pokemon.ability !== 'guts') {
     value = Math.floor(value * 0.5);
   }
   if (stat === 'speed' && bp.pokemon.status === 'paralysis') {
     value = Math.floor(value * 0.25);
   }
+
+  // Held item stat boost (Choice Band boosts attack)
+  const itemEffect = getHeldItemEffect(bp.pokemon.heldItem);
+  if (itemEffect?.boostStat === stat && itemEffect.boostMultiplier) {
+    value = Math.floor(value * itemEffect.boostMultiplier);
+  }
+
+  // Ability stat boosts
+  const ability = bp.pokemon.ability;
+  if (ability === 'huge_power' && stat === 'attack') value = Math.floor(value * 2);
+  if (ability === 'pure_power' && stat === 'attack') value = Math.floor(value * 2);
+  if (ability === 'guts' && bp.pokemon.status !== null && stat === 'attack') value = Math.floor(value * 1.5);
+  if (ability === 'hustle' && stat === 'attack') value = Math.floor(value * 1.5);
 
   return Math.max(1, value);
 }
@@ -171,10 +325,12 @@ export function executeTurn(
 
   // Handle item use
   if (playerAction === 'item' && itemId) {
+    const pFields = state.playerFieldEffects ?? createFieldEffects();
+    const oFields = state.opponentFieldEffects ?? createFieldEffects();
     messages.push(`Used ${itemId}!`);
     // Item effects handled by caller - here we just note the action
     // Opponent still gets to attack
-    const oppResult = executeMove(opponentBp, playerBp, selectOpponentMove(opponentBp, playerBp, state), messages);
+    const oppResult = executeMove(opponentBp, playerBp, selectOpponentMove(opponentBp, playerBp, state), messages, state.weather, pFields, oFields);
     opponentDamageDealt = oppResult.damage;
     playerFainted = playerPoke.currentHp <= 0;
     return { messages, playerFirst: false, playerDamageDealt, opponentDamageDealt, playerFainted, opponentFainted, expGained, caughtPokemon, ranAway };
@@ -182,10 +338,12 @@ export function executeTurn(
 
   // Handle switch
   if (playerAction === 'switch') {
+    const pFields = state.playerFieldEffects ?? createFieldEffects();
+    const oFields = state.opponentFieldEffects ?? createFieldEffects();
     messages.push(`Go! ${playerPoke.nickname ?? `Pokemon #${playerPoke.speciesId}`}!`);
     applyOnSwitchIn(playerBp, opponentBp, messages);
     // Opponent attacks the switched-in Pokemon
-    const oppResult = executeMove(opponentBp, playerBp, selectOpponentMove(opponentBp, playerBp, state), messages);
+    const oppResult = executeMove(opponentBp, playerBp, selectOpponentMove(opponentBp, playerBp, state), messages, state.weather, pFields, oFields);
     opponentDamageDealt = oppResult.damage;
     playerFainted = playerPoke.currentHp <= 0;
     return { messages, playerFirst: false, playerDamageDealt, opponentDamageDealt, playerFainted, opponentFainted, expGained, caughtPokemon, ranAway };
@@ -222,8 +380,15 @@ export function executeTurn(
   let currentWeather = state.weather;
   let currentWeatherTurns = state.weatherTurns;
 
+  // Determine field effects for each side (defender's side has the screens)
+  const playerFields = state.playerFieldEffects ?? createFieldEffects();
+  const opponentFields = state.opponentFieldEffects ?? createFieldEffects();
+
+  const firstDefenderFields = playerFirst ? opponentFields : playerFields;
+  const secondDefenderFields = playerFirst ? playerFields : opponentFields;
+
   // Execute first move
-  const firstResult = executeMove(first.attacker, first.defender, first.move, messages, currentWeather);
+  const firstResult = executeMove(first.attacker, first.defender, first.move, messages, currentWeather, firstDefenderFields, playerFirst ? playerFields : opponentFields);
   if (playerFirst) playerDamageDealt = firstResult.damage;
   else opponentDamageDealt = firstResult.damage;
   if (firstResult.weatherChange) {
@@ -233,7 +398,7 @@ export function executeTurn(
 
   // Check if second attacker fainted
   if (second.attacker.pokemon.currentHp > 0 && first.defender.pokemon.currentHp > 0) {
-    const secondResult = executeMove(second.attacker, second.defender, second.move, messages, currentWeather);
+    const secondResult = executeMove(second.attacker, second.defender, second.move, messages, currentWeather, secondDefenderFields, playerFirst ? opponentFields : playerFields);
     if (playerFirst) opponentDamageDealt = secondResult.damage;
     else playerDamageDealt = secondResult.damage;
     if (secondResult.weatherChange) {
@@ -245,6 +410,10 @@ export function executeTurn(
   // Post-turn effects (status damage, weather damage, leech seed, etc.)
   applyPostTurnEffects(playerBp, opponentBp, messages, 'Your', currentWeather);
   applyPostTurnEffects(opponentBp, playerBp, messages, 'Foe', currentWeather);
+
+  // Decrement field effect turns
+  decrementFieldEffectTurns(playerFields, messages, 'Your');
+  decrementFieldEffectTurns(opponentFields, messages, 'Foe');
 
   // Decrement weather turns
   if (currentWeather !== 'clear' && currentWeatherTurns > 0) {
@@ -290,7 +459,9 @@ function executeMove(
   defender: BattlePokemon,
   move: PokemonMove | null,
   messages: string[],
-  weather: Weather = 'clear'
+  weather: Weather = 'clear',
+  defenderFieldEffects?: FieldEffects,
+  attackerFieldEffects?: FieldEffects
 ): MoveResult {
   const atkPoke = attacker.pokemon;
   const defPoke = defender.pokemon;
@@ -312,7 +483,7 @@ function executeMove(
       return { damage: 0, hit: false, critical: false, effectiveness: 1 };
     }
 
-    return executeDamagingMove(attacker, defender, moveData, messages, weather);
+    return executeDamagingMove(attacker, defender, moveData, messages, weather, defenderFieldEffects);
   }
 
   if (!move) {
@@ -384,11 +555,11 @@ function executeMove(
 
   // Status moves
   if (moveData.category === 'status') {
-    const weatherChange = applyMoveEffect(moveData.effect, attacker, defender, messages);
+    const weatherChange = applyMoveEffect(moveData.effect, attacker, defender, messages, defenderFieldEffects, attackerFieldEffects);
     return { damage: 0, hit: true, critical: false, effectiveness: 1, weatherChange };
   }
 
-  return executeDamagingMove(attacker, defender, moveData, messages, weather);
+  return executeDamagingMove(attacker, defender, moveData, messages, weather, defenderFieldEffects);
 }
 
 function executeDamagingMove(
@@ -396,7 +567,8 @@ function executeDamagingMove(
   defender: BattlePokemon,
   moveData: MoveData,
   messages: string[],
-  weather: Weather
+  weather: Weather,
+  defenderFieldEffects?: FieldEffects
 ): MoveResult {
   const atkPoke = attacker.pokemon;
   const defPoke = defender.pokemon;
@@ -459,6 +631,25 @@ function executeDamagingMove(
     return { damage: 0, hit: true, critical: false, effectiveness: 0 };
   }
 
+  // Absorbing abilities: Water Absorb, Volt Absorb, Flash Fire
+  if (checkAbilityAbsorption(defender, moveData.type, messages)) {
+    return { damage: 0, hit: true, critical: false, effectiveness: 0 };
+  }
+
+  // Thick Fat: halve Fire and Ice damage
+  if (defPoke.ability === 'thick_fat' && (moveData.type === 'fire' || moveData.type === 'ice')) {
+    // Effectively halves the attack stat for these types (applied later via damage reduction)
+  }
+
+  // Wonder Guard: only super-effective moves can hit
+  if (defPoke.ability === 'wonder_guard') {
+    const preEffectiveness = getTypeEffectivenessMultiplier(moveData.type, defTypes as PokemonType[]);
+    if (preEffectiveness <= 1) {
+      messages.push(`${defPoke.nickname ?? `#${defPoke.speciesId}`}'s Wonder Guard blocked the attack!`);
+      return { damage: 0, hit: true, critical: false, effectiveness: 0 };
+    }
+  }
+
   // Type effectiveness
   const effectiveness = getTypeEffectivenessMultiplier(moveData.type, defTypes as PokemonType[]);
 
@@ -481,6 +672,43 @@ function executeDamagingMove(
     }
   }
 
+  // Thick Fat: halve Fire and Ice damage
+  if (damage > 0 && defPoke.ability === 'thick_fat' && (moveData.type === 'fire' || moveData.type === 'ice')) {
+    damage = Math.floor(damage * 0.5);
+  }
+
+  // Reflect/Light Screen: halve damage (crits ignore screens in Gen 3)
+  if (damage > 0 && !critical && defenderFieldEffects) {
+    if (isPhysical && defenderFieldEffects.reflect > 0) {
+      damage = Math.floor(damage * 0.5);
+    }
+    if (!isPhysical && defenderFieldEffects.lightScreen > 0) {
+      damage = Math.floor(damage * 0.5);
+    }
+  }
+
+  // Held item: Life Orb damage multiplier
+  const atkItemEffect = getHeldItemEffect(atkPoke.heldItem);
+  if (damage > 0 && atkItemEffect?.damageMultiplier) {
+    damage = Math.floor(damage * atkItemEffect.damageMultiplier);
+  }
+
+  // Sturdy: survive a KO at 1 HP from full HP
+  if (damage >= defPoke.currentHp && defPoke.currentHp === defPoke.stats.hp && defPoke.ability === 'sturdy') {
+    damage = defPoke.currentHp - 1;
+    const defName = defPoke.nickname ?? `#${defPoke.speciesId}`;
+    messages.push(`${defName} endured the hit with Sturdy!`);
+  }
+
+  // Held item: Focus Sash (defender survives KO at 1 HP if at full HP)
+  const defItemEffect = getHeldItemEffect(defPoke.heldItem);
+  if (damage >= defPoke.currentHp && defPoke.currentHp === defPoke.stats.hp && defItemEffect?.surviveKO) {
+    damage = defPoke.currentHp - 1;
+    defPoke.heldItem = undefined; // consumed
+    const defName = defPoke.nickname ?? `#${defPoke.speciesId}`;
+    messages.push(`${defName} held on with its Focus Sash!`);
+  }
+
   // Apply damage
   if (damage > 0) {
     defPoke.currentHp = Math.max(0, defPoke.currentHp - damage);
@@ -489,6 +717,19 @@ function executeDamagingMove(
     if (effectiveness < 1 && effectiveness > 0) messages.push("It's not very effective...");
     if (effectiveness === 0) messages.push("It doesn't affect the foe...");
     if (critical) messages.push('A critical hit!');
+  }
+
+  // Held item: Life Orb recoil (10% of max HP)
+  if (damage > 0 && atkItemEffect?.recoilPercent) {
+    const lifeOrbDmg = Math.max(1, Math.floor(atkPoke.stats.hp * atkItemEffect.recoilPercent));
+    atkPoke.currentHp = Math.max(0, atkPoke.currentHp - lifeOrbDmg);
+    messages.push(`${name} lost some HP due to Life Orb!`);
+  }
+
+  // Held item: Shell Bell (restore 1/8 of damage dealt)
+  if (damage > 0 && atkItemEffect?.drainFraction) {
+    const heal = Math.max(1, Math.floor(damage * atkItemEffect.drainFraction));
+    atkPoke.currentHp = Math.min(atkPoke.stats.hp, atkPoke.currentHp + heal);
   }
 
   // Move secondary effects
@@ -586,7 +827,9 @@ function applyMoveEffect(
   effect: MoveEffect | undefined,
   attacker: BattlePokemon,
   defender: BattlePokemon,
-  messages: string[]
+  messages: string[],
+  defenderFieldEffects?: FieldEffects,
+  attackerFieldEffects?: FieldEffects
 ): Weather | undefined {
   if (!effect) return undefined;
 
@@ -627,6 +870,16 @@ function applyMoveEffect(
       };
       messages.push(statusMessages[effect.status] ?? `${targetName} was afflicted!`);
       if (effect.status === 'sleep') target.sleepTurns = 1 + Math.floor(Math.random() * 3);
+
+      // Synchronize: mirror burn/paralysis/poison to the attacker
+      if (target.pokemon.ability === 'synchronize' && effect.target === 'opponent') {
+        const syncStatus = effect.status;
+        if ((syncStatus === 'burn' || syncStatus === 'paralysis' || syncStatus === 'poison') && attacker.pokemon.status === null) {
+          attacker.pokemon.status = syncStatus;
+          const atkName = attacker.pokemon.nickname ?? `#${attacker.pokemon.speciesId}`;
+          messages.push(`${targetName}'s Synchronize passed the ${syncStatus} to ${atkName}!`);
+        }
+      }
     } else {
       messages.push("But it failed!");
     }
@@ -695,6 +948,73 @@ function applyMoveEffect(
       messages.push('But it failed!');
     }
     return undefined;
+  }
+
+  // Field effects (Reflect, Light Screen, Stealth Rock, Spikes, Toxic Spikes)
+  if (effect.fieldEffect) {
+    const targetSideEffects = effect.target === 'self' ? attackerFieldEffects : defenderFieldEffects;
+    if (targetSideEffects) {
+      const userName = attacker.pokemon.nickname ?? `#${attacker.pokemon.speciesId}`;
+      const fieldHandlers: Record<FieldEffectType, () => void> = {
+        reflect: () => {
+          if (targetSideEffects.reflect > 0) {
+            messages.push('But it failed!');
+          } else {
+            targetSideEffects.reflect = 5;
+            messages.push(`${userName} raised a physical barrier!`);
+          }
+        },
+        light_screen: () => {
+          if (targetSideEffects.lightScreen > 0) {
+            messages.push('But it failed!');
+          } else {
+            targetSideEffects.lightScreen = 5;
+            messages.push(`${userName} raised a special barrier!`);
+          }
+        },
+        stealth_rock: () => {
+          if (targetSideEffects.stealthRock) {
+            messages.push('But it failed!');
+          } else {
+            targetSideEffects.stealthRock = true;
+            messages.push('Pointed stones float in the air around the foe!');
+          }
+        },
+        spikes: () => {
+          if (targetSideEffects.spikesLayers >= 3) {
+            messages.push('But it failed!');
+          } else {
+            targetSideEffects.spikesLayers++;
+            messages.push('Spikes were scattered on the ground!');
+          }
+        },
+        toxic_spikes: () => {
+          if (targetSideEffects.toxicSpikesLayers >= 2) {
+            messages.push('But it failed!');
+          } else {
+            targetSideEffects.toxicSpikesLayers++;
+            messages.push('Poison spikes were scattered on the ground!');
+          }
+        },
+      };
+      fieldHandlers[effect.fieldEffect]();
+    }
+    return undefined;
+  }
+
+  // Clear hazards (Rapid Spin)
+  if (effect.clearHazards && attackerFieldEffects) {
+    let cleared = false;
+    if (attackerFieldEffects.stealthRock) { attackerFieldEffects.stealthRock = false; cleared = true; }
+    if (attackerFieldEffects.spikesLayers > 0) { attackerFieldEffects.spikesLayers = 0; cleared = true; }
+    if (attackerFieldEffects.toxicSpikesLayers > 0) { attackerFieldEffects.toxicSpikesLayers = 0; cleared = true; }
+    if (cleared) {
+      messages.push('The hazards were blown away!');
+    }
+    // Also free from Leech Seed and trapping moves
+    if (attacker.volatileStatuses.has('leech_seed')) {
+      attacker.volatileStatuses.delete('leech_seed');
+    }
   }
 
   // Weather-setting moves
@@ -767,6 +1087,51 @@ function applyPostTurnEffects(bp: BattlePokemon, other: BattlePokemon, messages:
       const dmg = Math.max(1, Math.floor(poke.stats.hp / 16));
       poke.currentHp = Math.max(0, poke.currentHp - dmg);
       messages.push(`${prefix} ${name} is pelted by hail!`);
+    }
+  }
+
+  // Held item: Leftovers (restore 1/16 HP each turn)
+  if (poke.currentHp > 0 && poke.currentHp < poke.stats.hp) {
+    const itemEffect = getHeldItemEffect(poke.heldItem);
+    if (itemEffect?.endOfTurnHealFraction) {
+      const heal = Math.max(1, Math.floor(poke.stats.hp * itemEffect.endOfTurnHealFraction));
+      poke.currentHp = Math.min(poke.stats.hp, poke.currentHp + heal);
+      messages.push(`${prefix} ${name} restored a little HP with its Leftovers!`);
+    }
+  }
+
+  // Ability: Speed Boost (gain +1 Speed each turn)
+  if (poke.ability === 'speed_boost' && poke.currentHp > 0) {
+    const newStage = Math.min(6, bp.statStages.speed + 1);
+    if (newStage !== bp.statStages.speed) {
+      bp.statStages.speed = newStage;
+      messages.push(`${prefix} ${name}'s Speed Boost raised its Speed!`);
+    }
+  }
+
+  // Ability: Shed Skin (30% chance to cure status each turn)
+  if (poke.ability === 'shed_skin' && poke.status !== null && poke.currentHp > 0) {
+    if (Math.random() < 0.3) {
+      poke.status = null;
+      bp.toxicCounter = 0;
+      messages.push(`${prefix} ${name}'s Shed Skin cured its status!`);
+    }
+  }
+}
+
+// --- Field effect turn countdown ---
+
+function decrementFieldEffectTurns(fields: FieldEffects, messages: string[], prefix: string) {
+  if (fields.reflect > 0) {
+    fields.reflect--;
+    if (fields.reflect === 0) {
+      messages.push(`${prefix} team's Reflect wore off!`);
+    }
+  }
+  if (fields.lightScreen > 0) {
+    fields.lightScreen--;
+    if (fields.lightScreen === 0) {
+      messages.push(`${prefix} team's Light Screen wore off!`);
     }
   }
 }

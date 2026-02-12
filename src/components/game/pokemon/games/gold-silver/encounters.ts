@@ -9,10 +9,15 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 16, minLevel: 2, maxLevel: 5, weight: 35 },  // Pidgey
-        { speciesId: 161, minLevel: 2, maxLevel: 5, weight: 35 }, // Sentret
-        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 15 }, // Hoppip (morning/day)
-        { speciesId: 19, minLevel: 3, maxLevel: 4, weight: 15 },  // Rattata
+        { speciesId: 16, minLevel: 2, maxLevel: 5, weight: 35, timeOfDay: 'day' },     // Pidgey (day)
+        { speciesId: 16, minLevel: 2, maxLevel: 5, weight: 35, timeOfDay: 'morning' },  // Pidgey (morning)
+        { speciesId: 161, minLevel: 2, maxLevel: 5, weight: 35, timeOfDay: 'morning' }, // Sentret (morning)
+        { speciesId: 161, minLevel: 2, maxLevel: 5, weight: 35, timeOfDay: 'day' },     // Sentret (day)
+        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 15, timeOfDay: 'morning' }, // Hoppip (morning)
+        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 15, timeOfDay: 'day' },     // Hoppip (day)
+        { speciesId: 163, minLevel: 2, maxLevel: 5, weight: 35, timeOfDay: 'night' },   // Hoothoot (night)
+        { speciesId: 19, minLevel: 3, maxLevel: 5, weight: 30, timeOfDay: 'night' },    // Rattata (night)
+        { speciesId: 19, minLevel: 3, maxLevel: 4, weight: 15 },                         // Rattata (always)
       ],
     },
   ],
@@ -21,11 +26,16 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 16, minLevel: 3, maxLevel: 5, weight: 30 },  // Pidgey
-        { speciesId: 10, minLevel: 3, maxLevel: 5, weight: 20 },  // Caterpie
-        { speciesId: 11, minLevel: 4, maxLevel: 5, weight: 10 },  // Metapod
-        { speciesId: 60, minLevel: 4, maxLevel: 5, weight: 15 },  // Poliwag
-        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 25 }, // Hoppip
+        { speciesId: 16, minLevel: 3, maxLevel: 5, weight: 30, timeOfDay: 'morning' },  // Pidgey (morning)
+        { speciesId: 16, minLevel: 3, maxLevel: 5, weight: 30, timeOfDay: 'day' },      // Pidgey (day)
+        { speciesId: 10, minLevel: 3, maxLevel: 5, weight: 20, timeOfDay: 'morning' },  // Caterpie (morning)
+        { speciesId: 10, minLevel: 3, maxLevel: 5, weight: 20, timeOfDay: 'day' },      // Caterpie (day)
+        { speciesId: 11, minLevel: 4, maxLevel: 5, weight: 10 },                         // Metapod (always)
+        { speciesId: 60, minLevel: 4, maxLevel: 5, weight: 15 },                         // Poliwag (always)
+        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 25, timeOfDay: 'morning' }, // Hoppip (morning)
+        { speciesId: 187, minLevel: 3, maxLevel: 5, weight: 25, timeOfDay: 'day' },     // Hoppip (day)
+        { speciesId: 163, minLevel: 3, maxLevel: 5, weight: 30, timeOfDay: 'night' },   // Hoothoot (night)
+        { speciesId: 167, minLevel: 3, maxLevel: 5, weight: 25, timeOfDay: 'night' },   // Spinarak (night)
       ],
     },
   ],
@@ -34,11 +44,14 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 16, minLevel: 4, maxLevel: 6, weight: 30 },  // Pidgey
-        { speciesId: 10, minLevel: 4, maxLevel: 6, weight: 20 },  // Caterpie
-        { speciesId: 69, minLevel: 4, maxLevel: 6, weight: 20 },  // Bellsprout
-        { speciesId: 187, minLevel: 5, maxLevel: 6, weight: 15 }, // Hoppip
-        { speciesId: 60, minLevel: 4, maxLevel: 6, weight: 15 },  // Poliwag
+        { speciesId: 16, minLevel: 4, maxLevel: 6, weight: 30, timeOfDay: 'morning' },  // Pidgey (morning)
+        { speciesId: 16, minLevel: 4, maxLevel: 6, weight: 30, timeOfDay: 'day' },      // Pidgey (day)
+        { speciesId: 10, minLevel: 4, maxLevel: 6, weight: 20 },                         // Caterpie (always)
+        { speciesId: 69, minLevel: 4, maxLevel: 6, weight: 20 },                         // Bellsprout (always)
+        { speciesId: 187, minLevel: 5, maxLevel: 6, weight: 15, timeOfDay: 'morning' }, // Hoppip (morning)
+        { speciesId: 187, minLevel: 5, maxLevel: 6, weight: 15, timeOfDay: 'day' },     // Hoppip (day)
+        { speciesId: 60, minLevel: 4, maxLevel: 6, weight: 15 },                         // Poliwag (always)
+        { speciesId: 163, minLevel: 4, maxLevel: 6, weight: 30, timeOfDay: 'night' },   // Hoothoot (night)
       ],
     },
   ],
@@ -47,8 +60,10 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'cave',
       entries: [
-        { speciesId: 19, minLevel: 3, maxLevel: 5, weight: 50 },  // Rattata
-        { speciesId: 92, minLevel: 3, maxLevel: 6, weight: 50 },  // Gastly
+        { speciesId: 19, minLevel: 3, maxLevel: 5, weight: 50 },                        // Rattata (always)
+        { speciesId: 92, minLevel: 3, maxLevel: 6, weight: 50, timeOfDay: 'night' },    // Gastly (night)
+        { speciesId: 92, minLevel: 3, maxLevel: 6, weight: 25, timeOfDay: 'morning' },  // Gastly (rare morning)
+        { speciesId: 92, minLevel: 3, maxLevel: 6, weight: 25, timeOfDay: 'day' },      // Gastly (rare day)
       ],
     },
   ],
@@ -61,8 +76,9 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
         { speciesId: 41, minLevel: 4, maxLevel: 8, weight: 15 },   // Zubat
         { speciesId: 69, minLevel: 6, maxLevel: 8, weight: 15 },   // Bellsprout
         { speciesId: 179, minLevel: 6, maxLevel: 8, weight: 20 },  // Mareep
-        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 15 },  // Hoppip
-        { speciesId: 194, minLevel: 6, maxLevel: 8, weight: 15 },  // Wooper
+        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 15, timeOfDay: 'morning' }, // Hoppip (morning)
+        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 15, timeOfDay: 'day' },     // Hoppip (day)
+        { speciesId: 194, minLevel: 6, maxLevel: 8, weight: 15, timeOfDay: 'night' },   // Wooper (night)
       ],
     },
   ],
@@ -86,8 +102,9 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
       entries: [
         { speciesId: 21, minLevel: 6, maxLevel: 8, weight: 30 },  // Spearow
         { speciesId: 19, minLevel: 6, maxLevel: 8, weight: 25 },  // Rattata
-        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 20 }, // Hoppip
-        { speciesId: 23, minLevel: 6, maxLevel: 8, weight: 25 },  // Ekans
+        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 20, timeOfDay: 'morning' }, // Hoppip (morning)
+        { speciesId: 187, minLevel: 6, maxLevel: 8, weight: 20, timeOfDay: 'day' },     // Hoppip (day)
+        { speciesId: 23, minLevel: 6, maxLevel: 8, weight: 25 },                         // Ekans (always)
       ],
     },
   ],
@@ -96,13 +113,15 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 10, minLevel: 5, maxLevel: 7, weight: 20 },  // Caterpie
-        { speciesId: 11, minLevel: 5, maxLevel: 7, weight: 10 },  // Metapod
-        { speciesId: 13, minLevel: 5, maxLevel: 7, weight: 20 },  // Weedle
-        { speciesId: 14, minLevel: 5, maxLevel: 7, weight: 10 },  // Kakuna
-        { speciesId: 43, minLevel: 5, maxLevel: 7, weight: 15 },  // Oddish
-        { speciesId: 46, minLevel: 5, maxLevel: 7, weight: 15 },  // Paras
-        { speciesId: 41, minLevel: 5, maxLevel: 7, weight: 10 },  // Zubat
+        { speciesId: 10, minLevel: 5, maxLevel: 7, weight: 20, timeOfDay: 'morning' },  // Caterpie (morning)
+        { speciesId: 10, minLevel: 5, maxLevel: 7, weight: 20, timeOfDay: 'day' },      // Caterpie (day)
+        { speciesId: 11, minLevel: 5, maxLevel: 7, weight: 10 },                         // Metapod (always)
+        { speciesId: 13, minLevel: 5, maxLevel: 7, weight: 20 },                         // Weedle (always)
+        { speciesId: 14, minLevel: 5, maxLevel: 7, weight: 10 },                         // Kakuna (always)
+        { speciesId: 43, minLevel: 5, maxLevel: 7, weight: 15, timeOfDay: 'night' },    // Oddish (night)
+        { speciesId: 46, minLevel: 5, maxLevel: 7, weight: 15 },                         // Paras (always)
+        { speciesId: 41, minLevel: 5, maxLevel: 7, weight: 10 },                         // Zubat (always)
+        { speciesId: 163, minLevel: 5, maxLevel: 7, weight: 15, timeOfDay: 'night' },   // Hoothoot (night)
       ],
     },
   ],
@@ -151,11 +170,12 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
     {
       type: 'grass',
       entries: [
-        { speciesId: 37, minLevel: 14, maxLevel: 16, weight: 20 },  // Vulpix
-        { speciesId: 58, minLevel: 14, maxLevel: 16, weight: 20 },  // Growlithe
-        { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20 }, // Spinarak
-        { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20 }, // Ledyba
-        { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20 },  // Spearow
+        { speciesId: 37, minLevel: 14, maxLevel: 16, weight: 20 },                       // Vulpix (always)
+        { speciesId: 58, minLevel: 14, maxLevel: 16, weight: 20 },                       // Growlithe (always)
+        { speciesId: 167, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'night' },  // Spinarak (night)
+        { speciesId: 165, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'morning' },// Ledyba (morning)
+        { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20 },                       // Spearow (always)
+        { speciesId: 21, minLevel: 14, maxLevel: 16, weight: 20, timeOfDay: 'day' },     // Spearow (extra day)
       ],
     },
   ],
@@ -264,6 +284,48 @@ export const johtoEncounters: Record<string, WildEncounterZone[]> = {
         { speciesId: 84, minLevel: 24, maxLevel: 28, weight: 20 },  // Doduo
         { speciesId: 227, minLevel: 24, maxLevel: 28, weight: 15 }, // Skarmory
         { speciesId: 207, minLevel: 24, maxLevel: 28, weight: 20 }, // Gligar
+      ],
+    },
+  ],
+
+  route_43: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 16, minLevel: 23, maxLevel: 25, weight: 20 },   // Pidgey
+        { speciesId: 17, minLevel: 23, maxLevel: 25, weight: 10 },   // Pidgeotto
+        { speciesId: 22, minLevel: 23, maxLevel: 25, weight: 10 },   // Fearow
+        { speciesId: 20, minLevel: 23, maxLevel: 25, weight: 15 },   // Raticate
+        { speciesId: 129, minLevel: 10, maxLevel: 20, weight: 20 },  // Magikarp (lake area)
+        { speciesId: 130, minLevel: 30, maxLevel: 30, weight: 5 },   // Gyarados (Red Gyarados area)
+        { speciesId: 178, minLevel: 23, maxLevel: 25, weight: 20 },  // Xatu
+      ],
+    },
+  ],
+
+  route_46: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 74, minLevel: 2, maxLevel: 5, weight: 25 },  // Geodude
+        { speciesId: 21, minLevel: 2, maxLevel: 5, weight: 25 },  // Spearow
+        { speciesId: 19, minLevel: 2, maxLevel: 5, weight: 25 },  // Rattata
+        { speciesId: 41, minLevel: 2, maxLevel: 5, weight: 25 },  // Zubat
+      ],
+    },
+  ],
+
+  route_28: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 22, minLevel: 39, maxLevel: 42, weight: 15 },   // Fearow
+        { speciesId: 101, minLevel: 38, maxLevel: 40, weight: 15 },  // Electrode
+        { speciesId: 47, minLevel: 38, maxLevel: 42, weight: 15 },   // Parasect
+        { speciesId: 55, minLevel: 38, maxLevel: 42, weight: 15 },   // Golduck
+        { speciesId: 57, minLevel: 38, maxLevel: 42, weight: 15 },   // Primeape
+        { speciesId: 189, minLevel: 38, maxLevel: 42, weight: 10 },  // Jumpluff
+        { speciesId: 30, minLevel: 38, maxLevel: 42, weight: 15 },   // Nidorina
       ],
     },
   ],

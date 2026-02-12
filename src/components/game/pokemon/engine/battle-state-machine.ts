@@ -9,7 +9,8 @@ import type {
 } from './types';
 import {
   createBattlePokemon, executeTurn, checkLevelUp,
-  attemptCatch, getMoveData,
+  attemptCatch, getMoveData, createFieldEffects, applyEntryHazards,
+  applyOnSwitchIn, getAbilitySwitchInWeather,
 } from './battle-engine';
 import { checkEvolution, evolvePokemon, getMovesForLevel, getSpeciesName } from './evolution-system';
 
@@ -40,6 +41,8 @@ export function createBattleState(config: BattleConfig): BattleState {
     opponentActive,
     weather: 'clear',
     weatherTurns: 0,
+    playerFieldEffects: createFieldEffects(),
+    opponentFieldEffects: createFieldEffects(),
     turnNumber: 0,
     textQueue: [introText, `Go! ${playerName}!`],
     currentText: introText,
@@ -223,13 +226,19 @@ export function advanceBattle(state: BattleState): BattleState {
         if (nextOpponent) {
           const newActive = createBattlePokemon(nextOpponent);
           const opName = nextOpponent.nickname ?? `#${nextOpponent.speciesId}`;
+          const hazardMessages: string[] = [];
+          applyEntryHazards(newActive, state.opponentFieldEffects, hazardMessages);
+          applyOnSwitchIn(newActive, state.playerActive, hazardMessages);
+          const abilityWeather = getAbilitySwitchInWeather(nextOpponent.ability);
           return {
             ...state,
             phase: 'action_select' as BattlePhase,
             opponentActive: newActive,
             expGained: 0,
             pendingLevelUps: levelUps,
-            textQueue: [`Foe sent out ${opName}!`, 'What will you do?'],
+            weather: abilityWeather ?? state.weather,
+            weatherTurns: abilityWeather ? 0 : state.weatherTurns,
+            textQueue: [`Foe sent out ${opName}!`, ...hazardMessages, 'What will you do?'],
             currentText: `Foe sent out ${opName}!`,
           };
         }
@@ -429,8 +438,18 @@ export function executeSwitchPokemon(state: BattleState, partyIndex: number): Ba
   const pokemon = state.playerParty[partyIndex];
   if (!pokemon || pokemon.currentHp <= 0) return state;
 
+  // Natural Cure: cure status when switching out
+  if (state.playerActive.pokemon.ability === 'natural_cure' && state.playerActive.pokemon.status !== null) {
+    state.playerActive.pokemon.status = null;
+  }
+
   const newActive = createBattlePokemon(pokemon);
   const name = pokemon.nickname ?? `#${pokemon.speciesId}`;
+
+  // Apply entry hazards to the switching-in Pokemon
+  const hazardMessages: string[] = [];
+  applyEntryHazards(newActive, state.playerFieldEffects, hazardMessages);
+  const abilityWeather = getAbilitySwitchInWeather(pokemon.ability);
 
   const result = executeTurn(
     { ...state, playerActive: newActive },
@@ -441,7 +460,9 @@ export function executeSwitchPokemon(state: BattleState, partyIndex: number): Ba
     ...state,
     playerActive: newActive,
     phase: 'faint_check',
-    textQueue: [`Go! ${name}!`, ...result.messages],
+    weather: abilityWeather ?? state.weather,
+    weatherTurns: abilityWeather ? 0 : state.weatherTurns,
+    textQueue: [`Go! ${name}!`, ...hazardMessages, ...result.messages],
     currentText: `Go! ${name}!`,
   };
 }

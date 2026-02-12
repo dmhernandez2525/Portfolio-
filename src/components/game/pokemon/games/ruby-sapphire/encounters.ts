@@ -130,6 +130,63 @@ export const hoennEncounters: Record<string, WildEncounterZone[]> = {
     ],
   }],
 
+  route_103: [{
+    type: 'grass',
+    entries: [
+      { speciesId: 263, minLevel: 2, maxLevel: 4, weight: 40 }, // Zigzagoon
+      { speciesId: 261, minLevel: 2, maxLevel: 4, weight: 40 }, // Poochyena
+      { speciesId: 278, minLevel: 3, maxLevel: 4, weight: 20 }, // Wingull
+    ],
+  }],
+
+  route_112: [{
+    type: 'grass',
+    entries: [
+      { speciesId: 322, minLevel: 14, maxLevel: 16, weight: 30 }, // Numel
+      { speciesId: 66, minLevel: 14, maxLevel: 16, weight: 25 },  // Machop
+      { speciesId: 183, minLevel: 14, maxLevel: 16, weight: 25 }, // Marill
+      { speciesId: 263, minLevel: 14, maxLevel: 16, weight: 20 }, // Zigzagoon
+    ],
+  }],
+
+  route_121: [{
+    type: 'grass',
+    entries: [
+      { speciesId: 261, minLevel: 26, maxLevel: 28, weight: 15 }, // Poochyena
+      { speciesId: 262, minLevel: 26, maxLevel: 28, weight: 15 }, // Mightyena
+      { speciesId: 278, minLevel: 26, maxLevel: 28, weight: 15 }, // Wingull
+      { speciesId: 44, minLevel: 26, maxLevel: 28, weight: 15 },  // Gloom
+      { speciesId: 352, minLevel: 26, maxLevel: 28, weight: 10 }, // Kecleon
+      { speciesId: 264, minLevel: 26, maxLevel: 28, weight: 20 }, // Linoone
+      { speciesId: 353, minLevel: 26, maxLevel: 28, weight: 10 }, // Shuppet
+    ],
+  }],
+
+  route_123: [{
+    type: 'grass',
+    entries: [
+      { speciesId: 43, minLevel: 26, maxLevel: 28, weight: 15 },  // Oddish
+      { speciesId: 44, minLevel: 26, maxLevel: 28, weight: 10 },  // Gloom
+      { speciesId: 264, minLevel: 26, maxLevel: 28, weight: 20 }, // Linoone
+      { speciesId: 262, minLevel: 26, maxLevel: 28, weight: 15 }, // Mightyena
+      { speciesId: 353, minLevel: 26, maxLevel: 28, weight: 15 }, // Shuppet
+      { speciesId: 278, minLevel: 26, maxLevel: 28, weight: 15 }, // Wingull
+      { speciesId: 352, minLevel: 26, maxLevel: 28, weight: 10 }, // Kecleon
+    ],
+  }],
+
+  cave_of_origin: [{
+    type: 'cave',
+    entries: [
+      { speciesId: 41, minLevel: 30, maxLevel: 36, weight: 25 },  // Zubat
+      { speciesId: 42, minLevel: 30, maxLevel: 36, weight: 15 },  // Golbat
+      { speciesId: 302, minLevel: 30, maxLevel: 36, weight: 15 }, // Sableye
+      { speciesId: 303, minLevel: 30, maxLevel: 36, weight: 15 }, // Mawile
+      { speciesId: 74, minLevel: 30, maxLevel: 36, weight: 15 },  // Geodude
+      { speciesId: 75, minLevel: 30, maxLevel: 36, weight: 15 },  // Graveler
+    ],
+  }],
+
   victory_road_hoenn: [{
     type: 'cave',
     entries: [
