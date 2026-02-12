@@ -93,11 +93,14 @@ export const aiStats: AIStat[] = [
   { label: "Projects with AI Prompts", value: "77+", description: "Each with structured agent prompt infrastructure" },
   { label: "Production AI Products", value: "11", description: "Shipped, working AI-powered applications" },
   { label: "Reusable Prompt Patterns", value: "10", description: "Battle-tested across dozens of projects" },
-  { label: "Total AI Sessions", value: "560+", description: "Across Claude, Gemini, Codex, Cursor, and ChatGPT" },
+  { label: "Total AI Sessions", value: "620+", description: "Across Claude, Gemini, Codex, Cursor, Copilot, and ChatGPT" },
   { label: "Enterprise Prompts", value: "36", description: "Production prompts from client work (836KB)" },
-  { label: "Conversation Data", value: "19.7 GB", description: "Raw AI interaction data across all tools" },
-  { label: "Git Commits", value: "4,442", description: "Across 53 repositories spanning 2019-2026" },
-  { label: "Market Research Reports", value: "11", description: "Full competitive intelligence with validated unit economics" },
+  { label: "Conversation Data", value: "16.2 GB", description: "Raw AI interaction data across all tools" },
+  { label: "Tokens Processed", value: "10.7B", description: "Through Claude Code alone (351K+ messages)" },
+  { label: "Git Commits", value: "4,284", description: "Across 58 repositories spanning 2019-2026" },
+  { label: "Market Research Reports", value: "15", description: "Full competitive intelligence with validated unit economics" },
+  { label: "Development Acceleration", value: "58x", description: "Commit velocity increase: 429/yr to 25,035/yr projected" },
+  { label: "Demo Mode Apps", value: "23", description: "Portfolio apps with standardized demo mode pattern" },
   { label: "Test Coverage", value: "97.7%", description: "Research Agent branch coverage" },
 ]
 
@@ -570,13 +573,13 @@ export const gitWorkflow = [
 // ============================================
 
 export const aiTools: AITool[] = [
-  { name: "Claude Code CLI", stats: "330 sessions, 9.1 GB data, 4,050 history commands", purpose: "Primary development agent. Largest session: 1.53 GB. Peak: 15 simultaneous instances. Autonomous multi-phase builds with --dangerously-skip-permissions." },
-  { name: "Gemini CLI", stats: "41 sessions, 613 MB brain data", purpose: "Portfolio-specific work (games, visual features). Built Mafia Wars recreation (245 MB session, 10 phases), portfolio rebuild (111 MB, 17 phases). Identical code standards enforced via GEMINI.md." },
-  { name: "OpenAI Codex CLI", stats: "44 sessions, 248 MB, model gpt-5.2-codex", purpose: "Bulk parallel processing. Peak day: 12 sessions in one day across patent-intelligence, TreasureTrail, ChoreChamp, SpecTree, save-a-stray, ink-synthesis." },
-  { name: "Cursor IDE", stats: "49 workspace roots, 2.2 GB data, AI tracking DB", purpose: "AI-native VS Code fork with full project context. MCP integration for Render deployment management." },
-  { name: "GitHub Copilot Chat", stats: "5 versions installed (VS Code + Cursor)", purpose: "IDE-level code completion, inline suggestions, and chat-based assistance during manual coding." },
+  { name: "Claude Code CLI", stats: "398 sessions, 9.1 GB, 351K messages, 10.7B tokens", purpose: "Primary development agent. 54,970 tool calls. Peak day: 37,202 messages across 39 sessions. Longest session: 90 hours / 3,922 messages. Largest: 1.55 GB (CodeReview AI MVP)." },
+  { name: "Gemini CLI", stats: "140 sessions, 6.9 GB data", purpose: "Portfolio work (games, visual features), browser automation with 14 recordings, image generation. Identical code standards enforced via GEMINI.md referencing CLAUDE.md." },
+  { name: "OpenAI Codex CLI", stats: "44 sessions, 255 MB, gpt-5.2-codex (xhigh reasoning)", purpose: "Autonomous bulk processing. 'Do not stop until done' pattern across 10+ projects in one day. Peak: 12 sessions across patent-intelligence, TreasureTrail, ChoreChamp, SpecTree." },
+  { name: "Cursor IDE", stats: "3 workspaces, 695 MB, 4,099 file history entries", purpose: "AI-native VS Code fork with full project context. MCP integration for Render deployment management." },
+  { name: "VS Code / Copilot", stats: "177 sessions (90 chat + 87 editing), 283 MB", purpose: "Quick in-editor completions across 182 workspaces. 23 Copilot chat directories tracked." },
   { name: "ChatGPT Desktop", stats: "macOS app with 69 extensions", purpose: "Supplementary research and exploration. Conversation exports backed up to Google Drive." },
-  { name: "Ollama", stats: "5 models, 187 GB+, up to 72B parameters", purpose: "Local model server for privacy-first development. Models: qwen2.5 (7B/32B/72B), dolphin-mistral:7b, qwen2.5-coder:32b." },
+  { name: "Ollama", stats: "5 models, 93 GB, up to 72B parameters", purpose: "Local model server for privacy-first development. Models: qwen2.5 (7B/32B/72B), dolphin-mistral:7b, qwen2.5-coder:32b." },
 ]
 
 export const toolDiversificationStrategy = `Each AI tool serves a specific role in the workflow:
@@ -916,6 +919,190 @@ export const googleDriveStats = {
   transcriptions: "46 VTT transcription files",
   backupArchives: "ran.zip (156.81 GB), Personal projects.zip (22.19 GB)",
   allAiWork: "40,408 items, 836 MB of AI development artifacts",
+}
+
+// ============================================
+// DEVELOPMENT ACCELERATION
+// ============================================
+
+export interface AccelerationStat {
+  period: string
+  commitsPerYear: string
+  reposCreated: string
+  note: string
+}
+
+export const developmentAcceleration: AccelerationStat[] = [
+  { period: "Pre-2026 (~6 years)", commitsPerYear: "~429/year avg", reposCreated: "16 total", note: "Manual development, traditional workflow" },
+  { period: "2026 (43 days)", commitsPerYear: "~25,035/year projected", reposCreated: "42 new repos", note: "AI-augmented pipeline at full velocity" },
+]
+
+export const accelerationDescription = `In just 43 days of 2026, 2,950 commits were produced across 42 new repositories. This exceeds all pre-2026 development combined (2,574 commits over ~6 years). The 58x acceleration in commit velocity is not from lower-quality commits; it comes from the AI-augmented pipeline handling scaffolding, testing, documentation, and deployment while human judgment focuses on architecture and feature prioritization.`
+
+// ============================================
+// CLAUDE CODE DETAILED STATS
+// ============================================
+
+export const claudeCodeDetailedStats = {
+  totalSessions: "398",
+  totalMessages: "351,546",
+  totalToolCalls: "54,970",
+  tokensProcessed: "~10.7 billion",
+  peakDayDate: "January 25, 2026",
+  peakDayMessages: "37,202",
+  peakDaySessions: "39",
+  peakDayToolCalls: "5,854",
+  longestSession: "90 hours / 3,922 messages",
+  largestSession: "1,547 MB (CodeReview AI MVP build)",
+  dataSize: "9.1 GB across all sessions",
+}
+
+// ============================================
+// SPECTREE EXPORT FORMATS
+// ============================================
+
+export interface ExportFormat {
+  name: string
+  format: string
+  description: string
+}
+
+export const specTreeExportFormats: ExportFormat[] = [
+  { name: "Cursor", format: ".cursor/rules/*.mdc", description: "Cursor IDE rule files for project-specific AI context" },
+  { name: "GitHub Copilot", format: ".github/copilot-instructions.md + WRAP", description: "Copilot workspace instructions with structured wrap format" },
+  { name: "Devin", format: "Atomic task specs", description: "Task-level specifications for Devin's autonomous execution" },
+  { name: "v0", format: "UI specs", description: "Frontend component specifications for v0 generation" },
+  { name: "CodeRabbit", format: ".coderabbit.yaml", description: "Automated code review configuration" },
+  { name: "Windsurf", format: ".windsurfrules XML", description: "Windsurf IDE workspace rules in XML format" },
+  { name: "Lovable", format: "Knowledge Base PRD", description: "Product requirement documents for Lovable's builder" },
+  { name: "MCP Server", format: "Real-time JSON API", description: "Live specification access via Model Context Protocol" },
+  { name: "Universal JSON", format: "JSON export", description: "Platform-agnostic structured export for custom integrations" },
+]
+
+// ============================================
+// NATIVE macOS MENU BAR APPS
+// ============================================
+
+export interface NativeMacApp {
+  name: string
+  purpose: string
+  features: string[]
+}
+
+export const nativeMacOSApps: NativeMacApp[] = [
+  { name: "AgentPromptsManager", purpose: "Agent prompts orchestration and management", features: ["17 Swift source files", "Global hotkeys (Cmd+Shift+I for new idea)", "CLI detection for Claude Code, Gemini, Codex", "URL scheme (agentprompts://) with 12+ actions", "FSEvents file watching", "Automated 5-phase workflow"] },
+  { name: "JarvisApp", purpose: "Voice assistant with full duplex conversation", features: ["Option+Space hotkey", "PersonaPlex integration", "3 operating modes", "Home Assistant smart home control"] },
+  { name: "VoiceForge/QwenTTS", purpose: "Text-to-speech with voice cloning", features: ["PyTorch Metal GPU acceleration", "Voice cloning from 3-second samples", "Voice design from text descriptions"] },
+  { name: "GmailOrganizerHelper", purpose: "AI-powered email classification", features: ["9-worker parallel sync", "Claude-powered classification", "Semantic search by meaning", "Multi-account support"] },
+]
+
+export const nativeMacAppPattern = `All 4 apps share a consistent architecture: LSUIElement (no dock icon), dark mode support, AppleScript/Terminal integration, and build.sh scripts for compilation. This pattern uses Swift/Cocoa for native macOS frontends that orchestrate Python or local AI backends.`
+
+// ============================================
+// PERSONAPLEX CROSS-PROJECT STRATEGY
+// ============================================
+
+export interface PersonaPlexProject {
+  project: string
+  voiceUseCase: string
+}
+
+export const personaplexProjects: PersonaPlexProject[] = [
+  { project: "Jarvis Voice Assistant", voiceUseCase: "Primary conversational AI with full duplex (<500ms)" },
+  { project: "CodeReview AI", voiceUseCase: "Voice-driven code review walkthroughs" },
+  { project: "Patent Intelligence", voiceUseCase: "Voice patent research and discovery queries" },
+  { project: "Gmail Organizer", voiceUseCase: "Voice email triage and classification" },
+  { project: "VoiceForge", voiceUseCase: "Conversational voice design and cloning interface" },
+  { project: "OBS Tutorial Recorder", voiceUseCase: "Voice narration during screen recordings" },
+]
+
+export const personaplexDescription = `PersonaPlex (NVIDIA, <500ms full duplex) validated on Mac M2 Max with 96GB unified memory. Planned integration across 6+ projects, creating a consistent voice-first interface layer. Detailed analysis at PERSONAPLEX_UPGRADE_ANALYSIS.md (18 KB).`
+
+// ============================================
+// KNOWLEDGE INGESTION PIPELINE
+// ============================================
+
+export const knowledgeIngestionPipeline = {
+  youtubeSessions: "68",
+  pattern: "Download via yt-dlp, convert with ffmpeg, transcribe with whisper-cpp (Metal GPU), summarize with LLM",
+  purpose: "Systematic knowledge ingestion from YouTube into a personal knowledge base and NAS media library",
+  toolchain: "yt-dlp + ffmpeg + whisper-cpp + Claude/Ollama summarization",
+  speed: "~15 seconds transcription for a 12-minute video on M2 Max",
+}
+
+export const tutorialRecordings = [
+  { date: "2026-01-18", subject: "Building CodeReview AI", description: "OBS screen recording of the full build process for CodeReview AI application" },
+  { date: "2026-01-18", subject: "New App Process", description: "Recording of new project creation using the agent prompts system workflow" },
+  { date: "2026-01-21", subject: "Gmail Organizer Work", description: "Recording of Gmail Organizer development session" },
+]
+
+export const tutorialRecordingsDescription = `13 OBS screen recording sessions documenting the AI workflow system in action. These recordings serve as video evidence of the agent-augmented development process, capturing real builds from idea to deployment.`
+
+// ============================================
+// COST OPTIMIZATION PATTERNS
+// ============================================
+
+export interface CostPattern {
+  technique: string
+  result: string
+  project: string
+}
+
+export const costOptimizationPatterns: CostPattern[] = [
+  { technique: "Prompt Caching", result: "83.9% token reduction", project: "Research Agent" },
+  { technique: "3-Tier Model Routing", result: "Route simple tasks to cheap models, complex to expensive", project: "Research Agent" },
+  { technique: "Free Tier Harvesting", result: "Render free tier for static sites, PostgreSQL, Redis", project: "All portfolio projects" },
+  { technique: "Haiku/Sonnet Splitting", result: "Use Haiku for classification, Sonnet for reasoning", project: "Gmail Organizer" },
+  { technique: "Session Cost Tracking", result: "$0.06-0.15/session (96-97% cost reduction vs naive)", project: "Research Agent" },
+  { technique: "Token Counting", result: "TikToken for real-time cost estimation before API calls", project: "Multiple" },
+]
+
+// ============================================
+// CROSS-TOOL INSTRUCTION SYNC
+// ============================================
+
+export const crossToolSyncDescription = `A single source of truth (~/.claude/CLAUDE.md) synchronizes instructions across all AI tools. Gemini's config explicitly references it. Codex sessions were configured to always look at that file. This means updating one file propagates rules (forbidden patterns, git workflow, testing requirements) to all agents regardless of which tool runs them.`
+
+export const crossToolSyncEvidence = [
+  { tool: "Gemini CLI", method: "GEMINI.md references CLAUDE.md directly", quote: "Please also refer to the global agent instructions located at CLAUDE.md" },
+  { tool: "Codex CLI", method: "Configured to reference at session start", quote: "Can you just reference to always look at that file the Claude MD so I only have to worry about updating that one file" },
+  { tool: "Claude Code", method: "Native CLAUDE.md loading", quote: "Loaded automatically at every session start" },
+  { tool: "Cursor IDE", method: "MCP integration", quote: "Project context loaded via workspace configuration" },
+]
+
+// ============================================
+// ENFORCEMENT GAPS (Honest Self-Assessment)
+// ============================================
+
+export interface EnforcementGap {
+  policy: string
+  stated: string
+  actual: string
+}
+
+export const enforcementGaps: EnforcementGap[] = [
+  { policy: "80% Test Coverage", stated: "NON-NEGOTIABLE. NO EXCEPTIONS.", actual: "All Codecov configs use informational: true (reporting only, never blocks)" },
+  { policy: "Pre-commit Hooks", stated: "Elaborate hooks in enterprise-template-system", actual: "Entirely commented out in the most sophisticated project" },
+  { policy: "TypeScript Strict", stated: "No any types mandate", actual: "Enterprise-template-system itself has strict: false in tsconfig" },
+  { policy: "E2E Testing in CI", stated: "80% of critical paths", actual: "Only 1 project has E2E tests in CI pipeline" },
+  { policy: "Test File Coverage", stated: "Every code file must have a corresponding test file", actual: "31 of 59 projects have zero test files" },
+]
+
+export const enforcementGapsDescription = `An honest assessment of gaps between stated policy and actual enforcement. These gaps exist because the ecosystem scaled from 16 to 58 repos in 43 days. The policies were written first (design-first), and enforcement tooling is being propagated. The gaps are documented, tracked, and being addressed systematically.`
+
+// ============================================
+// ADDITIONAL NOTABLE PROJECTS
+// ============================================
+
+export const additionalFindings = {
+  geneticHealthPipeline: "Cross-referenced 667,120 SNPs against ClinVar (341K variants), PharmGKB, and GWAS Catalog (511 MB, 1M+ associations). 271,000+ genetic associations analyzed across 20 health categories, all processed locally.",
+  teamsTranscription: "387 Microsoft Teams meeting recordings (104 GB) from the startup period. 3 transcription engines compared: whisper-cpp (local), faster-whisper (local with speaker diarization), and OpenAI Whisper API (cloud).",
+  metaPromptEnhancement: "META_PROMPT_ENHANCE_EXCAVATION.md (34 KB): A prompt that improves prompts. This represents a third level of meta-prompting: prompts that generate prompts, AND prompts that improve prompt-generators.",
+  extractedPromptsLibrary: "392 KB of raw prompts extracted from production sessions, refined to 18 KB cleaned version, then curated to 16 KB reusable version. Three-stage prompt extraction pipeline.",
+  projectsArchiveDb: "187 MB SQLite queryable database of 224,228 files across 28,191 directories from 72 git repositories. Enables programmatic analysis of the full project archive.",
+  hivStrategy: "Active contractor work for HIVE Strategy (Diamond HubSpot Solutions Partner, top 4% globally). 3-pass code review applied to real client code: decomposed a 2,393-line file into 9 modules, a 1,106-line file into 11 sub-routers, fixed 146 console.* calls.",
+  stableDiffusion: "Full AUTOMATIC1111 Stable Diffusion WebUI installation for local AI image generation, adding to the portfolio of local-first AI tools.",
+  diffLocal: "DiffLocal: Content Security Policy headers restrict ALL network access. URL fragments never sent to server. Extreme privacy pattern where files stay within a strict boundary.",
 }
 
 // ============================================
