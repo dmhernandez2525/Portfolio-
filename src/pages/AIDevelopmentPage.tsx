@@ -9,6 +9,7 @@ import {
   FileText, HardDrive, Gauge, Smartphone, Share2,
   AlertTriangle, DollarSign, Video,
   TestTube2, Workflow, Package, Database, FolderTree, BarChart3,
+  KeyRound, ShieldCheck, Type, GitFork, Eye, Activity, Accessibility,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -100,6 +101,22 @@ import {
   templateConsistencyDescription,
   portfolioMaturitySpectrum,
   enterpriseOutlier,
+  envStats,
+  cloudServiceUsage,
+  envCategories,
+  byokPatternDescription,
+  securityStats,
+  securityHighlights,
+  typescriptPatternStats,
+  stateManagementPreference,
+  monorepoStats,
+  largestMonorepos,
+  accessibilityStats,
+  accessibilityHighlight,
+  performanceStats,
+  performanceHighlights,
+  resilienceStats,
+  resilienceDescription,
 } from "@/data/ai-development"
 
 // ============================================
@@ -251,6 +268,13 @@ const tocSections = [
   { id: "infra-deploy", label: "Infrastructure", icon: Database },
   { id: "sdd-coverage", label: "SDD Coverage", icon: FolderTree },
   { id: "prompt-infra", label: "Prompt Infrastructure", icon: BarChart3 },
+  { id: "env-secrets", label: "Environment & Secrets", icon: KeyRound },
+  { id: "security", label: "Security Implementations", icon: ShieldCheck },
+  { id: "typescript-patterns", label: "TypeScript Patterns", icon: Type },
+  { id: "monorepo", label: "Monorepo Architecture", icon: GitFork },
+  { id: "accessibility", label: "Accessibility & UX", icon: Accessibility },
+  { id: "performance", label: "Performance Optimization", icon: Activity },
+  { id: "resilience", label: "Error Handling & Resilience", icon: Eye },
   { id: "enforcement-gaps", label: "Enforcement Gaps", icon: AlertTriangle },
   { id: "use-cases", label: "Practical Use Cases", icon: Zap },
   { id: "enterprise", label: "Enterprise Patterns", icon: Server },
@@ -1191,6 +1215,162 @@ export function AIDevelopmentPage() {
               <h4 className="font-semibold mb-2">Enterprise Outlier</h4>
               <p className="text-sm text-muted-foreground">{enterpriseOutlier}</p>
             </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Environment & Secrets Management */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Environment & Secrets Management (325+ Variables)" icon={KeyRound} id="env-secrets">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              30+ projects with environment configuration, 45 .env files, 32 .env.example templates, and 4 AI/LLM providers supported across the portfolio.
+            </p>
+
+            <DataTable
+              headers={["Metric", "Value", "Detail"]}
+              rows={envStats.map(s => [s.metric, s.value, s.detail])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Cloud Service Distribution</h3>
+            <DataTable
+              headers={["Service", "Projects", "Examples"]}
+              rows={cloudServiceUsage.map(c => [c.service, String(c.projects), c.examples])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Variable Categories</h3>
+            <div className="space-y-2">
+              {envCategories.map(cat => (
+                <div key={cat.category} className="flex items-start gap-3 p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <Badge variant="secondary" className="font-mono text-xs shrink-0">{cat.count}</Badge>
+                  <div>
+                    <span className="font-semibold text-sm">{cat.category}</span>
+                    <p className="text-xs text-muted-foreground">{cat.examples}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
+              <h4 className="font-semibold mb-2">BYOK Pattern</h4>
+              <p className="text-sm text-muted-foreground">{byokPatternDescription}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Security Implementations */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Security Implementations (4,020+ Validation Occurrences)" icon={ShieldCheck} id="security">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Comprehensive security across authentication (Clerk, NextAuth, JWT), encryption (AES-256-GCM, HIPAA-compliant), RBAC (custom Strapi plugins), and input validation (Zod nearly universal).
+            </p>
+
+            <DataTable
+              headers={["Category", "Files", "Occurrences", "Top Projects"]}
+              rows={securityStats.map(s => [s.category, s.filesFound, s.occurrences, s.topProjects])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Security Highlights</h3>
+            <div className="space-y-3">
+              {securityHighlights.map(h => (
+                <div key={h.label} className="p-3 rounded-lg border border-green-500/30 bg-green-500/5">
+                  <span className="font-semibold text-sm text-green-400">{h.label}</span>
+                  <p className="text-sm text-muted-foreground mt-1">{h.detail}</p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: TypeScript Patterns */}
+          {/* ============================================ */}
+          <CollapsibleSection title="TypeScript & Architecture Patterns (2,358 Generic Type Files)" icon={Type} id="typescript-patterns">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Mature TypeScript architecture with Zod for runtime validation, Zustand for state management, tRPC for type-safe APIs, and Prisma for database access.
+            </p>
+
+            <DataTable
+              headers={["Pattern", "Files", "Highlight"]}
+              rows={typescriptPatternStats.map(p => [p.pattern, p.filesFound, p.highlight])}
+            />
+
+            <div className="mt-6 p-4 rounded-lg border border-blue-500/30 bg-blue-500/5">
+              <h4 className="font-semibold mb-2">State Management Preference</h4>
+              <p className="text-sm text-muted-foreground">{stateManagementPreference}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Monorepo Architecture */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Monorepo Architecture (10 Turborepo, 40 Packages)" icon={GitFork} id="monorepo">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              10 projects use Turborepo with npm/yarn workspaces, 40 individual packages across all monorepos, and 11 projects with dedicated Client/Server separation.
+            </p>
+
+            <DataTable
+              headers={["Metric", "Value", "Detail"]}
+              rows={monorepoStats.map(s => [s.metric, s.value, s.detail])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Largest Monorepos by Package Count</h3>
+            <DataTable
+              headers={["Project", "Packages", "Highlights"]}
+              rows={largestMonorepos.map(m => [m.project, String(m.packages), m.highlights])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Accessibility & UX */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Accessibility & UX Patterns (747 ARIA Files)" icon={Accessibility} id="accessibility">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Extensive accessibility implementation across the portfolio, from ARIA attributes and keyboard navigation to screen reader support, PWA patterns, and internationalization.
+            </p>
+
+            <DataTable
+              headers={["Pattern", "Files Found", "Top Projects"]}
+              rows={accessibilityStats.map(a => [a.pattern, a.filesFound, a.topProjects])}
+            />
+
+            <div className="mt-6 p-4 rounded-lg border border-purple-500/30 bg-purple-500/5">
+              <h4 className="font-semibold mb-2">Notable Implementations</h4>
+              <p className="text-sm text-muted-foreground">{accessibilityHighlight}</p>
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Performance Optimization */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Performance Optimization (329 Caching, 447 DB Indexes)" icon={Activity} id="performance">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Strong backend optimization (connection pooling, database indexing, caching) with production-grade implementations in rave-collective, Learning-Hall, and Comfort-Order.
+            </p>
+
+            <DataTable
+              headers={["Pattern", "Files", "Occurrences", "Top Projects"]}
+              rows={performanceStats.map(p => [p.pattern, p.filesFound, p.occurrences, p.topProjects])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Performance Highlights</h3>
+            <div className="space-y-3">
+              {performanceHighlights.map(h => (
+                <div key={h.label} className="p-3 rounded-lg border border-cyan-500/30 bg-cyan-500/5">
+                  <span className="font-semibold text-sm text-cyan-400">{h.label}</span>
+                  <p className="text-sm text-muted-foreground mt-1">{h.detail}</p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Error Handling & Resilience */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Error Handling & Resilience (116 Try-Catch, 37 Fallbacks)" icon={Eye} id="resilience">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{resilienceDescription}</p>
+
+            <DataTable
+              headers={["Pattern", "Count", "Detail"]}
+              rows={resilienceStats.map(r => [r.pattern, r.count, r.detail])}
+            />
           </CollapsibleSection>
 
           {/* ============================================ */}
