@@ -105,6 +105,57 @@ export const kantoEncounters: Record<string, WildEncounterZone[]> = {
     },
   ],
 
+  route_5: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 43, minLevel: 13, maxLevel: 16, weight: 25 }, // Oddish
+        { speciesId: 52, minLevel: 13, maxLevel: 16, weight: 25 }, // Meowth
+        { speciesId: 16, minLevel: 13, maxLevel: 16, weight: 25 }, // Pidgey
+        { speciesId: 56, minLevel: 13, maxLevel: 16, weight: 25 }, // Mankey
+      ],
+    },
+  ],
+
+  route_7: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 16, minLevel: 17, maxLevel: 22, weight: 20 }, // Pidgey
+        { speciesId: 37, minLevel: 17, maxLevel: 20, weight: 20 }, // Vulpix
+        { speciesId: 43, minLevel: 17, maxLevel: 22, weight: 20 }, // Oddish
+        { speciesId: 52, minLevel: 17, maxLevel: 22, weight: 20 }, // Meowth
+        { speciesId: 58, minLevel: 17, maxLevel: 20, weight: 20 }, // Growlithe
+      ],
+    },
+  ],
+
+  route_9: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 19, minLevel: 15, maxLevel: 18, weight: 20 }, // Rattata
+        { speciesId: 21, minLevel: 15, maxLevel: 18, weight: 25 }, // Spearow
+        { speciesId: 23, minLevel: 14, maxLevel: 17, weight: 20 }, // Ekans
+        { speciesId: 29, minLevel: 11, maxLevel: 17, weight: 15 }, // Nidoran F
+        { speciesId: 32, minLevel: 11, maxLevel: 17, weight: 20 }, // Nidoran M
+      ],
+    },
+  ],
+
+  route_10: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 100, minLevel: 14, maxLevel: 17, weight: 20 }, // Voltorb
+        { speciesId: 21, minLevel: 13, maxLevel: 17, weight: 25 },  // Spearow
+        { speciesId: 23, minLevel: 11, maxLevel: 17, weight: 20 },  // Ekans
+        { speciesId: 81, minLevel: 16, maxLevel: 17, weight: 15 },  // Magnemite
+        { speciesId: 29, minLevel: 13, maxLevel: 17, weight: 20 },  // Nidoran F
+      ],
+    },
+  ],
+
   rock_tunnel: [
     {
       type: 'cave',
@@ -126,6 +177,159 @@ export const kantoEncounters: Record<string, WildEncounterZone[]> = {
         { speciesId: 52, minLevel: 18, maxLevel: 22, weight: 20 }, // Meowth
         { speciesId: 77, minLevel: 18, maxLevel: 22, weight: 20 }, // Ponyta
         { speciesId: 96, minLevel: 20, maxLevel: 22, weight: 20 }, // Drowzee
+      ],
+    },
+  ],
+
+  route_11: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 23, minLevel: 13, maxLevel: 17, weight: 20 }, // Ekans
+        { speciesId: 96, minLevel: 15, maxLevel: 18, weight: 20 }, // Drowzee
+        { speciesId: 21, minLevel: 13, maxLevel: 17, weight: 20 }, // Spearow
+        { speciesId: 19, minLevel: 13, maxLevel: 17, weight: 20 }, // Rattata
+        { speciesId: 56, minLevel: 15, maxLevel: 18, weight: 20 }, // Mankey
+      ],
+    },
+  ],
+
+  route_12: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 43, minLevel: 22, maxLevel: 26, weight: 25 }, // Oddish
+        { speciesId: 44, minLevel: 24, maxLevel: 26, weight: 10 }, // Gloom
+        { speciesId: 69, minLevel: 22, maxLevel: 26, weight: 25 }, // Bellsprout
+        { speciesId: 16, minLevel: 23, maxLevel: 27, weight: 20 }, // Pidgey
+        { speciesId: 48, minLevel: 24, maxLevel: 26, weight: 20 }, // Venonat
+      ],
+    },
+  ],
+
+  route_13: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 43, minLevel: 22, maxLevel: 26, weight: 20 }, // Oddish
+        { speciesId: 69, minLevel: 22, maxLevel: 26, weight: 20 }, // Bellsprout
+        { speciesId: 16, minLevel: 25, maxLevel: 27, weight: 15 }, // Pidgey
+        { speciesId: 17, minLevel: 27, maxLevel: 29, weight: 10 }, // Pidgeotto
+        { speciesId: 48, minLevel: 24, maxLevel: 26, weight: 20 }, // Venonat
+        { speciesId: 132, minLevel: 25, maxLevel: 25, weight: 15 }, // Ditto
+      ],
+    },
+  ],
+
+  route_14: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 43, minLevel: 23, maxLevel: 26, weight: 20 }, // Oddish
+        { speciesId: 69, minLevel: 23, maxLevel: 26, weight: 20 }, // Bellsprout
+        { speciesId: 48, minLevel: 24, maxLevel: 27, weight: 20 }, // Venonat
+        { speciesId: 132, minLevel: 23, maxLevel: 23, weight: 15 }, // Ditto
+        { speciesId: 17, minLevel: 28, maxLevel: 30, weight: 10 }, // Pidgeotto
+        { speciesId: 44, minLevel: 26, maxLevel: 28, weight: 15 }, // Gloom
+      ],
+    },
+  ],
+
+  route_15: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 43, minLevel: 23, maxLevel: 26, weight: 20 }, // Oddish
+        { speciesId: 69, minLevel: 23, maxLevel: 26, weight: 20 }, // Bellsprout
+        { speciesId: 48, minLevel: 26, maxLevel: 28, weight: 20 }, // Venonat
+        { speciesId: 132, minLevel: 23, maxLevel: 23, weight: 15 }, // Ditto
+        { speciesId: 17, minLevel: 28, maxLevel: 30, weight: 10 }, // Pidgeotto
+        { speciesId: 44, minLevel: 26, maxLevel: 28, weight: 15 }, // Gloom
+      ],
+    },
+  ],
+
+  route_16: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 19, minLevel: 18, maxLevel: 22, weight: 20 }, // Rattata
+        { speciesId: 20, minLevel: 22, maxLevel: 25, weight: 15 }, // Raticate
+        { speciesId: 21, minLevel: 20, maxLevel: 22, weight: 20 }, // Spearow
+        { speciesId: 84, minLevel: 22, maxLevel: 26, weight: 20 }, // Doduo
+        { speciesId: 143, minLevel: 30, maxLevel: 30, weight: 5 },  // Snorlax (rare)
+        { speciesId: 56, minLevel: 20, maxLevel: 24, weight: 20 }, // Mankey
+      ],
+    },
+  ],
+
+  route_17: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 21, minLevel: 20, maxLevel: 25, weight: 25 }, // Spearow
+        { speciesId: 22, minLevel: 25, maxLevel: 29, weight: 10 }, // Fearow
+        { speciesId: 19, minLevel: 20, maxLevel: 25, weight: 20 }, // Rattata
+        { speciesId: 20, minLevel: 25, maxLevel: 29, weight: 10 }, // Raticate
+        { speciesId: 84, minLevel: 24, maxLevel: 28, weight: 20 }, // Doduo
+        { speciesId: 85, minLevel: 26, maxLevel: 29, weight: 15 }, // Dodrio
+      ],
+    },
+  ],
+
+  route_18: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 21, minLevel: 20, maxLevel: 25, weight: 25 }, // Spearow
+        { speciesId: 22, minLevel: 25, maxLevel: 29, weight: 15 }, // Fearow
+        { speciesId: 84, minLevel: 24, maxLevel: 28, weight: 20 }, // Doduo
+        { speciesId: 85, minLevel: 26, maxLevel: 29, weight: 10 }, // Dodrio
+        { speciesId: 20, minLevel: 25, maxLevel: 29, weight: 15 }, // Raticate
+        { speciesId: 19, minLevel: 20, maxLevel: 25, weight: 15 }, // Rattata
+      ],
+    },
+  ],
+
+  route_22: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 19, minLevel: 2, maxLevel: 5, weight: 25 },  // Rattata
+        { speciesId: 21, minLevel: 3, maxLevel: 5, weight: 25 },  // Spearow
+        { speciesId: 29, minLevel: 3, maxLevel: 5, weight: 15 },  // Nidoran F
+        { speciesId: 32, minLevel: 3, maxLevel: 5, weight: 15 },  // Nidoran M
+        { speciesId: 56, minLevel: 3, maxLevel: 5, weight: 20 },  // Mankey
+      ],
+    },
+  ],
+
+  route_23: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 21, minLevel: 26, maxLevel: 32, weight: 15 }, // Spearow
+        { speciesId: 22, minLevel: 34, maxLevel: 38, weight: 10 }, // Fearow
+        { speciesId: 23, minLevel: 26, maxLevel: 32, weight: 15 }, // Ekans
+        { speciesId: 24, minLevel: 32, maxLevel: 36, weight: 10 }, // Arbok
+        { speciesId: 56, minLevel: 26, maxLevel: 32, weight: 15 }, // Mankey
+        { speciesId: 132, minLevel: 26, maxLevel: 26, weight: 15 }, // Ditto
+        { speciesId: 30, minLevel: 30, maxLevel: 34, weight: 10 }, // Nidorina
+        { speciesId: 33, minLevel: 30, maxLevel: 34, weight: 10 }, // Nidorino
+      ],
+    },
+  ],
+
+  route_25: [
+    {
+      type: 'grass',
+      entries: [
+        { speciesId: 10, minLevel: 8, maxLevel: 12, weight: 15 }, // Caterpie
+        { speciesId: 13, minLevel: 8, maxLevel: 12, weight: 15 }, // Weedle
+        { speciesId: 43, minLevel: 12, maxLevel: 14, weight: 20 }, // Oddish
+        { speciesId: 63, minLevel: 8, maxLevel: 12, weight: 20 }, // Abra
+        { speciesId: 16, minLevel: 8, maxLevel: 14, weight: 15 }, // Pidgey
+        { speciesId: 69, minLevel: 12, maxLevel: 14, weight: 15 }, // Bellsprout
       ],
     },
   ],
