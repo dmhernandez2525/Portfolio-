@@ -1,5 +1,5 @@
 // ============================================================================
-// Hoenn Maps — Routes, Cities, Dungeons, and Interiors
+// Hoenn Maps - Routes, Cities, Dungeons, and Interiors
 // ============================================================================
 
 import type { GameMap, Direction, NPCDef } from '../../../engine/types';

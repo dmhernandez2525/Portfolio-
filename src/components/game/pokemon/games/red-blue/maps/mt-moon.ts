@@ -1,5 +1,5 @@
 // ============================================================================
-// Mt. Moon — Cave dungeon between Route 3 and Route 4
+// Mt. Moon - Cave dungeon between Route 3 and Route 4
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Battle State Machine
+// Pokemon RPG Engine - Battle State Machine
 // ============================================================================
 // Manages the full battle flow from intro through victory/defeat.
 
@@ -198,6 +198,23 @@ export function advanceBattle(state: BattleState): BattleState {
           ? [{ pokemon: state.playerActive.pokemon, newLevel: expResult.newLevel, newMoves }]
           : [];
 
+        // Exp. Share: non-participating party members holding exp-share get 50% EXP
+        const expShareAmount = Math.floor(state.expGained * 0.5);
+        if (expShareAmount > 0) {
+          for (const partyMon of state.playerParty) {
+            if (partyMon.uid === state.playerActive.pokemon.uid) continue;
+            if (partyMon.currentHp <= 0) continue;
+            const hasExpShare = partyMon.heldItem === 'exp-share';
+            if (hasExpShare) {
+              const shareResult = checkLevelUp(partyMon, expShareAmount);
+              if (shareResult.leveled) {
+                const shareMoves = getMovesForLevel(partyMon.speciesId, shareResult.newLevel);
+                levelUps.push({ pokemon: partyMon, newLevel: shareResult.newLevel, newMoves: shareMoves });
+              }
+            }
+          }
+        }
+
         // Check if opponent has more pokemon (trainer battle)
         const nextOpponent = state.opponentParty.find(p =>
           p.uid !== state.opponentActive.pokemon.uid && p.currentHp > 0
@@ -263,7 +280,7 @@ export function advanceBattle(state: BattleState): BattleState {
         };
       }
 
-      // Neither fainted — back to action select
+      // Neither fainted - back to action select
       return {
         ...state,
         phase: 'action_select' as BattlePhase,
@@ -322,7 +339,7 @@ export function advanceBattle(state: BattleState): BattleState {
           phase: 'battle_end' as BattlePhase,
         };
       }
-      // Didn't catch — opponent attacks
+      // Didn't catch - opponent attacks
       return {
         ...state,
         phase: 'action_select' as BattlePhase,
@@ -417,7 +434,7 @@ export function executeSwitchPokemon(state: BattleState, partyIndex: number): Ba
 
   const result = executeTurn(
     { ...state, playerActive: newActive },
-    null, 'switch', undefined, partyIndex
+    null, 'switch'
   );
 
   return {

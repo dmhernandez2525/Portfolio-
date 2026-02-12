@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Save/Load Manager
+// Pokemon RPG Engine - Save/Load Manager
 // ============================================================================
 
 import type { GameSave, GameVersion } from './types';

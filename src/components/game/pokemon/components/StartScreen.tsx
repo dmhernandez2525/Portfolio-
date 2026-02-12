@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Start Screen (New Game / Continue)
+// Pokemon RPG - Start Screen (New Game / Continue)
 // ============================================================================
 
 import { useState } from 'react';

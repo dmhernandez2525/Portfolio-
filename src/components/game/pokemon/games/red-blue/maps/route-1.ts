@@ -1,5 +1,5 @@
 // ============================================================================
-// Route 1 — Connects Pallet Town (south) to Viridian City (north)
+// Route 1 - Connects Pallet Town (south) to Viridian City (north)
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

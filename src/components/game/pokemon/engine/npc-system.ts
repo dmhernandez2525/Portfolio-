@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — NPC System
+// Pokemon RPG Engine - NPC System
 // ============================================================================
 // Handles NPC movement, dialog trees, and trainer line-of-sight.
 
@@ -67,7 +67,7 @@ export function updateNPC(
   playerTileY: number,
   allNPCStates: Map<string, NPCState>
 ): NPCState {
-  // Currently moving — animate
+  // Currently moving - animate
   if (state.isMoving) {
     const newProgress = state.moveProgress + 0.05;
     if (newProgress >= 1) {

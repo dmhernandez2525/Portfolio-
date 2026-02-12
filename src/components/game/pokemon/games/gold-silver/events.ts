@@ -1,21 +1,11 @@
 // ============================================================================
-// Gold/Silver — Story Events & Cutscenes
+// Gold/Silver - Story Events & Cutscenes
 // ============================================================================
 
-export interface StoryEvent {
-  id: string;
-  trigger: 'map_enter' | 'interact' | 'flag_check';
-  mapId?: string;
-  npcId?: string;
-  requiredFlags?: string[];
-  blockedByFlags?: string[];
-  dialog: string[];
-  setsFlags?: string[];
-  givesItem?: { itemId: string; quantity: number };
-  givesPokemon?: { speciesId: number; level: number };
-  starterSelection?: boolean;
-  battle?: { trainerId: string };
-}
+import type { StoryEvent } from '../../engine/story-events';
+import { getActiveEvents as filterEvents } from '../../engine/story-events';
+
+export type { StoryEvent };
 
 export const storyEvents: StoryEvent[] = [
   // --- Opening ---
@@ -129,6 +119,34 @@ export const storyEvents: StoryEvent[] = [
     ],
     setsFlags: ['hall_of_fame_gs'],
   },
+
+  // --- Post-Game: Kanto Unlock ---
+  {
+    id: 'kanto_unlock',
+    trigger: 'map_enter',
+    mapId: 'new_bark_town',
+    requiredFlags: ['defeated_champion_gs'],
+    blockedByFlags: ['kanto_unlocked'],
+    dialog: [
+      'PROF. ELM calls!',
+      '"Congratulations! As Champion, the S.S. Ticket',
+      'lets you travel to KANTO!"',
+      'The route to KANTO is now open!',
+    ],
+    setsFlags: ['kanto_unlocked'],
+  },
+
+  // --- Post-Game: Red on Mt. Silver ---
+  {
+    id: 'red_encounter',
+    trigger: 'interact',
+    npcId: 'red_mt_silver',
+    requiredFlags: ['kanto_unlocked'],
+    blockedByFlags: ['defeated_red'],
+    dialog: ['...'],
+    battle: { trainerId: 'red_mt_silver' },
+    setsFlags: ['defeated_red'],
+  },
 ];
 
 export function getActiveEvents(
@@ -137,12 +155,5 @@ export function getActiveEvents(
   mapId?: string,
   npcId?: string,
 ): StoryEvent[] {
-  return storyEvents.filter(event => {
-    if (event.trigger !== trigger) return false;
-    if (event.mapId && event.mapId !== mapId) return false;
-    if (event.npcId && event.npcId !== npcId) return false;
-    if (event.requiredFlags?.some(f => !flags[f])) return false;
-    if (event.blockedByFlags?.some(f => flags[f])) return false;
-    return true;
-  });
+  return filterEvents(storyEvents, trigger, flags, mapId, npcId);
 }

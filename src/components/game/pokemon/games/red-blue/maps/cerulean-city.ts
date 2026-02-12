@@ -1,5 +1,5 @@
 // ============================================================================
-// Cerulean City — Misty's Gym, Nugget Bridge access
+// Cerulean City - Misty's Gym, Nugget Bridge access
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

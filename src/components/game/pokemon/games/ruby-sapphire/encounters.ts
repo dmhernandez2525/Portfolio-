@@ -1,5 +1,5 @@
 // ============================================================================
-// Ruby/Sapphire — Wild Encounter Tables
+// Ruby/Sapphire - Wild Encounter Tables
 // ============================================================================
 
 import type { WildEncounterZone } from '../../engine/types';

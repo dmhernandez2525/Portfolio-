@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Overworld Hook (player movement, encounters)
+// Pokemon RPG - Overworld Hook (player movement, encounters)
 // ============================================================================
 
 import { useRef, useCallback } from 'react';
@@ -138,7 +138,7 @@ export function useOverworld() {
 
       const pos = check.calcPosition(conn);
 
-      // Resolve final position based on direction — place at opposite edge of target map
+      // Resolve final position based on direction - place at opposite edge of target map
       // We don't know the target map dimensions here, so we use sentinel values
       // that PokemonCanvas.loadMap will resolve. Use -1 as "place at far edge".
       const finalX = pos.x;
@@ -214,7 +214,7 @@ export function useOverworld() {
       return player;
     }
 
-    // Not moving — process new input
+    // Not moving - process new input
     let direction: Direction | null = null;
     if (dirY < 0) direction = 'up';
     else if (dirY > 0) direction = 'down';
@@ -233,7 +233,7 @@ export function useOverworld() {
       const isOffMap = target.x < 0 || target.y < 0 || target.x >= currentMap.width || target.y >= currentMap.height;
 
       if (isOffMap && hasConnection) {
-        // Allow the move — connection will be handled when movement completes
+        // Allow the move - connection will be handled when movement completes
         player.tileX = target.x;
         player.tileY = target.y;
         player.isMoving = true;

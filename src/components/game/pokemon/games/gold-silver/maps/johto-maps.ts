@@ -1,5 +1,5 @@
 // ============================================================================
-// Johto Maps — Routes, Cities, Dungeons, and Interiors
+// Johto Maps - Routes, Cities, Dungeons, and Interiors
 // ============================================================================
 
 import type { GameMap, Direction, NPCDef } from '../../../engine/types';

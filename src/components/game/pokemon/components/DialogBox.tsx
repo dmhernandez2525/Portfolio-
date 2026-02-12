@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Dialog Box Component
+// Pokemon RPG - Dialog Box Component
 // ============================================================================
 
 interface DialogBoxProps {

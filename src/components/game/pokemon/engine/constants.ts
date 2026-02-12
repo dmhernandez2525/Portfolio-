@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Constants & Configuration
+// Pokemon RPG Engine - Constants & Configuration
 // ============================================================================
 
 import type { PokemonType, Nature, StatName } from './types';

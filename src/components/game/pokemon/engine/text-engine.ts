@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Text / Dialog Engine
+// Pokemon RPG Engine - Text / Dialog Engine
 // ============================================================================
 // Handles typewriter-style text rendering for RPG dialogs.
 

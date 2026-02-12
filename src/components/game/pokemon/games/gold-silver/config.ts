@@ -1,5 +1,5 @@
 // ============================================================================
-// Gold/Silver — Game Configuration
+// Gold/Silver - Game Configuration
 // ============================================================================
 
 import type { GameConfig, PokemonType } from '../../engine/types';

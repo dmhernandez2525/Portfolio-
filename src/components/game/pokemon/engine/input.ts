@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Input Manager
+// Pokemon RPG Engine - Input Manager
 // ============================================================================
 
 import type { InputState } from './types';

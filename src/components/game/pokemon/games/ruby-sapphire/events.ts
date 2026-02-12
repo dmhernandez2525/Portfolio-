@@ -1,21 +1,11 @@
 // ============================================================================
-// Ruby/Sapphire — Story Events & Cutscenes
+// Ruby/Sapphire - Story Events & Cutscenes
 // ============================================================================
 
-export interface StoryEvent {
-  id: string;
-  trigger: 'map_enter' | 'interact' | 'flag_check';
-  mapId?: string;
-  npcId?: string;
-  requiredFlags?: string[];
-  blockedByFlags?: string[];
-  dialog: string[];
-  setsFlags?: string[];
-  givesItem?: { itemId: string; quantity: number };
-  givesPokemon?: { speciesId: number; level: number };
-  starterSelection?: boolean;
-  battle?: { trainerId: string };
-}
+import type { StoryEvent } from '../../engine/story-events';
+import { getActiveEvents as filterEvents } from '../../engine/story-events';
+
+export type { StoryEvent };
 
 export const storyEvents: StoryEvent[] = [
   // --- Opening ---
@@ -122,6 +112,53 @@ export const storyEvents: StoryEvent[] = [
     ],
     setsFlags: ['hall_of_fame_rs'],
   },
+
+  // --- Post-Game: Legendary Encounters ---
+  {
+    id: 'groudon_static_encounter',
+    trigger: 'interact',
+    npcId: 'groudon_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_groudon'],
+    dialog: ['The ground trembles violently...', 'GROUDON appeared!'],
+    givesPokemon: { speciesId: 383, level: 45 },
+    setsFlags: ['caught_groudon'],
+  },
+  {
+    id: 'kyogre_encounter',
+    trigger: 'interact',
+    npcId: 'kyogre_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_kyogre'],
+    dialog: ['A massive wave of energy surges...', 'KYOGRE appeared!'],
+    givesPokemon: { speciesId: 382, level: 45 },
+    setsFlags: ['caught_kyogre'],
+  },
+  {
+    id: 'rayquaza_encounter',
+    trigger: 'interact',
+    npcId: 'rayquaza_static',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: ['caught_rayquaza'],
+    dialog: ['An immense dragon descends from the clouds...', 'RAYQUAZA appeared!'],
+    givesPokemon: { speciesId: 384, level: 70 },
+    setsFlags: ['caught_rayquaza'],
+  },
+
+  // --- Post-Game: Battle Tower ---
+  // Battle Tower trainer pool: see engine/postgame.ts (battleTowerTrainers)
+  {
+    id: 'battle_tower_open',
+    trigger: 'map_enter',
+    mapId: 'battle_tower',
+    requiredFlags: ['defeated_champion_rs'],
+    blockedByFlags: [],
+    dialog: [
+      'Welcome to the BATTLE TOWER!',
+      'Challenge trainers in consecutive battles!',
+      'Your POKeMON will be set to Level 50.',
+    ],
+  },
 ];
 
 export function getActiveEvents(
@@ -130,12 +167,5 @@ export function getActiveEvents(
   mapId?: string,
   npcId?: string,
 ): StoryEvent[] {
-  return storyEvents.filter(event => {
-    if (event.trigger !== trigger) return false;
-    if (event.mapId && event.mapId !== mapId) return false;
-    if (event.npcId && event.npcId !== npcId) return false;
-    if (event.requiredFlags?.some(f => !flags[f])) return false;
-    if (event.blockedByFlags?.some(f => flags[f])) return false;
-    return true;
-  });
+  return filterEvents(storyEvents, trigger, flags, mapId, npcId);
 }

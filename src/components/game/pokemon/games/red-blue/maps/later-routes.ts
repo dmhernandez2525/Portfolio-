@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';
+import { kantoLegendaries } from '../../../engine/postgame';
 
 const T = 5, G = 1, P = 2, TG = 3, W = 4, B = 6, R = 7, D = 8;
 const RK = 11, S = 16, FL = 14, LD = 13;
@@ -559,6 +560,12 @@ victoryRoad.warps = [
   { x: 18, y: 1, targetMap: 'indigo_plateau', targetX: 6, targetY: 9 },
 ];
 
+// Postgame: Moltres static encounter (requires defeated_champion flag via story event)
+const moltresEncounter = kantoLegendaries.find(l => l.id === 'moltres');
+if (moltresEncounter) victoryRoad.npcs.push(moltresEncounter.npc);
+
+// TODO: Articuno (seafoam_islands_b4f) and Zapdos (power_plant) need their maps created
+
 export const ceruleanCave: GameMap = makeRoute(
   'cerulean_cave', 'CERULEAN CAVE', 20, 20,
   [],
@@ -578,6 +585,10 @@ ceruleanCave.tilesetId = 'cave';
 ceruleanCave.warps = [
   { x: 1, y: 18, targetMap: 'cerulean_city', targetX: 14, targetY: 4 },
 ];
+
+// Postgame: Mewtwo static encounter (requires defeated_champion flag via story event)
+const mewtwoEncounter = kantoLegendaries.find(l => l.id === 'mewtwo');
+if (mewtwoEncounter) ceruleanCave.npcs.push(mewtwoEncounter.npc);
 
 export const safariZone: GameMap = makeRoute(
   'safari_zone', 'SAFARI ZONE', 20, 20,

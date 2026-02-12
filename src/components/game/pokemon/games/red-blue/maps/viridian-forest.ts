@@ -1,5 +1,5 @@
 // ============================================================================
-// Viridian Forest — Bug-type dungeon between Route 2 and Pewter City
+// Viridian Forest - Bug-type dungeon between Route 2 and Pewter City
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

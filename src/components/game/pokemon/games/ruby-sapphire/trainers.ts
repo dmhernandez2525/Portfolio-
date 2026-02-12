@@ -1,6 +1,10 @@
 // ============================================================================
-// Ruby/Sapphire — Trainer Definitions
+// Ruby/Sapphire - Trainer Definitions
 // ============================================================================
+// ID convention: plain lowercase for characters unique to this game.
+// Characters appearing across games with different roles get a suffix:
+//   _e4 = Elite Four member.
+// e.g. drake_e4 distinguishes from potential future appearances.
 
 import type { TrainerDef } from '../../engine/types';
 

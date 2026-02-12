@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Game Selector Screen
+// Pokemon RPG - Game Selector Screen
 // ============================================================================
 
 import type { GameVersion } from '../engine/types';

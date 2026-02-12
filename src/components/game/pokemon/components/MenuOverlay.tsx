@@ -1,6 +1,9 @@
 // ============================================================================
-// Pokemon RPG — Menu Overlay (Start Menu)
+// Pokemon RPG - Menu Overlay (Start Menu)
 // ============================================================================
+
+import { isMuted, setMuted, playSFX } from '../engine/audio-manager';
+import { useState } from 'react';
 
 interface MenuOverlayProps {
   onResume: () => void;
@@ -8,37 +11,36 @@ interface MenuOverlayProps {
   onParty: () => void;
   onBag: () => void;
   onSave: () => void;
-  onOption: () => void;
   playerName: string;
   badges: number;
   playTime: string;
 }
 
-const MENU_ITEMS = [
-  { key: 'pokedex', label: 'POKeDEX' },
-  { key: 'party', label: 'POKeMON' },
-  { key: 'bag', label: 'BAG' },
-  { key: 'save', label: 'SAVE' },
-  { key: 'option', label: 'OPTION' },
-  { key: 'close', label: 'CLOSE' },
-] as const;
-
 export default function MenuOverlay({
-  onResume, onPokedex, onParty, onBag, onSave, onOption,
+  onResume, onPokedex, onParty, onBag, onSave,
   playerName, badges, playTime,
 }: MenuOverlayProps) {
-  const handlers: Record<string, () => void> = {
-    pokedex: onPokedex,
-    party: onParty,
-    bag: onBag,
-    save: onSave,
-    option: onOption,
-    close: onResume,
+  const [muted, setMutedState] = useState<boolean>(isMuted());
+
+  const toggleMute = () => {
+    const next = !muted;
+    setMuted(next);
+    setMutedState(next);
+    if (!next) playSFX('select');
   };
+
+  const menuItems = [
+    { key: 'pokedex', label: 'POKeDEX', action: onPokedex },
+    { key: 'party', label: 'POKeMON', action: onParty },
+    { key: 'bag', label: 'BAG', action: onBag },
+    { key: 'save', label: 'SAVE', action: onSave },
+    { key: 'sound', label: muted ? 'SOUND: OFF' : 'SOUND: ON', action: toggleMute },
+    { key: 'close', label: 'CLOSE', action: onResume },
+  ];
 
   return (
     <div className="absolute inset-0 z-40 flex">
-      {/* Transparent left side — tap to close */}
+      {/* Transparent left side, tap to close */}
       <div className="flex-1" onClick={onResume} />
 
       {/* Menu panel */}
@@ -53,10 +55,10 @@ export default function MenuOverlay({
 
         {/* Menu items */}
         <div className="flex-1 p-2">
-          {MENU_ITEMS.map(item => (
+          {menuItems.map(item => (
             <button
               key={item.key}
-              onClick={handlers[item.key]}
+              onClick={() => { playSFX('select'); item.action(); }}
               className="w-full text-left px-3 py-2 font-mono text-sm text-black hover:bg-[#e8d8a0] rounded transition-colors"
             >
               {item.label}

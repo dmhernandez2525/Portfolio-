@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Main Canvas Component
+// Pokemon RPG - Main Canvas Component
 // ============================================================================
 
 import { useRef, useEffect, useCallback, useState } from 'react';
@@ -10,14 +10,15 @@ import type {
 } from '../engine/types';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, SCALED_TILE, PC_BOX_COUNT, PC_BOX_SIZE } from '../engine/constants';
 import { createCamera, updateCamera, setCameraTarget } from '../engine/camera';
-import { renderOverworld, showMapName, renderNightTint } from '../engine/renderer';
+import { renderOverworld, showMapName, renderNightTint, renderBattleTransition, renderWarpFade, resetHpAnimation } from '../engine/renderer';
+import { playBGM, stopBGM, playSFX, mapMusicToTrack, getTrackForBattle } from '../engine/audio-manager';
 import { getTimeOfDay } from '../engine/time-system';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { useInput } from '../hooks/useInput';
 import { useOverworld } from '../hooks/useOverworld';
 import { useBattle } from '../hooks/useBattle';
 import { initSprites } from '../engine/sprites';
-import { setSpeciesDatabase, setMoveDatabase } from '../engine/battle-engine';
+import { setSpeciesDatabase, setMoveDatabase, getMoveData } from '../engine/battle-engine';
 import { createPokemon } from '../engine/pokemon-factory';
 import { rollWildEncounter } from '../games/red-blue/encounters';
 import { kantoMaps } from '../games/red-blue/maps';
@@ -35,14 +36,15 @@ import { gymLeaders as hoennGymLeaders, eliteFour as hoennEliteFour, champion as
 import { getActiveEvents as getKantoEvents } from '../games/red-blue/events';
 import { getActiveEvents as getJohtoEvents } from '../games/gold-silver/events';
 import { getActiveEvents as getHoennEvents } from '../games/ruby-sapphire/events';
-import type { StoryEvent } from '../games/red-blue/events';
-import { saveGame } from '../engine/save-manager';
+import type { StoryEvent } from '../engine/story-events';
+import { saveGame, formatPlayTime } from '../engine/save-manager';
 import MenuOverlay from './MenuOverlay';
 import PartyScreen from './PartyScreen';
 import BagScreen from './BagScreen';
 import PokedexScreen from './PokedexScreen';
 import ShopScreen from './ShopScreen';
 import PCStorageScreen from './PCStorageScreen';
+import MoveTutorScreen from './MoveTutorScreen';
 import MobileControls from './MobileControls';
 import DialogBox from './DialogBox';
 import BattleUI from './BattleUI';
@@ -55,7 +57,7 @@ import movesData from '../data/moves.json';
 import itemsData from '../data/items.json';
 
 type LoadMapFn = (mapId: string, startX: number, startY: number) => void;
-type ActiveMenu = 'none' | 'party' | 'bag' | 'pokedex' | 'party_item_target' | 'shop' | 'pc';
+type ActiveMenu = 'none' | 'party' | 'bag' | 'pokedex' | 'party_item_target' | 'shop' | 'pc' | 'move_deleter' | 'move_reminder';
 
 // --- Static data setup ---
 const VERSION_START: Record<GameVersion, { mapId: string; startX: number; startY: number }> = {
@@ -138,6 +140,8 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   const [activeMenu, setActiveMenu] = useState<ActiveMenu>('none');
   const [screen, setScreen] = useState<'overworld' | 'battle' | 'starter_select'>('overworld');
   const [bagVersion, setBagVersion] = useState(0);
+  const battleTransitionRef = useRef<number>(0); // 0 = none, 0..1 = animating
+  const warpFadeRef = useRef<number>(0); // 0 = none, 0..1 = animating
 
   const currentMapRef = useRef<GameMap | null>(null);
   const partyRef = useRef<Pokemon[]>([]);
@@ -161,6 +165,9 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   );
 
   const visitedTownsRef = useRef<Set<string>>(new Set());
+  const playTimeRef = useRef(0);
+  const versionRef = useRef(version);
+  versionRef.current = version;
 
   const input = useInput();
   const overworld = useOverworld();
@@ -233,6 +240,11 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
     currentTrainerRef.current = trainer;
     for (const op of opponentParty) markPokedex(op.speciesId, false);
+
+    resetHpAnimation();
+    const isGym = trainer.isGymLeader;
+    const isChamp = trainer.id === ALL_TRAINERS[version].champion.id;
+    playBGM(getTrackForBattle(true, isGym, isChamp));
 
     battle.startBattle({
       type: 'trainer',
@@ -356,6 +368,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     cam.x = cam.targetX;
     cam.y = cam.targetY;
     showMapName(map.name);
+    playBGM(mapMusicToTrack(map.music));
     // Track visited towns for Fly
     if (mapId.includes('_city') || mapId.includes('_town')) {
       visitedTownsRef.current.add(mapId);
@@ -391,7 +404,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       { itemId: 'potion', quantity: 5 },
     ];
 
-    const start = VERSION_START[version];
+    const start = VERSION_START[versionRef.current];
     loadMapRef.current?.(start.mapId, start.startX, start.startY);
     setScreen('starter_select');
 
@@ -406,11 +419,16 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       if (!wildSpecies) return;
       const wildPokemon = createPokemon(wildSpecies, result.level);
       markPokedex(result.speciesId, false);
+      resetHpAnimation();
+      playBGM(getTrackForBattle(false, false, false));
       battle.startBattle({ type: 'wild', playerParty: partyRef.current, opponentParty: [wildPokemon] });
       setScreen('battle');
     });
 
-    overworld.onWarp((mapId, x, y) => loadMapRef.current?.(mapId, x, y));
+    overworld.onWarp((mapId, x, y) => {
+      playSFX('select');
+      loadMapRef.current?.(mapId, x, y);
+    });
     overworld.onConnection((mapId, x, y) => loadMapRef.current?.(mapId, x, y));
 
     // Friendship gain from walking (+1 per 128 steps to lead Pokemon)
@@ -437,7 +455,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       const map = currentMapRef.current;
       if (!map) return;
       // Check for story event on this NPC first
-      const events = VERSION_EVENTS[version].getActiveEvents('interact', storyFlagsRef.current, map.id, npcId);
+      const events = VERSION_EVENTS[versionRef.current].getActiveEvents('interact', storyFlagsRef.current, map.id, npcId);
       if (events.length > 0) {
         const event = events[0];
         setDialogText(event.dialog);
@@ -455,6 +473,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
           pkmn.status = null;
           for (const move of pkmn.moves) move.pp = move.maxPp;
         }
+        playSFX('heal');
         setDialogText([
           'Welcome to our POKeMON CENTER!',
           "We'll restore your POKeMON to full health.",
@@ -480,16 +499,37 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
         return;
       }
 
+      // Move Deleter NPC
+      if (npc.isMoveDeleter) {
+        setActiveMenu('move_deleter');
+        setIsPaused(true);
+        return;
+      }
+
+      // Move Reminder NPC
+      if (npc.isMoveReminder) {
+        setActiveMenu('move_reminder');
+        setIsPaused(true);
+        return;
+      }
+
       // Default NPC dialog
       setDialogText(npc.dialog);
       setDialogIndex(0);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // --- Handle battle end ---
   useEffect(() => {
     battle.onBattleEnd((result, opponentParty) => {
       setScreen('overworld');
+      // Restore overworld music
+      const map = currentMapRef.current;
+      if (map) playBGM(mapMusicToTrack(map.music));
+
+      if (result === 'win') playSFX('level_up');
+      if (result === 'caught') playSFX('catch');
+
       const trainer = currentTrainerRef.current;
 
       if (result === 'caught' && opponentParty.length > 0) {
@@ -497,6 +537,25 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
         markPokedex(caught.speciesId, true);
         if (partyRef.current.length < 6) {
           partyRef.current = [...partyRef.current, caught];
+        } else {
+          // Party full: send to first available PC box slot
+          let sent = false;
+          for (const box of pcBoxesRef.current) {
+            const emptySlot = box.pokemon.findIndex(p => p === null);
+            if (emptySlot >= 0) {
+              box.pokemon[emptySlot] = caught;
+              sent = true;
+              setDialogText([
+                `${caught.nickname ?? getSpeciesName(caught.speciesId)} was sent to ${box.name}!`,
+              ]);
+              setDialogIndex(0);
+              break;
+            }
+          }
+          if (!sent) {
+            setDialogText(['All PC boxes are full! The Pokemon could not be stored.']);
+            setDialogIndex(0);
+          }
         }
       }
 
@@ -589,16 +648,17 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
       rivalName: 'BLUE',
       player: p,
       party: partyRef.current,
-      pcBoxes: [],
+      pcBoxes: pcBoxesRef.current,
       bag: bagRef.current,
       money: moneyRef.current,
       badges: badgesRef.current,
       pokedex: pokedexRef.current,
       storyFlags: storyFlagsRef.current,
       currentMap: currentMapRef.current?.id ?? '',
-      playTime: 0,
+      playTime: playTimeRef.current,
       timestamp: Date.now(),
     });
+    playSFX('save');
     setIsPaused(false);
     setActiveMenu('none');
     setDialogText(['Game saved!']);
@@ -635,12 +695,13 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
   }, [version]);
 
   // --- Game loop ---
-  useGameLoop((_dt, frameCount) => {
+  useGameLoop((dt, frameCount) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     const map = currentMapRef.current;
     if (!canvas || !ctx || !map) return;
     input.update();
+    playTimeRef.current += dt;
 
     if (screen === 'battle' && battle.battleState) return;
     if (screen === 'starter_select') return;
@@ -731,10 +792,9 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
             onParty={() => setActiveMenu('party')}
             onBag={() => setActiveMenu('bag')}
             onSave={handleSave}
-            onOption={() => {}}
             playerName="RED"
             badges={badgesRef.current.length}
-            playTime="0:00"
+            playTime={formatPlayTime(playTimeRef.current)}
           />
         )}
 
@@ -789,6 +849,32 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
               if (!pkmn) return;
               pcBoxesRef.current[boxIdx].pokemon[slot] = null;
               partyRef.current = [...partyRef.current, pkmn];
+            }}
+            onBack={() => { setActiveMenu('none'); setIsPaused(false); }}
+          />
+        )}
+        {screen === 'overworld' && (activeMenu === 'move_deleter' || activeMenu === 'move_reminder') && (
+          <MoveTutorScreen
+            party={partyRef.current}
+            mode={activeMenu === 'move_deleter' ? 'deleter' : 'reminder'}
+            speciesDatabase={speciesMap}
+            hasHeartScale={bagRef.current.some(i => i.itemId === 'heart-scale' && i.quantity > 0)}
+            onDeleteMove={(partyIdx, moveIdx) => {
+              const pkmn = partyRef.current[partyIdx];
+              if (pkmn.moves.length <= 1) return;
+              pkmn.moves = pkmn.moves.filter((_, i) => i !== moveIdx);
+              setActiveMenu('none');
+              setIsPaused(false);
+            }}
+            onRelearnMove={(partyIdx, moveId) => {
+              const pkmn = partyRef.current[partyIdx];
+              if (pkmn.moves.length >= 4) return;
+              const moveData = getMoveData(moveId);
+              if (!moveData) return;
+              pkmn.moves.push({ moveId, pp: moveData.pp, maxPp: moveData.pp });
+              bagRef.current = removeItem(bagRef.current, 'heart-scale');
+              setActiveMenu('none');
+              setIsPaused(false);
             }}
             onBack={() => { setActiveMenu('none'); setIsPaused(false); }}
           />

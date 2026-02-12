@@ -1,5 +1,5 @@
 // ============================================================================
-// Red/Blue — Game Configuration
+// Red/Blue - Game Configuration
 // ============================================================================
 
 import type { GameConfig, PokemonType } from '../../engine/types';

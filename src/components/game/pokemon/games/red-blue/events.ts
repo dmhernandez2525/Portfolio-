@@ -1,21 +1,11 @@
 // ============================================================================
-// Red/Blue — Story Events & Cutscenes
+// Red/Blue - Story Events & Cutscenes
 // ============================================================================
 
-export interface StoryEvent {
-  id: string;
-  trigger: 'map_enter' | 'interact' | 'flag_check';
-  mapId?: string;
-  npcId?: string;
-  requiredFlags?: string[];
-  blockedByFlags?: string[];
-  dialog: string[];
-  setsFlags?: string[];
-  givesItem?: { itemId: string; quantity: number };
-  givesPokemon?: { speciesId: number; level: number };
-  starterSelection?: boolean;
-  battle?: { trainerId: string };
-}
+import type { StoryEvent } from '../../engine/story-events';
+import { getActiveEvents as filterEvents } from '../../engine/story-events';
+
+export type { StoryEvent };
 
 export const storyEvents: StoryEvent[] = [
   // --- Opening sequence ---
@@ -127,21 +117,68 @@ export const storyEvents: StoryEvent[] = [
     ],
     setsFlags: ['hall_of_fame'],
   },
+  // --- Post-Game: Cerulean Cave Unlock ---
+  {
+    id: 'cerulean_cave_open',
+    trigger: 'map_enter',
+    mapId: 'cerulean_city',
+    requiredFlags: ['defeated_champion'],
+    blockedByFlags: ['cerulean_cave_noticed'],
+    dialog: [
+      'The guard blocking Cerulean Cave has left!',
+      'A mysterious Pokemon is said to lurk within...',
+    ],
+    setsFlags: ['cerulean_cave_noticed'],
+  },
+
+  // --- Legendary encounters ---
+  {
+    id: 'mewtwo_encounter',
+    trigger: 'interact',
+    npcId: 'mewtwo_static',
+    requiredFlags: ['defeated_champion'],
+    blockedByFlags: ['caught_mewtwo'],
+    dialog: ['A powerful psychic presence...', 'MEWTWO appeared!'],
+    givesPokemon: { speciesId: 150, level: 70 },
+    setsFlags: ['caught_mewtwo'],
+  },
+  {
+    id: 'articuno_encounter',
+    trigger: 'interact',
+    npcId: 'articuno_static',
+    requiredFlags: ['defeated_champion'],
+    blockedByFlags: ['caught_articuno'],
+    dialog: ['A majestic icy bird...', 'ARTICUNO appeared!'],
+    givesPokemon: { speciesId: 144, level: 50 },
+    setsFlags: ['caught_articuno'],
+  },
+  {
+    id: 'zapdos_encounter',
+    trigger: 'interact',
+    npcId: 'zapdos_static',
+    requiredFlags: ['defeated_champion'],
+    blockedByFlags: ['caught_zapdos'],
+    dialog: ['Electric energy crackles in the air...', 'ZAPDOS appeared!'],
+    givesPokemon: { speciesId: 145, level: 50 },
+    setsFlags: ['caught_zapdos'],
+  },
+  {
+    id: 'moltres_encounter',
+    trigger: 'interact',
+    npcId: 'moltres_static',
+    requiredFlags: ['defeated_champion'],
+    blockedByFlags: ['caught_moltres'],
+    dialog: ['Intense heat radiates from within...', 'MOLTRES appeared!'],
+    givesPokemon: { speciesId: 146, level: 50 },
+    setsFlags: ['caught_moltres'],
+  },
 ];
 
-// Helper to find applicable events
 export function getActiveEvents(
   trigger: StoryEvent['trigger'],
   flags: Record<string, boolean>,
   mapId?: string,
   npcId?: string,
 ): StoryEvent[] {
-  return storyEvents.filter(event => {
-    if (event.trigger !== trigger) return false;
-    if (event.mapId && event.mapId !== mapId) return false;
-    if (event.npcId && event.npcId !== npcId) return false;
-    if (event.requiredFlags?.some(f => !flags[f])) return false;
-    if (event.blockedByFlags?.some(f => flags[f])) return false;
-    return true;
-  });
+  return filterEvents(storyEvents, trigger, flags, mapId, npcId);
 }

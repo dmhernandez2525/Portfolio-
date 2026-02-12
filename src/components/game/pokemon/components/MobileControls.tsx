@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG — Mobile Touch Controls (D-pad + A/B buttons)
+// Pokemon RPG - Mobile Touch Controls (D-pad + A/B buttons)
 // ============================================================================
 
 import type { InputState } from '../engine/types';

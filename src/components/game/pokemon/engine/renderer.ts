@@ -1,11 +1,12 @@
 // ============================================================================
-// Pokemon RPG Engine — Main Renderer
+// Pokemon RPG Engine - Main Renderer
 // ============================================================================
 
 import type { Camera, GameMap, Player, BattleState, BattlePokemon } from './types';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS } from './constants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, COLORS, getExpForLevel, MAX_LEVEL } from './constants';
+import { getSpeciesData } from './battle-engine';
 import { renderMap, renderAboveLayer, renderNPCs, renderPlayer } from './tilemap';
-import { drawPokemonSprite } from './sprites';
+import { drawPokemonSprite, getShinySparkles, drawShinySparkles } from './sprites';
 
 // --- Overworld rendering ---
 
@@ -19,13 +20,13 @@ export function renderOverworld(
   // Clear
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Ground + objects
-  renderMap(ctx, map, camera);
+  // Ground + objects (pass frameCount for grass sway animation)
+  renderMap(ctx, map, camera, frameCount);
 
   // NPCs
   renderNPCs(ctx, map, camera, frameCount);
 
-  // Player — pixel position is already interpolated by the movement system
+  // Player - pixel position is already interpolated by the movement system
   const playerPixelX = player.x;
   const playerPixelY = player.y;
 
@@ -35,7 +36,7 @@ export function renderOverworld(
   renderAboveLayer(ctx, map, camera);
 
   // Map name overlay (fade in/out)
-  renderMapName(ctx, map.name, frameCount);
+  renderMapName(ctx);
 }
 
 // --- Map name display ---
@@ -48,7 +49,7 @@ export function showMapName(name: string) {
   mapNameTimer = 120; // 2 seconds at 60fps
 }
 
-function renderMapName(ctx: CanvasRenderingContext2D, _name: string, _frame: number) {
+function renderMapName(ctx: CanvasRenderingContext2D) {
   if (mapNameTimer <= 0) return;
   mapNameTimer--;
 
@@ -149,11 +150,11 @@ function drawBattlePokemon(
     ctx.globalAlpha = 0.3;
   }
 
-  // Try to draw PokeAPI sprite first
-  const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack);
+  // Try to draw PokeAPI sprite first (shiny variant if applicable)
+  const spriteDrawn = drawPokemonSprite(ctx, pokemon.speciesId, x, y + bounceY, size, isBack, pokemon.isShiny);
 
   if (!spriteDrawn) {
-    // Procedural fallback — colored shape based on type
+    // Procedural fallback - colored shape based on type
     const primaryType = bp.types?.[0] ?? 'normal';
     const typeColor = TYPE_COLORS[primaryType] ?? TYPE_COLORS['normal'];
     ctx.fillStyle = typeColor;
@@ -185,6 +186,12 @@ function drawBattlePokemon(
   }
 
   ctx.globalAlpha = 1;
+
+  // Shiny sparkle effect (plays during the first 60 frames of battle)
+  if (pokemon.isShiny && frame < 60) {
+    const sparkles = getShinySparkles(x, y + bounceY, size, frame);
+    drawShinySparkles(ctx, sparkles);
+  }
 }
 
 function drawPokemonInfoBox(
@@ -215,8 +222,9 @@ function drawPokemonInfoBox(
   ctx.font = '11px monospace';
   ctx.fillText(`Lv${pokemon.level}`, x + w - 50, y + 18);
 
-  // HP bar
+  // HP bar (animated)
   const hpRatio = pokemon.currentHp / pokemon.stats.hp;
+  const displayRatio = getAnimatedHpRatio(bp, hpRatio);
   const hpBarX = x + 40;
   const hpBarY = y + 28;
   const hpBarW = w - 55;
@@ -225,9 +233,9 @@ function drawPokemonInfoBox(
   ctx.fillStyle = '#404040';
   ctx.fillRect(hpBarX, hpBarY, hpBarW, hpBarH);
 
-  const hpColor = hpRatio > 0.5 ? COLORS.hpGreen : hpRatio > 0.2 ? COLORS.hpYellow : COLORS.hpRed;
+  const hpColor = displayRatio > 0.5 ? COLORS.hpGreen : displayRatio > 0.2 ? COLORS.hpYellow : COLORS.hpRed;
   ctx.fillStyle = hpColor;
-  ctx.fillRect(hpBarX, hpBarY, hpBarW * hpRatio, hpBarH);
+  ctx.fillRect(hpBarX, hpBarY, hpBarW * displayRatio, hpBarH);
 
   ctx.fillStyle = '#000000';
   ctx.font = 'bold 8px monospace';
@@ -244,8 +252,15 @@ function drawPokemonInfoBox(
     ctx.fillStyle = '#404040';
     ctx.fillRect(x + 8, expBarY, w - 16, 5);
     ctx.fillStyle = COLORS.expBar;
-    // Simplified exp display
-    const expRatio = 0.5; // placeholder
+    let expRatio = 1;
+    if (pokemon.level < MAX_LEVEL) {
+      const species = getSpeciesData(pokemon.speciesId);
+      const growthRate = (species?.growthRate ?? 'medium_fast') as Parameters<typeof getExpForLevel>[0];
+      const currentLevelExp = getExpForLevel(growthRate, pokemon.level);
+      const nextLevelExp = getExpForLevel(growthRate, pokemon.level + 1);
+      const range = nextLevelExp - currentLevelExp;
+      expRatio = range > 0 ? Math.max(0, Math.min(1, (pokemon.exp - currentLevelExp) / range)) : 1;
+    }
     ctx.fillRect(x + 8, expBarY, (w - 16) * expRatio, 5);
   }
 
@@ -370,7 +385,7 @@ export function renderDialog(
 
 // --- Utility ---
 
-function roundRect(
+export function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -389,6 +404,51 @@ function roundRect(
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
+}
+
+// --- HP bar animation state ---
+
+const hpDisplayCache = new Map<string, number>();
+
+function getAnimatedHpRatio(bp: BattlePokemon, targetRatio: number): number {
+  const key = bp.pokemon.uid;
+  const current = hpDisplayCache.get(key) ?? targetRatio;
+
+  if (Math.abs(current - targetRatio) < 0.005) {
+    hpDisplayCache.set(key, targetRatio);
+    return targetRatio;
+  }
+
+  // Lerp toward target at a visible speed
+  const speed = 0.02;
+  const next = current + (targetRatio - current > 0 ? speed : -speed);
+  const clamped = targetRatio > current
+    ? Math.min(next, targetRatio)
+    : Math.max(next, targetRatio);
+
+  hpDisplayCache.set(key, clamped);
+  return clamped;
+}
+
+export function resetHpAnimation(): void {
+  hpDisplayCache.clear();
+}
+
+// --- Warp fade transition ---
+
+export function renderWarpFade(
+  ctx: CanvasRenderingContext2D,
+  progress: number // 0 to 1 (0 = clear, 0.5 = fully black, 1 = clear again)
+) {
+  if (progress <= 0 || progress >= 1) return;
+
+  // First half fades to black, second half fades from black
+  const alpha = progress <= 0.5
+    ? progress * 2
+    : (1 - progress) * 2;
+
+  ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 const TYPE_COLORS: Record<string, string> = {

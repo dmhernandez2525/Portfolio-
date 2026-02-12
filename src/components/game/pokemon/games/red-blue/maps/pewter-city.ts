@@ -1,5 +1,5 @@
 // ============================================================================
-// Pewter City — Home of Brock's Gym and Museum
+// Pewter City - Home of Brock's Gym and Museum
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

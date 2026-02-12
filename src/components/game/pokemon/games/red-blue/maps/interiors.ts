@@ -1,5 +1,5 @@
 // ============================================================================
-// Kanto Interior Maps — Shared indoor spaces
+// Kanto Interior Maps - Shared indoor spaces
 // ============================================================================
 
 import type { GameMap, Direction, NPCDef } from '../../../engine/types';
@@ -446,3 +446,43 @@ export const championRoomKanto = makeE4Chamber(
   ['So, you are finally here!', 'I am the POKeMON LEAGUE CHAMPION!', 'Or I was, until now...'],
   'e4_room_4_kanto', 5, 1,
 );
+
+// Aggregated interior maps (mirrors johtoInteriors / hoennInteriors pattern)
+export const kantoInteriors: Record<string, GameMap> = {
+  player_house_1f: playerHouse1F,
+  rival_house: rivalHouse,
+  oaks_lab: oaksLab,
+  viridian_pokecenter: viridianPokecenter,
+  pewter_pokecenter: pewterPokecenter,
+  cerulean_pokecenter: ceruleanPokecenter,
+  vermilion_pokecenter: vermilionPokecenter,
+  lavender_pokecenter: lavenderPokecenter,
+  celadon_pokecenter: celadonPokecenter,
+  fuchsia_pokecenter: fuchsiaPokecenter,
+  saffron_pokecenter: saffronPokecenter,
+  cinnabar_pokecenter: cinnabarPokecenter,
+  indigo_pokecenter: indigoPokecenter,
+  viridian_mart: viridianMart,
+  pewter_mart: pewterMart,
+  cerulean_mart: ceruleanMart,
+  pewter_gym: pewterGym,
+  cerulean_gym: ceruleanGym,
+  vermilion_gym: vermilionGym,
+  celadon_gym: celadonGym,
+  fuchsia_gym: fuchsiaGym,
+  saffron_gym: saffronGym,
+  cinnabar_gym: cinnabarGym,
+  viridian_gym: viridianGym,
+  indigo_plateau: indigoPlateau,
+  e4_room_1_kanto: e4Room1Kanto,
+  e4_room_2_kanto: e4Room2Kanto,
+  e4_room_3_kanto: e4Room3Kanto,
+  e4_room_4_kanto: e4Room4Kanto,
+  champion_room_kanto: championRoomKanto,
+  pewter_museum: pewterMuseum,
+  cerulean_bike_shop: ceruleanBikeShop,
+  cerulean_house: ceruleanHouse,
+  victory_road_entrance: victoryRoadEntrance,
+  victory_road_exit: victoryRoadExit,
+  rock_tunnel_entrance: rockTunnelEntrance,
+};

@@ -1,5 +1,5 @@
 // ============================================================================
-// Littleroot Town — Starting town for Ruby/Sapphire
+// Littleroot Town - Starting town for Ruby/Sapphire
 // ============================================================================
 
 import type { GameMap } from '../../../engine/types';

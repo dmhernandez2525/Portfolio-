@@ -1,5 +1,5 @@
 // ============================================================================
-// Pokemon RPG Engine — Retro Pixel Sprite System
+// Pokemon RPG Engine - Retro Pixel Sprite System
 // ============================================================================
 // Generates GBC-style pixel art sprites programmatically using offscreen
 // canvases. Falls back to procedural rendering if sprites aren't ready.
@@ -498,9 +498,10 @@ const POKEAPI_SPRITE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/ma
 
 export function getPokemonSprite(
   speciesId: number,
-  isBack: boolean
+  isBack: boolean,
+  isShiny: boolean = false
 ): HTMLImageElement | null {
-  const key = `${speciesId}-${isBack ? 'back' : 'front'}`;
+  const key = `${speciesId}-${isBack ? 'back' : 'front'}${isShiny ? '-shiny' : ''}`;
   const cached = pokemonSpriteCache.get(key);
   if (cached) return cached.complete ? cached : null;
 
@@ -508,16 +509,20 @@ export function getPokemonSprite(
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.onerror = () => {
-    // Remove failed entry so caller always gets null → procedural fallback
     pokemonSpriteCache.delete(key);
   };
-  img.src = isBack
-    ? `${POKEAPI_SPRITE_URL}/back/${speciesId}.png`
-    : `${POKEAPI_SPRITE_URL}/${speciesId}.png`;
+
+  if (isShiny) {
+    img.src = isBack
+      ? `${POKEAPI_SPRITE_URL}/back/shiny/${speciesId}.png`
+      : `${POKEAPI_SPRITE_URL}/shiny/${speciesId}.png`;
+  } else {
+    img.src = isBack
+      ? `${POKEAPI_SPRITE_URL}/back/${speciesId}.png`
+      : `${POKEAPI_SPRITE_URL}/${speciesId}.png`;
+  }
 
   pokemonSpriteCache.set(key, img);
-
-  // Return null while loading — caller should use fallback
   return null;
 }
 
@@ -527,13 +532,77 @@ export function drawPokemonSprite(
   x: number,
   y: number,
   size: number,
-  isBack: boolean
+  isBack: boolean,
+  isShiny: boolean = false
 ): boolean {
-  const sprite = getPokemonSprite(speciesId, isBack);
+  const sprite = getPokemonSprite(speciesId, isBack, isShiny);
   if (!sprite) return false;
 
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(sprite, x - size / 2, y - size / 2, size, size);
   ctx.imageSmoothingEnabled = true;
   return true;
+}
+
+// --- Shiny sparkle animation ---
+// Returns an array of sparkle particles to draw around a shiny Pokemon
+
+interface SparkleParticle {
+  x: number;
+  y: number;
+  size: number;
+  alpha: number;
+}
+
+export function getShinySparkles(
+  centerX: number,
+  centerY: number,
+  spriteSize: number,
+  frameCount: number,
+  duration: number = 60
+): SparkleParticle[] {
+  if (frameCount >= duration) return [];
+
+  const progress = frameCount / duration;
+  const sparkles: SparkleParticle[] = [];
+  const count = 8;
+
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + progress * Math.PI;
+    const radius = spriteSize * 0.4 * (0.5 + progress * 0.8);
+    const sparkleX = centerX + Math.cos(angle) * radius;
+    const sparkleY = centerY + Math.sin(angle) * radius;
+    const alpha = 1 - progress;
+    const size = 3 * (1 - progress * 0.5);
+
+    sparkles.push({ x: sparkleX, y: sparkleY, size, alpha });
+  }
+
+  return sparkles;
+}
+
+export function drawShinySparkles(
+  ctx: CanvasRenderingContext2D,
+  sparkles: SparkleParticle[]
+): void {
+  for (const s of sparkles) {
+    ctx.globalAlpha = s.alpha;
+    // Four-pointed star shape
+    ctx.fillStyle = '#ffffa0';
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y - s.size);
+    ctx.lineTo(s.x + s.size * 0.3, s.y);
+    ctx.lineTo(s.x, s.y + s.size);
+    ctx.lineTo(s.x - s.size * 0.3, s.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(s.x - s.size, s.y);
+    ctx.lineTo(s.x, s.y + s.size * 0.3);
+    ctx.lineTo(s.x + s.size, s.y);
+    ctx.lineTo(s.x, s.y - s.size * 0.3);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
 }
