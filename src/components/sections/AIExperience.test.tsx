@@ -23,15 +23,18 @@ import { AIExperience } from "./AIExperience"
 let observerCallbacks: ((entries: Array<{ isIntersecting: boolean }>) => void)[] = []
 
 let rafCallCount = 0
-const baseTime = performance.now()
+const FIXED_TIME = 10000
 
 beforeAll(() => {
+  // Mock performance.now so startTime inside AnimatedCounter matches our rAF timestamps
+  vi.spyOn(performance, "now").mockReturnValue(FIXED_TIME)
+
   // Mock requestAnimationFrame to execute synchronously with incrementing time
   vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
     rafCallCount++
     // First call at 500ms (progress < 1), second at 2000ms (progress >= 1)
     const elapsed = rafCallCount % 2 === 1 ? 500 : 2000
-    cb(baseTime + elapsed)
+    cb(FIXED_TIME + elapsed)
     return 0
   })
 })
