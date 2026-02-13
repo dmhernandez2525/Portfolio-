@@ -185,6 +185,20 @@ const games: Game[] = [
     isOriginal: true,
     funFact: "This game has 23 JSON data files totaling 30,000+ lines of real Clash of Clans balance data.",
     features: ["Isometric village builder", "Battle engine with targeting AI", "90-level campaign", "Spell and hero system", "Clan perks and castle troops", "Achievement tracking"]
+  },
+  {
+    id: "fireboy-watergirl",
+    title: "Fireboy & Watergirl",
+    description: "Cooperative puzzle platformer for two characters at once!",
+    longDescription: "My recreation of the beloved co-op puzzle platformer. Control both Fireboy and Watergirl simultaneously to navigate temple levels filled with lava, water, green goo, buttons, levers, and moving platforms. Fireboy uses Arrow Keys and is safe in lava; Watergirl uses WASD and is safe in water. Both must reach their exit doors to complete each level.",
+    thumbnail: "/game-fireboy-watergirl.svg",
+    category: "arcade",
+    link: "/fireboy-watergirl",
+    isExternal: false,
+    isBuiltIn: true,
+    yearPlayed: "2010+",
+    funFact: "The original was one of my favorite Flash games. Convincing a friend to play the other character was always the hardest puzzle.",
+    features: ["Dual character control (Arrow Keys + WASD)", "5 temple levels with progressive difficulty", "Buttons, levers, and moving platforms", "Lava, water, and green goo hazards", "Gem collection and best time tracking", "Mobile touch controls"]
   }
 ]
 
@@ -364,6 +378,11 @@ export function Games() {
                     <Play className="w-3 h-3" /> Clash of Clans
                   </Button>
                 </Link>
+                <Link to="/fireboy-watergirl">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Fireboy & Watergirl
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           )}
@@ -411,6 +430,7 @@ export function Games() {
                     {game.id === "mafia-wars" && "🔫"}
                     {game.id === "pokemon" && "⚡"}
                     {game.id === "coc" && "🏰"}
+                    {game.id === "fireboy-watergirl" && "🔥💧"}
                   </div>
                   {game.isExternal && (
                     <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-black/50 px-2 py-1 rounded">

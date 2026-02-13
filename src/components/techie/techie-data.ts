@@ -36,6 +36,7 @@ export const fileTree: FileNode[] = [
           { name: "pokemon.exe", type: "file", contentKey: "game-pokemon" },
           { name: "clash-of-clans.exe", type: "file", contentKey: "game-coc" },
           { name: "shopping-cart-hero.exe", type: "file", contentKey: "game-shopping-cart-hero" },
+          { name: "fireboy-watergirl.exe", type: "file", contentKey: "game-fireboy-watergirl" },
         ],
       },
       { name: ".env", type: "file", contentKey: "hidden-env", hidden: true },
