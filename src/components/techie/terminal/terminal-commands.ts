@@ -204,6 +204,7 @@ const run: CommandHandler = (args, ctx) => {
     "mafia-wars": { contentKey: "game-mafia-wars", fileName: "mafia-wars.exe" },
     pokemon: { contentKey: "game-pokemon", fileName: "pokemon.exe" },
     "shopping-cart-hero": { contentKey: "game-shopping-cart-hero", fileName: "shopping-cart-hero.exe" },
+    "fireboy-watergirl": { contentKey: "game-fireboy-watergirl", fileName: "fireboy-watergirl.exe" },
   }
 
   const game = gameKeys[gameName]
@@ -343,7 +344,7 @@ const man: CommandHandler = (args, ctx) => {
       "",
       "DESCRIPTION:",
       "  Launches a game executable.",
-      "  Available: snake, tetris, chess, falling-blocks, cookie-clicker, agar, mafia-wars, pokemon",
+      "  Available: snake, tetris, chess, falling-blocks, cookie-clicker, agar, mafia-wars, pokemon, fireboy-watergirl",
     ],
     js: [
       "JS(1) — run JavaScript code",

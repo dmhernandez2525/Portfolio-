@@ -31,6 +31,7 @@ import { MafiaWarsGame } from "@/components/game/mafia-wars"
 import { PokemonGame } from "@/components/game/pokemon"
 import { ShoppingCartHeroGame } from "@/components/game/shopping-cart-hero"
 import { CocGame } from "@/components/game/coc-game"
+import { FireboyWatergirlGame } from "@/components/game/fireboy-watergirl"
 import { Philosophy } from "@/pages/Philosophy"
 import { Inventions } from "@/pages/Inventions"
 import { Blog } from "@/pages/Blog"
@@ -80,6 +81,7 @@ function CreativeRoutes() {
         <Route path="/pokemon" element={<PokemonGame />} />
         <Route path="/shopping-cart-hero" element={<ShoppingCartHeroGame />} />
         <Route path="/coc" element={<CocGame />} />
+        <Route path="/fireboy-watergirl" element={<FireboyWatergirlGame />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

@@ -17,6 +17,7 @@ const MafiaWars = lazy(() => import("@/components/game/mafia-wars"))
 const PokemonGame = lazy(() => import("@/components/game/pokemon").then(m => ({ default: m.PokemonGame })))
 const CocGame = lazy(() => import("@/components/game/coc-game").then(m => ({ default: m.CocGame })))
 const ShoppingCartHeroGame = lazy(() => import("@/components/game/shopping-cart-hero").then(m => ({ default: m.ShoppingCartHeroGame })))
+const FireboyWatergirlGame = lazy(() => import("@/components/game/fireboy-watergirl").then(m => ({ default: m.FireboyWatergirlGame })))
 
 interface TechieContentViewerProps {
   tab: TechieTab | null
@@ -380,6 +381,7 @@ export function TechieContentViewer({ tab, onEditorChange, onRunCode, editorSett
     "game-pokemon": <GameLoader><PokemonGame /></GameLoader>,
     "game-coc": <GameLoader><CocGame /></GameLoader>,
     "game-shopping-cart-hero": <GameLoader><ShoppingCartHeroGame /></GameLoader>,
+    "game-fireboy-watergirl": <GameLoader><FireboyWatergirlGame /></GameLoader>,
   }
 
   if (contentKey in gameMap) return <>{gameMap[contentKey]}</>
