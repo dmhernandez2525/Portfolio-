@@ -120,14 +120,14 @@ export function AIExperience() {
         >
           <Badge variant="secondary" className="mb-4 gap-1.5 px-3 py-1">
             <Brain className="h-3.5 w-3.5" />
-            20+ Months of Production AI Work
+            Portfolio Deep Dive
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
             AI & LLM Development
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A complete, production-grade system for building software with AI agents.
-            Not experiments. Not demos. Real applications, real users, real engineering standards.
+            The engineering methodology and tools behind my 77+ AI-assisted projects.
+            Not experiments or demos, but real production applications with real users and real engineering standards.
           </p>
         </motion.div>
 

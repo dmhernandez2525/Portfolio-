@@ -90,14 +90,14 @@ describe("AIExperience", () => {
     expect(screen.getByText("AI & LLM Development")).toBeInTheDocument()
   })
 
-  it("renders the badge with months", () => {
+  it("renders the badge", () => {
     renderComponent()
-    expect(screen.getByText(/20\+ Months of Production AI Work/)).toBeInTheDocument()
+    expect(screen.getByText(/Portfolio Deep Dive/)).toBeInTheDocument()
   })
 
   it("renders the description text", () => {
     renderComponent()
-    expect(screen.getByText(/complete, production-grade system/)).toBeInTheDocument()
+    expect(screen.getByText(/engineering methodology and tools behind my/)).toBeInTheDocument()
   })
 
   it("renders all 4 highlight cards", () => {
