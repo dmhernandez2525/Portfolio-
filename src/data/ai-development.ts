@@ -1301,6 +1301,31 @@ export const databaseUsage: DatabaseUsage[] = [
   { database: "ChromaDB", projects: "1", useCase: "Vector DB for RAG (Research Agent)" },
 ]
 
+// ============================================
+// PRISMA SCHEMA ARCHITECTURE
+// ============================================
+
+export interface PrismaSchemaProject {
+  project: string
+  models: number
+  enums: number
+  lines: string
+  provider: string
+  highlights: string
+}
+
+export const prismaSchemas: PrismaSchemaProject[] = [
+  { project: "rave-collective", models: 106, enums: 81, lines: "3,894", provider: "PostgreSQL", highlights: "Marketplace with B2B wholesale, events, loyalty/gamification, sales funnel analytics" },
+  { project: "baked-by-chrissy", models: 22, enums: 9, lines: "~600", provider: "PostgreSQL", highlights: "Multi-tenant bakery with Stripe split payments, recipe costing" },
+  { project: "made-with-love", models: 22, enums: 9, lines: "~600", provider: "PostgreSQL", highlights: "Identical bakery template with independent customization" },
+  { project: "interestingandbeyond", models: 14, enums: 2, lines: "~350", provider: "PostgreSQL", highlights: "3D printing e-commerce with product variants and shipment tracking" },
+  { project: "tattoo-generator", models: 6, enums: 4, lines: "~200", provider: "PostgreSQL", highlights: "UUID primary keys, commission tracking, style presets" },
+  { project: "FocusFlow", models: 6, enums: 2, lines: "~150", provider: "PostgreSQL", highlights: "NextAuth.js integration, task management" },
+  { project: "niche-selection-app", models: 4, enums: 0, lines: "~70", provider: "PostgreSQL", highlights: "Business intelligence: user > niche > keyword > analysis chain" },
+]
+
+export const prismaDescription = `7 Prisma schemas totaling 180 models and 107 enums, all PostgreSQL. The rave-collective marketplace (3,894 lines) is the most complex, with 387+ relations, 36+ composite key constraints, and 338 index declarations. Advanced patterns include marketplace split orders (VendorOrder), multi-tenant bakery isolation, JSON fields for flexible customization data, gamification systems (achievement badges, purchase streaks, loyalty tiers), and phase-based feature development documented in schema comments.`
+
 export interface APIFramework {
   framework: string
   projects: string

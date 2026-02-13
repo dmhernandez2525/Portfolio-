@@ -125,8 +125,61 @@ describe("AIDevelopmentPage", () => {
     expect(screen.getAllByText(/Enforcement Gaps/).length).toBeGreaterThanOrEqual(1)
   })
 
+  it("renders Prisma Schema Architecture section in TOC", () => {
+    renderPage()
+    expect(screen.getAllByText(/Prisma Schemas/).length).toBeGreaterThanOrEqual(1)
+  })
+
   it("renders practical use cases section", () => {
     renderPage()
     expect(screen.getByText(/Practical Day-to-Day Use Cases/)).toBeInTheDocument()
+  })
+
+  it("clicking a TOC link triggers navigation", () => {
+    renderPage()
+    const journeyLink = screen.getByRole("link", { name: /The Journey/i })
+    fireEvent.click(journeyLink)
+    // The TOC link should still exist and function
+    expect(journeyLink).toHaveAttribute("href", "#journey")
+  })
+
+  it("expands a PatternCard to reveal problem/solution/insight", () => {
+    renderPage()
+    // Open the Prompt Patterns section first
+    const patternHeaders = screen.getAllByText(/10 Battle-Tested Prompt Patterns/)
+    fireEvent.click(patternHeaders[patternHeaders.length - 1])
+
+    // Find and click the first pattern card button (pattern #1)
+    const patternButtons = screen.getAllByRole("button", { name: /Two-Phase Initialization/i })
+    expect(patternButtons.length).toBeGreaterThanOrEqual(1)
+    fireEvent.click(patternButtons[0])
+
+    // After expanding, problem/solution/insight should be visible
+    expect(screen.getAllByText(/Problem/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/Solution/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/Key Insight/).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it("expands an AIProjectCard to reveal innovation and features", () => {
+    const { container } = renderPage()
+    // Open the AI Products section first
+    const productHeaders = screen.getAllByText(/11 Production AI Products/)
+    fireEvent.click(productHeaders[productHeaders.length - 1])
+
+    // Find the AI project card buttons inside the #ai-projects section
+    const aiProjectsSection = container.querySelector("#ai-projects")
+    expect(aiProjectsSection).not.toBeNull()
+
+    // Get buttons within the section (first is section header, rest are project cards)
+    const cardButtons = aiProjectsSection!.querySelectorAll("button")
+    // Should have section header + 11 project card buttons
+    expect(cardButtons.length).toBeGreaterThanOrEqual(12)
+
+    // Click the second button (first project card, skipping section header)
+    fireEvent.click(cardButtons[1])
+
+    // After expanding, should show innovation and AI features
+    expect(screen.getAllByText(/Core Innovation/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/AI Features/).length).toBeGreaterThanOrEqual(1)
   })
 })

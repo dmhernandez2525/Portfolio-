@@ -8,7 +8,7 @@ import {
   Server, RotateCw, TrendingUp, Users, Ban, Briefcase,
   FileText, HardDrive, Gauge, Smartphone, Share2,
   AlertTriangle, DollarSign,
-  TestTube2, Workflow, Package, Database, FolderTree, BarChart3,
+  TestTube2, Workflow, Package, Database, FolderTree, BarChart3, Table2,
   KeyRound, ShieldCheck, Type, GitFork, Eye, Activity, Accessibility,
   Radio, Palette, Cpu, Wifi,
 } from "lucide-react"
@@ -128,6 +128,8 @@ import {
   orchestrationPatterns,
   pwaStats,
   pwaDescription,
+  prismaSchemas,
+  prismaDescription,
 } from "@/data/ai-development"
 
 // ============================================
@@ -314,6 +316,7 @@ const tocGroups = [
       { id: "env-secrets", label: "Environment & Secrets", icon: KeyRound },
       { id: "dependencies", label: "Dependency Ecosystem", icon: Package },
       { id: "infra-deploy", label: "Infrastructure", icon: Database },
+      { id: "prisma-schemas", label: "Prisma Schemas", icon: Table2 },
       { id: "sdd-coverage", label: "SDD Coverage", icon: FolderTree },
     ],
   },
@@ -1210,6 +1213,21 @@ export function AIDevelopmentPage() {
             <DataTable
               headers={["Framework", "Projects", "Use Case"]}
               rows={apiFrameworks.map(f => [f.framework, f.projects, f.useCase])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Prisma Schema Architecture */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Prisma Schema Architecture (180 Models, 7 Projects)" icon={Table2} id="prisma-schemas">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              {prismaDescription}
+            </p>
+
+            <h3 className="text-lg font-bold mb-3">Schema Breakdown by Project</h3>
+            <DataTable
+              headers={["Project", "Models", "Enums", "Lines", "Provider", "Highlights"]}
+              rows={prismaSchemas.map(s => [s.project, String(s.models), String(s.enums), s.lines, s.provider, s.highlights])}
             />
           </CollapsibleSection>
 
