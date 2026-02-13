@@ -7,9 +7,10 @@ import {
   GitBranch, CheckCircle, Monitor, Lightbulb, ArrowRight, Lock,
   Server, RotateCw, TrendingUp, Users, Ban, Briefcase,
   FileText, HardDrive, Gauge, Smartphone, Share2,
-  AlertTriangle, DollarSign, Video,
+  AlertTriangle, DollarSign,
   TestTube2, Workflow, Package, Database, FolderTree, BarChart3,
   KeyRound, ShieldCheck, Type, GitFork, Eye, Activity, Accessibility,
+  Radio, Palette, Cpu, Wifi,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -117,6 +118,16 @@ import {
   performanceHighlights,
   resilienceStats,
   resilienceDescription,
+  realTimeStats,
+  realTimeDescription,
+  animationStats,
+  animationEngineDescription,
+  animationHighlights,
+  aiOrchestrationProjects,
+  orchestrationDescription,
+  orchestrationPatterns,
+  pwaStats,
+  pwaDescription,
 } from "@/data/ai-development"
 
 // ============================================
@@ -239,47 +250,93 @@ function StatCard({ label, value, description }: { label: string; value: string;
 // Table of Contents
 // ============================================
 
-const tocSections = [
-  { id: "journey", label: "The Journey", icon: BookOpen },
-  { id: "career", label: "Career Context", icon: Briefcase },
-  { id: "ecosystem", label: "The Ecosystem", icon: Layers },
-  { id: "agent-prompts", label: "Agent Prompt System", icon: Terminal },
-  { id: "lifecycle", label: "Development Lifecycle", icon: RotateCw },
-  { id: "prompt-patterns", label: "10 Prompt Patterns", icon: Code2 },
-  { id: "ai-projects", label: "11 AI Products", icon: Sparkles },
-  { id: "market-research", label: "Market Research", icon: TrendingUp },
-  { id: "multi-llm", label: "Multi-LLM Strategy", icon: Bot },
-  { id: "voice-first", label: "Voice-First AI", icon: Mic },
-  { id: "privacy-first", label: "Privacy-First", icon: Shield },
-  { id: "cross-machine", label: "Cross-Machine Workflow", icon: Monitor },
-  { id: "multi-agent", label: "Multi-Agent Orchestration", icon: Users },
-  { id: "quality", label: "Quality Engineering", icon: CheckCircle },
-  { id: "forbidden", label: "Forbidden Patterns", icon: Ban },
-  { id: "doc-hierarchy", label: "Document Hierarchy", icon: FileText },
-  { id: "acceleration", label: "58x Acceleration", icon: Gauge },
-  { id: "tools", label: "AI Coding Tools", icon: Wrench },
-  { id: "cross-tool-sync", label: "Cross-Tool Sync", icon: Share2 },
-  { id: "native-apps", label: "Native macOS Apps", icon: Smartphone },
-  { id: "spectree-exports", label: "SpecTree Exports", icon: FileText },
-  { id: "cost-optimization", label: "Cost Optimization", icon: DollarSign },
-  { id: "testing-infra", label: "Testing Infrastructure", icon: TestTube2 },
-  { id: "cicd-patterns", label: "CI/CD Patterns", icon: Workflow },
-  { id: "dependencies", label: "Dependency Ecosystem", icon: Package },
-  { id: "infra-deploy", label: "Infrastructure", icon: Database },
-  { id: "sdd-coverage", label: "SDD Coverage", icon: FolderTree },
-  { id: "prompt-infra", label: "Prompt Infrastructure", icon: BarChart3 },
-  { id: "env-secrets", label: "Environment & Secrets", icon: KeyRound },
-  { id: "security", label: "Security Implementations", icon: ShieldCheck },
-  { id: "typescript-patterns", label: "TypeScript Patterns", icon: Type },
-  { id: "monorepo", label: "Monorepo Architecture", icon: GitFork },
-  { id: "accessibility", label: "Accessibility & UX", icon: Accessibility },
-  { id: "performance", label: "Performance Optimization", icon: Activity },
-  { id: "resilience", label: "Error Handling & Resilience", icon: Eye },
-  { id: "enforcement-gaps", label: "Enforcement Gaps", icon: AlertTriangle },
-  { id: "use-cases", label: "Practical Use Cases", icon: Zap },
-  { id: "enterprise", label: "Enterprise Patterns", icon: Server },
-  { id: "lessons", label: "Lessons Learned", icon: Lightbulb },
+const tocGroups = [
+  {
+    group: "Foundation",
+    sections: [
+      { id: "journey", label: "The Journey", icon: BookOpen },
+      { id: "career", label: "Career Context", icon: Briefcase },
+      { id: "ecosystem", label: "The Ecosystem", icon: Layers },
+    ],
+  },
+  {
+    group: "Prompt Engineering",
+    sections: [
+      { id: "agent-prompts", label: "Agent Prompt System", icon: Terminal },
+      { id: "lifecycle", label: "Development Lifecycle", icon: RotateCw },
+      { id: "prompt-patterns", label: "10 Prompt Patterns", icon: Code2 },
+      { id: "prompt-infra", label: "Prompt Infrastructure", icon: BarChart3 },
+      { id: "forbidden", label: "Forbidden Patterns", icon: Ban },
+    ],
+  },
+  {
+    group: "AI Products & Strategy",
+    sections: [
+      { id: "ai-projects", label: "11 AI Products", icon: Sparkles },
+      { id: "market-research", label: "Market Research", icon: TrendingUp },
+      { id: "multi-llm", label: "Multi-LLM Strategy", icon: Bot },
+      { id: "ai-orchestration", label: "AI Orchestration Patterns", icon: Cpu },
+      { id: "voice-first", label: "Voice-First AI", icon: Mic },
+      { id: "privacy-first", label: "Privacy-First", icon: Shield },
+      { id: "cost-optimization", label: "Cost Optimization", icon: DollarSign },
+    ],
+  },
+  {
+    group: "Development Workflow",
+    sections: [
+      { id: "cross-machine", label: "Cross-Machine Workflow", icon: Monitor },
+      { id: "multi-agent", label: "Multi-Agent Orchestration", icon: Users },
+      { id: "tools", label: "AI Coding Tools", icon: Wrench },
+      { id: "cross-tool-sync", label: "Cross-Tool Sync", icon: Share2 },
+      { id: "acceleration", label: "58x Acceleration", icon: Gauge },
+      { id: "doc-hierarchy", label: "Document Hierarchy", icon: FileText },
+    ],
+  },
+  {
+    group: "Architecture & Engineering",
+    sections: [
+      { id: "typescript-patterns", label: "TypeScript Patterns", icon: Type },
+      { id: "monorepo", label: "Monorepo Architecture", icon: GitFork },
+      { id: "real-time", label: "Real-Time Architecture", icon: Radio },
+      { id: "animation", label: "Animation & Motion", icon: Palette },
+      { id: "pwa", label: "PWA & Offline", icon: Wifi },
+      { id: "native-apps", label: "Native macOS Apps", icon: Smartphone },
+      { id: "spectree-exports", label: "SpecTree Exports", icon: FileText },
+    ],
+  },
+  {
+    group: "Quality & Infrastructure",
+    sections: [
+      { id: "quality", label: "Quality Engineering", icon: CheckCircle },
+      { id: "testing-infra", label: "Testing Infrastructure", icon: TestTube2 },
+      { id: "cicd-patterns", label: "CI/CD Patterns", icon: Workflow },
+      { id: "security", label: "Security Implementations", icon: ShieldCheck },
+      { id: "env-secrets", label: "Environment & Secrets", icon: KeyRound },
+      { id: "dependencies", label: "Dependency Ecosystem", icon: Package },
+      { id: "infra-deploy", label: "Infrastructure", icon: Database },
+      { id: "sdd-coverage", label: "SDD Coverage", icon: FolderTree },
+    ],
+  },
+  {
+    group: "UX & Resilience",
+    sections: [
+      { id: "accessibility", label: "Accessibility & UX", icon: Accessibility },
+      { id: "performance", label: "Performance Optimization", icon: Activity },
+      { id: "resilience", label: "Error Handling & Resilience", icon: Eye },
+    ],
+  },
+  {
+    group: "Reflections",
+    sections: [
+      { id: "enforcement-gaps", label: "Enforcement Gaps", icon: AlertTriangle },
+      { id: "use-cases", label: "Practical Use Cases", icon: Zap },
+      { id: "enterprise", label: "Enterprise Patterns", icon: Server },
+      { id: "lessons", label: "Lessons Learned", icon: Lightbulb },
+    ],
+  },
 ]
+
+const tocSections = tocGroups.flatMap(g => g.sections)
 
 // ============================================
 // Main Page Component
@@ -354,22 +411,27 @@ export function AIDevelopmentPage() {
 
             <div className={`${tocOpen ? "block" : "hidden"} md:block`}>
               <div className="p-4 md:p-6 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm md:mt-0 mt-1">
-                <h3 className="hidden md:block font-semibold mb-3 text-sm uppercase tracking-wider text-muted-foreground">Contents</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                  {tocSections.map((section) => {
-                    const Icon = section.icon
-                    return (
-                      <a
-                        key={section.id}
-                        href={`#${section.id}`}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-                        onClick={() => setTocOpen(false)}
-                      >
-                        <Icon className="h-3.5 w-3.5" />
-                        {section.label}
-                      </a>
-                    )
-                  })}
+                <h3 className="hidden md:block font-semibold mb-4 text-sm uppercase tracking-wider text-muted-foreground">Contents ({tocSections.length} sections)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+                  {tocGroups.map((group) => (
+                    <div key={group.group} className="mb-3">
+                      <div className="text-xs font-bold uppercase tracking-wider text-primary/70 px-3 py-1 mb-1">{group.group}</div>
+                      {group.sections.map((section) => {
+                        const Icon = section.icon
+                        return (
+                          <a
+                            key={section.id}
+                            href={`#${section.id}`}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                            onClick={() => setTocOpen(false)}
+                          >
+                            <Icon className="h-3.5 w-3.5 shrink-0" />
+                            {section.label}
+                          </a>
+                        )
+                      })}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1370,6 +1432,74 @@ export function AIDevelopmentPage() {
             <DataTable
               headers={["Pattern", "Count", "Detail"]}
               rows={resilienceStats.map(r => [r.pattern, r.count, r.detail])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Real-Time Architecture */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Real-Time Architecture (8 Implementations)" icon={Radio} id="real-time">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{realTimeDescription}</p>
+
+            <DataTable
+              headers={["Project", "Technology", "Lines", "Key Feature"]}
+              rows={realTimeStats.map(r => [r.project, r.technology, r.lines, r.keyFeature])}
+            />
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: Animation & Motion Engineering */}
+          {/* ============================================ */}
+          <CollapsibleSection title="Animation & Motion Engineering (790-Line Engine)" icon={Palette} id="animation">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{animationEngineDescription}</p>
+
+            <DataTable
+              headers={["Category", "Metric", "Detail"]}
+              rows={animationStats.map(a => [a.category, a.metric, a.detail])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Highlights</h3>
+            <div className="space-y-3">
+              {animationHighlights.map((h, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <span className="font-mono text-xs font-semibold text-primary">{h.label}</span>
+                  <p className="text-sm text-muted-foreground mt-1">{h.detail}</p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: AI Orchestration Patterns */}
+          {/* ============================================ */}
+          <CollapsibleSection title="AI Orchestration Patterns (8 Projects, 4 Providers)" icon={Cpu} id="ai-orchestration">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{orchestrationDescription}</p>
+
+            <DataTable
+              headers={["Project", "Providers", "Sophistication", "Key Feature"]}
+              rows={aiOrchestrationProjects.map(p => [p.project, p.providers, p.sophistication, p.keyFeature])}
+            />
+
+            <h3 className="text-lg font-bold mt-8 mb-3">Architectural Patterns</h3>
+            <div className="grid md:grid-cols-2 gap-3">
+              {orchestrationPatterns.map((p, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border/30 bg-muted/10">
+                  <h5 className="font-semibold text-sm mb-1">{p.name}</h5>
+                  <p className="text-xs text-muted-foreground">{p.description}</p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+
+          {/* ============================================ */}
+          {/* SECTION: PWA & Offline Architecture */}
+          {/* ============================================ */}
+          <CollapsibleSection title="PWA & Offline Architecture (5 Projects)" icon={Wifi} id="pwa">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{pwaDescription}</p>
+
+            <DataTable
+              headers={["Project", "Manifest", "Service Worker", "Cache Strategy", "Status"]}
+              rows={pwaStats.map(p => [p.project, p.manifest, p.serviceWorker, p.cacheStrategy, p.status])}
             />
           </CollapsibleSection>
 

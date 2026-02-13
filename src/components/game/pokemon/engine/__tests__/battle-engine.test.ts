@@ -22,8 +22,6 @@ import type {
   PokemonMove,
   MoveData,
   BattleState,
-  BattlePokemon,
-  FieldEffects,
   PokemonType,
 } from '../types';
 
@@ -3327,7 +3325,6 @@ describe('executeTurn - Shell Bell', () => {
       opponentParty: [opponentPokemon], opponentActive: createBattlePokemon(opponentPokemon),
     });
 
-    const initialHp = playerPokemon.currentHp;
     executeTurn(state, 0, 'fight');
 
     // Shell Bell should have healed some HP (though opponent also attacked)
