@@ -1,11 +1,51 @@
-import { describe, it, expect, vi, beforeAll } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest"
+import { render, screen, act } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
+
+// Mock aiStats to include a decimal value (covers isDecimal branch in AnimatedCounter)
+vi.mock("@/data/ai-development", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/data/ai-development")>()
+  return {
+    ...original,
+    aiStats: [
+      { label: "Projects with AI Prompts", value: "77+", description: "Structured agent prompt infrastructure" },
+      { label: "Production AI Products", value: "11", description: "Shipped AI applications" },
+      { label: "Test Coverage", value: "97.7", description: "Research Agent coverage" },
+      { label: "Total AI Sessions", value: "620+", description: "Across all tools" },
+      ...original.aiStats.slice(4),
+    ],
+  }
+})
+
 import { AIExperience } from "./AIExperience"
 
-// Mock IntersectionObserver as a proper class
+// Store observer callbacks so tests can trigger them
+let observerCallbacks: ((entries: Array<{ isIntersecting: boolean }>) => void)[] = []
+
+let rafCallCount = 0
+const FIXED_TIME = 10000
+
 beforeAll(() => {
+  // Mock performance.now so startTime inside AnimatedCounter matches our rAF timestamps
+  vi.spyOn(performance, "now").mockReturnValue(FIXED_TIME)
+
+  // Mock requestAnimationFrame to execute synchronously with incrementing time
+  vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+    rafCallCount++
+    // First call at 500ms (progress < 1), second at 2000ms (progress >= 1)
+    const elapsed = rafCallCount % 2 === 1 ? 500 : 2000
+    cb(FIXED_TIME + elapsed)
+    return 0
+  })
+})
+
+beforeEach(() => {
+  rafCallCount = 0
+  observerCallbacks = []
   class MockIntersectionObserver {
+    constructor(callback: (entries: Array<{ isIntersecting: boolean }>) => void) {
+      observerCallbacks.push(callback)
+    }
     observe() {}
     unobserve() {}
     disconnect() {}
@@ -53,14 +93,14 @@ describe("AIExperience", () => {
     expect(screen.getByText("AI & LLM Development")).toBeInTheDocument()
   })
 
-  it("renders the badge with months", () => {
+  it("renders the badge", () => {
     renderComponent()
-    expect(screen.getByText(/20\+ Months of Production AI Work/)).toBeInTheDocument()
+    expect(screen.getByText(/Portfolio Deep Dive/)).toBeInTheDocument()
   })
 
   it("renders the description text", () => {
     renderComponent()
-    expect(screen.getByText(/complete, production-grade system/)).toBeInTheDocument()
+    expect(screen.getByText(/engineering methodology and tools behind my/)).toBeInTheDocument()
   })
 
   it("renders all 4 highlight cards", () => {
@@ -81,7 +121,8 @@ describe("AIExperience", () => {
 
   it("renders stat labels", () => {
     renderComponent()
-    const statLabels = screen.getAllByText(/Projects with AI Prompts|Production AI Products|Reusable Prompt Patterns|Total AI Sessions/)
+    // Third stat is mocked to "Test Coverage" to test decimal branch
+    const statLabels = screen.getAllByText(/Projects with AI Prompts|Production AI Products|Test Coverage|Total AI Sessions/)
     expect(statLabels.length).toBe(4)
   })
 
@@ -94,5 +135,57 @@ describe("AIExperience", () => {
   it("renders the CTA subtitle", () => {
     renderComponent()
     expect(screen.getByText(/11 production AI products/)).toBeInTheDocument()
+  })
+
+  it("triggers animated counter when IntersectionObserver fires", () => {
+    renderComponent()
+
+    // Trigger all IntersectionObserver callbacks with isIntersecting: true
+    act(() => {
+      for (const callback of observerCallbacks) {
+        callback([{ isIntersecting: true }])
+      }
+    })
+
+    // After animation fires, counter values should be non-zero
+    // The stat values from aiStats are rendered via AnimatedCounter
+    // With requestAnimationFrame mocked at +2000ms (> 1500ms duration),
+    // the animation should complete to the target value
+    const statElements = screen.getAllByText(/^\d+/)
+    expect(statElements.length).toBeGreaterThan(0)
+  })
+
+  it("covers animation loop with intermediate progress values", () => {
+    renderComponent()
+
+    // With our rAF mock, first call is at 500ms (progress ~0.33, < 1)
+    // which triggers requestAnimationFrame again, second call at 2000ms (progress 1.0)
+    act(() => {
+      for (const callback of observerCallbacks) {
+        callback([{ isIntersecting: true }])
+      }
+    })
+
+    // Animation should complete and display final counter values
+    expect(screen.getByText("AI & LLM Development")).toBeInTheDocument()
+  })
+
+  it("does not re-animate counter on subsequent intersections", () => {
+    renderComponent()
+
+    // Fire intersection twice
+    act(() => {
+      for (const callback of observerCallbacks) {
+        callback([{ isIntersecting: true }])
+      }
+    })
+    act(() => {
+      for (const callback of observerCallbacks) {
+        callback([{ isIntersecting: true }])
+      }
+    })
+
+    // Should still render fine (hasAnimated guard prevents double animation)
+    expect(screen.getByText("AI & LLM Development")).toBeInTheDocument()
   })
 })

@@ -48,6 +48,8 @@ import {
   machines,
   developmentLifecycle,
   multiAgentSystem,
+  prismaSchemas,
+  prismaDescription,
 } from "./ai-development"
 
 // ============================================
@@ -462,6 +464,52 @@ describe("pwaStats", () => {
     const chore = pwaStats.find((p) => p.project === "ChoreChamp")
     expect(chore).toBeDefined()
     expect(chore?.status).toBe("Production-Ready")
+  })
+})
+
+// ============================================
+// Prisma Schema Architecture
+// ============================================
+
+describe("prismaSchemas", () => {
+  it("has 7 projects", () => {
+    expect(prismaSchemas.length).toBe(7)
+  })
+
+  it("each schema has all required fields", () => {
+    for (const schema of prismaSchemas) {
+      expect(schema.project).toBeTruthy()
+      expect(schema.models).toBeGreaterThan(0)
+      expect(typeof schema.enums).toBe("number")
+      expect(schema.lines).toBeTruthy()
+      expect(schema.provider).toBe("PostgreSQL")
+      expect(schema.highlights).toBeTruthy()
+    }
+  })
+
+  it("rave-collective is the largest with 106 models", () => {
+    const rave = prismaSchemas.find(s => s.project === "rave-collective")
+    expect(rave).toBeDefined()
+    expect(rave?.models).toBe(106)
+    expect(rave?.enums).toBe(81)
+  })
+
+  it("total models across all schemas is 180", () => {
+    const total = prismaSchemas.reduce((sum, s) => sum + s.models, 0)
+    expect(total).toBe(180)
+  })
+})
+
+describe("prismaDescription", () => {
+  it("is a non-empty string", () => {
+    expect(prismaDescription).toBeTruthy()
+    expect(typeof prismaDescription).toBe("string")
+  })
+
+  it("mentions key stats", () => {
+    expect(prismaDescription).toContain("180 models")
+    expect(prismaDescription).toContain("107 enums")
+    expect(prismaDescription).toContain("PostgreSQL")
   })
 })
 
