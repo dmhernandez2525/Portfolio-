@@ -34,6 +34,7 @@ export const fileTree: FileNode[] = [
           { name: "agar.exe", type: "file", contentKey: "game-agar" },
           { name: "mafia-wars.exe", type: "file", contentKey: "game-mafia-wars" },
           { name: "pokemon.exe", type: "file", contentKey: "game-pokemon" },
+          { name: "clash-of-clans.exe", type: "file", contentKey: "game-coc" },
           { name: "shopping-cart-hero.exe", type: "file", contentKey: "game-shopping-cart-hero" },
         ],
       },
