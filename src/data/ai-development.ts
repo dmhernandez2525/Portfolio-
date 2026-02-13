@@ -1607,6 +1607,110 @@ export const resilienceStats: ResilienceStat[] = [
 export const resilienceDescription = `Error handling concentrates in voice recognition, speech synthesis, and AI assistant features (8-10 try-catch blocks each). The pattern is consistent: detect capability, attempt operation, catch and fallback gracefully. No external error tracking (Sentry/LogRocket), relying instead on structured console logging with descriptive messages.`
 
 // ============================================
+// REAL-TIME & WEBSOCKET ARCHITECTURE
+// ============================================
+
+export interface RealTimeStat {
+  project: string
+  technology: string
+  lines: string
+  keyFeature: string
+}
+
+export const realTimeStats: RealTimeStat[] = [
+  { project: "Comfort-Order", technology: "Socket.io (Singleton)", lines: "350+", keyFeature: "Exponential backoff reconnection, room persistence, subscription registry" },
+  { project: "Enterprise Template System", technology: "Mock Socket Server", lines: "475", keyFeature: "6 event types (CRM, opportunity, activity, calendar, marketing, system)" },
+  { project: "Jarvis/PersonaPlex", technology: "Binary WebSocket Protocol", lines: "277", keyFeature: "7 frame types (0x00-0x06), sub-500ms latency, binary audio streaming" },
+  { project: "SpecTree", technology: "Server-Sent Events (SSE)", lines: "375", keyFeature: "Multi-provider stream parsing (OpenAI, Claude, Gemini formats)" },
+  { project: "Comfort-Order", technology: "Hybrid WebSocket + Polling", lines: "514", keyFeature: "30s polling fallback, page visibility sync, conflict resolution" },
+  { project: "Comfort-Order", technology: "WebRTC", lines: "200+", keyFeature: "4 quality presets (640p to 4K@60fps), stream caching, STUN servers" },
+  { project: "ChoreChamp", technology: "Socket.io + Fastify", lines: "40", keyFeature: "Household-isolated rooms, automatic cleanup on disconnect" },
+  { project: "Comfort-Order", technology: "3D Asset Streaming", lines: "300+", keyFeature: "500MB cache limit, camera-based loading, Cesium.js integration" },
+]
+
+export const realTimeDescription = `8 distinct real-time implementations across the portfolio, ranging from a custom binary protocol for sub-500ms voice communication to enterprise Socket.io singletons with exponential backoff. The Jarvis binary protocol uses 7 frame types (handshake, audio, text, control, metadata, error, ping) transmitted as Uint8Array buffers for minimal latency. The Comfort-Order event sync service demonstrates hybrid architecture: WebSocket for real-time updates with 30s polling fallback, page visibility integration, and server-wins conflict resolution.`
+
+// ============================================
+// ANIMATION & MOTION ENGINEERING
+// ============================================
+
+export interface AnimationStat {
+  category: string
+  metric: string
+  detail: string
+}
+
+export const animationStats: AnimationStat[] = [
+  { category: "Framer Motion", metric: "541 occurrences across 198 files", detail: "Primary animation library for React components" },
+  { category: "Web Animations API", metric: "790-line AnimationEngine singleton", detail: "14 animation types, 22+ presets, full lifecycle management" },
+  { category: "CSS Keyframes", metric: "541 @keyframes declarations", detail: "Tailwind utilities and custom animations" },
+  { category: "Canvas/3D", metric: "209 files", detail: "Three.js, Canvas API, Pokemon sprites, COC game graphics" },
+  { category: "Skeleton Loaders", metric: "410+ files", detail: "Loading states across virtually every project" },
+  { category: "GPU Acceleration", metric: "Dedicated utility file", detail: "GPUAcceleratedAnimations.ts in enterprise dashboard" },
+]
+
+export const animationEngineDescription = `The AnimationEngine (Comfort-Order/Enterprise Template System) is the most sophisticated animation system in the portfolio. A singleton class supporting 14 animation types (fade, slide, scale, rotate, flip, bounce, parallax, typewriter, counter, custom), 6 trigger mechanisms (onLoad, onScroll, onHover, onClick, onFocus, custom), 22+ presets organized by category (entrance, scroll, hover, interactive), IntersectionObserver for scroll-triggered animations, and CSS keyframe generation. It demonstrates enterprise-grade animation architecture with proper cleanup, memory management, and requestAnimationFrame throttling.`
+
+export const animationHighlights = [
+  { label: "AnimationEngine Singleton", detail: "790 lines, Web Animations API, 14 types, 22+ presets, scroll-triggered parallax with rAF throttling" },
+  { label: "Confetti Systems", detail: "Two implementations: Framer Motion particle system (50 particles, 720-degree spin) and CSS keyframe variant with configurable durations" },
+  { label: "Entrance Animations", detail: "Standardized: fade-in (600ms), slide-up (800ms), scale-in (500ms), bounce-in (1000ms custom bezier)" },
+  { label: "Counter Animations", detail: "Number counting with easing (ease-in, ease-out, ease-in-out), decimal support, prefix/suffix formatting" },
+]
+
+// ============================================
+// AI ORCHESTRATION PATTERNS
+// ============================================
+
+export interface AIOrchestrationProject {
+  project: string
+  providers: string
+  sophistication: string
+  keyFeature: string
+}
+
+export const aiOrchestrationProjects: AIOrchestrationProject[] = [
+  { project: "SpecTree", providers: "OpenAI, Anthropic, Gemini", sophistication: "Enterprise", keyFeature: "Provider factory + fallback chains + task-type routing + cost tracking" },
+  { project: "GenomeForge", providers: "OpenAI, Anthropic, Gemini, Ollama", sophistication: "Advanced", keyFeature: "Context-aware prompts with genetic data injection (max 2000 chars)" },
+  { project: "Learning-Hall", providers: "OpenAI, Anthropic", sophistication: "Standard", keyFeature: "Context-aware educational prompts (course, lesson, quiz modes)" },
+  { project: "CodeReview-AI", providers: "OpenAI", sophistication: "Domain-Specific", keyFeature: "Structured JSON output with streaming, severity/category taxonomy" },
+  { project: "InterestingAndBeyond", providers: "Gemini", sophistication: "Specialized", keyFeature: "Image-to-SVG generation for 3D printing with style variants" },
+]
+
+export const orchestrationDescription = `SpecTree implements the most comprehensive AI orchestration: a Provider Factory for centralized registration, error-categorized fallback chains (rate limit, network, timeout, server, quota), task-type model selection (generation uses GPT-4 Turbo, questions use GPT-3.5 for speed), SSE streaming with multi-format parsing, and real-time cost tracking with daily/monthly budgets and alert thresholds (80% warning, 95% critical). Model equivalence mapping enables automatic fallback (GPT-4 to Claude Opus to Gemini Pro).`
+
+export const orchestrationPatterns = [
+  { name: "Provider Factory", description: "Central registry for provider registration, automatic detection from model ID, unified completion interface" },
+  { name: "Error-Categorized Fallback", description: "6 error categories (rate limit, network, timeout, server, model unavailable, quota exceeded) with configurable fallback chains" },
+  { name: "Task-Type Router", description: "5 task types (generation, expansion, questions, refinement, chat) with per-task model preferences persisted to localStorage" },
+  { name: "Budget Guard", description: "Token/cost limits with daily and monthly caps, warning thresholds, usage history export/import, alert severity levels" },
+  { name: "AsyncGenerator Streaming", description: "Efficient streaming via async generators, avoiding promise buffering. Multi-format SSE parsing for OpenAI, Claude, and Gemini" },
+  { name: "Context Injection", description: "Domain knowledge embedding in system prompts. GenomeForge injects genetic analysis results, Learning-Hall injects course context" },
+]
+
+// ============================================
+// PWA & OFFLINE ARCHITECTURE
+// ============================================
+
+export interface PWAStat {
+  project: string
+  manifest: string
+  serviceWorker: string
+  cacheStrategy: string
+  status: string
+}
+
+export const pwaStats: PWAStat[] = [
+  { project: "ChoreChamp", manifest: "8 icon sizes, shortcuts, screenshots", serviceWorker: "Full (sync, push, fetch)", cacheStrategy: "Install/activate/fetch events", status: "Production-Ready" },
+  { project: "Comfort-Order", manifest: "9 icon sizes, shortcuts, screenshots", serviceWorker: "Advanced (3 strategies)", cacheStrategy: "Network-first (API), cache-first (static), stale-while-revalidate", status: "Enterprise-Grade" },
+  { project: "LifeContextCompiler", manifest: "Yes + browser extension", serviceWorker: "IndexedDB-focused", cacheStrategy: "Client-side encrypted storage", status: "Storage-Focused" },
+  { project: "Triple-A Lemonade", manifest: "Yes", serviceWorker: "Basic registration", cacheStrategy: "Minimal", status: "Basic" },
+  { project: "Job-Harmony", manifest: "Yes", serviceWorker: "None", cacheStrategy: "None", status: "Manifest Only" },
+]
+
+export const pwaDescription = `5 projects implement PWA capabilities at varying levels. ChoreChamp delivers the most complete implementation: 4 dedicated React components (PWAProvider, InstallPrompt, UpdateNotification, OfflineIndicator), BeforeInstallPrompt event handling, background sync for offline chore completions, and push notification support with action buttons. Comfort-Order implements the most sophisticated caching: network-first for GraphQL API calls, cache-first for static assets, stale-while-revalidate as fallback, and an offline.html fallback page. LifeContextCompiler takes a different approach with IndexedDB for encrypted local storage across 8 files.`
+
+// ============================================
 // LESSONS LEARNED
 // ============================================
 
