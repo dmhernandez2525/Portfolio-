@@ -482,7 +482,7 @@ describe('advanceBattle - faint_check', () => {
     const opponentPokemon = makePokemon({ uid: 'opp-001', speciesId: 4, nickname: 'Charmy', currentHp: 60 });
 
     const playerActive = vi.mocked(createBattlePokemon)(playerPokemon);
-    playerActive.chargingMove = 'dig';
+    playerActive.chargingMove = { moveId: 'dig', turnsLeft: 1 };
 
     vi.mocked(executeTurn).mockReturnValueOnce({
       messages: ['Bulba came up from underground!', 'It hit hard!'],

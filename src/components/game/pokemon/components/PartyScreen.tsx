@@ -34,8 +34,7 @@ export default function PartyScreen({ party, onSelect, onBack, mode }: PartyScre
               ${mode === 'switch' && isFainted ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
           >
-            {/* Pokemon sprite placeholder */}
-            <div className="w-10 h-10 bg-[#3068a8] rounded-full flex items-center justify-center text-white font-mono text-xs font-bold">
+            <div className="w-10 h-10 bg-[#3068a8] rounded-full flex items-center justify-center text-white font-mono text-xs font-bold border border-white/20">
               #{poke.speciesId}
             </div>
 

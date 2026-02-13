@@ -15,12 +15,18 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'jsdom',
+    setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     coverage: {
       provider: 'v8',
-      include: ['src/components/game/pokemon/engine/**/*.ts'],
-      exclude: ['**/*.test.ts', '**/renderer.ts', '**/sprites.ts', '**/tilemap.ts', '**/audio-manager.ts', '**/types.ts', '**/postgame.ts'],
+      include: [
+        'src/components/game/pokemon/engine/**/*.ts',
+        'src/data/ai-development.ts',
+        'src/pages/AIDevelopmentPage.tsx',
+        'src/components/sections/AIExperience.tsx',
+      ],
+      exclude: ['**/*.test.ts', '**/*.test.tsx', '**/renderer.ts', '**/sprites.ts', '**/tilemap.ts', '**/audio-manager.ts', '**/types.ts', '**/postgame.ts'],
     },
   },
 })
