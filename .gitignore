@@ -29,3 +29,10 @@ dist-ssr
 *.sln
 *.sw?
 *.tsbuildinfo
+
+# Test coverage output
+coverage/
+
+# Agent working files
+.claude/
+.gemini/
