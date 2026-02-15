@@ -9,6 +9,7 @@ import { RESUME_PRESETS, RESUME_VERSIONS } from "@/data/resume-data"
 import { exportResumeAsDocx, exportResumeAsText, getResumePdfUrl } from "@/lib/resume-export"
 import { buildResumeComparison, buildResumeSnapshot } from "@/lib/resume-model"
 import { getResumeDownloadEvents, trackResumeDownload } from "@/lib/resume-analytics"
+import { trackGoal } from "@/lib/analytics-store"
 import type { ResumeExportFormat, ResumePresetId, ResumeSectionKey, ResumeVersionId } from "@/types/resume"
 import "@/styles/resume-print.css"
 
@@ -89,6 +90,7 @@ export function ResumePage() {
       versionId: selectedVersion,
       presetId: selectedPreset,
     })
+    trackGoal("/resume", "resume_download")
 
     if (format === "pdf") {
       window.open(getResumePdfUrl(), "_blank", "noopener,noreferrer")

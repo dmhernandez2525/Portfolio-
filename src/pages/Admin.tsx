@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useState } from "react"
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
+import { AnalyticsPanel } from "@/components/admin/analytics/AnalyticsPanel"
 import { Button } from '@/components/ui/button'
 import { ProjectManagementPanel } from "@/components/admin/projects/ProjectManagementPanel"
 import { TestimonialAdminPanel } from "@/components/admin/testimonials/TestimonialAdminPanel"
@@ -197,6 +198,7 @@ export function Admin() {
         </div>
 
         {activeFeatureId === "projects" ? <ProjectManagementPanel /> : null}
+        {activeFeatureId === "analytics" ? <AnalyticsPanel /> : null}
         {activeFeatureId === "testimonials" ? <TestimonialAdminPanel /> : null}
 
         {/* Demo Mode Info */}

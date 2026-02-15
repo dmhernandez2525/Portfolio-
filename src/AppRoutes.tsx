@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
+import { usePageAnalytics } from "@/hooks/usePageAnalytics"
 import { RootLayout } from "@/components/layout/RootLayout"
 import { Gateway } from "@/pages/Gateway"
 import { BusinessCardPage } from "@/pages/BusinessCardPage"
@@ -113,6 +114,7 @@ const MODE_PAGES: Partial<Record<PortfolioMode, React.ReactElement>> = {
 }
 
 export function AppRoutes() {
+  usePageAnalytics()
   const { mode } = useMode()
 
   if (!mode) {
