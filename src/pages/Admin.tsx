@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
 import { AnalyticsPanel } from "@/components/admin/analytics/AnalyticsPanel"
 import { Button } from '@/components/ui/button'
+import { ContentManagementPanel } from "@/components/admin/content/ContentManagementPanel"
 import { ProjectManagementPanel } from "@/components/admin/projects/ProjectManagementPanel"
 import { TestimonialAdminPanel } from "@/components/admin/testimonials/TestimonialAdminPanel"
 import {
@@ -199,6 +200,7 @@ export function Admin() {
 
         {activeFeatureId === "projects" ? <ProjectManagementPanel /> : null}
         {activeFeatureId === "analytics" ? <AnalyticsPanel /> : null}
+        {activeFeatureId === "blog-posts" || activeFeatureId === "media-library" ? <ContentManagementPanel /> : null}
         {activeFeatureId === "testimonials" ? <TestimonialAdminPanel /> : null}
 
         {/* Demo Mode Info */}
