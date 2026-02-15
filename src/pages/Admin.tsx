@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
 import { Button } from '@/components/ui/button'
+import { ProjectManagementPanel } from "@/components/admin/projects/ProjectManagementPanel"
 import { TestimonialAdminPanel } from "@/components/admin/testimonials/TestimonialAdminPanel"
 import {
   LogOut,
@@ -195,6 +196,7 @@ export function Admin() {
           })}
         </div>
 
+        {activeFeatureId === "projects" ? <ProjectManagementPanel /> : null}
         {activeFeatureId === "testimonials" ? <TestimonialAdminPanel /> : null}
 
         {/* Demo Mode Info */}
