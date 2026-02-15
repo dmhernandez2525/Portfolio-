@@ -38,6 +38,7 @@ import { Blog } from "@/pages/Blog"
 import { Social } from "@/pages/Social"
 import { Games } from "@/pages/Games"
 import { ProjectsPage } from "@/pages/ProjectsPage"
+import { ProjectDetailPage } from "@/pages/ProjectDetailPage"
 import { NotFound } from "@/pages/NotFound"
 import { Login } from "@/pages/Login"
 import { Admin } from "@/pages/Admin"
@@ -69,6 +70,7 @@ function CreativeRoutes() {
         <Route path="/social" element={<Social />} />
         <Route path="/games" element={<Games />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects/:slug" element={<ProjectDetailPage />} />
         <Route path="/ai-development" element={<AIDevelopmentPage />} />
         <Route path="/game" element={<FallingBlocksGame />} />
         <Route path="/tetris" element={<TetrisGame />} />

@@ -95,6 +95,9 @@ function ProjectCard({ project, index, viewMode }: { project: ProjectItem; index
 
             {/* Actions */}
             <div className="flex gap-2 flex-shrink-0">
+              <Button size="sm" variant="secondary" asChild>
+                <Link to={`/projects/${project.id}`}>Open Page</Link>
+              </Button>
               {project.link && (
                 <Button size="sm" asChild>
                   <a href={project.link} target={project.link.startsWith('/') ? "_self" : "_blank"} rel="noopener noreferrer">
@@ -171,6 +174,9 @@ function ProjectCard({ project, index, viewMode }: { project: ProjectItem; index
               </div>
 
               <div className="flex flex-wrap gap-3 pt-4 border-t">
+                <Button variant="secondary" asChild>
+                  <Link to={`/projects/${project.id}`}>Open Detail Page</Link>
+                </Button>
                 {project.link && (
                   <Button asChild>
                     <a href={project.link} target={project.link.startsWith('/') ? "_self" : "_blank"} rel="noopener noreferrer">
@@ -248,6 +254,9 @@ function ProjectCard({ project, index, viewMode }: { project: ProjectItem; index
             </div>
 
             <div className="flex gap-2 mt-auto">
+              <Button size="sm" variant="secondary" asChild>
+                <Link to={`/projects/${project.id}`}>Open Page</Link>
+              </Button>
               {project.link && (
                 <Button size="sm" asChild className="flex-1">
                   <a href={project.link} target={project.link.startsWith('/') ? "_self" : "_blank"} rel="noopener noreferrer">
@@ -326,6 +335,9 @@ function ProjectCard({ project, index, viewMode }: { project: ProjectItem; index
             </div>
 
             <div className="flex flex-wrap gap-3 pt-4 border-t">
+              <Button variant="secondary" asChild>
+                <Link to={`/projects/${project.id}`}>Open Detail Page</Link>
+              </Button>
               {project.link && (
                 <Button asChild>
                   <a href={project.link} target={project.link.startsWith('/') ? "_self" : "_blank"} rel="noopener noreferrer">
