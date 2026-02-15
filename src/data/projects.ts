@@ -845,6 +845,9 @@ export const getProjectsByTier = (tier: ProjectTier): ProjectItem[] =>
 export const getProjectsByCategory = (category: ProjectCategory): ProjectItem[] =>
   projectsData.filter(p => p.category === category)
 
+export const getProjectById = (id: string): ProjectItem | null =>
+  projectsData.find((project) => project.id === id) ?? null
+
 // Get featured projects (Tier 1 flagship)
 export const getFeaturedProjects = (): ProjectItem[] =>
   projectsData.filter(p => p.featured)
