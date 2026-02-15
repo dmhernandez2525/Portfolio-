@@ -1,154 +1,273 @@
+import { useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { Download, Github, Linkedin, Mail, Printer } from "lucide-react"
+import { Github, Linkedin, Mail } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
-import { experienceData } from "@/data/experience"
-import { skillsData, type SkillCategory } from "@/data/skills"
-import { projectsData } from "@/data/projects"
+import { ResumeComparison } from "@/components/resume/ResumeComparison"
+import { ResumeControlPanel } from "@/components/resume/ResumeControlPanel"
+import { ResumeSectionBlock } from "@/components/resume/ResumeSectionBlock"
+import { RESUME_PRESETS, RESUME_VERSIONS } from "@/data/resume-data"
+import { exportResumeAsDocx, exportResumeAsText, getResumePdfUrl } from "@/lib/resume-export"
+import { buildResumeComparison, buildResumeSnapshot } from "@/lib/resume-model"
+import { getResumeDownloadEvents, trackResumeDownload } from "@/lib/resume-analytics"
+import type { ResumeExportFormat, ResumePresetId, ResumeSectionKey, ResumeVersionId } from "@/types/resume"
+import "@/styles/resume-print.css"
 
-const QR_LINKS = [
-  { label: "GitHub", url: "https://github.com/dmhernandez2525" },
-  { label: "LinkedIn", url: "https://linkedin.com/in/dh25" },
-  { label: "Portfolio", url: "https://interestingandbeyond.com" },
-] as const
-
-function ResumeQRCodes() {
-  return (
-    <div className="hidden print:block mt-8 pt-6 border-t border-border">
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground print:text-black mb-4">
-        Scan to Connect
-      </h2>
-      <div className="flex items-start gap-8">
-        {QR_LINKS.map((link) => (
-          <div key={link.label} className="flex flex-col items-center gap-2">
-            <QRCodeSVG value={link.url} size={80} level="M" />
-            <span className="text-xs text-muted-foreground print:text-black">{link.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+const INITIAL_SECTION_VISIBILITY: Record<ResumeSectionKey, boolean> = {
+  contact: true,
+  summary: true,
+  skills: true,
+  experience: true,
+  projects: true,
+  qr: true,
 }
 
-const fadeIn = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
+const INITIAL_COLLAPSED_STATE: Record<ResumeSectionKey, boolean> = {
+  contact: false,
+  summary: false,
+  skills: false,
+  experience: false,
+  projects: false,
+  qr: false,
 }
 
-const skillCategories: SkillCategory[] = ["Frontend", "Backend", "Database", "Cloud", "Beyond Code"]
+function toExportCounts() {
+  const counts: Record<ResumeExportFormat, number> = {
+    pdf: 0,
+    docx: 0,
+    txt: 0,
+  }
+
+  for (const event of getResumeDownloadEvents()) {
+    counts[event.format] += 1
+  }
+
+  return counts
+}
 
 export function ResumePage() {
-  const topProjects = projectsData.filter((p) => p.tier === "flagship").slice(0, 6)
+  const [selectedPreset, setSelectedPreset] = useState<ResumePresetId>("full-stack")
+  const [selectedVersion, setSelectedVersion] = useState<ResumeVersionId>("v1-core")
+  const [atsMode, setAtsMode] = useState<boolean>(false)
+  const [sectionVisibility, setSectionVisibility] = useState<Record<ResumeSectionKey, boolean>>(INITIAL_SECTION_VISIBILITY)
+  const [collapsedSections, setCollapsedSections] = useState<Record<ResumeSectionKey, boolean>>(INITIAL_COLLAPSED_STATE)
+  const [leftCompareVersion, setLeftCompareVersion] = useState<ResumeVersionId>("v1-core")
+  const [rightCompareVersion, setRightCompareVersion] = useState<ResumeVersionId>("v3-ats")
+  const [exportCounts, setExportCounts] = useState<Record<ResumeExportFormat, number>>(toExportCounts)
+
+  const snapshot = useMemo(
+    () =>
+      buildResumeSnapshot({
+        presetId: selectedPreset,
+        versionId: selectedVersion,
+        atsMode,
+      }),
+    [atsMode, selectedPreset, selectedVersion],
+  )
+
+  const comparison = useMemo(
+    () => buildResumeComparison(leftCompareVersion, rightCompareVersion),
+    [leftCompareVersion, rightCompareVersion],
+  )
+
+  const handleSectionToggle = (section: ResumeSectionKey, visible: boolean): void => {
+    setSectionVisibility((current) => ({
+      ...current,
+      [section]: visible,
+    }))
+  }
+
+  const handleCollapseToggle = (section: ResumeSectionKey): void => {
+    setCollapsedSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }))
+  }
+
+  const handleExport = (format: ResumeExportFormat): void => {
+    trackResumeDownload({
+      format,
+      versionId: selectedVersion,
+      presetId: selectedPreset,
+    })
+
+    if (format === "pdf") {
+      window.open(getResumePdfUrl(), "_blank", "noopener,noreferrer")
+    }
+
+    if (format === "docx") {
+      exportResumeAsDocx(snapshot)
+    }
+
+    if (format === "txt") {
+      exportResumeAsText(snapshot)
+    }
+
+    setExportCounts(toExportCounts())
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Utility Bar */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border print:hidden">
-        <div className="max-w-3xl mx-auto px-6 py-3 flex items-center justify-end gap-3">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Printer className="h-3.5 w-3.5" />
-            Print
-          </button>
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Download className="h-3.5 w-3.5" />
-            PDF
-          </a>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background pb-12 pt-24">
+      <div className="container resume-shell max-w-7xl">
+        <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <ResumeControlPanel
+            presets={RESUME_PRESETS}
+            versions={RESUME_VERSIONS}
+            selectedPreset={selectedPreset}
+            selectedVersion={selectedVersion}
+            atsMode={atsMode}
+            sectionVisibility={sectionVisibility}
+            onPresetChange={setSelectedPreset}
+            onVersionChange={setSelectedVersion}
+            onAtsModeChange={setAtsMode}
+            onSectionToggle={handleSectionToggle}
+            onExport={handleExport}
+            exportCounts={exportCounts}
+          />
 
-      <div className="max-w-3xl mx-auto px-6 py-12 print:py-0 print:px-0">
-        {/* Header */}
-        <motion.header {...fadeIn} transition={{ delay: 0.1 }} className="mb-10 print:mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-1">Daniel Hernandez</h1>
-          <p className="text-lg text-muted-foreground mb-3">Senior Software Engineer</p>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <a href="mailto:daniel@interestingandbeyond.com" className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors">
-              <Mail className="h-3.5 w-3.5" /> daniel@interestingandbeyond.com
-            </a>
-            <a href="https://github.com/dmhernandez2525" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors">
-              <Github className="h-3.5 w-3.5" /> GitHub
-            </a>
-            <a href="https://linkedin.com/in/dh25" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors">
-              <Linkedin className="h-3.5 w-3.5" /> LinkedIn
-            </a>
-          </div>
-        </motion.header>
+          <div className="space-y-5">
+            <motion.article
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="resume-main space-y-4 rounded-xl border border-border bg-background/90 p-6"
+            >
+              <header className="mb-2">
+                <h1 className="text-3xl font-bold">{snapshot.profile.name}</h1>
+                <p className="text-lg text-muted-foreground">{snapshot.profile.title}</p>
+              </header>
 
-        {/* Summary */}
-        <motion.section {...fadeIn} transition={{ delay: 0.15 }} className="mb-10 print:mb-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 border-b border-border pb-1">Summary</h2>
-          <p className="text-foreground leading-relaxed">
-            Full-stack engineer with 10+ years of experience building production-grade applications across React, Node.js, Python, and cloud platforms.
-            From co-founding a software consultancy to developing secure DoD applications for Space Force and Navy, I bring a builder's mindset to every project.
-            Passionate about shipping high-quality software, mentoring teams, and making complex systems accessible.
-          </p>
-        </motion.section>
-
-        {/* Skills */}
-        <motion.section {...fadeIn} transition={{ delay: 0.2 }} className="mb-10 print:mb-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 border-b border-border pb-1">Skills</h2>
-          <div className="space-y-2">
-            {skillCategories.map((category) => {
-              const skills = skillsData.filter((s) => s.category === category)
-              return (
-                <div key={category} className="flex flex-wrap items-baseline gap-x-1">
-                  <span className="text-sm font-medium text-foreground mr-1">{category}:</span>
-                  <span className="text-sm text-muted-foreground">
-                    {skills.map((s) => s.name).join(", ")}
-                  </span>
+              <ResumeSectionBlock
+                sectionKey="contact"
+                title="Contact"
+                isVisible={sectionVisibility.contact}
+                isCollapsed={collapsedSections.contact}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-3">
+                  <a href={`mailto:${snapshot.profile.email}`} className="resume-link inline-flex items-center gap-2 hover:text-foreground">
+                    <Mail className="h-4 w-4" /> {snapshot.profile.email}
+                  </a>
+                  <a href={snapshot.profile.githubUrl} className="resume-link inline-flex items-center gap-2 hover:text-foreground" target="_blank" rel="noreferrer">
+                    <Github className="h-4 w-4" /> GitHub
+                  </a>
+                  <a href={snapshot.profile.linkedinUrl} className="resume-link inline-flex items-center gap-2 hover:text-foreground" target="_blank" rel="noreferrer">
+                    <Linkedin className="h-4 w-4" /> LinkedIn
+                  </a>
                 </div>
-              )
-            })}
-          </div>
-        </motion.section>
+              </ResumeSectionBlock>
 
-        {/* Experience */}
-        <motion.section {...fadeIn} transition={{ delay: 0.25 }} className="mb-10 print:mb-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border pb-1">Experience</h2>
-          <div className="space-y-6">
-            {experienceData.map((exp) => (
-              <div key={exp.id}>
-                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-1">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground">{exp.title}</h3>
-                    <p className="text-sm text-muted-foreground">{exp.company}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 sm:mt-0 whitespace-nowrap">{exp.duration}</p>
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{exp.description}</p>
-                <ul className="list-disc list-inside space-y-0.5">
-                  {exp.achievements.map((a, i) => (
-                    <li key={i} className="text-sm text-foreground/80">{a}</li>
+              <ResumeSectionBlock
+                sectionKey="summary"
+                title="Summary"
+                isVisible={sectionVisibility.summary}
+                isCollapsed={collapsedSections.summary}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <p className="text-sm leading-relaxed text-muted-foreground">{snapshot.summary}</p>
+                {atsMode ? <p className="mt-3 text-xs text-primary">ATS keywords: {snapshot.keywords.join(", ")}</p> : null}
+              </ResumeSectionBlock>
+
+              <ResumeSectionBlock
+                sectionKey="skills"
+                title="Skills"
+                isVisible={sectionVisibility.skills}
+                isCollapsed={collapsedSections.skills}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <div className="space-y-2 text-sm">
+                  {snapshot.skillGroups.map((group) => (
+                    <div key={group.category}>
+                      <span className="font-medium">{group.category}:</span>{" "}
+                      <span className="text-muted-foreground">{group.skills.map((skill) => skill.name).join(", ")}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </motion.section>
+                </div>
+              </ResumeSectionBlock>
 
-        {/* Projects */}
-        <motion.section {...fadeIn} transition={{ delay: 0.3 }} className="mb-10 print:mb-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 border-b border-border pb-1">Selected Projects</h2>
-          <div className="space-y-3">
-            {topProjects.map((p) => (
-              <div key={p.id} className="flex flex-col sm:flex-row sm:items-baseline gap-1">
-                <h3 className="text-sm font-medium text-foreground whitespace-nowrap">{p.title}</h3>
-                <span className="hidden sm:inline text-muted-foreground/30 mx-1">—</span>
-                <p className="text-sm text-muted-foreground">{p.tagline}</p>
-              </div>
-            ))}
-          </div>
-        </motion.section>
+              <ResumeSectionBlock
+                sectionKey="experience"
+                title="Experience"
+                isVisible={sectionVisibility.experience}
+                isCollapsed={collapsedSections.experience}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <div className="space-y-4">
+                  {snapshot.experiences.map((experience) => (
+                    <article key={experience.id} className="space-y-1 text-sm">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                        <h3 className="font-semibold">{experience.title} • {experience.company}</h3>
+                        <span className="text-xs text-muted-foreground">{experience.duration}</span>
+                      </div>
+                      <p className="text-muted-foreground">{experience.description}</p>
+                      <ul className="space-y-1 text-muted-foreground">
+                        {experience.achievements.map((achievement) => (
+                          <li key={`${experience.id}-${achievement}`}>• {achievement}</li>
+                        ))}
+                      </ul>
+                    </article>
+                  ))}
+                </div>
+              </ResumeSectionBlock>
 
-        {/* QR codes - visible only in print */}
-        <ResumeQRCodes />
+              <ResumeSectionBlock
+                sectionKey="projects"
+                title="Selected Projects"
+                isVisible={sectionVisibility.projects}
+                isCollapsed={collapsedSections.projects}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <div className="space-y-2 text-sm">
+                  {snapshot.projects.map((project) => (
+                    <div key={project.id} className="rounded-md border border-border bg-card/40 p-3">
+                      <p className="font-medium">{project.title}</p>
+                      <p className="text-muted-foreground">{project.tagline}</p>
+                    </div>
+                  ))}
+                </div>
+              </ResumeSectionBlock>
+
+              <ResumeSectionBlock
+                sectionKey="qr"
+                title="Portfolio QR"
+                isVisible={sectionVisibility.qr}
+                isCollapsed={collapsedSections.qr}
+                onToggleCollapse={handleCollapseToggle}
+              >
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <QRCodeSVG value={snapshot.profile.portfolioUrl} size={84} level="M" />
+                  <div>
+                    <p className="font-medium text-foreground">Scan to open live portfolio</p>
+                    <p>{snapshot.profile.portfolioUrl}</p>
+                  </div>
+                </div>
+              </ResumeSectionBlock>
+            </motion.article>
+
+            <div className="space-y-3 rounded-xl border border-border bg-card/40 p-4 print:hidden">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Version History</h2>
+              {RESUME_VERSIONS.map((version) => (
+                <article key={version.id} className="rounded-md border border-border bg-background/60 p-3 text-sm">
+                  <p className="font-medium">{version.label}</p>
+                  <p className="text-xs text-muted-foreground">Updated {version.updatedAt}</p>
+                  <p className="mt-1 text-muted-foreground">{version.notes}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="resume-comparison">
+              <ResumeComparison
+                versions={RESUME_VERSIONS}
+                leftVersionId={leftCompareVersion}
+                rightVersionId={rightCompareVersion}
+                leftSummary={comparison.leftVersion.summary}
+                rightSummary={comparison.rightVersion.summary}
+                addedKeywords={comparison.addedKeywords}
+                removedKeywords={comparison.removedKeywords}
+                onLeftChange={setLeftCompareVersion}
+                onRightChange={setRightCompareVersion}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
