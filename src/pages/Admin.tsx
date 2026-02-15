@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
+import { useState } from "react"
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
 import { Button } from '@/components/ui/button'
+import { TestimonialAdminPanel } from "@/components/admin/testimonials/TestimonialAdminPanel"
 import {
   LogOut,
   User,
@@ -12,40 +14,54 @@ import {
   MessageSquare,
   Image,
   Code2,
+  Quote,
 } from 'lucide-react'
 
 const adminFeatures = [
   {
+    id: "blog-posts",
     icon: FileText,
     title: 'Blog Posts',
     description: 'Manage and publish blog articles',
     adminOnly: false,
   },
   {
+    id: "projects",
     icon: Code2,
     title: 'Projects',
     description: 'Update portfolio projects',
     adminOnly: false,
   },
   {
+    id: "media-library",
     icon: Image,
     title: 'Media Library',
     description: 'Upload and manage images',
     adminOnly: false,
   },
   {
+    id: "messages",
     icon: MessageSquare,
     title: 'Messages',
     description: 'View contact form submissions',
     adminOnly: false,
   },
   {
+    id: "testimonials",
+    icon: Quote,
+    title: "Testimonials",
+    description: "Approve, edit, and reorder testimonials",
+    adminOnly: false,
+  },
+  {
+    id: "analytics",
     icon: BarChart3,
     title: 'Analytics',
     description: 'View site traffic and engagement',
     adminOnly: true,
   },
   {
+    id: "settings",
     icon: Settings,
     title: 'Settings',
     description: 'Configure site settings',
@@ -56,6 +72,7 @@ const adminFeatures = [
 export function Admin() {
   const { user, logout, isDemoMode } = useAuth()
   const navigate = useNavigate()
+  const [activeFeatureId, setActiveFeatureId] = useState<string | null>(null)
 
   const handleLogout = () => {
     logout()
@@ -134,6 +151,11 @@ export function Admin() {
               >
                 <button
                   disabled={isDisabled}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      setActiveFeatureId(feature.id)
+                    }
+                  }}
                   className={`w-full p-6 text-left rounded-lg border transition-all ${
                     isDisabled
                       ? 'border-border bg-muted/50 opacity-50 cursor-not-allowed'
@@ -172,6 +194,8 @@ export function Admin() {
             )
           })}
         </div>
+
+        {activeFeatureId === "testimonials" ? <TestimonialAdminPanel /> : null}
 
         {/* Demo Mode Info */}
         {isDemoMode && (
