@@ -9,6 +9,7 @@ import { ProfileProvider } from "@/context/profile-context"
 import { ModeProvider, useMode } from "@/context/mode-context"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
 import { SkipNav } from "@/components/ui/SkipNav"
+import { HeadTags } from "@/components/seo/HeadTags"
 import { CustomCursor } from "@/components/ui/CustomCursor"
 import { ScrollToTop } from "@/components/shared/ScrollToTop"
 import { ModeSwitcher } from "@/components/shared/ModeSwitcher"
@@ -81,6 +82,7 @@ function AppShell() {
   return (
     <>
       <SkipNav />
+      <HeadTags />
       <ScrollToTop />
       <div id="main-content">
       {mode === 'creative' ? <CreativeExtras /> : <NonCreativeShell />}
