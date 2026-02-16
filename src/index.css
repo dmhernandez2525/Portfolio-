@@ -168,6 +168,13 @@
     --neon-blue: 224 100% 66%;
     --neon-purple: 271 94% 80%;
   }
+
+  :root[data-easter-theme="matrix"] {
+    --primary: 145 95% 44%;
+    --accent: 170 100% 35%;
+    --neon-cyan: 145 95% 44%;
+    --neon-blue: 170 100% 35%;
+  }
 }
 
 @layer base {

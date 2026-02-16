@@ -22,6 +22,7 @@ import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
 import { AIExperience } from "@/components/sections/AIExperience"
 import { AIDevelopmentPage } from "@/pages/AIDevelopmentPage"
 import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
+import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -123,8 +124,15 @@ export function AppRoutes() {
   usePageAnalytics()
   const { mode } = useMode()
 
+  const withEasterEggPanel = (content: React.ReactElement) => (
+    <>
+      {content}
+      <EasterEggLogPanel />
+    </>
+  )
+
   if (!mode) {
-    return (
+    return withEasterEggPanel(
       <Routes>
         <Route path="*" element={<Gateway />} />
       </Routes>
@@ -132,11 +140,13 @@ export function AppRoutes() {
   }
 
   // Creative mode has nested sub-routes
-  if (mode === "creative") return <CreativeRoutes />
+  if (mode === "creative") {
+    return withEasterEggPanel(<CreativeRoutes />)
+  }
 
   const page = MODE_PAGES[mode]
   if (page) {
-    return (
+    return withEasterEggPanel(
       <Routes>
         <Route path="*" element={page} />
       </Routes>
@@ -144,7 +154,7 @@ export function AppRoutes() {
   }
 
   // Fallback for modes without pages yet (e.g., dashboard)
-  return (
+  return withEasterEggPanel(
     <Routes>
       <Route path="*" element={<Gateway />} />
     </Routes>

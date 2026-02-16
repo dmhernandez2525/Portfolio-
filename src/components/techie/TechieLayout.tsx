@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import { TechieMenuBar } from "./TechieMenuBar"
 import { TechieFileExplorer } from "./TechieFileExplorer"
 import { TechieContentViewer } from "./TechieContentViewer"
@@ -15,6 +15,7 @@ import { ReleaseNotesDialog } from "./dialogs/ReleaseNotesDialog"
 import { SettingsDialog } from "./dialogs/SettingsDialog"
 import { useEasterEggs } from "@/hooks/use-easter-eggs"
 import type { EditorSettings, CursorPosition } from "./editor-settings"
+import type { EasterEggDefinition } from "@/types/easter-eggs"
 import { loadEditorSettings, saveEditorSettings } from "./editor-settings"
 import { getLangLabelFromFile } from "./CodeMirrorEditor"
 
@@ -90,6 +91,24 @@ export function TechieLayout() {
     onMonkey: useCallback(() => {
       setEasterEggToast("Monkey mode activated! Just kidding.")
     }, []),
+    onMatrix: useCallback(() => {
+      setShowMatrix(true)
+      setEasterEggToast("Wake up, Neo. Matrix mode enabled.")
+    }, []),
+    onMario: useCallback(() => {
+      setEasterEggToast("Coin collected. Retro mode approved.")
+    }, []),
+    onMiniGame: useCallback((miniGameId: string) => {
+      setEasterEggToast(`Mini-game unlocked: ${miniGameId}`)
+    }, []),
+    onSeasonal: useCallback((egg: EasterEggDefinition) => {
+      setEasterEggToast(`Seasonal unlock: ${egg.name}`)
+    }, []),
+    onHint: useCallback((hint: string) => {
+      setEasterEggToast(`Hint: ${hint}`)
+    }, []),
+    emitEvents: true,
+    enableInactivityHints: true,
   })
 
   const openFile = useCallback((contentKey: string, fileName: string) => {
@@ -179,7 +198,7 @@ export function TechieLayout() {
   }, [])
 
   // Action lookup table
-  const menuActions: Record<string, () => void> = {
+  const menuActions: Record<string, () => void> = useMemo(() => ({
     "new-file": createNewFile,
     "close-tab": () => { if (activeTabId) closeTab(activeTabId) },
     "close-all-tabs": closeAllTabs,
@@ -214,13 +233,12 @@ export function TechieLayout() {
     },
     "panic": () => setShowMatrix(true),
     "about": () => setShowAbout(true),
-  }
+  }), [activeTabId, closeAllTabs, closeTab, createNewFile, editorSettings.fontSize, editorSettings.minimap, editorSettings.vimMode, editorSettings.wordWrap, handleSave, openFile, updateEditorSettings])
 
   const handleMenuAction = useCallback((action: string) => {
     const handler = menuActions[action]
     if (handler) handler()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId, createNewFile, closeAllTabs, handleSave, openFile, editorSettings, updateEditorSettings])
+  }, [menuActions])
 
   // Global keyboard shortcuts
   useEffect(() => {

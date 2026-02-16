@@ -3,7 +3,11 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionV
 import { Sparkles, UserCheck, Trash2 } from "lucide-react"
 import { useGamification } from "@/hooks/use-gamification"
 import { useEasterEggs } from "@/hooks/use-easter-eggs"
+import { getEasterEggCatalog } from "@/lib/easter-eggs/catalog"
+import { EASTER_EGG_DISCOVERY_EVENT } from "@/lib/easter-eggs/events"
+import { hasUnlockedReward, loadEasterEggProgress } from "@/lib/easter-eggs/progress"
 import { cn } from "@/lib/utils"
+import type { EasterEggDiscoveryEvent } from "@/types/easter-eggs"
 // Import sub-components
 import { Ghost } from "./creatures/Ghost"
 import { Wizard } from "./creatures/Wizard"
@@ -120,6 +124,10 @@ function PrincessCreature({ creature, onRemove }: { creature: Creature; onRemove
 export function CreatureLayer() {
   const [creatures, setCreatures] = useState<Creature[]>([])
   const [wizardMessage, setWizardMessage] = useState<string | null>(null)
+  const [hasPixelSkin, setHasPixelSkin] = useState<boolean>(() => {
+    const progress = loadEasterEggProgress(getEasterEggCatalog())
+    return hasUnlockedReward(progress, "skin-pixel-creatures")
+  })
   const { incrementCount, creaturesEnabled, healSite } = useGamification()
 
   // Track timeouts for cleanup
@@ -291,6 +299,16 @@ export function CreatureLayer() {
       }
   }, [])
 
+  useEffect(() => {
+      const handleDiscovery = (event: Event) => {
+          const detail = (event as CustomEvent<EasterEggDiscoveryEvent>).detail
+          setHasPixelSkin(detail.progress.unlockedRewardIds.includes("skin-pixel-creatures"))
+      }
+
+      window.addEventListener(EASTER_EGG_DISCOVERY_EVENT, handleDiscovery)
+      return () => window.removeEventListener(EASTER_EGG_DISCOVERY_EVENT, handleDiscovery)
+  }, [])
+
   const handleCatch = (creature: Creature) => {
     const { id, type } = creature;
 
@@ -436,7 +454,45 @@ export function CreatureLayer() {
            setWizardMessage("🐒 Ooh ooh! A wild monkey appears!")
            if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
            messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2500)
-      }
+      },
+      onMatrix: () => {
+           const baseId = Date.now()
+           const matrixZaps = Array.from({ length: 4 }).map((_, i) => ({
+               id: baseId + i,
+               type: "zap" as CreatureType,
+               x: 15 + Math.random() * 70,
+               y: 15 + Math.random() * 70,
+               delay: i * 0.1,
+               scale: 1.1,
+               fullData: undefined,
+           }))
+           setCreatures(prev => [...prev, ...matrixZaps])
+           setWizardMessage("Matrix breach detected. Systems green.")
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2500)
+      },
+      onMario: () => {
+           setWizardMessage("Coin combo! +1 style points.")
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2200)
+      },
+      onMiniGame: (miniGameId) => {
+           setWizardMessage(`Secret mini-game unlocked: ${miniGameId}`)
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2600)
+      },
+      onSeasonal: (egg) => {
+           setWizardMessage(`Seasonal egg found: ${egg.name}`)
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2600)
+      },
+      onHint: (hint) => {
+           setWizardMessage(`Hint: ${hint}`)
+           if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+           messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 3000)
+      },
+      emitEvents: true,
+      enableInactivityHints: true,
   })
 
   // Only return null AFTER all hooks are called
@@ -586,7 +642,11 @@ export function CreatureLayer() {
                              </motion.div>
                            </>
                        ) : (
-                           <Icon className={cn("w-8 h-8")} />
+                           creature.type === "sparkle" && hasPixelSkin ? (
+                             <span className="text-3xl text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.9)]">✶</span>
+                           ) : (
+                             <Icon className={cn("w-8 h-8")} />
+                           )
                        )}
                        
                        {/* Desktop: attached message */}
