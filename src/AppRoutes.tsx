@@ -1,14 +1,11 @@
+import { lazy, Suspense } from "react"
 import { Routes, Route } from "react-router-dom"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 import { usePageAnalytics } from "@/hooks/usePageAnalytics"
 import { RootLayout } from "@/components/layout/RootLayout"
 import { Gateway } from "@/pages/Gateway"
-import { BusinessCardPage } from "@/pages/BusinessCardPage"
-import { ResumePage } from "@/pages/ResumePage"
-import { TechieLayout } from "@/components/techie/TechieLayout"
-import { RetroTerminalPage } from "@/pages/RetroTerminalPage"
-import { DashboardPage } from "@/pages/DashboardPage"
-import { CalendarPage } from "@/pages/CalendarPage"
+import { PageSkeleton } from "@/components/ui/PageSkeleton"
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 
 import { Hero } from "@/components/sections/Hero"
 import { About } from "@/components/sections/About"
@@ -20,34 +17,51 @@ import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
 import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
 import { AIExperience } from "@/components/sections/AIExperience"
-import { AIDevelopmentPage } from "@/pages/AIDevelopmentPage"
 import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
 import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
-
-import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
-import { TetrisGame } from "@/components/game/TetrisGame"
-import { SnakeGame } from "@/components/game/SnakeGame"
-import { TanksGame } from "@/components/game/tanks"
-import { CookieClickerGame } from "@/components/game/cookie-clicker"
-import { ChessGame } from "@/components/game/ChessGame"
-import { AgarGame } from "@/components/game/agar"
-import { MafiaWarsGame } from "@/components/game/mafia-wars"
-import { PokemonGame } from "@/components/game/pokemon"
-import { ShoppingCartHeroGame } from "@/components/game/shopping-cart-hero"
-import { CocGame } from "@/components/game/coc-game"
-import { FireboyWatergirlGame } from "@/components/game/fireboy-watergirl"
-import { Philosophy } from "@/pages/Philosophy"
-import { Inventions } from "@/pages/Inventions"
-import { Blog } from "@/pages/Blog"
-import { Social } from "@/pages/Social"
-import { Games } from "@/pages/Games"
-import { ProjectsPage } from "@/pages/ProjectsPage"
-import { ProjectDetailPage } from "@/pages/ProjectDetailPage"
-import { NotFound } from "@/pages/NotFound"
-import { Login } from "@/pages/Login"
-import { Admin } from "@/pages/Admin"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import type { GameId } from "@/types/game-stats"
+
+// Lazy-loaded page components
+const BusinessCardPage = lazy(() => import("@/pages/BusinessCardPage").then((m) => ({ default: m.BusinessCardPage })))
+const ResumePage = lazy(() => import("@/pages/ResumePage").then((m) => ({ default: m.ResumePage })))
+const TechieLayout = lazy(() => import("@/components/techie/TechieLayout").then((m) => ({ default: m.TechieLayout })))
+const RetroTerminalPage = lazy(() => import("@/pages/RetroTerminalPage").then((m) => ({ default: m.RetroTerminalPage })))
+const DashboardPage = lazy(() => import("@/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })))
+const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })))
+const AIDevelopmentPage = lazy(() => import("@/pages/AIDevelopmentPage").then((m) => ({ default: m.AIDevelopmentPage })))
+const Philosophy = lazy(() => import("@/pages/Philosophy").then((m) => ({ default: m.Philosophy })))
+const Inventions = lazy(() => import("@/pages/Inventions").then((m) => ({ default: m.Inventions })))
+const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })))
+const Social = lazy(() => import("@/pages/Social").then((m) => ({ default: m.Social })))
+const Games = lazy(() => import("@/pages/Games").then((m) => ({ default: m.Games })))
+const ProjectsPage = lazy(() => import("@/pages/ProjectsPage").then((m) => ({ default: m.ProjectsPage })))
+const ProjectDetailPage = lazy(() => import("@/pages/ProjectDetailPage").then((m) => ({ default: m.ProjectDetailPage })))
+const Login = lazy(() => import("@/pages/Login").then((m) => ({ default: m.Login })))
+const Admin = lazy(() => import("@/pages/Admin").then((m) => ({ default: m.Admin })))
+const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })))
+
+// Lazy-loaded game components
+const FallingBlocksGame = lazy(() => import("@/components/game/FallingBlocksGame").then((m) => ({ default: m.FallingBlocksGame })))
+const TetrisGame = lazy(() => import("@/components/game/TetrisGame").then((m) => ({ default: m.TetrisGame })))
+const SnakeGame = lazy(() => import("@/components/game/SnakeGame").then((m) => ({ default: m.SnakeGame })))
+const TanksGame = lazy(() => import("@/components/game/tanks").then((m) => ({ default: m.TanksGame })))
+const CookieClickerGame = lazy(() => import("@/components/game/cookie-clicker").then((m) => ({ default: m.CookieClickerGame })))
+const ChessGame = lazy(() => import("@/components/game/ChessGame").then((m) => ({ default: m.ChessGame })))
+const AgarGame = lazy(() => import("@/components/game/agar").then((m) => ({ default: m.AgarGame })))
+const MafiaWarsGame = lazy(() => import("@/components/game/mafia-wars").then((m) => ({ default: m.MafiaWarsGame })))
+const PokemonGame = lazy(() => import("@/components/game/pokemon").then((m) => ({ default: m.PokemonGame })))
+const ShoppingCartHeroGame = lazy(() => import("@/components/game/shopping-cart-hero").then((m) => ({ default: m.ShoppingCartHeroGame })))
+const CocGame = lazy(() => import("@/components/game/coc-game").then((m) => ({ default: m.CocGame })))
+const FireboyWatergirlGame = lazy(() => import("@/components/game/fireboy-watergirl").then((m) => ({ default: m.FireboyWatergirlGame })))
+
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
+}
+
+function LazyGame({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<LoadingSpinner label="Loading game..." size="lg" />}>{children}</Suspense>
+}
 
 const Home = () => (
     <div className="min-h-screen">
@@ -74,36 +88,36 @@ function CreativeRoutes() {
     <Routes>
       <Route element={<RootLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/philosophy" element={<Philosophy />} />
-        <Route path="/inventions" element={<Inventions />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/social" element={<Social />} />
-        <Route path="/games" element={<Games />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/:slug" element={<ProjectDetailPage />} />
-        <Route path="/ai-development" element={<AIDevelopmentPage />} />
-        <Route path="/game" element={<GameRouteWrapper gameId="game"><FallingBlocksGame /></GameRouteWrapper>} />
-        <Route path="/tetris" element={<GameRouteWrapper gameId="tetris"><TetrisGame /></GameRouteWrapper>} />
-        <Route path="/snake" element={<GameRouteWrapper gameId="snake"><SnakeGame /></GameRouteWrapper>} />
-        <Route path="/tanks" element={<GameRouteWrapper gameId="tanks"><TanksGame /></GameRouteWrapper>} />
-        <Route path="/cookie-clicker" element={<GameRouteWrapper gameId="cookie-clicker"><CookieClickerGame /></GameRouteWrapper>} />
-        <Route path="/chess" element={<GameRouteWrapper gameId="chess"><ChessGame /></GameRouteWrapper>} />
-        <Route path="/agar" element={<GameRouteWrapper gameId="agar"><AgarGame /></GameRouteWrapper>} />
-        <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><MafiaWarsGame /></GameRouteWrapper>} />
-        <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><PokemonGame /></GameRouteWrapper>} />
-        <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><ShoppingCartHeroGame /></GameRouteWrapper>} />
-        <Route path="/coc" element={<GameRouteWrapper gameId="game"><CocGame /></GameRouteWrapper>} />
-        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><FireboyWatergirlGame /></GameRouteWrapper>} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/philosophy" element={<LazyPage><Philosophy /></LazyPage>} />
+        <Route path="/inventions" element={<LazyPage><Inventions /></LazyPage>} />
+        <Route path="/blog" element={<LazyPage><Blog /></LazyPage>} />
+        <Route path="/social" element={<LazyPage><Social /></LazyPage>} />
+        <Route path="/games" element={<LazyPage><Games /></LazyPage>} />
+        <Route path="/projects" element={<LazyPage><ProjectsPage /></LazyPage>} />
+        <Route path="/projects/:slug" element={<LazyPage><ProjectDetailPage /></LazyPage>} />
+        <Route path="/ai-development" element={<LazyPage><AIDevelopmentPage /></LazyPage>} />
+        <Route path="/game" element={<GameRouteWrapper gameId="game"><LazyGame><FallingBlocksGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/tetris" element={<GameRouteWrapper gameId="tetris"><LazyGame><TetrisGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/snake" element={<GameRouteWrapper gameId="snake"><LazyGame><SnakeGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/tanks" element={<GameRouteWrapper gameId="tanks"><LazyGame><TanksGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/cookie-clicker" element={<GameRouteWrapper gameId="cookie-clicker"><LazyGame><CookieClickerGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/chess" element={<GameRouteWrapper gameId="chess"><LazyGame><ChessGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/agar" element={<GameRouteWrapper gameId="agar"><LazyGame><AgarGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><LazyGame><MafiaWarsGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><LazyGame><PokemonGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><LazyGame><ShoppingCartHeroGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/coc" element={<GameRouteWrapper gameId="game"><LazyGame><CocGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><LazyGame><FireboyWatergirlGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="*" element={<LazyPage><NotFound /></LazyPage>} />
       </Route>
 
       {/* Auth routes - outside RootLayout for clean login/admin experience */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
-            <Admin />
+            <LazyPage><Admin /></LazyPage>
           </ProtectedRoute>
         }
       />
@@ -111,13 +125,13 @@ function CreativeRoutes() {
   )
 }
 
-const MODE_PAGES: Partial<Record<PortfolioMode, React.ReactElement>> = {
-  "business-card": <BusinessCardPage />,
-  "resume": <ResumePage />,
-  "techie": <TechieLayout />,
-  "retro": <RetroTerminalPage />,
-  "dashboard": <DashboardPage />,
-  "calendar": <CalendarPage />,
+const MODE_COMPONENTS: Partial<Record<PortfolioMode, React.LazyExoticComponent<React.ComponentType>>> = {
+  "business-card": BusinessCardPage,
+  "resume": ResumePage,
+  "techie": TechieLayout,
+  "retro": RetroTerminalPage,
+  "dashboard": DashboardPage,
+  "calendar": CalendarPage,
 }
 
 export function AppRoutes() {
@@ -144,16 +158,16 @@ export function AppRoutes() {
     return withEasterEggPanel(<CreativeRoutes />)
   }
 
-  const page = MODE_PAGES[mode]
-  if (page) {
+  const LazyModeComponent = MODE_COMPONENTS[mode]
+  if (LazyModeComponent) {
     return withEasterEggPanel(
       <Routes>
-        <Route path="*" element={page} />
+        <Route path="*" element={<Suspense fallback={<PageSkeleton />}><LazyModeComponent /></Suspense>} />
       </Routes>
     )
   }
 
-  // Fallback for modes without pages yet (e.g., dashboard)
+  // Fallback for modes without pages yet
   return withEasterEggPanel(
     <Routes>
       <Route path="*" element={<Gateway />} />
