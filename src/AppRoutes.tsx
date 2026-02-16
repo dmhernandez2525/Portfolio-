@@ -21,6 +21,7 @@ import { GlobeSection } from "@/components/sections/GlobeSection"
 import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
 import { AIExperience } from "@/components/sections/AIExperience"
 import { AIDevelopmentPage } from "@/pages/AIDevelopmentPage"
+import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -45,6 +46,7 @@ import { NotFound } from "@/pages/NotFound"
 import { Login } from "@/pages/Login"
 import { Admin } from "@/pages/Admin"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import type { GameId } from "@/types/game-stats"
 
 const Home = () => (
     <div className="min-h-screen">
@@ -62,6 +64,10 @@ const Home = () => (
     </div>
 )
 
+function GameRouteWrapper({ gameId, children }: { gameId: GameId; children: React.ReactNode }) {
+  return <GameExperienceLayout gameId={gameId}>{children}</GameExperienceLayout>
+}
+
 function CreativeRoutes() {
   return (
     <Routes>
@@ -75,18 +81,18 @@ function CreativeRoutes() {
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/:slug" element={<ProjectDetailPage />} />
         <Route path="/ai-development" element={<AIDevelopmentPage />} />
-        <Route path="/game" element={<FallingBlocksGame />} />
-        <Route path="/tetris" element={<TetrisGame />} />
-        <Route path="/snake" element={<SnakeGame />} />
-        <Route path="/tanks" element={<TanksGame />} />
-        <Route path="/cookie-clicker" element={<CookieClickerGame />} />
-        <Route path="/chess" element={<ChessGame />} />
-        <Route path="/agar" element={<AgarGame />} />
-        <Route path="/mafia-wars" element={<MafiaWarsGame />} />
-        <Route path="/pokemon" element={<PokemonGame />} />
-        <Route path="/shopping-cart-hero" element={<ShoppingCartHeroGame />} />
-        <Route path="/coc" element={<CocGame />} />
-        <Route path="/fireboy-watergirl" element={<FireboyWatergirlGame />} />
+        <Route path="/game" element={<GameRouteWrapper gameId="game"><FallingBlocksGame /></GameRouteWrapper>} />
+        <Route path="/tetris" element={<GameRouteWrapper gameId="tetris"><TetrisGame /></GameRouteWrapper>} />
+        <Route path="/snake" element={<GameRouteWrapper gameId="snake"><SnakeGame /></GameRouteWrapper>} />
+        <Route path="/tanks" element={<GameRouteWrapper gameId="tanks"><TanksGame /></GameRouteWrapper>} />
+        <Route path="/cookie-clicker" element={<GameRouteWrapper gameId="cookie-clicker"><CookieClickerGame /></GameRouteWrapper>} />
+        <Route path="/chess" element={<GameRouteWrapper gameId="chess"><ChessGame /></GameRouteWrapper>} />
+        <Route path="/agar" element={<GameRouteWrapper gameId="agar"><AgarGame /></GameRouteWrapper>} />
+        <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><MafiaWarsGame /></GameRouteWrapper>} />
+        <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><PokemonGame /></GameRouteWrapper>} />
+        <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><ShoppingCartHeroGame /></GameRouteWrapper>} />
+        <Route path="/coc" element={<GameRouteWrapper gameId="game"><CocGame /></GameRouteWrapper>} />
+        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><FireboyWatergirlGame /></GameRouteWrapper>} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
