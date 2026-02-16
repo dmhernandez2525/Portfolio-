@@ -8,6 +8,7 @@ import { AuthProvider } from "@/context/auth-context"
 import { ProfileProvider } from "@/context/profile-context"
 import { ModeProvider, useMode } from "@/context/mode-context"
 import { CreatureLayer } from "@/components/game/CreatureLayer"
+import { SkipNav } from "@/components/ui/SkipNav"
 import { CustomCursor } from "@/components/ui/CustomCursor"
 import { ScrollToTop } from "@/components/shared/ScrollToTop"
 import { ModeSwitcher } from "@/components/shared/ModeSwitcher"
@@ -79,8 +80,11 @@ function AppShell() {
 
   return (
     <>
+      <SkipNav />
       <ScrollToTop />
+      <div id="main-content">
       {mode === 'creative' ? <CreativeExtras /> : <NonCreativeShell />}
+      </div>
       {mode && <ModeSwitcher />}
 
       {/* Right-click easter egg toast */}
