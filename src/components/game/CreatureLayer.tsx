@@ -309,6 +309,32 @@ export function CreatureLayer() {
       return () => window.removeEventListener(EASTER_EGG_DISCOVERY_EVENT, handleDiscovery)
   }, [])
 
+  useEffect(() => {
+      const handleVoiceEgg = (event: Event) => {
+          const detail = (event as CustomEvent<{ eggId?: string }>).detail
+          if (detail?.eggId !== "gandalf") {
+              return
+          }
+
+          setCreatures(prev => [...prev, {
+              id: Date.now() + Math.floor(Math.random() * 10000),
+              type: "wizard",
+              x: 50,
+              y: 45,
+              delay: 0,
+              scale: 2,
+              fullData: { quote: "Voice command accepted. You shall pass." }
+          }])
+
+          setWizardMessage("Voice easter egg unlocked: Gandalf summoned.")
+          if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current)
+          messageTimeoutRef.current = setTimeout(() => setWizardMessage(null), 2600)
+      }
+
+      window.addEventListener("voice-easter-egg", handleVoiceEgg as EventListener)
+      return () => window.removeEventListener("voice-easter-egg", handleVoiceEgg as EventListener)
+  }, [])
+
   const handleCatch = (creature: Creature) => {
     const { id, type } = creature;
 

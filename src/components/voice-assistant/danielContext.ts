@@ -64,7 +64,30 @@ ranging from AI-powered platforms to games and open-source tools.`,
   ]
 };
 
-export function generateSystemPrompt(): string {
+interface PromptOptions {
+  personalityInstruction?: string
+  locale?: string
+  conversationMemory?: string
+  projectKnowledge?: string
+}
+
+export function generateSystemPrompt(options: PromptOptions = {}): string {
+  const personalityInstruction = options.personalityInstruction
+    ? `\n**Tone Requirement:** ${options.personalityInstruction}`
+    : ""
+
+  const localeInstruction = options.locale && options.locale !== "en-US"
+    ? `\n**Language Requirement:** Reply in ${options.locale} unless the user asks for another language.`
+    : ""
+
+  const memoryBlock = options.conversationMemory
+    ? `\n**Conversation Memory:**\n${options.conversationMemory}`
+    : ""
+
+  const projectKnowledgeBlock = options.projectKnowledge
+    ? `\n**Project Knowledge Context:**\n${options.projectKnowledge}`
+    : ""
+
   return `You are an AI assistant on Daniel Hernandez's portfolio website. Your job is to answer questions about Daniel in a friendly, professional manner.
 
 Here's what you know about Daniel:
@@ -89,6 +112,10 @@ ${danielContext.flagshipProjects.map(p => `- ${p.name}: ${p.description} (Built 
 **Interests:** ${danielContext.interests.join(", ")}
 
 **Fun Facts:** ${danielContext.funFacts.join(". ")}
+${personalityInstruction}
+${localeInstruction}
+${memoryBlock}
+${projectKnowledgeBlock}
 
 **Guidelines:**
 - Be friendly and conversational

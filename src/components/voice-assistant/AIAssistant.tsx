@@ -11,12 +11,12 @@
  * Place this component in RootLayout so it persists across all pages.
  */
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Mic, MicOff, Send, Bot, User,
-  Volume2, VolumeX, Loader2, Sparkles, Navigation, Repeat, Settings
+  Volume2, VolumeX, Loader2, Sparkles, Navigation, Repeat, Settings, History
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -31,6 +31,16 @@ import { guidedTour } from "@/services/voice-stocks/guidedTour"
 import { TourPlayer } from "./TourPlayer"
 import { useSpeechController } from "@/context/speech-context"
 import type { CommandContext } from "@/types/voiceStocks"
+import { ConversationHistoryPanel } from "./ConversationHistoryPanel"
+import { buildFollowUpSuggestions } from "@/lib/voice-assistant/followups"
+import { exportAssistantHistory, filterAssistantHistory, loadAssistantHistory, saveAssistantHistory } from "@/lib/voice-assistant/history"
+import { getQuickQuestions, getVoiceFilterPrefix, localizeTourScript, parseAssistantLocale, SUPPORTED_ASSISTANT_LOCALES, ASSISTANT_LOCALE_STORAGE_KEY } from "@/lib/voice-assistant/localization"
+import { buildConversationMemory } from "@/lib/voice-assistant/memory"
+import { getPersonalityInstruction, ASSISTANT_PERSONALITIES, ASSISTANT_PERSONALITY_STORAGE_KEY, parsePersonality } from "@/lib/voice-assistant/personality"
+import { buildProjectKnowledgeContext, getProjectKnowledgeResponse } from "@/lib/voice-assistant/project-knowledge"
+import { getProactiveSuggestions } from "@/lib/voice-assistant/proactive"
+import { triggerVoiceEasterEgg } from "@/lib/voice-assistant/voice-easter-eggs"
+import type { AssistantHistoryEntry, AssistantHistoryRoleFilter, AssistantLocale, AssistantPersonality, ProactiveSuggestion } from "@/types/assistant-enhancements"
 
 interface Message {
   id: string
@@ -40,11 +50,46 @@ interface Message {
   isNavigation?: boolean
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getSpeechRecognition(): any {
+interface SpeechRecognitionResultLike {
+  isFinal: boolean
+  [index: number]: { transcript: string }
+  length: number
+}
+
+interface SpeechRecognitionEventLike extends Event {
+  resultIndex: number
+  results: ArrayLike<SpeechRecognitionResultLike>
+}
+
+interface SpeechRecognitionErrorEventLike extends Event {
+  error: string
+}
+
+interface SpeechRecognitionLike extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  maxAlternatives: number
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null
+  onstart: (() => void) | null
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null
+  onend: (() => void) | null
+  start: () => void
+  stop: () => void
+  abort: () => void
+}
+
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognitionLike
+}
+
+function getSpeechRecognition(): SpeechRecognitionConstructor | null {
   if (typeof window === "undefined") return null
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null
+  const speechWindow = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor
+    webkitSpeechRecognition?: SpeechRecognitionConstructor
+  }
+  return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition ?? null
 }
 
 function generateMessageId(): string {
@@ -53,8 +98,39 @@ function generateMessageId(): string {
 
 const speechRecognitionSupported = typeof window !== "undefined" && getSpeechRecognition() !== null
 
+function toHistoryEntry(message: Message): AssistantHistoryEntry {
+  return {
+    id: message.id,
+    role: message.role,
+    content: message.content,
+    timestamp: message.timestamp.getTime(),
+    isNavigation: message.isNavigation,
+  }
+}
+
+function toMessage(entry: AssistantHistoryEntry): Message {
+  return {
+    id: entry.id,
+    role: entry.role,
+    content: entry.content,
+    timestamp: new Date(entry.timestamp),
+    isNavigation: entry.isNavigation,
+  }
+}
+
+function downloadTextFile(filename: string, content: string): void {
+  const blob = new Blob([content], { type: "application/json" })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement("a")
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 export function AIAssistant() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Configure navigation service with React Router
   useEffect(() => {
@@ -63,14 +139,31 @@ export function AIAssistant() {
 
   // UI State
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. Or say \"give me a tour\" to explore the site!",
-      timestamp: new Date()
+  const [assistantPersonality, setAssistantPersonality] = useState<AssistantPersonality>(() => {
+    if (typeof window === "undefined") return "professional"
+    const saved = window.localStorage.getItem(ASSISTANT_PERSONALITY_STORAGE_KEY)
+    return parsePersonality(saved)
+  })
+  const [assistantLocale, setAssistantLocale] = useState<AssistantLocale>(() => {
+    if (typeof window === "undefined") return "en-US"
+    const saved = window.localStorage.getItem(ASSISTANT_LOCALE_STORAGE_KEY)
+    return parseAssistantLocale(saved)
+  })
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const history = loadAssistantHistory()
+    if (history.length > 0) {
+      return history.map(toMessage)
     }
-  ])
+
+    return [
+      {
+        id: "welcome",
+        role: "assistant",
+        content: "Hey! I'm Daniel's AI assistant. Ask me anything — skills, projects, random fun facts. Or say \"give me a tour\" to explore the site!",
+        timestamp: new Date()
+      }
+    ]
+  })
   const [input, setInput] = useState("")
   const [interimTranscript, setInterimTranscript] = useState("")
   const [isListening, setIsListening] = useState(false)
@@ -78,6 +171,11 @@ export function AIAssistant() {
   const [tourActive, setTourActive] = useState(false)
   const [speechError, setSpeechError] = useState<string | null>(null)
   const [talkMode, setTalkMode] = useState(false)
+  const [followUpSuggestions, setFollowUpSuggestions] = useState<string[]>([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [historySearch, setHistorySearch] = useState("")
+  const [historyRoleFilter, setHistoryRoleFilter] = useState<AssistantHistoryRoleFilter>("all")
+  const [proactiveSuggestions, setProactiveSuggestions] = useState<ProactiveSuggestion[]>([])
 
   // Text-to-Speech via shared speech controller (queue + Chrome handling)
   const {
@@ -103,8 +201,7 @@ export function AIAssistant() {
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const wasSpeakingRef = useRef(false)
   const talkModeRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -112,6 +209,7 @@ export function AIAssistant() {
   const isSpeakingRef = useRef(isSpeaking)
   const isListeningRef = useRef(isListening)
   const suppressTranscriptCommitRef = useRef(false)
+  const pageEntryTimeRef = useRef(Date.now())
 
   // Keep talkModeRef in sync with state for access in callbacks
   useEffect(() => {
@@ -124,12 +222,44 @@ export function AIAssistant() {
   }, [messages])
 
   useEffect(() => {
+    const historyEntries = messages.map(toHistoryEntry)
+    saveAssistantHistory(historyEntries)
+  }, [messages])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+    window.localStorage.setItem(ASSISTANT_PERSONALITY_STORAGE_KEY, assistantPersonality)
+  }, [assistantPersonality])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+    window.localStorage.setItem(ASSISTANT_LOCALE_STORAGE_KEY, assistantLocale)
+  }, [assistantLocale])
+
+  useEffect(() => {
     isSpeakingRef.current = isSpeaking
   }, [isSpeaking])
 
   useEffect(() => {
     isListeningRef.current = isListening
   }, [isListening])
+
+  useEffect(() => {
+    pageEntryTimeRef.current = Date.now()
+    const refreshSuggestions = () => {
+      const elapsed = Date.now() - pageEntryTimeRef.current
+      const next = getProactiveSuggestions(location.pathname, elapsed)
+      setProactiveSuggestions(next)
+    }
+
+    refreshSuggestions()
+    const interval = setInterval(refreshSuggestions, 15000)
+    return () => clearInterval(interval)
+  }, [location.pathname])
 
   // Stop listening - defined early since it's used in event handlers below
   const stopListening = useCallback(() => {
@@ -226,8 +356,9 @@ export function AIAssistant() {
   // Callback for TourPlayer to trigger speech with custom rate
   // Uses shared speech controller so audio queues with assistant replies
   const handleTourSpeak = useCallback((text: string, rate?: number) => {
-    speakText(text, { rate }, { source: "tour" })
-  }, [speakText])
+    const localized = localizeTourScript(text, assistantLocale)
+    speakText(localized, { rate }, { source: "tour" })
+  }, [assistantLocale, speakText])
 
   // Speech Recognition
   const startListening = useCallback(() => {
@@ -248,7 +379,7 @@ export function AIAssistant() {
         const recognition = new SpeechRecognitionCtor()
         recognition.continuous = false
         recognition.interimResults = true
-        recognition.lang = "en-US"
+        recognition.lang = SUPPORTED_ASSISTANT_LOCALES[assistantLocale].recognition
         recognition.maxAlternatives = 1
 
         let finalTranscript = ""
@@ -256,8 +387,7 @@ export function AIAssistant() {
         let lastInterimTranscript = "" // Track interim to commit on end
         let hadFinalResult = false
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SpeechRecognitionEventLike) => {
           let interim = ""
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript
@@ -286,8 +416,7 @@ export function AIAssistant() {
           suppressTranscriptCommitRef.current = false
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onerror = (event: any) => {
+        recognition.onerror = (event: SpeechRecognitionErrorEventLike) => {
           if (event.error === 'not-allowed') {
             setSpeechError("Microphone access denied. Please allow microphone access.")
           } else if (event.error === 'audio-capture') {
@@ -335,7 +464,7 @@ export function AIAssistant() {
         setTimeout(() => setSpeechError(null), 4000)
       }
     }, 150)
-  }, [])
+  }, [assistantLocale])
 
   const toggleListening = useCallback(() => {
     if (isListening) {
@@ -349,6 +478,10 @@ export function AIAssistant() {
     const combinedInput = directMessage ?? (input + (interimTranscript ? (input ? " " : "") + interimTranscript : ""))
     const trimmedInput = combinedInput.trim()
     if (!trimmedInput || isProcessing) return
+
+    if (trimmedInput.toLowerCase().includes("gandalf")) {
+      triggerVoiceEasterEgg("gandalf")
+    }
 
     if (isListening) {
       suppressTranscriptCommitRef.current = true
@@ -369,14 +502,15 @@ export function AIAssistant() {
     setIsProcessing(true)
 
     try {
+      const historyEntries = messagesRef.current.map(toHistoryEntry)
+      const conversationMemory = buildConversationMemory(historyEntries)
+      const personalityInstruction = getPersonalityInstruction(assistantPersonality)
+      const projectKnowledge = buildProjectKnowledgeContext(trimmedInput)
+      const directKnowledgeResponse = getProjectKnowledgeResponse(trimmedInput)
+
       // Build conversation context
       const conversationHistory = [
-        ...messagesRef.current.map(m => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          timestamp: m.timestamp.getTime()
-        })),
+        ...historyEntries,
         { id: userMessage.id, role: 'user' as const, content: trimmedInput, timestamp: Date.now() }
       ]
 
@@ -403,6 +537,7 @@ export function AIAssistant() {
             isNavigation: true
           }
           setMessages(prev => [...prev, assistantMessage])
+          setFollowUpSuggestions(buildFollowUpSuggestions(trimmedInput, assistantLocale))
 
           if (commandResult.shouldSpeak) {
             speakText(commandResult.response, undefined, { source: "assistant" }).catch(() => {})
@@ -477,7 +612,14 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 body: JSON.stringify({
                   contents: [{
                     role: "user",
-                    parts: [{ text: generateSystemPrompt() + "\n\nUser question: " + trimmedInput }]
+                    parts: [{
+                      text: generateSystemPrompt({
+                        personalityInstruction,
+                        locale: assistantLocale,
+                        conversationMemory,
+                        projectKnowledge,
+                      }) + "\n\nUser question: " + trimmedInput
+                    }]
                   }],
                   generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
                 })
@@ -486,16 +628,16 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
 
             if (apiResponse.ok) {
               const data = await apiResponse.json()
-              response = data.candidates?.[0]?.content?.parts?.[0]?.text || getFallbackResponse(trimmedInput)
+              response = data.candidates?.[0]?.content?.parts?.[0]?.text || directKnowledgeResponse || getFallbackResponse(trimmedInput)
             } else {
-              response = getFallbackResponse(trimmedInput)
+              response = directKnowledgeResponse || getFallbackResponse(trimmedInput)
             }
           } catch {
-            response = getFallbackResponse(trimmedInput)
+            response = directKnowledgeResponse || getFallbackResponse(trimmedInput)
           }
         } else {
           await new Promise(resolve => setTimeout(resolve, 800))
-          response = getFallbackResponse(trimmedInput)
+          response = directKnowledgeResponse || getFallbackResponse(trimmedInput)
         }
       }
 
@@ -507,6 +649,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         isNavigation: isNavResponse
       }
       setMessages(prev => [...prev, assistantMessage])
+      setFollowUpSuggestions(buildFollowUpSuggestions(trimmedInput, assistantLocale))
       speakText(response, undefined, { source: "assistant" }).catch(() => {})
     } finally {
       setIsProcessing(false)
@@ -518,7 +661,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
         }, 700)
       }
     }
-  }, [input, interimTranscript, isProcessing, isListening, stopListening, speakText, startListening])
+  }, [assistantLocale, assistantPersonality, input, interimTranscript, isListening, isProcessing, speakText, startListening, stopListening])
 
   useEffect(() => {
     const handleTalkModeSend = (event: CustomEvent<{ transcript: string }>) => {
@@ -552,12 +695,17 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
     }
   }
 
-  const quickQuestions = [
-    "Give me a tour",
-    "Go to games",
-    "Show me projects",
-    "What can Daniel do?"
-  ]
+  const quickQuestions = useMemo(() => getQuickQuestions(assistantLocale), [assistantLocale])
+  const historyEntries = useMemo(() => messages.map(toHistoryEntry), [messages])
+  const filteredHistoryEntries = useMemo(
+    () => filterAssistantHistory(historyEntries, historySearch, historyRoleFilter),
+    [historyEntries, historyRoleFilter, historySearch],
+  )
+
+  const handleExportHistory = useCallback(() => {
+    const payload = exportAssistantHistory(filteredHistoryEntries)
+    downloadTextFile(`assistant-history-${Date.now()}.json`, payload)
+  }, [filteredHistoryEntries])
 
   const displayText = input + (interimTranscript ? (input ? " " : "") + interimTranscript : "")
 
@@ -583,12 +731,23 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">Ask About Daniel</div>
-              {speechEnabled && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Volume2 className="w-3 h-3" />
-                  <span>Voice on</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {speechEnabled && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Volume2 className="w-3 h-3" />
+                    <span>Voice on</span>
+                  </div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setHistoryOpen(true)}
+                  title="Conversation history"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </div>
             </DialogTitle>
             <DialogDescription className="sr-only">
               Chat with Daniel's AI assistant to learn about his skills, projects, and experience.
@@ -674,6 +833,45 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                     disabled={isProcessing}
                   >
                     {q}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {proactiveSuggestions.length > 0 && (
+            <div className="px-4 pb-2">
+              <div className="flex flex-wrap gap-1.5">
+                {proactiveSuggestions.map((item) => (
+                  <Button
+                    key={item.id}
+                    variant="secondary"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => sendMessage(item.text)}
+                    disabled={isProcessing}
+                  >
+                    {item.text}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {followUpSuggestions.length > 0 && (
+            <div className="px-4 pb-2">
+              <p className="text-[11px] text-muted-foreground mb-1">Follow-up suggestions</p>
+              <div className="flex flex-wrap gap-1.5">
+                {followUpSuggestions.map((suggestion) => (
+                  <Button
+                    key={suggestion}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => sendMessage(suggestion)}
+                    disabled={isProcessing}
+                  >
+                    {suggestion}
                   </Button>
                 ))}
               </div>
@@ -782,6 +980,38 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                   <div className="space-y-4">
                     <div className="font-medium text-sm">Voice Settings</div>
 
+                    {/* Personality */}
+                    <div className="space-y-2">
+                      <label className="text-xs">Personality</label>
+                      <select
+                        value={assistantPersonality}
+                        onChange={(event) => setAssistantPersonality(parsePersonality(event.target.value))}
+                        className="w-full h-8 px-2 text-xs rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        {Object.entries(ASSISTANT_PERSONALITIES).map(([key, config]) => (
+                          <option key={key} value={key}>
+                            {config.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Language */}
+                    <div className="space-y-2">
+                      <label className="text-xs">Language</label>
+                      <select
+                        value={assistantLocale}
+                        onChange={(event) => setAssistantLocale(parseAssistantLocale(event.target.value))}
+                        className="w-full h-8 px-2 text-xs rounded border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        {Object.entries(SUPPORTED_ASSISTANT_LOCALES).map(([key, locale]) => (
+                          <option key={key} value={key}>
+                            {locale.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     {/* Speed */}
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
@@ -844,7 +1074,7 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                         >
                           <option value="">Auto (system default)</option>
                           {voices
-                            .filter(v => v.lang.startsWith('en'))
+                            .filter(v => v.lang.toLowerCase().startsWith(getVoiceFilterPrefix(assistantLocale)))
                             .map((voice) => (
                               <option key={voice.voiceURI} value={voice.name}>
                                 {voice.name} ({voice.lang})
@@ -860,6 +1090,8 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
                       size="sm"
                       className="w-full text-xs"
                       onClick={() => {
+                        setAssistantPersonality("professional")
+                        setAssistantLocale("en-US")
                         setSpeechRate(1.0)
                         setSpeechPitch(1.0)
                         setSpeechVolume(0.8)
@@ -917,6 +1149,17 @@ If this is NOT a navigation request, respond with ONLY: CHAT` }]
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConversationHistoryPanel
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        entries={filteredHistoryEntries}
+        searchTerm={historySearch}
+        onSearchTermChange={setHistorySearch}
+        roleFilter={historyRoleFilter}
+        onRoleFilterChange={setHistoryRoleFilter}
+        onExport={handleExportHistory}
+      />
     </>
   )
 }
