@@ -5,6 +5,7 @@ export type AnalyticsEventType =
   | "time_on_page"
   | "goal"
   | "session_start"
+  | "web_vital"
 
 export type AnalyticsGoalType = "resume_download" | "contact_submission" | "game_play"
 
