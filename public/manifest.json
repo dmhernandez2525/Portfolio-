@@ -1,0 +1,19 @@
+{
+  "name": "Daniel Hernandez Portfolio",
+  "short_name": "DH Portfolio",
+  "description": "Interactive portfolio with 34+ projects, 10 playable games, and AI assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00D4FF",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["portfolio", "games", "education"]
+}

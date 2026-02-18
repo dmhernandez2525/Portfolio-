@@ -3,6 +3,7 @@ import { Header } from "@/components/shared/Header"
 import { Footer } from "@/components/shared/Footer"
 import { AIAssistant } from "@/components/voice-assistant"
 import { CreatureDexPanel } from "@/components/game/CreatureDexPanel"
+import { MobileBottomNav } from "@/components/ui/MobileBottomNav"
 
 export function RootLayout() {
   return (
@@ -15,6 +16,7 @@ export function RootLayout() {
       {/* AI Assistant - TourPlayer and Dialog, persists across all pages */}
       <AIAssistant />
       <CreatureDexPanel />
+      <MobileBottomNav />
     </div>
   )
 }
