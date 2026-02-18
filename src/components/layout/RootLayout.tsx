@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom"
 import { Header } from "@/components/shared/Header"
 import { Footer } from "@/components/shared/Footer"
 import { AIAssistant } from "@/components/voice-assistant"
+import { CreatureDexPanel } from "@/components/game/CreatureDexPanel"
 
 export function RootLayout() {
   return (
@@ -13,6 +14,7 @@ export function RootLayout() {
       <Footer />
       {/* AI Assistant - TourPlayer and Dialog, persists across all pages */}
       <AIAssistant />
+      <CreatureDexPanel />
     </div>
   )
 }
