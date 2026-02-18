@@ -134,14 +134,14 @@ export function EasterEggLogPanel() {
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="fixed left-3 bottom-3 z-[110] px-3 py-2 rounded-full bg-background/95 border border-border shadow-xl text-xs flex items-center gap-2"
+        className="fixed right-3 bottom-3 z-[110] px-3 py-2 rounded-full bg-background/95 border border-border shadow-xl text-xs flex items-center gap-2"
       >
         <Sparkles className="size-4 text-amber-500" />
         <span>Egg Log {progress.completionPercentage}%</span>
       </button>
 
       {(hint || status) && (
-        <div className="fixed left-3 bottom-16 z-[110] max-w-xs rounded-lg border border-border bg-background/95 p-3 text-xs shadow-xl">
+        <div className="fixed right-3 bottom-16 z-[110] max-w-xs rounded-lg border border-border bg-background/95 p-3 text-xs shadow-xl">
           {hint && <p className="text-amber-500">Hint: {hint}</p>}
           {status && <p className="text-emerald-500 mt-1">{status}</p>}
         </div>
