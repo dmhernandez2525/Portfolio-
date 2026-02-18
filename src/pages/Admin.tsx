@@ -1,7 +1,13 @@
 import { motion } from 'framer-motion'
+import { useState } from "react"
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
+import { AnalyticsPanel } from "@/components/admin/analytics/AnalyticsPanel"
 import { Button } from '@/components/ui/button'
+import { ContentManagementPanel } from "@/components/admin/content/ContentManagementPanel"
+import { GameStatsPanel } from "@/components/admin/games/GameStatsPanel"
+import { ProjectManagementPanel } from "@/components/admin/projects/ProjectManagementPanel"
+import { TestimonialAdminPanel } from "@/components/admin/testimonials/TestimonialAdminPanel"
 import {
   LogOut,
   User,
@@ -12,40 +18,62 @@ import {
   MessageSquare,
   Image,
   Code2,
+  Quote,
+  Trophy,
 } from 'lucide-react'
 
 const adminFeatures = [
   {
+    id: "blog-posts",
     icon: FileText,
     title: 'Blog Posts',
     description: 'Manage and publish blog articles',
     adminOnly: false,
   },
   {
+    id: "projects",
     icon: Code2,
     title: 'Projects',
     description: 'Update portfolio projects',
     adminOnly: false,
   },
   {
+    id: "media-library",
     icon: Image,
     title: 'Media Library',
     description: 'Upload and manage images',
     adminOnly: false,
   },
   {
+    id: "messages",
     icon: MessageSquare,
     title: 'Messages',
     description: 'View contact form submissions',
     adminOnly: false,
   },
   {
+    id: "game-stats",
+    icon: Trophy,
+    title: "Game Stats",
+    description: "Track scores, streaks, and achievements",
+    adminOnly: false,
+  },
+  {
+    id: "testimonials",
+    icon: Quote,
+    title: "Testimonials",
+    description: "Approve, edit, and reorder testimonials",
+    adminOnly: false,
+  },
+  {
+    id: "analytics",
     icon: BarChart3,
     title: 'Analytics',
     description: 'View site traffic and engagement',
     adminOnly: true,
   },
   {
+    id: "settings",
     icon: Settings,
     title: 'Settings',
     description: 'Configure site settings',
@@ -56,6 +84,7 @@ const adminFeatures = [
 export function Admin() {
   const { user, logout, isDemoMode } = useAuth()
   const navigate = useNavigate()
+  const [activeFeatureId, setActiveFeatureId] = useState<string | null>(null)
 
   const handleLogout = () => {
     logout()
@@ -134,6 +163,11 @@ export function Admin() {
               >
                 <button
                   disabled={isDisabled}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      setActiveFeatureId(feature.id)
+                    }
+                  }}
                   className={`w-full p-6 text-left rounded-lg border transition-all ${
                     isDisabled
                       ? 'border-border bg-muted/50 opacity-50 cursor-not-allowed'
@@ -172,6 +206,12 @@ export function Admin() {
             )
           })}
         </div>
+
+        {activeFeatureId === "projects" ? <ProjectManagementPanel /> : null}
+        {activeFeatureId === "analytics" ? <AnalyticsPanel /> : null}
+        {activeFeatureId === "blog-posts" || activeFeatureId === "media-library" ? <ContentManagementPanel /> : null}
+        {activeFeatureId === "game-stats" ? <GameStatsPanel /> : null}
+        {activeFeatureId === "testimonials" ? <TestimonialAdminPanel /> : null}
 
         {/* Demo Mode Info */}
         {isDemoMode && (

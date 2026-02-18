@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { trackGoal } from "@/lib/analytics-store"
 
 // Web3Forms API endpoint
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit"
@@ -97,6 +98,7 @@ export function Contact() {
       window.location.href = `mailto:Danher2525@Gmail.com?subject=${subject}&body=${body}`
       setIsSubmitting(false)
       setIsSuccess(true)
+      trackGoal("/contact", "contact_submission")
       reset()
       setTimeout(() => setIsSuccess(false), 5000)
       return
@@ -125,6 +127,7 @@ export function Contact() {
 
       if (result.success) {
         setIsSuccess(true)
+        trackGoal("/contact", "contact_submission")
 
         // Easter egg: confetti for hire-related messages
         if (checkForHireKeywords(data.message)) {

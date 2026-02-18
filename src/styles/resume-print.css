@@ -1,0 +1,33 @@
+@media print {
+  .resume-shell {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .resume-main {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .resume-controls,
+  .resume-comparison {
+    display: none !important;
+  }
+
+  .resume-section {
+    break-inside: avoid;
+    border: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .resume-section h2 {
+    color: #111111 !important;
+  }
+
+  .resume-link {
+    color: #111111 !important;
+    text-decoration: none !important;
+  }
+}

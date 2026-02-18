@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
+import { usePageAnalytics } from "@/hooks/usePageAnalytics"
 import { RootLayout } from "@/components/layout/RootLayout"
 import { Gateway } from "@/pages/Gateway"
 import { BusinessCardPage } from "@/pages/BusinessCardPage"
@@ -14,11 +15,14 @@ import { About } from "@/components/sections/About"
 import { Experience } from "@/components/sections/Experience"
 import { Skills } from "@/components/sections/Skills"
 import { Projects } from "@/components/sections/Projects"
+import { Testimonials } from "@/components/sections/Testimonials"
 import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
 import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
 import { AIExperience } from "@/components/sections/AIExperience"
 import { AIDevelopmentPage } from "@/pages/AIDevelopmentPage"
+import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
+import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
 
 import { FallingBlocksGame } from "@/components/game/FallingBlocksGame"
 import { TetrisGame } from "@/components/game/TetrisGame"
@@ -43,6 +47,7 @@ import { NotFound } from "@/pages/NotFound"
 import { Login } from "@/pages/Login"
 import { Admin } from "@/pages/Admin"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import type { GameId } from "@/types/game-stats"
 
 const Home = () => (
     <div className="min-h-screen">
@@ -52,12 +57,17 @@ const Home = () => (
       <Skills />
       <Experience />
       <Projects />
+      <Testimonials />
       <AIExperience />
       <GlobeSection />
       <AskAboutMe />
       <Contact />
     </div>
 )
+
+function GameRouteWrapper({ gameId, children }: { gameId: GameId; children: React.ReactNode }) {
+  return <GameExperienceLayout gameId={gameId}>{children}</GameExperienceLayout>
+}
 
 function CreativeRoutes() {
   return (
@@ -72,18 +82,18 @@ function CreativeRoutes() {
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/:slug" element={<ProjectDetailPage />} />
         <Route path="/ai-development" element={<AIDevelopmentPage />} />
-        <Route path="/game" element={<FallingBlocksGame />} />
-        <Route path="/tetris" element={<TetrisGame />} />
-        <Route path="/snake" element={<SnakeGame />} />
-        <Route path="/tanks" element={<TanksGame />} />
-        <Route path="/cookie-clicker" element={<CookieClickerGame />} />
-        <Route path="/chess" element={<ChessGame />} />
-        <Route path="/agar" element={<AgarGame />} />
-        <Route path="/mafia-wars" element={<MafiaWarsGame />} />
-        <Route path="/pokemon" element={<PokemonGame />} />
-        <Route path="/shopping-cart-hero" element={<ShoppingCartHeroGame />} />
-        <Route path="/coc" element={<CocGame />} />
-        <Route path="/fireboy-watergirl" element={<FireboyWatergirlGame />} />
+        <Route path="/game" element={<GameRouteWrapper gameId="game"><FallingBlocksGame /></GameRouteWrapper>} />
+        <Route path="/tetris" element={<GameRouteWrapper gameId="tetris"><TetrisGame /></GameRouteWrapper>} />
+        <Route path="/snake" element={<GameRouteWrapper gameId="snake"><SnakeGame /></GameRouteWrapper>} />
+        <Route path="/tanks" element={<GameRouteWrapper gameId="tanks"><TanksGame /></GameRouteWrapper>} />
+        <Route path="/cookie-clicker" element={<GameRouteWrapper gameId="cookie-clicker"><CookieClickerGame /></GameRouteWrapper>} />
+        <Route path="/chess" element={<GameRouteWrapper gameId="chess"><ChessGame /></GameRouteWrapper>} />
+        <Route path="/agar" element={<GameRouteWrapper gameId="agar"><AgarGame /></GameRouteWrapper>} />
+        <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><MafiaWarsGame /></GameRouteWrapper>} />
+        <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><PokemonGame /></GameRouteWrapper>} />
+        <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><ShoppingCartHeroGame /></GameRouteWrapper>} />
+        <Route path="/coc" element={<GameRouteWrapper gameId="game"><CocGame /></GameRouteWrapper>} />
+        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><FireboyWatergirlGame /></GameRouteWrapper>} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -111,10 +121,18 @@ const MODE_PAGES: Partial<Record<PortfolioMode, React.ReactElement>> = {
 }
 
 export function AppRoutes() {
+  usePageAnalytics()
   const { mode } = useMode()
 
+  const withEasterEggPanel = (content: React.ReactElement) => (
+    <>
+      {content}
+      <EasterEggLogPanel />
+    </>
+  )
+
   if (!mode) {
-    return (
+    return withEasterEggPanel(
       <Routes>
         <Route path="*" element={<Gateway />} />
       </Routes>
@@ -122,11 +140,13 @@ export function AppRoutes() {
   }
 
   // Creative mode has nested sub-routes
-  if (mode === "creative") return <CreativeRoutes />
+  if (mode === "creative") {
+    return withEasterEggPanel(<CreativeRoutes />)
+  }
 
   const page = MODE_PAGES[mode]
   if (page) {
-    return (
+    return withEasterEggPanel(
       <Routes>
         <Route path="*" element={page} />
       </Routes>
@@ -134,7 +154,7 @@ export function AppRoutes() {
   }
 
   // Fallback for modes without pages yet (e.g., dashboard)
-  return (
+  return withEasterEggPanel(
     <Routes>
       <Route path="*" element={<Gateway />} />
     </Routes>
