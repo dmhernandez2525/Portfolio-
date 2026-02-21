@@ -64,7 +64,7 @@
     "resium": "^1.19.3",
     "split-type": "^0.3.4",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^4.2.0",
     "three": "^0.182.0",
     "vite-plugin-cesium": "^1.2.23",
     "zod": "^4.3.6"
