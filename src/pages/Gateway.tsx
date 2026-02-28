@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3, CalendarDays } from "lucide-react"
+import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3, CalendarDays, Search } from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 
 const modes: { key: PortfolioMode; title: string; description: string; icon: typeof CreditCard; accent: string; bg: string; preview: string; comingSoon?: boolean }[] = [
@@ -58,9 +58,18 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
     preview: "Data-driven & analytical",
   },
   {
+    key: "consulting",
+    title: "Consulting",
+    description: "Technology consulting services. Book a free tech audit for your business.",
+    icon: Search,
+    accent: "from-emerald-400 to-teal-500",
+    bg: "hover:border-emerald-400/50",
+    preview: "Services & tech audits",
+  },
+  {
     key: "calendar",
     title: "Book a Meeting",
-    description: "Schedule time with me — coming soon! This feature is currently under development.",
+    description: "Schedule time with me. This feature is currently under development.",
     icon: CalendarDays,
     accent: "from-teal-400 to-cyan-500",
     bg: "hover:border-teal-400/50",

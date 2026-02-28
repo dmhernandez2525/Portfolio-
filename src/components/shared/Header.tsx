@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightbulb, Brain, BookOpen, Share2, Gamepad2, ChevronDown, Download, Bot } from "lucide-react"
+import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightbulb, Brain, BookOpen, Share2, Gamepad2, ChevronDown, Download, Bot, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utils"
@@ -39,6 +39,7 @@ const navStructure = {
       { name: "About Me", path: "/#about", icon: User },
       { name: "Philosophy", path: "/philosophy", icon: Brain },
       { name: "Blog", path: "/blog", icon: BookOpen },
+      { name: "Tech Audit", path: "/tech-audit", icon: Search },
     ]
   },
   work: {
@@ -72,6 +73,7 @@ const allNavItems = [
   { name: "Philosophy", path: "/philosophy", icon: Brain },
   { name: "Inventions", path: "/inventions", icon: Lightbulb },
   { name: "AI Development", path: "/ai-development", icon: Bot },
+  { name: "Tech Audit", path: "/tech-audit", icon: Search },
   { name: "Contact", path: "/#contact", icon: Mail },
 ]
 

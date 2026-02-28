@@ -1,3 +1,4 @@
+import democratizingTechnologyContent from "@/content/blog/democratizing-technology.md?raw"
 import buildingWithoutDegreeContent from "@/content/blog/building-without-degree.md?raw"
 import systemsThinkingContent from "@/content/blog/systems-thinking-real-world.md?raw"
 import whyIBuildToolsContent from "@/content/blog/why-i-build-tools.md?raw"
@@ -11,6 +12,7 @@ export type { BlogCategory, BlogPost } from "@/types/blog"
 export { BLOG_CATEGORIES, BLOG_PAGE_SIZES } from "@/data/blog-metadata"
 
 const BLOG_CONTENT_BY_ID: Record<string, string> = {
+  "democratizing-technology": democratizingTechnologyContent,
   "building-without-degree": buildingWithoutDegreeContent,
   "systems-thinking-real-world": systemsThinkingContent,
   "why-i-build-tools": whyIBuildToolsContent,

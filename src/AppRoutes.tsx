@@ -17,6 +17,7 @@ import { Contact } from "@/components/sections/Contact"
 import { GlobeSection } from "@/components/sections/GlobeSection"
 import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
 import { AIExperience } from "@/components/sections/AIExperience"
+import { TechAudit } from "@/components/sections/TechAudit"
 import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
 import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
@@ -29,7 +30,9 @@ const TechieLayout = lazy(() => import("@/components/techie/TechieLayout").then(
 const RetroTerminalPage = lazy(() => import("@/pages/RetroTerminalPage").then((m) => ({ default: m.RetroTerminalPage })))
 const DashboardPage = lazy(() => import("@/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })))
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })))
+const ConsultingPage = lazy(() => import("@/pages/ConsultingPage").then((m) => ({ default: m.ConsultingPage })))
 const AIDevelopmentPage = lazy(() => import("@/pages/AIDevelopmentPage").then((m) => ({ default: m.AIDevelopmentPage })))
+const TechAuditPage = lazy(() => import("@/pages/TechAuditPage").then((m) => ({ default: m.TechAuditPage })))
 const Philosophy = lazy(() => import("@/pages/Philosophy").then((m) => ({ default: m.Philosophy })))
 const Inventions = lazy(() => import("@/pages/Inventions").then((m) => ({ default: m.Inventions })))
 const Blog = lazy(() => import("@/pages/Blog").then((m) => ({ default: m.Blog })))
@@ -73,6 +76,7 @@ const Home = () => (
       <Projects />
       <Testimonials />
       <AIExperience />
+      <TechAudit />
       <GlobeSection />
       <AskAboutMe />
       <Contact />
@@ -96,6 +100,7 @@ function CreativeRoutes() {
         <Route path="/projects" element={<LazyPage><ProjectsPage /></LazyPage>} />
         <Route path="/projects/:slug" element={<LazyPage><ProjectDetailPage /></LazyPage>} />
         <Route path="/ai-development" element={<LazyPage><AIDevelopmentPage /></LazyPage>} />
+        <Route path="/tech-audit" element={<LazyPage><TechAuditPage /></LazyPage>} />
         <Route path="/game" element={<GameRouteWrapper gameId="game"><LazyGame><FallingBlocksGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/tetris" element={<GameRouteWrapper gameId="tetris"><LazyGame><TetrisGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/snake" element={<GameRouteWrapper gameId="snake"><LazyGame><SnakeGame /></LazyGame></GameRouteWrapper>} />
@@ -132,6 +137,7 @@ const MODE_COMPONENTS: Partial<Record<PortfolioMode, React.LazyExoticComponent<R
   "retro": RetroTerminalPage,
   "dashboard": DashboardPage,
   "calendar": CalendarPage,
+  "consulting": ConsultingPage,
 }
 
 export function AppRoutes() {

@@ -36,3 +36,4 @@ coverage/
 # Agent working files
 .claude/
 .gemini/
+.jarvis-resume
