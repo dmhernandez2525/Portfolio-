@@ -76,6 +76,6 @@ describe("Blog page", () => {
 
     const pageSizeSelect = screen.getByLabelText("Posts per page") as HTMLSelectElement
     expect(pageSizeSelect.value).toBe("20")
-    expect(screen.getByText("Showing page 1 of 1 (4 posts)")).toBeInTheDocument()
+    expect(screen.getByText(/Showing page 1 of 1 \(\d+ posts\)/)).toBeInTheDocument()
   })
 })

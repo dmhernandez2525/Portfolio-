@@ -53,11 +53,13 @@ describe("blog-utils", () => {
   it("paginates and bounds out-of-range pages", () => {
     const pageOne = paginateBlogPosts(blogPosts, 1, 2)
     expect(pageOne.items).toHaveLength(2)
-    expect(pageOne.pagination.totalPages).toBe(3)
+    const expectedTotalPages = Math.ceil(blogPosts.length / 2)
+    expect(pageOne.pagination.totalPages).toBe(expectedTotalPages)
 
     const outOfRange = paginateBlogPosts(blogPosts, 99, 2)
-    expect(outOfRange.pagination.page).toBe(3)
-    expect(outOfRange.items).toHaveLength(1)
+    expect(outOfRange.pagination.page).toBe(expectedTotalPages)
+    const lastPageCount = blogPosts.length % 2 === 0 ? 2 : 1
+    expect(outOfRange.items).toHaveLength(lastPageCount)
   })
 
   it("generates RSS xml with one item per post", () => {

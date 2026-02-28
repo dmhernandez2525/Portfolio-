@@ -5,11 +5,24 @@ export const BLOG_CATEGORIES: readonly BlogCategory[] = [
   "Philosophy",
   "Projects",
   "Life",
+  "Services",
 ] as const
 
 export const BLOG_PAGE_SIZES: readonly number[] = [10, 20, 50] as const
 
 export const BLOG_POST_METADATA: readonly BlogPostMetadata[] = [
+  {
+    id: "democratizing-technology",
+    title: "Democratizing Technology: Why Every Business Deserves a Tech Audit",
+    excerpt:
+      "Most small businesses overpay for technology they do not fully understand. A free, confidential tech audit can change that.",
+    category: "Services",
+    tags: ["consulting", "technology", "business", "audit", "services"],
+    author: "Daniel Hernandez",
+    date: "2026-02-28",
+    lastUpdated: "2026-02-28",
+    featured: true,
+  },
   {
     id: "building-without-degree",
     title: "Building a Tech Career Without a Degree",

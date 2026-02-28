@@ -1,4 +1,4 @@
-export type BlogCategory = "Engineering" | "Philosophy" | "Projects" | "Life"
+export type BlogCategory = "Engineering" | "Philosophy" | "Projects" | "Life" | "Services"
 
 export interface BlogPostMetadata {
   id: string
