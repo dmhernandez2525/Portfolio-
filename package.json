@@ -43,7 +43,7 @@
     "@tsparticles/slim": "^3.9.1",
     "@uiw/codemirror-themes-all": "^4.25.4",
     "@uiw/react-codemirror": "^4.25.4",
-    "cesium": "^1.137.0",
+    "cesium": "^1.138.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "flubber": "^0.4.2",
