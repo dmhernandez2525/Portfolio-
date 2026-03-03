@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run generate:rss && tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "npm run generate:rss && tsc -b apps/web/tsconfig.app.json && vite build apps/web",
+    "lint": "eslint apps/web",
     "preview": "vite preview",
-    "generate:resume": "tsx --tsconfig tsconfig.scripts.json scripts/generate-resume.tsx",
-    "generate:rss": "tsx --tsconfig tsconfig.scripts.json scripts/generate-rss.ts",
+    "generate:resume": "tsx --tsconfig apps/web/tsconfig.scripts.json apps/web/scripts/generate-resume.tsx",
+    "generate:rss": "tsx --tsconfig apps/web/tsconfig.scripts.json apps/web/scripts/generate-rss.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

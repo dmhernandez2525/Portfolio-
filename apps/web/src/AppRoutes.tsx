@@ -54,6 +54,10 @@ const ChessGame = lazy(() => import("@/components/game/ChessGame").then((m) => (
 const AgarGame = lazy(() => import("@/components/game/agar").then((m) => ({ default: m.AgarGame })))
 const MafiaWarsGame = lazy(() => import("@/components/game/mafia-wars").then((m) => ({ default: m.MafiaWarsGame })))
 const PokemonGame = lazy(() => import("@/components/game/pokemon").then((m) => ({ default: m.PokemonGame })))
+const PokedokuGame = lazy(() => import("@/components/game/pokedoku/PokedokuGame").then((m) => ({ default: m.PokedokuGame })))
+const MeanBeanMachine = lazy(() => import("@/components/game/mean-bean-machine/MeanBeanMachine").then((m) => ({ default: m.MeanBeanMachine })))
+const OregonTrail = lazy(() => import("@/components/game/oregon-trail/OregonTrail").then((m) => ({ default: m.OregonTrail })))
+const PoisonLizard = lazy(() => import("@/components/game/poison-lizard/PoisonLizard").then((m) => ({ default: m.PoisonLizard })))
 const ShoppingCartHeroGame = lazy(() => import("@/components/game/shopping-cart-hero").then((m) => ({ default: m.ShoppingCartHeroGame })))
 const CocGame = lazy(() => import("@/components/game/coc-game").then((m) => ({ default: m.CocGame })))
 const FireboyWatergirlGame = lazy(() => import("@/components/game/fireboy-watergirl").then((m) => ({ default: m.FireboyWatergirlGame })))
@@ -110,6 +114,10 @@ function CreativeRoutes() {
         <Route path="/agar" element={<GameRouteWrapper gameId="agar"><LazyGame><AgarGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><LazyGame><MafiaWarsGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><LazyGame><PokemonGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/pokedoku" element={<GameRouteWrapper gameId="game"><LazyGame><PokedokuGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/mean-bean-machine" element={<GameRouteWrapper gameId="game"><LazyGame><MeanBeanMachine /></LazyGame></GameRouteWrapper>} />
+        <Route path="/oregon-trail" element={<GameRouteWrapper gameId="game"><LazyGame><OregonTrail /></LazyGame></GameRouteWrapper>} />
+        <Route path="/poison-lizard" element={<GameRouteWrapper gameId="game"><LazyGame><PoisonLizard /></LazyGame></GameRouteWrapper>} />
         <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><LazyGame><ShoppingCartHeroGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/coc" element={<GameRouteWrapper gameId="game"><LazyGame><CocGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><LazyGame><FireboyWatergirlGame /></LazyGame></GameRouteWrapper>} />

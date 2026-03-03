@@ -420,6 +420,20 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     });
     overworld.onConnection((mapId, x, y) => loadMapRef.current?.(mapId, x, y));
 
+    overworld.onTrainerBattle((npcId) => {
+      const map = currentMapRef.current;
+      if (!map) return;
+      const npc = map.npcs.find(n => n.id === npcId);
+      if (!npc || defeatedTrainersRef.current.has(npc.id)) return;
+
+      const trainer = getTrainerDefFromNPC(npc, versionRef.current);
+      if (trainer) {
+        // Trigger exclamation mark and walk toward player if needed
+        alertedTrainerRef.current = { npc, trainer, framesLeft: 60 };
+        playSFX('select');
+      }
+    });
+
     // Friendship gain from walking (+1 per 128 steps to lead Pokemon)
     overworld.onStep(() => {
       const lead = partyRef.current[0];
@@ -694,7 +708,17 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
 
     if (screen === 'battle' && battle.battleState) return;
     if (screen === 'starter_select') return;
-    if (input.isJustPressed('start')) { setIsPaused(p => !p); setActiveMenu('none'); return; }
+
+    if (input.isJustPressed('start')) {
+      if (activeMenu === 'none') {
+        setIsPaused(p => !p);
+      } else {
+        setActiveMenu('none');
+        setIsPaused(false);
+      }
+      return;
+    }
+
     if (dialogText) {
       if (input.isJustPressed('a')) advanceDialog();
       const p = overworld.getState()?.player;

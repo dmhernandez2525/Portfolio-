@@ -15,6 +15,10 @@ const CookieClickerGame = lazy(() => import("@/components/game/cookie-clicker").
 const AgarGame = lazy(() => import("@/components/game/agar").then(m => ({ default: m.AgarGame })))
 const MafiaWars = lazy(() => import("@/components/game/mafia-wars"))
 const PokemonGame = lazy(() => import("@/components/game/pokemon").then(m => ({ default: m.PokemonGame })))
+const PokedokuGame = lazy(() => import("@/components/game/pokedoku/PokedokuGame").then(m => ({ default: m.PokedokuGame })))
+const MeanBeanMachine = lazy(() => import("@/components/game/mean-bean-machine/MeanBeanMachine").then(m => ({ default: m.MeanBeanMachine })))
+const OregonTrail = lazy(() => import("@/components/game/oregon-trail/OregonTrail").then(m => ({ default: m.OregonTrail })))
+const PoisonLizard = lazy(() => import("@/components/game/poison-lizard/PoisonLizard").then(m => ({ default: m.PoisonLizard })))
 const CocGame = lazy(() => import("@/components/game/coc-game").then(m => ({ default: m.CocGame })))
 const ShoppingCartHeroGame = lazy(() => import("@/components/game/shopping-cart-hero").then(m => ({ default: m.ShoppingCartHeroGame })))
 const FireboyWatergirlGame = lazy(() => import("@/components/game/fireboy-watergirl").then(m => ({ default: m.FireboyWatergirlGame })))
@@ -379,6 +383,10 @@ export function TechieContentViewer({ tab, onEditorChange, onRunCode, editorSett
     "game-agar": <GameLoader><AgarGame /></GameLoader>,
     "game-mafia-wars": <GameLoader><MafiaWars /></GameLoader>,
     "game-pokemon": <GameLoader><PokemonGame /></GameLoader>,
+    "game-pokedoku": <GameLoader><PokedokuGame /></GameLoader>,
+    "game-mean-bean-machine": <GameLoader><MeanBeanMachine /></GameLoader>,
+    "game-oregon-trail": <GameLoader><OregonTrail /></GameLoader>,
+    "game-poison-lizard": <GameLoader><PoisonLizard /></GameLoader>,
     "game-coc": <GameLoader><CocGame /></GameLoader>,
     "game-shopping-cart-hero": <GameLoader><ShoppingCartHeroGame /></GameLoader>,
     "game-fireboy-watergirl": <GameLoader><FireboyWatergirlGame /></GameLoader>,

@@ -158,6 +158,62 @@ const games: Game[] = [
     features: ["151 Pokemon with accurate stats", "Full battle system with type chart", "8 Gym Leaders + Elite Four", "Wild encounters and catching", "Save/Load system", "Mobile touch controls"]
   },
   {
+    id: "pokedoku",
+    title: "PokeDoku",
+    description: "The viral Pokemon grid trivia game - daily puzzles!",
+    longDescription: "A faithful recreation of the popular grid-based trivia game. Fill a 3x3 grid with Pokemon that match both row and column criteria. Features daily seeded puzzles, Gen 1-3 support, and unique categories like Legendary, Evolution, and Monotype.",
+    thumbnail: "/game-pokedoku.svg",
+    category: "strategy",
+    link: "/pokedoku",
+    isExternal: false,
+    isBuiltIn: true,
+    isOriginal: true,
+    funFact: "This uses the same logic as the daily version but is limited to the first three generations available in my engine.",
+    features: ["Daily seeded 3x3 grids", "Gen 1-3 data integration", "Unique categories (Types, Gens, Stats, Legends)", "9 guess limit", "Auto-save progress", "Search with real-time filtering"]
+  },
+  {
+    id: "mean-bean-machine",
+    title: "Mean Bean Machine",
+    description: "Dr. Robotnik's classic bean-stacking puzzle game!",
+    longDescription: "A faithful recreation of the Puyo Puyo classic. Stack colored beans, create massive chains, and defeat Dr. Robotnik. Features a custom Puyo AI, smooth animations, and the iconic 'Mean Bean' aesthetic.",
+    thumbnail: "/game-mean-bean.svg",
+    category: "arcade",
+    link: "/mean-bean-machine",
+    isExternal: false,
+    isBuiltIn: true,
+    isOriginal: true,
+    funFact: "The original game was actually a reskin of 'Puyo Puyo' for Western audiences, released by SEGA in 1993.",
+    features: ["Classic Puyo Puyo mechanics", "AI opponent (Dr. Robotnik)", "Chaining and combo system", "Garbage block mechanics", "Increasing difficulty", "Retro-inspired UI"]
+  },
+  {
+    id: "oregon-trail",
+    title: "Oregon Trail",
+    description: "The classic pioneer survival game - can you make it to Oregon?",
+    longDescription: "A retro-inspired recreation of the 1848 pioneer journey. Manage your wagon, hunt for food, trade at forts, and face the perils of the trail. Features the iconic green-text aesthetic, random event system, and resource management.",
+    thumbnail: "/game-oregon-trail.svg",
+    category: "strategy",
+    link: "/oregon-trail",
+    isExternal: false,
+    isBuiltIn: true,
+    isOriginal: true,
+    funFact: "The original Oregon Trail was created in 1971 by three student teachers to help teach history to their classes.",
+    features: ["2,000 mile journey across North America", "Real-time travel simulation", "Resource management (oxen, food, ammo)", "Random events and diseases", "Hunting minigame", "Retro 8-bit aesthetic"]
+  },
+  {
+    id: "poison-lizard",
+    title: "Poison Lizard: Venomous Defense",
+    description: "Defend the jungle with lethal venom spit in this arcade shooter!",
+    longDescription: "Protect your jungle base from waves of invading troops. As a Poison Lizard, you must use your venomous spit to weaken and destroy enemies. Features wave-based progression, upgradeable stats, and unique poison damage-over-time mechanics.",
+    thumbnail: "/game-poison-lizard.svg",
+    category: "arcade",
+    link: "/poison-lizard",
+    isExternal: false,
+    isBuiltIn: true,
+    isOriginal: true,
+    funFact: "The Poison Lizard is a pet from Clash of Clans, known for its ability to slow down and poison Heroes.",
+    features: ["Arcade-style wave defense", "Poison damage-over-time system", "Multiple enemy types (Barbarians, Giants, etc.)", "Upgradeable spit speed and potency", "Canvas-based high performance rendering", "Increasing difficulty curves"]
+  },
+  {
     id: "shopping-cart-hero",
     title: "Shopping Cart Hero",
     description: "Launch a shopping cart off a ramp and fly as far as possible!",
@@ -373,6 +429,26 @@ export function Games() {
                     <Play className="w-3 h-3" /> Pokemon
                   </Button>
                 </Link>
+                <Link to="/pokedoku">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> PokeDoku
+                  </Button>
+                </Link>
+                <Link to="/mean-bean-machine">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Mean Bean Machine
+                  </Button>
+                </Link>
+                <Link to="/oregon-trail">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Oregon Trail
+                  </Button>
+                </Link>
+                <Link to="/poison-lizard">
+                  <Button size="sm" variant="secondary" className="gap-1">
+                    <Play className="w-3 h-3" /> Poison Lizard
+                  </Button>
+                </Link>
                 <Link to="/coc">
                   <Button size="sm" variant="secondary" className="gap-1">
                     <Play className="w-3 h-3" /> Clash of Clans
@@ -429,6 +505,10 @@ export function Games() {
                     {game.id === "snake" && "🐍"}
                     {game.id === "mafia-wars" && "🔫"}
                     {game.id === "pokemon" && "⚡"}
+                    {game.id === "pokedoku" && "🧩"}
+                    {game.id === "mean-bean-machine" && "🫘"}
+                    {game.id === "oregon-trail" && "🚜"}
+                    {game.id === "poison-lizard" && "🦎"}
                     {game.id === "coc" && "🏰"}
                     {game.id === "fireboy-watergirl" && "🔥💧"}
                   </div>
