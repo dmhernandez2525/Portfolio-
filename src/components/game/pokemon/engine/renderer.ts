@@ -81,11 +81,21 @@ export function renderNightTint(ctx: CanvasRenderingContext2D, timeOfDay: 'morni
 
 // --- Battle rendering (procedural, no sprites needed) ---
 
+let battleIntroProgress = 0;
+
 export function renderBattle(
   ctx: CanvasRenderingContext2D,
   battle: BattleState,
   frameCount: number
 ) {
+  // Reset intro progress on action_select (means intro is done)
+  if (battle.phase !== 'intro') {
+    battleIntroProgress = 1;
+  } else {
+    // Increment intro progress
+    battleIntroProgress = Math.min(1, battleIntroProgress + 0.02);
+  }
+
   // Background
   ctx.fillStyle = '#e8e8e8';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -93,20 +103,33 @@ export function renderBattle(
   // Battle field
   drawBattleBackground(ctx);
 
+  // Intro Slide logic
+  const slideOffset = (1 - battleIntroProgress) * 300;
+
   // Opponent Pokemon (top-right)
-  drawBattlePokemon(ctx, battle.opponentActive, 340, 50, false, frameCount);
+  drawBattlePokemon(ctx, battle.opponentActive, 340 + slideOffset, 50, false, frameCount);
 
   // Player Pokemon (bottom-left)
-  drawBattlePokemon(ctx, battle.playerActive, 100, 150, true, frameCount);
+  drawBattlePokemon(ctx, battle.playerActive, 100 - slideOffset, 150, true, frameCount);
 
-  // Opponent info box (top-left)
-  drawPokemonInfoBox(ctx, battle.opponentActive, 10, 10, false);
+  // Info boxes slide in from opposite sides
+  if (battleIntroProgress > 0.5) {
+    const infoAlpha = (battleIntroProgress - 0.5) * 2;
+    ctx.save();
+    ctx.globalAlpha = infoAlpha;
+    // Opponent info box (top-left)
+    drawPokemonInfoBox(ctx, battle.opponentActive, 10 - slideOffset * 0.5, 10, false);
+    // Player info box (bottom-right)
+    drawPokemonInfoBox(ctx, battle.playerActive, 250 + slideOffset * 0.5, 175, true);
+    ctx.restore();
+  }
 
-  // Player info box (bottom-right)
-  drawPokemonInfoBox(ctx, battle.playerActive, 250, 175, true);
-
-  // Text box at bottom
+  // Text box at bottom (always visible or slides up)
   drawTextBox(ctx, battle.currentText);
+}
+
+export function resetBattleIntro() {
+  battleIntroProgress = 0;
 }
 
 function drawBattleBackground(ctx: CanvasRenderingContext2D) {

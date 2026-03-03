@@ -5,7 +5,7 @@
 import { useRef, useCallback } from 'react';
 import type { Player, Direction, GameMap } from '../engine/types';
 import { SCALED_TILE, PLAYER_SPEED, ENCOUNTER_RATE } from '../engine/constants';
-import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp, getTileType } from '../engine/collision';
+import { isTileWalkable, canCrossLedge, isTallGrass, isNPCAtTile, getAdjacentTile, checkWarp, getTileType, checkTrainerLOS } from '../engine/collision';
 import { setCameraTarget } from '../engine/camera';
 import type { Camera } from '../engine/types';
 
@@ -20,6 +20,7 @@ export function useOverworld() {
   const warpCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
   const connectionCallback = useRef<((mapId: string, x: number, y: number) => void) | null>(null);
   const npcCallback = useRef<((npcId: string) => void) | null>(null);
+  const trainerCallback = useRef<((npcId: string) => void) | null>(null);
   const stepCallback = useRef<(() => void) | null>(null);
   const surfCallback = useRef<(() => boolean) | null>(null);
   const fieldMoveCallback = useRef<((move: 'cut' | 'strength') => boolean) | null>(null);
@@ -64,6 +65,10 @@ export function useOverworld() {
 
   const onNPCInteract = useCallback((cb: (npcId: string) => void) => {
     npcCallback.current = cb;
+  }, []);
+
+  const onTrainerBattle = useCallback((cb: (npcId: string) => void) => {
+    trainerCallback.current = cb;
   }, []);
 
   const onStep = useCallback((cb: () => void) => {
@@ -207,6 +212,14 @@ export function useOverworld() {
             return player;
           }
         }
+
+        // Check for trainer line of sight
+        for (const npc of currentMap.npcs) {
+          if (npc.isTrainer && checkTrainerLOS(npc, player.tileX, player.tileY, currentMap)) {
+            trainerCallback.current?.(npc.id);
+            return player;
+          }
+        }
       }
 
       // Update camera
@@ -305,6 +318,7 @@ export function useOverworld() {
     onWarp,
     onConnection,
     onNPCInteract,
+    onTrainerBattle,
     onStep,
     onSurfCheck,
     onFieldMoveCheck,

@@ -33,15 +33,15 @@ export const BASE_HILL_ACCEL = 0.02;     // gravity acceleration at top of hill 
 export const MAX_HILL_ACCEL = 0.12;      // gravity acceleration at bottom of hill (fast)
 export const MAX_RUN_SPEED = 10;         // base max run speed (modified by wheel upgrades)
 export const RUN_DECEL = 0.05;           // deceleration when not pressing right
-export const GRAVITY = 0.38;
-export const AIR_DRAG = 0.9985;
-export const ROTATION_SPEED = 0.07;  // radians per frame
-export const BOUNCE_COEFFICIENT = 0.45;
-export const ROLL_FRICTION = 0.985;
+export const GRAVITY = 0.45;
+export const AIR_DRAG = 0.992;
+export const ROTATION_SPEED = 0.08;  // radians per frame
+export const BOUNCE_COEFFICIENT = 0.35;
+export const ROLL_FRICTION = 0.97;
 export const MIN_BOUNCE_VEL = 2;
 // --- Launch ---
-export const LAUNCH_ANGLE = -Math.PI / 3.5; // ~51 degrees upward
-export const LAUNCH_SPEED_MULT = 1.6;        // speed multiplier at launch
+export const LAUNCH_ANGLE = -Math.PI / 4; // 45 degrees upward
+export const LAUNCH_SPEED_MULT = 1.2;        // speed multiplier at launch
 
 // --- Ground ---
 export const FLAT_GROUND_Y = HILL_END_Y + 20;

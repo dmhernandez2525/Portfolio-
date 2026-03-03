@@ -167,7 +167,7 @@ export function updateCartFlight(
   if (keys.right) {
     next.angularVel += ROTATION_SPEED * 0.3;
   }
-  next.angularVel *= 0.95; // angular damping
+  next.angularVel *= 0.97; // increased damping for weightier feel
   next.angle += next.angularVel;
 
   // Position update
@@ -206,9 +206,9 @@ function handleLanding(cart: CartState, upgrades: PlayerUpgrades): CartState {
   // Bounce
   if (Math.abs(next.vel.y) > MIN_BOUNCE_VEL && next.bounceCount < 3) {
     next.vel.y = -next.vel.y * BOUNCE_COEFFICIENT;
-    next.vel.x *= 0.9;
+    next.vel.x *= 0.7; // lose more horizontal speed on bounce
     next.bounceCount++;
-    next.angularVel *= 0.5;
+    next.angularVel *= 0.4;
     return next;
   }
 
