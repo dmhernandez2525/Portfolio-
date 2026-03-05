@@ -7,7 +7,10 @@ import cesium from "vite-plugin-cesium"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), cesium()],
+  plugins: [react(), tailwindcss(), cesium({
+    cesiumBuildRootPath: path.resolve(__dirname, "../../node_modules/cesium/Build"),
+    cesiumBuildPath: path.resolve(__dirname, "../../node_modules/cesium/Build/Cesium/"),
+  })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

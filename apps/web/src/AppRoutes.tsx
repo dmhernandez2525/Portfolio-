@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, Component, type ReactNode, type ErrorInfo } from "react"
 import { Routes, Route } from "react-router-dom"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 import { usePageAnalytics } from "@/hooks/usePageAnalytics"
@@ -22,6 +22,23 @@ import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLay
 import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import type { GameId } from "@/types/game-stats"
+
+class GlobeErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError(_: Error) {
+    return { hasError: true }
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("GlobeSection failed to render:", error, info)
+  }
+  render() {
+    if (this.state.hasError) return null
+    return this.props.children
+  }
+}
 
 // Lazy-loaded page components
 const BusinessCardPage = lazy(() => import("@/pages/BusinessCardPage").then((m) => ({ default: m.BusinessCardPage })))
@@ -81,7 +98,7 @@ const Home = () => (
       <Testimonials />
       <AIExperience />
       <TechAudit />
-      <GlobeSection />
+      <GlobeErrorBoundary><GlobeSection /></GlobeErrorBoundary>
       <AskAboutMe />
       <Contact />
     </div>
