@@ -30,7 +30,7 @@ export function generateAchievementShareCard(params: {
 
   context.fillStyle = "rgba(255,255,255,0.8)"
   context.font = "24px Georgia"
-  context.fillText("portfolio-site.onrender.com", 48, 430)
+  context.fillText("brainydeveloper.com", 48, 430)
 
   return canvas.toDataURL("image/png")
 }

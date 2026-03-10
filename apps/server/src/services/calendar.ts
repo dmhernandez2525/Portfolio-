@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import { google, type calendar_v3 } from "googleapis"
 import { MEETING_TYPES, type TimeSlot, type BookingRequest } from "../types/booking.js"
 
@@ -184,7 +185,7 @@ export async function createBooking(request: BookingRequest): Promise<{
       attendees: [{ email: request.email, displayName: request.name }],
       conferenceData: {
         createRequest: {
-          requestId: `booking-${Date.now()}`,
+          requestId: randomUUID(),
           conferenceSolutionKey: { type: "hangoutsMeet" },
         },
       },

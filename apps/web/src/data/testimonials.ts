@@ -25,7 +25,7 @@ export const TESTIMONIAL_SOURCE_LABELS: Record<TestimonialSource, string> = {
   direct: "Direct",
 }
 
-export const TESTIMONIAL_REQUEST_FORM_URL = "https://portfolio-site.onrender.com/contact?request=testimonial"
+export const TESTIMONIAL_REQUEST_FORM_URL = "https://brainydeveloper.com/contact?request=testimonial"
 
 export const DEFAULT_TESTIMONIALS: TestimonialRecord[] = [
   seedRecord("tm-1", 0, {

@@ -68,6 +68,6 @@ describe("blog-utils", () => {
     expect(xml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")).toBe(true)
     expect(xml.includes("<rss version=\"2.0\">")).toBe(true)
     expect((xml.match(/<item>/g) ?? []).length).toBe(blogPosts.length)
-    expect(xml.includes("https://portfolio-site.onrender.com/blog?post=building-without-degree")).toBe(true)
+    expect(xml.includes("https://brainydeveloper.com/blog?post=building-without-degree")).toBe(true)
   })
 })

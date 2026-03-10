@@ -212,7 +212,7 @@ export function ContentManagementPanel() {
             <div className="rounded-md border border-border bg-card/40 p-3 text-sm">
               <p className="font-medium">{activePost.seo.ogTitle}</p>
               <p className="text-muted-foreground">{activePost.seo.ogDescription}</p>
-              <p className="mt-2 text-xs text-muted-foreground">Open Graph Preview · portfolio-site.onrender.com/{activePost.slug}</p>
+              <p className="mt-2 text-xs text-muted-foreground">Open Graph Preview · brainydeveloper.com/{activePost.slug}</p>
             </div>
 
             <div className="rounded-md border border-border bg-card/40 p-3">

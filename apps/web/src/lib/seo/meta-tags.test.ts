@@ -3,7 +3,7 @@ import { buildOpenGraphTags, buildTwitterCardTags, getCanonicalUrl, getPageMeta 
 
 describe("getCanonicalUrl", () => {
   it("returns full URL for path", () => {
-    expect(getCanonicalUrl("/projects")).toBe("https://portfolio-site.onrender.com/projects")
+    expect(getCanonicalUrl("/projects")).toBe("https://brainydeveloper.com/projects")
   })
 })
 

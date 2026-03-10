@@ -32,6 +32,8 @@ export function validateQuery(schema: ZodSchema) {
       })
       return
     }
+    // Write validated data back to req.query so downstream handlers get typed values
+    req.query = result.data as typeof req.query
     next()
   }
 }

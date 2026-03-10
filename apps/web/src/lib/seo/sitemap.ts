@@ -1,4 +1,4 @@
-const BASE_URL = "https://portfolio-site.onrender.com"
+const BASE_URL = "https://brainydeveloper.com"
 
 interface SitemapEntry {
   path: string

@@ -9,10 +9,19 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     },
   })
 
-  const data = await res.json()
+  let data: unknown
+  try {
+    data = await res.json()
+  } catch {
+    if (!res.ok) throw new Error(`Request failed with status ${res.status}`)
+    throw new Error("Invalid response from server")
+  }
 
   if (!res.ok) {
-    throw new Error(data.error ?? `Request failed with status ${res.status}`)
+    const message = typeof data === "object" && data !== null && "error" in data
+      ? String((data as { error: unknown }).error)
+      : `Request failed with status ${res.status}`
+    throw new Error(message)
   }
 
   return data as T
