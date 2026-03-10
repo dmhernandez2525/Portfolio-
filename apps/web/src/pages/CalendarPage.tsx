@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Construction } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 import { CalendarProfile } from '@/components/calendar/CalendarProfile'
 import { MeetingTypeSelector } from '@/components/calendar/MeetingTypeSelector'
 import { CalendarDatePicker } from '@/components/calendar/CalendarDatePicker'
@@ -9,12 +8,11 @@ import { BookingSuccess } from '@/components/calendar/BookingSuccess'
 import {
   meetingTypes,
   getVisitorTimezone,
-  generateBookingId,
-  toDateString,
   type MeetingType,
   type BookingFormData,
   type BookingConfirmation,
 } from '@/data/calendar'
+import { api } from '@/lib/api'
 
 type BookingStep = 'select-meeting' | 'select-date' | 'confirm-booking' | 'success'
 
@@ -24,43 +22,66 @@ export function CalendarPage() {
   const [step, setStep] = useState<BookingStep>('select-meeting')
   const [selectedMeeting, setSelectedMeeting] = useState<MeetingType | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedTime, setSelectedTime] = useState('')
   const [selectedTimeLabel, setSelectedTimeLabel] = useState('')
   const [booking, setBooking] = useState<BookingConfirmation | null>(null)
+  const [bookingError, setBookingError] = useState<string | null>(null)
 
   function handleMeetingSelect(meeting: MeetingType) {
     setSelectedMeeting(meeting)
     setStep('select-date')
   }
 
-  function handleTimeSelect(date: Date, _timeRaw: string, timeLabel: string) {
+  function handleTimeSelect(date: Date, timeRaw: string, timeLabel: string) {
     setSelectedDate(date)
+    setSelectedTime(timeRaw)
     setSelectedTimeLabel(timeLabel)
     setStep('confirm-booking')
   }
 
-  function handleBookingSubmit(data: BookingFormData) {
+  async function handleBookingSubmit(data: BookingFormData) {
     if (!selectedMeeting || !selectedDate) return
 
-    const confirmation: BookingConfirmation = {
-      id: generateBookingId(),
-      meetingType: selectedMeeting,
-      date: toDateString(selectedDate),
-      timeLabel: selectedTimeLabel,
-      timezone,
-      guestName: data.name,
-      guestEmail: data.email,
-    }
+    setBookingError(null)
 
-    setBooking(confirmation)
-    setStep('success')
+    try {
+      const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+
+      const result = await api.createBooking({
+        meetingTypeId: selectedMeeting.id,
+        date: dateStr,
+        startTime: selectedTime,
+        timezone,
+        name: data.name,
+        email: data.email,
+        message: data.message,
+      })
+
+      const confirmation: BookingConfirmation = {
+        id: result.bookingId,
+        meetingType: selectedMeeting,
+        date: dateStr,
+        timeLabel: selectedTimeLabel,
+        timezone,
+        guestName: data.name,
+        guestEmail: data.email,
+      }
+
+      setBooking(confirmation)
+      setStep('success')
+    } catch (err) {
+      setBookingError(err instanceof Error ? err.message : 'Booking failed. Please try again.')
+    }
   }
 
   function handleBookAnother() {
     setStep('select-meeting')
     setSelectedMeeting(null)
     setSelectedDate(null)
+    setSelectedTime('')
     setSelectedTimeLabel('')
     setBooking(null)
+    setBookingError(null)
   }
 
   function handleBackToMeetings() {
@@ -70,22 +91,11 @@ export function CalendarPage() {
 
   function handleBackToDate() {
     setStep('select-date')
+    setBookingError(null)
   }
 
   return (
     <div className="min-h-screen bg-[#0a1214] text-white">
-      {/* Development banner */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-amber-900/30 border-b border-amber-700/40 px-4 py-2.5 text-center"
-      >
-        <p className="text-sm text-amber-300 flex items-center justify-center gap-2">
-          <Construction className="w-4 h-4" />
-          Under Development — Booking is simulated and not yet connected to a real calendar.
-        </p>
-      </motion.div>
-
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-12">
           {/* Profile sidebar */}
@@ -95,6 +105,12 @@ export function CalendarPage() {
 
           {/* Booking flow */}
           <div className="min-w-0">
+            {bookingError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-900/20 border border-red-700/40 text-sm text-red-300">
+                {bookingError}
+              </div>
+            )}
+
             <AnimatePresence mode="wait">
               {step === 'select-meeting' && (
                 <MeetingTypeSelector

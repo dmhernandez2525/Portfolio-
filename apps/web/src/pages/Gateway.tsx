@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3,
   CalendarDays, Search, Sun, Moon, HelpCircle, ArrowRight, ArrowLeft,
-  X, LayoutGrid,
+  X, LayoutGrid, FolderKanban,
 } from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 import { useTheme } from "@/components/providers/ThemeProvider"
@@ -75,12 +75,20 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
   {
     key: "calendar",
     title: "Book a Meeting",
-    description: "Schedule time with me. This feature is currently under development.",
+    description: "Schedule time with me directly. Pick a meeting type, choose a date, and book.",
     icon: CalendarDays,
     accent: "from-teal-400 to-cyan-500",
     bg: "hover:border-teal-400/50",
-    preview: "Coming Soon",
-    comingSoon: true,
+    preview: "Schedule & connect",
+  },
+  {
+    key: "projects",
+    title: "Projects",
+    description: "Browse all projects with filtering by tier, category, and status. Live demos included.",
+    icon: FolderKanban,
+    accent: "from-violet-400 to-purple-500",
+    bg: "hover:border-violet-400/50",
+    preview: "Full portfolio gallery",
   },
 ]
 
@@ -105,6 +113,7 @@ const wizardSteps: Record<string, WizardStep> = {
     options: [
       { label: "A clean summary of skills and experience", next: null, mode: "resume", reason: "Resume mode shows my professional background, skills, and project history in a clean, scannable format." },
       { label: "Hard data: project metrics, tech stack coverage, code stats", next: null, mode: "dashboard", reason: "Dashboard mode displays career analytics, skills radar charts, and real project metrics so you can evaluate with data." },
+      { label: "Browse all my projects with live demos", next: null, mode: "projects", reason: "Projects mode lets you filter and explore every project by tier, category, and tech stack, with live demo links where available." },
       { label: "I want to see the actual work and how it's built", next: null, mode: "creative", reason: "Creative mode is the full portfolio with project deep-dives, live demos, and the complete story behind each build." },
       { label: "I'd rather browse it like source code", next: null, mode: "techie", reason: "Techie mode presents my portfolio as a VS Code-style IDE where you can browse files, run terminal commands, and explore like a codebase." },
     ],
@@ -114,6 +123,7 @@ const wizardSteps: Record<string, WizardStep> = {
     options: [
       { label: "A free technology audit for my business", next: null, mode: "consulting", reason: "Consulting mode has my service offerings and a booking form for a free, no-obligation technology audit." },
       { label: "Custom development, automation, or AI integration", next: null, mode: "consulting", reason: "Consulting mode outlines all my services: custom development, process automation, and AI integration. You can book a free intro session there." },
+      { label: "I just want to book a meeting directly", next: null, mode: "calendar", reason: "Calendar mode lets you pick a meeting type, choose an available time slot, and book directly on my calendar." },
       { label: "I want to see your credentials and background first", next: null, mode: "resume", reason: "Resume mode gives you a professional overview of my skills, experience, and past projects before you commit to anything." },
     ],
   },
