@@ -23,7 +23,7 @@ export function GlobeSection() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="w-full h-[600px]"
+                    className="w-full h-[350px] md:h-[450px] lg:h-[600px]"
                 >
                     <HolographicGlobe />
                 </motion.div>

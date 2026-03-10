@@ -310,7 +310,7 @@ function ContactContent() {
       <div className="mt-4 space-y-2">
         <div className="text-sm">
           <span className="text-[#569cd6]">EMAIL</span><span className="text-[#d4d4d4]">=</span>
-          <a href="mailto:daniel@interestingandbeyond.com" className="text-[#ce9178] hover:underline">"daniel@interestingandbeyond.com"</a>
+          <a href="mailto:danher2525@gmail.com" className="text-[#ce9178] hover:underline">"danher2525@gmail.com"</a>
         </div>
         <div className="text-sm">
           <span className="text-[#569cd6]">GITHUB</span><span className="text-[#d4d4d4]">=</span>

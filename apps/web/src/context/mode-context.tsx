@@ -33,6 +33,7 @@ export function ModeProvider({ children }: ModeProviderProps) {
   const setMode = useCallback((newMode: PortfolioMode) => {
     setModeState(newMode)
     localStorage.setItem(STORAGE_KEY, newMode)
+    window.scrollTo(0, 0)
   }, [])
 
   const clearMode = useCallback(() => {

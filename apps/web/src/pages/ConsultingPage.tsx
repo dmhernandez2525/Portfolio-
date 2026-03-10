@@ -13,12 +13,13 @@ import {
   ArrowRight,
   Download,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { useMode } from "@/context/mode-context"
 
 const socials = [
   { icon: Github, href: "https://github.com/dmhernandez2525", label: "GitHub" },
   { icon: Linkedin, href: "https://linkedin.com/in/dh25", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:daniel@interestingandbeyond.com", label: "Email" },
+  { icon: Mail, href: "mailto:danher2525@gmail.com", label: "Email" },
 ]
 
 const auditHighlights = [
@@ -69,6 +70,7 @@ const itemVariants = {
 
 export function ConsultingPage() {
   const { clearMode } = useMode()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-[#0a1214] text-gray-100">
@@ -157,20 +159,16 @@ export function ConsultingPage() {
               ))}
             </div>
 
-            <a
-              href="/tech-audit"
-              onClick={(e) => {
-                e.preventDefault()
+            <button
+              onClick={() => {
                 clearMode()
-                setTimeout(() => {
-                  window.location.href = "/tech-audit"
-                }, 100)
+                navigate("/tech-audit")
               }}
               className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors"
             >
               Book Your Free Audit
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </button>
           </div>
         </motion.div>
 

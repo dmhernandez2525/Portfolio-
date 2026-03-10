@@ -95,7 +95,7 @@ export function Contact() {
       // Fallback: open mailto link
       const subject = encodeURIComponent(`Website Inbox: Message from ${data.name}`)
       const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)
-      window.location.href = `mailto:Danher2525@Gmail.com?subject=${subject}&body=${body}`
+      window.location.href = `mailto:danher2525@gmail.com?subject=${subject}&body=${body}`
       setIsSubmitting(false)
       setIsSuccess(true)
       trackGoal("/contact", "contact_submission")
