@@ -68,7 +68,7 @@ export function HeadTags() {
       url: "https://portfolio-site.onrender.com",
       sameAs: [
         "https://github.com/dmhernandez2525",
-        "https://linkedin.com/in/dh25",
+        "https://www.linkedin.com/in/dh25/",
       ],
     }))
 

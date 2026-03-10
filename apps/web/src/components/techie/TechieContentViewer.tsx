@@ -318,7 +318,7 @@ function ContactContent() {
         </div>
         <div className="text-sm">
           <span className="text-[#569cd6]">LINKEDIN</span><span className="text-[#d4d4d4]">=</span>
-          <a href="https://linkedin.com/in/dh25" target="_blank" rel="noopener noreferrer" className="text-[#ce9178] hover:underline">"https://linkedin.com/in/dh25"</a>
+          <a href="https://www.linkedin.com/in/dh25/" target="_blank" rel="noopener noreferrer" className="text-[#ce9178] hover:underline">"https://www.linkedin.com/in/dh25/"</a>
         </div>
       </div>
       <div className="mt-6 bg-[#1a1a1a] p-3 text-xs space-y-1">

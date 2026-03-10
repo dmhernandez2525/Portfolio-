@@ -1,6 +1,10 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3, CalendarDays, Search, Sun, Moon, HelpCircle, ArrowRight, X } from "lucide-react"
+import {
+  CreditCard, FileText, Sparkles, Terminal, Monitor, BarChart3,
+  CalendarDays, Search, Sun, Moon, HelpCircle, ArrowRight, ArrowLeft,
+  X, LayoutGrid,
+} from "lucide-react"
 import { useMode, type PortfolioMode } from "@/context/mode-context"
 import { useTheme } from "@/components/providers/ThemeProvider"
 
@@ -80,26 +84,57 @@ const modes: { key: PortfolioMode; title: string; description: string; icon: typ
   },
 ]
 
-type WizardAnswer = "hire" | "services" | "explore" | "data" | null
+// Multi-step wizard with branching paths to ALL modes
+type WizardStep = {
+  question: string
+  options: { label: string; next: string | null; mode?: PortfolioMode; reason?: string }[]
+}
 
-const wizardQuestions: { question: string; options: { label: string; value: WizardAnswer }[] }[] = [
-  {
+const wizardSteps: Record<string, WizardStep> = {
+  start: {
     question: "What brings you here today?",
     options: [
-      { label: "I'm looking to hire a developer", value: "hire" },
-      { label: "I need technology consulting or a free tech audit", value: "services" },
-      { label: "I just want to explore and see cool stuff", value: "explore" },
-      { label: "I want to see skills and project data", value: "data" },
+      { label: "I'm looking to hire or evaluate a developer", next: "hire" },
+      { label: "I need help with my business technology", next: "business" },
+      { label: "I want to explore and have fun", next: "explore" },
+      { label: "Just give me the quick version", next: null, mode: "business-card", reason: "Business Card mode gives you the essentials: name, links, and a quick intro. Nothing more, nothing less." },
     ],
   },
-]
-
-const wizardResults: Record<NonNullable<WizardAnswer>, { mode: PortfolioMode; reason: string }> = {
-  hire: { mode: "resume", reason: "Resume mode gives you a clean overview of my skills, experience, and projects." },
-  services: { mode: "consulting", reason: "Consulting mode has my service offerings and a free tech audit booking form." },
-  explore: { mode: "creative", reason: "Creative mode is the full interactive experience with animations, games, and easter eggs." },
-  data: { mode: "dashboard", reason: "Dashboard mode shows career analytics, skills radar, and project metrics." },
+  hire: {
+    question: "What would be most useful for your evaluation?",
+    options: [
+      { label: "A clean summary of skills and experience", next: null, mode: "resume", reason: "Resume mode shows my professional background, skills, and project history in a clean, scannable format." },
+      { label: "Hard data: project metrics, tech stack coverage, code stats", next: null, mode: "dashboard", reason: "Dashboard mode displays career analytics, skills radar charts, and real project metrics so you can evaluate with data." },
+      { label: "I want to see the actual work and how it's built", next: null, mode: "creative", reason: "Creative mode is the full portfolio with project deep-dives, live demos, and the complete story behind each build." },
+      { label: "I'd rather browse it like source code", next: null, mode: "techie", reason: "Techie mode presents my portfolio as a VS Code-style IDE where you can browse files, run terminal commands, and explore like a codebase." },
+    ],
+  },
+  business: {
+    question: "What kind of help are you looking for?",
+    options: [
+      { label: "A free technology audit for my business", next: null, mode: "consulting", reason: "Consulting mode has my service offerings and a booking form for a free, no-obligation technology audit." },
+      { label: "Custom development, automation, or AI integration", next: null, mode: "consulting", reason: "Consulting mode outlines all my services: custom development, process automation, and AI integration. You can book a free intro session there." },
+      { label: "I want to see your credentials and background first", next: null, mode: "resume", reason: "Resume mode gives you a professional overview of my skills, experience, and past projects before you commit to anything." },
+    ],
+  },
+  explore: {
+    question: "What's your vibe?",
+    options: [
+      { label: "Give me the full experience with all the bells and whistles", next: null, mode: "creative", reason: "Creative mode has everything: animations, a 3D globe, 16+ playable games, easter eggs, and a voice assistant. It's the showcase." },
+      { label: "I like terminals and hacker aesthetics", next: "terminal" },
+      { label: "Show me charts and data visualizations", next: null, mode: "dashboard", reason: "Dashboard mode is built around data viz: skills radar, project timelines, technology breakdowns, and career analytics." },
+    ],
+  },
+  terminal: {
+    question: "Pick your flavor:",
+    options: [
+      { label: "Modern VS Code / IDE style", next: null, mode: "techie", reason: "Techie mode looks like VS Code. File tree on the left, tabs across the top, integrated terminal at the bottom. Browse my portfolio like a codebase." },
+      { label: "Old-school green phosphor CRT", next: null, mode: "retro", reason: "Retro Terminal mode is a vintage CRT simulation with green text, scanlines, and command-line navigation. Type 'help' to get started." },
+    ],
+  },
 }
+
+const FIRST_VISIT_KEY = "portfolio-first-visit-seen"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -118,7 +153,23 @@ export function Gateway() {
   const { setMode } = useMode()
   const { theme, setTheme } = useTheme()
   const [showWizard, setShowWizard] = useState(false)
-  const [wizardResult, setWizardResult] = useState<WizardAnswer>(null)
+  const [wizardStepKey, setWizardStepKey] = useState("start")
+  const [wizardHistory, setWizardHistory] = useState<string[]>([])
+  const [wizardResult, setWizardResult] = useState<{ mode: PortfolioMode; reason: string } | null>(null)
+  const [showFirstVisit, setShowFirstVisit] = useState(false)
+
+  useEffect(() => {
+    const seen = localStorage.getItem(FIRST_VISIT_KEY)
+    if (!seen) {
+      const timer = setTimeout(() => setShowFirstVisit(true), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const dismissFirstVisit = useCallback(() => {
+    setShowFirstVisit(false)
+    localStorage.setItem(FIRST_VISIT_KEY, "true")
+  }, [])
 
   const effectiveTheme = theme === "system"
     ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
@@ -128,16 +179,51 @@ export function Gateway() {
     setTheme(effectiveTheme === "dark" ? "light" : "dark")
   }, [effectiveTheme, setTheme])
 
-  const handleWizardAnswer = useCallback((answer: WizardAnswer) => {
-    setWizardResult(answer)
+  const openWizard = useCallback(() => {
+    setWizardStepKey("start")
+    setWizardHistory([])
+    setWizardResult(null)
+    setShowWizard(true)
   }, [])
+
+  const closeWizard = useCallback(() => {
+    setShowWizard(false)
+    setWizardResult(null)
+    setWizardHistory([])
+    setWizardStepKey("start")
+  }, [])
+
+  const handleWizardOption = useCallback((opt: { next: string | null; mode?: PortfolioMode; reason?: string }) => {
+    if (opt.mode && opt.reason) {
+      setWizardResult({ mode: opt.mode, reason: opt.reason })
+    } else if (opt.next) {
+      setWizardHistory(prev => [...prev, wizardStepKey])
+      setWizardStepKey(opt.next)
+    }
+  }, [wizardStepKey])
+
+  const handleWizardBack = useCallback(() => {
+    if (wizardResult) {
+      setWizardResult(null)
+      return
+    }
+    const prev = [...wizardHistory]
+    const lastStep = prev.pop()
+    if (lastStep) {
+      setWizardHistory(prev)
+      setWizardStepKey(lastStep)
+    }
+  }, [wizardResult, wizardHistory])
 
   const handleWizardSelect = useCallback(() => {
     if (wizardResult) {
       setShowWizard(false)
-      setMode(wizardResults[wizardResult].mode)
+      setMode(wizardResult.mode)
     }
   }, [wizardResult, setMode])
+
+  const currentStep = wizardSteps[wizardStepKey]
+  const canGoBack = wizardResult || wizardHistory.length > 0
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12 relative">
@@ -176,7 +262,7 @@ export function Gateway() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          onClick={() => setShowWizard(true)}
+          onClick={openWizard}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg border border-blue-400/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:border-blue-400/50 transition-colors"
         >
           <HelpCircle className="h-4 w-4" />
@@ -233,6 +319,46 @@ export function Gateway() {
         You can switch modes anytime using the button in the corner
       </motion.p>
 
+      {/* First-visit tooltip */}
+      <AnimatePresence>
+        {showFirstVisit && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="fixed bottom-20 left-4 sm:bottom-10 sm:left-10 z-50 max-w-xs"
+          >
+            <div className="relative rounded-xl border border-border bg-card p-4 shadow-2xl">
+              <button
+                onClick={dismissFirstVisit}
+                className="absolute top-2 right-2 p-1 rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="flex items-start gap-3 pr-4">
+                <div className="flex-shrink-0 p-2 rounded-lg bg-blue-500/10 border border-blue-400/20">
+                  <LayoutGrid className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-1">Tip: You can always come back here</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    After picking a mode, look for the <strong>Switch Mode</strong> button in the
+                    bottom-left corner to return to this page and try a different view.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={dismissFirstVisit}
+                className="mt-3 w-full text-center text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Got it
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Wizard modal */}
       <AnimatePresence>
         {showWizard && (
@@ -241,7 +367,7 @@ export function Gateway() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-            onClick={(e) => { if (e.target === e.currentTarget) { setShowWizard(false); setWizardResult(null) } }}
+            onClick={(e) => { if (e.target === e.currentTarget) closeWizard() }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -250,7 +376,7 @@ export function Gateway() {
               className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
             >
               <button
-                onClick={() => { setShowWizard(false); setWizardResult(null) }}
+                onClick={closeWizard}
                 className="absolute top-4 right-4 p-1 rounded-full text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Close"
               >
@@ -259,13 +385,21 @@ export function Gateway() {
 
               {!wizardResult ? (
                 <>
-                  <h3 className="text-lg font-semibold mb-1">{wizardQuestions[0].question}</h3>
+                  {canGoBack && (
+                    <button
+                      onClick={handleWizardBack}
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-3"
+                    >
+                      <ArrowLeft className="h-3 w-3" /> Back
+                    </button>
+                  )}
+                  <h3 className="text-lg font-semibold mb-1">{currentStep.question}</h3>
                   <p className="text-sm text-muted-foreground mb-5">Pick the option that best describes you.</p>
                   <div className="space-y-3">
-                    {wizardQuestions[0].options.map((opt) => (
+                    {currentStep.options.map((opt, i) => (
                       <button
-                        key={opt.value}
-                        onClick={() => handleWizardAnswer(opt.value)}
+                        key={i}
+                        onClick={() => handleWizardOption(opt)}
                         className="w-full text-left px-4 py-3 rounded-xl border border-border/50 hover:border-blue-400/50 hover:bg-blue-500/5 text-sm transition-colors"
                       >
                         {opt.label}
@@ -275,18 +409,24 @@ export function Gateway() {
                 </>
               ) : (
                 <>
+                  <button
+                    onClick={handleWizardBack}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-3"
+                  >
+                    <ArrowLeft className="h-3 w-3" /> Back
+                  </button>
                   <h3 className="text-lg font-semibold mb-2">
-                    I'd recommend: {modes.find(m => m.key === wizardResults[wizardResult].mode)?.title}
+                    I'd recommend: {modes.find(m => m.key === wizardResult.mode)?.title}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-6">
-                    {wizardResults[wizardResult].reason}
+                    {wizardResult.reason}
                   </p>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => setWizardResult(null)}
+                      onClick={() => { setWizardResult(null); setWizardStepKey("start"); setWizardHistory([]) }}
                       className="flex-1 px-4 py-2.5 rounded-lg border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
                     >
-                      Pick again
+                      Start over
                     </button>
                     <button
                       onClick={handleWizardSelect}

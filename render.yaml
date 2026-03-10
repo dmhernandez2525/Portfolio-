@@ -3,7 +3,7 @@ services:
     name: portfolio-site
     runtime: static
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
+    staticPublishPath: ./apps/web/dist
     envVars:
       - key: NODE_VERSION
         value: "20"

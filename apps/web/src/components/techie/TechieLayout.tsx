@@ -116,7 +116,7 @@ export function TechieLayout() {
     if (contentKey.startsWith("link-")) {
       const urls: Record<string, string> = {
         "link-github": "https://github.com/dmhernandez2525",
-        "link-linkedin": "https://linkedin.com/in/dh25",
+        "link-linkedin": "https://www.linkedin.com/in/dh25/",
       }
       const url = urls[contentKey]
       if (url) window.open(url, "_blank")
