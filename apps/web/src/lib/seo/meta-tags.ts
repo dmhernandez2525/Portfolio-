@@ -6,7 +6,7 @@ export interface MetaTagConfig {
   type?: string
 }
 
-const BASE_URL = "https://portfolio-site.onrender.com"
+const BASE_URL = "https://brainydeveloper.com"
 const SITE_NAME = "Daniel Hernandez Portfolio"
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`
 

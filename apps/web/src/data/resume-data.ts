@@ -6,7 +6,7 @@ export const RESUME_PROFILE: ResumeProfile = {
   email: "danher2525@gmail.com",
   githubUrl: "https://github.com/dmhernandez2525",
   linkedinUrl: "https://www.linkedin.com/in/dh25/",
-  portfolioUrl: "https://portfolio-site.onrender.com",
+  portfolioUrl: "https://brainydeveloper.com",
 }
 
 export const RESUME_SECTION_ORDER: ResumeSectionKey[] = [

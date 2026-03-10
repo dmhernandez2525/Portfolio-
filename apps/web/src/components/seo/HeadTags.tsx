@@ -65,7 +65,7 @@ export function HeadTags() {
     setJsonLd("jsonld-person", buildPersonJsonLd({
       name: "Daniel Hernandez",
       jobTitle: "Full-Stack Developer",
-      url: "https://portfolio-site.onrender.com",
+      url: "https://brainydeveloper.com",
       sameAs: [
         "https://github.com/dmhernandez2525",
         "https://www.linkedin.com/in/dh25/",
@@ -74,7 +74,7 @@ export function HeadTags() {
 
     setJsonLd("jsonld-website", buildWebSiteJsonLd(
       "Daniel Hernandez Portfolio",
-      "https://portfolio-site.onrender.com",
+      "https://brainydeveloper.com",
     ))
   }, [location.pathname])
 

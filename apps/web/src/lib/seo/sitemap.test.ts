@@ -6,8 +6,8 @@ describe("generateSitemapXml", () => {
     const xml = generateSitemapXml()
     expect(xml).toContain('<?xml version="1.0"')
     expect(xml).toContain("<urlset")
-    expect(xml).toContain("<loc>https://portfolio-site.onrender.com/</loc>")
-    expect(xml).toContain("<loc>https://portfolio-site.onrender.com/projects</loc>")
+    expect(xml).toContain("<loc>https://brainydeveloper.com/</loc>")
+    expect(xml).toContain("<loc>https://brainydeveloper.com/projects</loc>")
   })
 
   it("includes project slugs when provided", () => {
