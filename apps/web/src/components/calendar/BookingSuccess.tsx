@@ -29,7 +29,7 @@ export function BookingSuccess({ booking, onBookAnother }: BookingSuccessProps) 
 
       <h3 className="text-xl font-bold text-white mb-1">Meeting Booked!</h3>
       <p className="text-sm text-[#6b8a8e] mb-6">
-        A confirmation would be sent to {booking.guestEmail}
+        A calendar invite has been sent to {booking.guestEmail}
       </p>
 
       {/* Booking details card */}

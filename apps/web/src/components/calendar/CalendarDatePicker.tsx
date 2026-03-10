@@ -1,20 +1,20 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Globe, ArrowLeft, Clock } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Globe, ArrowLeft, Clock, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
-  generateAvailableSlots,
   getMonthGrid,
   isWeekday,
   isPast,
   isSameDay,
   isMonthInRange,
   formatDate,
+  toDateString,
   MONTH_NAMES,
   DAY_HEADERS,
   type MeetingType,
-  type TimeSlot,
 } from '@/data/calendar'
+import { api, type ApiTimeSlot } from '@/lib/api'
 
 interface CalendarDatePickerProps {
   meeting: MeetingType
@@ -28,15 +28,39 @@ export function CalendarDatePicker({ meeting, timezone, onTimeSelect, onBack }: 
   const [viewYear, setViewYear] = useState(now.getFullYear())
   const [viewMonth, setViewMonth] = useState(now.getMonth())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [slots, setSlots] = useState<ApiTimeSlot[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const grid = useMemo(() => getMonthGrid(viewYear, viewMonth), [viewYear, viewMonth])
 
-  const slots = useMemo<TimeSlot[]>(() => {
-    if (!selectedDate) return []
-    return generateAvailableSlots(selectedDate, meeting.duration, timezone)
-  }, [selectedDate, meeting.duration, timezone])
-
   const availableSlots = useMemo(() => slots.filter(s => s.available), [slots])
+
+  // Fetch availability when a date is selected
+  useEffect(() => {
+    if (!selectedDate) {
+      setSlots([])
+      return
+    }
+
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+
+    api
+      .getAvailability(toDateString(selectedDate), meeting.id, timezone)
+      .then((res) => {
+        if (!cancelled) setSlots(res.slots)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load availability")
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [selectedDate, meeting.id, timezone])
 
   const canGoBack = isMonthInRange(
     viewMonth === 0 ? viewYear - 1 : viewYear,
@@ -66,10 +90,9 @@ export function CalendarDatePicker({ meeting, timezone, onTimeSelect, onBack }: 
     setSelectedDate(date)
   }
 
-  function handleTimeClick(slot: TimeSlot) {
+  function handleTimeClick(slot: ApiTimeSlot) {
     if (!selectedDate || !slot.available) return
-    const timeStr = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`
-    onTimeSelect(selectedDate, timeStr, slot.label)
+    onTimeSelect(selectedDate, slot.startTime, slot.label)
   }
 
   return (
@@ -182,13 +205,20 @@ export function CalendarDatePicker({ meeting, timezone, onTimeSelect, onBack }: 
                   <span>{timezone}</span>
                 </div>
 
-                {availableSlots.length === 0 ? (
+                {loading ? (
+                  <div className="flex items-center gap-2 text-sm text-[#6b8a8e]">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading times...
+                  </div>
+                ) : error ? (
+                  <p className="text-sm text-red-400">{error}</p>
+                ) : availableSlots.length === 0 ? (
                   <p className="text-sm text-[#6b8a8e]">No available slots for this date.</p>
                 ) : (
                   <div className="flex flex-col gap-1.5 max-h-[320px] overflow-y-auto pr-1">
                     {availableSlots.map((slot) => (
                       <Button
-                        key={`${slot.hour}-${slot.minute}`}
+                        key={slot.startTime}
                         variant="outline"
                         size="sm"
                         onClick={() => handleTimeClick(slot)}

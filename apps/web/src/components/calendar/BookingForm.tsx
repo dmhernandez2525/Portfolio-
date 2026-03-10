@@ -22,7 +22,7 @@ interface BookingFormProps {
   date: Date
   timeLabel: string
   timezone: string
-  onSubmit: (data: BookingFormData) => void
+  onSubmit: (data: BookingFormData) => void | Promise<void>
   onBack: () => void
 }
 
@@ -39,9 +39,11 @@ export function BookingForm({ meeting, date, timeLabel, timezone, onSubmit, onBa
 
   async function handleFormSubmit(data: BookingFormData) {
     setIsSubmitting(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    onSubmit(data)
+    try {
+      await onSubmit(data)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

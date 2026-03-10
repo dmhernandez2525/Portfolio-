@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 
-export type PortfolioMode = 'business-card' | 'resume' | 'creative' | 'techie' | 'retro' | 'dashboard' | 'calendar' | 'consulting'
+export type PortfolioMode = 'business-card' | 'resume' | 'creative' | 'techie' | 'retro' | 'dashboard' | 'calendar' | 'consulting' | 'projects'
 
 const STORAGE_KEY = 'portfolio-mode'
 
@@ -14,7 +14,7 @@ interface ModeContextType {
 const ModeContext = createContext<ModeContextType | null>(null)
 
 const VALID_MODES = new Set<PortfolioMode>([
-  'business-card', 'resume', 'creative', 'techie', 'retro', 'dashboard', 'calendar', 'consulting'
+  'business-card', 'resume', 'creative', 'techie', 'retro', 'dashboard', 'calendar', 'consulting', 'projects'
 ])
 
 function getStoredMode(): PortfolioMode | null {

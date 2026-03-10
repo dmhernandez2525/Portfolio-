@@ -165,6 +165,18 @@ const MODE_COMPONENTS: Partial<Record<PortfolioMode, React.LazyExoticComponent<R
   "consulting": ConsultingPage,
 }
 
+function ProjectsRoutes() {
+  return (
+    <Routes>
+      <Route element={<RootLayout />}>
+        <Route path="/" element={<LazyPage><ProjectsPage /></LazyPage>} />
+        <Route path="/projects/:slug" element={<LazyPage><ProjectDetailPage /></LazyPage>} />
+        <Route path="*" element={<LazyPage><ProjectsPage /></LazyPage>} />
+      </Route>
+    </Routes>
+  )
+}
+
 export function AppRoutes() {
   usePageAnalytics()
   const { mode } = useMode()
@@ -188,6 +200,11 @@ export function AppRoutes() {
   // Creative mode has nested sub-routes
   if (mode === "creative") {
     return withEasterEggPanel(<CreativeRoutes />)
+  }
+
+  // Projects mode has its own routes for detail pages
+  if (mode === "projects") {
+    return withEasterEggPanel(<ProjectsRoutes />)
   }
 
   const LazyModeComponent = MODE_COMPONENTS[mode]
