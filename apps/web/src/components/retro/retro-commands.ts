@@ -118,7 +118,7 @@ function handleContact(_args: string[], ctx: RetroContext) {
     { text: "" },
     { text: "  EMAIL     danher2525@gmail.com", color: "cyan" },
     { text: "  GITHUB    github.com/dmhernandez2525" },
-    { text: "  LINKEDIN  linkedin.com/in/dh25" },
+    { text: "  LINKEDIN  www.linkedin.com/in/dh25" },
     { text: "" },
     { text: '  $ echo "Let\'s build something" | mail daniel', color: "dim" },
     { text: "" },

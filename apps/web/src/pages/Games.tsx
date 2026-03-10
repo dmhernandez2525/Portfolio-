@@ -321,7 +321,7 @@ export function Games() {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground">Playing locally — full account system coming soon</span>
+                  <span className="text-[10px] text-muted-foreground">Playing locally</span>
                   <Button variant="outline" size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
                     Switch
                   </Button>
@@ -335,7 +335,7 @@ export function Games() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="w-4 h-4" />
                   <span>Create a profile to save your game progress</span>
-                  <span className="text-[10px] text-muted-foreground ml-1">— cloud sync coming soon</span>
+                  <span className="text-[10px] text-muted-foreground ml-1">— saved locally</span>
                 </div>
                 <Button size="sm" onClick={() => setShowProfileSelector(true)} className="text-xs h-7">
                   Create Profile

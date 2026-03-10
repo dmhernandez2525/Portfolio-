@@ -5,7 +5,7 @@ export const RESUME_PROFILE: ResumeProfile = {
   title: "Senior Software Engineer",
   email: "danher2525@gmail.com",
   githubUrl: "https://github.com/dmhernandez2525",
-  linkedinUrl: "https://linkedin.com/in/dh25",
+  linkedinUrl: "https://www.linkedin.com/in/dh25/",
   portfolioUrl: "https://portfolio-site.onrender.com",
 }
 
