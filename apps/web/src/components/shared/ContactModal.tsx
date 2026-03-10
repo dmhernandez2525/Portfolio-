@@ -72,6 +72,9 @@ const createConfetti = () => {
   setTimeout(() => container.remove(), 5000)
 }
 
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit"
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || ""
+
 export function ContactModal({ trigger, children }: ContactModalProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -93,24 +96,48 @@ export function ContactModal({ trigger, children }: ContactModalProps) {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    console.log(data)
+
+    if (!WEB3FORMS_ACCESS_KEY) {
+      const subject = encodeURIComponent(`Portfolio Contact: Message from ${data.name}`)
+      const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)
+      window.location.href = `mailto:danher2525@gmail.com?subject=${subject}&body=${body}`
+      setIsSubmitting(false)
+      setIsSuccess(true)
+      reset()
+      setTimeout(() => { setIsSuccess(false); setOpen(false) }, 3000)
+      return
+    }
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `Portfolio Contact: Message from ${data.name}`,
+          from_name: data.name,
+          email: data.email,
+          replyto: data.email,
+          message: data.message,
+        }),
+      })
+      const result = await response.json()
+      if (!result.success) throw new Error(result.message || "Failed to send")
+    } catch {
+      const subject = encodeURIComponent(`Portfolio Contact: Message from ${data.name}`)
+      const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)
+      window.location.href = `mailto:danher2525@gmail.com?subject=${subject}&body=${body}`
+    }
+
     setIsSubmitting(false)
     setIsSuccess(true)
 
-    // Easter egg: confetti for hire-related messages
     if (checkForHireKeywords(data.message)) {
       createConfetti()
     }
 
     reset()
-
-    // Close modal after showing success
-    setTimeout(() => {
-      setIsSuccess(false)
-      setOpen(false)
-    }, 3000)
+    setTimeout(() => { setIsSuccess(false); setOpen(false) }, 3000)
   }
 
   return (

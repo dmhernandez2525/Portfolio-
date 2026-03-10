@@ -3,7 +3,7 @@ import type { ResumePreset, ResumeProfile, ResumeSectionKey, ResumeVersion } fro
 export const RESUME_PROFILE: ResumeProfile = {
   name: "Daniel Hernandez",
   title: "Senior Software Engineer",
-  email: "daniel@interestingandbeyond.com",
+  email: "danher2525@gmail.com",
   githubUrl: "https://github.com/dmhernandez2525",
   linkedinUrl: "https://linkedin.com/in/dh25",
   portfolioUrl: "https://portfolio-site.onrender.com",

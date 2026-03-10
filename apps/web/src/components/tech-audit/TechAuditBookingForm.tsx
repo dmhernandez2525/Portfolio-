@@ -55,7 +55,7 @@ export function TechAuditBookingForm() {
     if (!WEB3FORMS_ACCESS_KEY) {
       const subject = encodeURIComponent(`Tech Audit Request: ${data.businessName} (${data.name})`)
       const body = encodeURIComponent(messageBody)
-      window.location.href = `mailto:Danher2525@Gmail.com?subject=${subject}&body=${body}`
+      window.location.href = `mailto:danher2525@gmail.com?subject=${subject}&body=${body}`
       setIsSubmitting(false)
       setIsSuccess(true)
       reset()

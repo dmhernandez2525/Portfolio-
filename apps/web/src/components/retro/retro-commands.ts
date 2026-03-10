@@ -116,7 +116,7 @@ function handleContact(_args: string[], ctx: RetroContext) {
     { text: "Contact Information", color: "bright" },
     { text: "=" .repeat(50), color: "dim" },
     { text: "" },
-    { text: "  EMAIL     daniel@interestingandbeyond.com", color: "cyan" },
+    { text: "  EMAIL     danher2525@gmail.com", color: "cyan" },
     { text: "  GITHUB    github.com/dmhernandez2525" },
     { text: "  LINKEDIN  linkedin.com/in/dh25" },
     { text: "" },
@@ -156,7 +156,7 @@ function handleSudo(args: string[], ctx: RetroContext) {
     ctx.addLines([
       { text: "" },
       { text: "ACCESS GRANTED", color: "bright" },
-      { text: "Sending offer letter to daniel@interestingandbeyond.com...", color: "cyan" },
+      { text: "Sending offer letter to danher2525@gmail.com...", color: "cyan" },
       { text: "Just kidding. But seriously, let's talk!", color: "dim" },
       { text: "" },
     ])

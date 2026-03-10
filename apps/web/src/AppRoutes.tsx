@@ -179,6 +179,7 @@ export function AppRoutes() {
   if (!mode) {
     return withEasterEggPanel(
       <Routes>
+        <Route path="/tech-audit" element={<LazyPage><TechAuditPage /></LazyPage>} />
         <Route path="*" element={<Gateway />} />
       </Routes>
     )
