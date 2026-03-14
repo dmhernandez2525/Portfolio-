@@ -1,0 +1,13 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run generate:rss && tsc -b tsconfig.app.json && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "generate:rss": "tsx --tsconfig tsconfig.scripts.json scripts/generate-rss.ts"
+  }
+}

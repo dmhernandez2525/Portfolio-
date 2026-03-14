@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run generate:rss && tsc -b apps/web/tsconfig.app.json && vite build apps/web",
+    "build": "cd apps/web && npm run generate:rss && tsc -b tsconfig.app.json && vite build",
     "lint": "eslint apps/web",
     "preview": "vite preview",
     "generate:resume": "tsx --tsconfig apps/web/tsconfig.scripts.json apps/web/scripts/generate-resume.tsx",
