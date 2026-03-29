@@ -130,7 +130,7 @@ export function TechAuditPage() {
                 variant="outline"
                 size="lg"
                 className="gap-2"
-                onClick={() => window.open("/nda.pdf", "_blank")}
+                onClick={() => window.open("/nda.pdf", '_blank', 'noopener,noreferrer')}
               >
                 <Download className="h-4 w-4" />
                 Download NDA
@@ -242,7 +242,7 @@ export function TechAuditPage() {
                   variant="outline"
                   size="lg"
                   className="gap-2 border-emerald-500/30 hover:border-emerald-500/50"
-                  onClick={() => window.open("/nda.pdf", "_blank")}
+                  onClick={() => window.open("/nda.pdf", '_blank', 'noopener,noreferrer')}
                 >
                   <Download className="h-4 w-4" />
                   Download Mutual NDA

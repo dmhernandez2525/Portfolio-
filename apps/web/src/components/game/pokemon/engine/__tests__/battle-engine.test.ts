@@ -2753,9 +2753,9 @@ describe('executeTurn - status moves and applyMoveEffect', () => {
 
   it('protect status move protects the user', () => {
     // First random for opponent selection, second for protect success
-    let callCount = 0;
+    let _callCount = 0;
     vi.spyOn(Math, 'random').mockImplementation(() => {
-      callCount++;
+      _callCount++;
       return 0.01; // Low value ensures protect succeeds (< 0.5^0 = 1.0)
     });
 

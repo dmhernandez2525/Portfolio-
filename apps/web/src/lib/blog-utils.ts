@@ -152,7 +152,7 @@ function escapeXml(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;")
 }
 
@@ -177,7 +177,7 @@ export function buildBlogRssXml(posts: BlogPost[], options: RssOptions): string 
         "<item>",
         `<title>${escapeXml(post.title)}</title>`,
         `<link>${escapeXml(postLink)}</link>`,
-        `<guid isPermaLink=\"false\">${escapeXml(post.id)}</guid>`,
+        `<guid isPermaLink="false">${escapeXml(post.id)}</guid>`,
         `<description>${description}</description>`,
         `<author>${escapeXml(post.author)}</author>`,
         `<category>${escapeXml(post.category)}</category>`,

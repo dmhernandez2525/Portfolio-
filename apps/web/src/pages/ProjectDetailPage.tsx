@@ -18,18 +18,16 @@ import { buildProjectDetailModel } from "@/lib/project-detail-utils"
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>()
+  const detail = slug ? buildProjectDetailModel(slug, projectsData) : null
+  const { metrics, isLoading, error } = useProjectRepoMetrics(detail?.project ?? null)
 
   if (!slug) {
     return <Navigate to="/projects" replace />
   }
 
-  const detail = buildProjectDetailModel(slug, projectsData)
-
   if (!detail) {
     return <Navigate to="/404" replace />
   }
-
-  const { metrics, isLoading, error } = useProjectRepoMetrics(detail.project)
 
   return (
     <div className="min-h-screen bg-background">

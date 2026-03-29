@@ -57,14 +57,14 @@ async function fetchJson<T>(url: string, signal: AbortSignal): Promise<T> {
   return (await response.json()) as T
 }
 
-export function useProjectRepoMetrics(project: ProjectItem): UseProjectRepoMetricsResult {
-  const fallback = useMemo(() => fallbackMetrics(project), [project])
+export function useProjectRepoMetrics(project: ProjectItem | null): UseProjectRepoMetricsResult {
+  const fallback = useMemo(() => project ? fallbackMetrics(project) : { stars: 0, forks: 0, linesOfCodeApprox: 0 }, [project])
   const [metrics, setMetrics] = useState<ProjectRepoMetrics>(fallback)
-  const [isLoading, setIsLoading] = useState<boolean>(Boolean(project.github))
+  const [isLoading, setIsLoading] = useState<boolean>(Boolean(project?.github))
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const repo = extractGitHubRepo(project.github)
+    const repo = extractGitHubRepo(project?.github)
     if (!repo) {
       setMetrics(fallback)
       setIsLoading(false)
@@ -124,7 +124,7 @@ export function useProjectRepoMetrics(project: ProjectItem): UseProjectRepoMetri
       active = false
       controller.abort()
     }
-  }, [fallback, project.github])
+  }, [fallback, project?.github])
 
   return { metrics, isLoading, error }
 }

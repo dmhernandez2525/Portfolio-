@@ -3,10 +3,10 @@ import { createCreatureTradeChannel } from "@/lib/creature-system/trading"
 
 let mockPostMessage: ReturnType<typeof vi.fn>
 let mockClose: ReturnType<typeof vi.fn>
-let onMessageHandler: ((event: { data: unknown }) => void) | null
+let _onMessageHandler: ((event: { data: unknown }) => void) | null
 
 beforeEach(() => {
-  onMessageHandler = null
+  _onMessageHandler = null
   mockPostMessage = vi.fn()
   mockClose = vi.fn()
 
@@ -15,7 +15,7 @@ beforeEach(() => {
       onmessage: ((event: { data: unknown }) => void) | null = null
       constructor() {
         setTimeout(() => {
-          onMessageHandler = this.onmessage
+          _onMessageHandler = this.onmessage
         }, 0)
       }
       postMessage = mockPostMessage

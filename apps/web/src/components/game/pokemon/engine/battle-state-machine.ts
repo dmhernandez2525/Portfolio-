@@ -467,7 +467,7 @@ export function executeSwitchPokemon(state: BattleState, partyIndex: number): Ba
   };
 }
 
-export function useItemInBattle(
+export function applyItemInBattle(
   state: BattleState,
   itemId: string,
   _targetIndex?: number

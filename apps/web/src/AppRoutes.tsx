@@ -12,13 +12,17 @@ import { About } from "@/components/sections/About"
 import { Experience } from "@/components/sections/Experience"
 import { Skills } from "@/components/sections/Skills"
 import { Projects } from "@/components/sections/Projects"
-import { Testimonials } from "@/components/sections/Testimonials"
 import { Contact } from "@/components/sections/Contact"
-import { GlobeSection } from "@/components/sections/GlobeSection"
-import { AskAboutMe, AICTABanner } from "@/components/voice-assistant"
-import { AIExperience } from "@/components/sections/AIExperience"
-import { TechAudit } from "@/components/sections/TechAudit"
-import { GameExperienceLayout } from "@/components/game/shared/GameExperienceLayout"
+
+// Lazy-loaded heavy homepage sections
+const GlobeSection = lazy(() => import("@/components/sections/GlobeSection").then((m) => ({ default: m.GlobeSection })))
+const AskAboutMe = lazy(() => import("@/components/voice-assistant").then((m) => ({ default: m.AskAboutMe })))
+const AICTABanner = lazy(() => import("@/components/voice-assistant").then((m) => ({ default: m.AICTABanner })))
+const AIExperience = lazy(() => import("@/components/sections/AIExperience").then((m) => ({ default: m.AIExperience })))
+const TechAudit = lazy(() => import("@/components/sections/TechAudit").then((m) => ({ default: m.TechAudit })))
+const Testimonials = lazy(() => import("@/components/sections/Testimonials").then((m) => ({ default: m.Testimonials })))
+const GameExperienceLayout = lazy(() => import("@/components/game/shared/GameExperienceLayout").then((m) => ({ default: m.GameExperienceLayout })))
+
 import { EasterEggLogPanel } from "@/components/easter-eggs/EasterEggLogPanel"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import type { GameId } from "@/types/game-stats"
@@ -90,27 +94,38 @@ function LazyGame({ children }: { children: React.ReactNode }) {
 const Home = () => (
     <div className="min-h-screen">
       <Hero />
-      <AICTABanner />
+      <Suspense fallback={null}><AICTABanner /></Suspense>
       <About />
       <Skills />
       <Experience />
       <Projects />
-      <Testimonials />
-      <AIExperience />
-      <TechAudit />
-      <GlobeErrorBoundary><GlobeSection /></GlobeErrorBoundary>
-      <AskAboutMe />
+      <Suspense fallback={null}><Testimonials /></Suspense>
+      <Suspense fallback={null}><AIExperience /></Suspense>
+      <Suspense fallback={null}><TechAudit /></Suspense>
+      <GlobeErrorBoundary><Suspense fallback={null}><GlobeSection /></Suspense></GlobeErrorBoundary>
+      <Suspense fallback={null}><AskAboutMe /></Suspense>
       <Contact />
     </div>
 )
 
 function GameRouteWrapper({ gameId, children }: { gameId: GameId; children: React.ReactNode }) {
-  return <GameExperienceLayout gameId={gameId}>{children}</GameExperienceLayout>
+  return <Suspense fallback={null}><GameExperienceLayout gameId={gameId}>{children}</GameExperienceLayout></Suspense>
 }
 
 function CreativeRoutes() {
   return (
     <Routes>
+      {/* Auth routes - outside RootLayout for clean login/admin experience */}
+      <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <LazyPage><Admin /></LazyPage>
+          </ProtectedRoute>
+        }
+      />
+
       <Route element={<RootLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/philosophy" element={<LazyPage><Philosophy /></LazyPage>} />
@@ -131,26 +146,15 @@ function CreativeRoutes() {
         <Route path="/agar" element={<GameRouteWrapper gameId="agar"><LazyGame><AgarGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/mafia-wars" element={<GameRouteWrapper gameId="mafia-wars"><LazyGame><MafiaWarsGame /></LazyGame></GameRouteWrapper>} />
         <Route path="/pokemon" element={<GameRouteWrapper gameId="pokemon"><LazyGame><PokemonGame /></LazyGame></GameRouteWrapper>} />
-        <Route path="/pokedoku" element={<GameRouteWrapper gameId="game"><LazyGame><PokedokuGame /></LazyGame></GameRouteWrapper>} />
-        <Route path="/mean-bean-machine" element={<GameRouteWrapper gameId="game"><LazyGame><MeanBeanMachine /></LazyGame></GameRouteWrapper>} />
-        <Route path="/oregon-trail" element={<GameRouteWrapper gameId="game"><LazyGame><OregonTrail /></LazyGame></GameRouteWrapper>} />
-        <Route path="/poison-lizard" element={<GameRouteWrapper gameId="game"><LazyGame><PoisonLizard /></LazyGame></GameRouteWrapper>} />
+        <Route path="/pokedoku" element={<GameRouteWrapper gameId="pokedoku"><LazyGame><PokedokuGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/mean-bean-machine" element={<GameRouteWrapper gameId="mean-bean-machine"><LazyGame><MeanBeanMachine /></LazyGame></GameRouteWrapper>} />
+        <Route path="/oregon-trail" element={<GameRouteWrapper gameId="oregon-trail"><LazyGame><OregonTrail /></LazyGame></GameRouteWrapper>} />
+        <Route path="/poison-lizard" element={<GameRouteWrapper gameId="poison-lizard"><LazyGame><PoisonLizard /></LazyGame></GameRouteWrapper>} />
         <Route path="/shopping-cart-hero" element={<GameRouteWrapper gameId="shopping-cart-hero"><LazyGame><ShoppingCartHeroGame /></LazyGame></GameRouteWrapper>} />
-        <Route path="/coc" element={<GameRouteWrapper gameId="game"><LazyGame><CocGame /></LazyGame></GameRouteWrapper>} />
-        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="game"><LazyGame><FireboyWatergirlGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/coc" element={<GameRouteWrapper gameId="coc"><LazyGame><CocGame /></LazyGame></GameRouteWrapper>} />
+        <Route path="/fireboy-watergirl" element={<GameRouteWrapper gameId="fireboy-watergirl"><LazyGame><FireboyWatergirlGame /></LazyGame></GameRouteWrapper>} />
         <Route path="*" element={<LazyPage><NotFound /></LazyPage>} />
       </Route>
-
-      {/* Auth routes - outside RootLayout for clean login/admin experience */}
-      <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <LazyPage><Admin /></LazyPage>
-          </ProtectedRoute>
-        }
-      />
     </Routes>
   )
 }

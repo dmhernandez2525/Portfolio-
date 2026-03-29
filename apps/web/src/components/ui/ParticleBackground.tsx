@@ -11,6 +11,8 @@ export function ParticleBackground() {
       await loadSlim(engine)
     }).then(() => {
       setInit(true)
+    }).catch(() => {
+      // Particle engine failed to initialize; render nothing
     })
   }, [])
 

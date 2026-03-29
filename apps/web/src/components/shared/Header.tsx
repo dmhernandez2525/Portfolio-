@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { Menu, X, Moon, Sun, User, FolderKanban, Briefcase, Mail, Wrench, Lightbulb, Brain, BookOpen, Share2, Gamepad2, ChevronDown, Download, Bot, Search } from "lucide-react"
+import { Moon, Sun, User, Briefcase, Wrench, Lightbulb, Brain, BookOpen, ChevronDown, Bot, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/providers/ThemeProvider"
 import { cn } from "@/lib/utils"
@@ -61,28 +61,11 @@ const directLinks = [
   { name: "Contact", path: "/#contact" },
 ]
 
-// All items for mobile menu
-const allNavItems = [
-  { name: "About", path: "/#about", icon: User },
-  { name: "Skills", path: "/#skills", icon: Wrench },
-  { name: "Experience", path: "/#experience", icon: Briefcase },
-  { name: "Projects", path: "/#projects", icon: FolderKanban },
-  { name: "Games", path: "/games", icon: Gamepad2 },
-  { name: "Blog", path: "/blog", icon: BookOpen },
-  { name: "Social", path: "/social", icon: Share2 },
-  { name: "Philosophy", path: "/philosophy", icon: Brain },
-  { name: "Inventions", path: "/inventions", icon: Lightbulb },
-  { name: "AI Development", path: "/ai-development", icon: Bot },
-  { name: "Tech Audit", path: "/tech-audit", icon: Search },
-  { name: "Contact", path: "/#contact", icon: Mail },
-]
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [easterEggToast, setEasterEggToast] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
-  const { creatureCount } = useGamification()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -141,7 +124,6 @@ export function Header() {
   }, [])
 
   const scrollToSection = (path: string) => {
-    setMobileMenuOpen(false)
     if (path.startsWith("/#")) {
       const id = path.substring(2)
       if (location.pathname === "/") {
@@ -290,110 +272,6 @@ export function Header() {
         </div>
       )}
     </header>
-
-    {/* Mobile Bottom Navigation Bar */}
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border safe-area-pb">
-      <div className="flex items-center justify-around h-16 px-2">
-        <button
-          onClick={() => scrollToSection("/#about")}
-          className="flex flex-col items-center justify-center gap-1 p-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <User className="h-5 w-5" />
-          <span className="text-[10px] font-medium">About</span>
-        </button>
-        <button
-          onClick={() => scrollToSection("/#projects")}
-          className="flex flex-col items-center justify-center gap-1 p-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <FolderKanban className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Projects</span>
-        </button>
-
-        {/* Center Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={cn(
-            "flex items-center justify-center w-14 h-14 -mt-6 rounded-full border-4 border-background shadow-lg transition-all",
-            mobileMenuOpen
-              ? "bg-primary text-primary-foreground"
-              : "bg-gradient-to-br from-primary to-blue-600 text-white"
-          )}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-
-        <button
-          onClick={() => scrollToSection("/games")}
-          className="flex flex-col items-center justify-center gap-1 p-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <Gamepad2 className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Games</span>
-        </button>
-        <button
-          onClick={() => scrollToSection("/#contact")}
-          className="flex flex-col items-center justify-center gap-1 p-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <Mail className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Contact</span>
-        </button>
-      </div>
-    </div>
-
-    {/* Mobile Bottom Sheet Menu */}
-    {mobileMenuOpen && (
-      <div className="md:hidden fixed inset-0 z-40" onClick={() => setMobileMenuOpen(false)}>
-        <div className="absolute inset-0 bg-black/50 animate-in fade-in duration-200" />
-
-        <div
-          className="absolute bottom-20 left-0 right-0 bg-background border-t border-border rounded-t-3xl p-6 pb-8 shadow-2xl animate-in slide-in-from-bottom-10 duration-300"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-6" />
-
-          <nav className="grid grid-cols-2 gap-3">
-            {allNavItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => scrollToSection(item.path)}
-                className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors active:scale-95 text-left"
-              >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <item.icon className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-base font-medium">{item.name}</span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Resume Download */}
-          <div className="mt-4 pt-4 border-t border-border">
-            <Button
-              className="w-full gap-2"
-              onClick={() => {
-                setMobileMenuOpen(false)
-                window.open('/resume.pdf', '_blank')
-              }}
-            >
-              <Download className="h-4 w-4" />
-              Download Resume
-            </Button>
-          </div>
-
-          {/* Creature Controls on Mobile */}
-          <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <SiteHealthBar />
-              <CreatureToggle />
-              <ProfileButton />
-            </div>
-            <div className="flex items-center gap-2 text-sm font-mono px-3 py-1 rounded-full bg-secondary/50 border border-border">
-              <span className="text-neon-pink">✨</span>
-              <span className="font-bold">{creatureCount}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
     </>
   )
 }

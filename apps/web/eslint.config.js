@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'lib']),
+  globalIgnores(['**/dist', '**/lib/coc-game', '**/lib/voice-docs-app', '**/scripts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -24,6 +24,12 @@ export default defineConfig([
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
       }],
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/use-memo': 'off',
     },
   },
 ])

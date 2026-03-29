@@ -119,7 +119,7 @@ export function TechieLayout() {
         "link-linkedin": "https://www.linkedin.com/in/dh25/",
       }
       const url = urls[contentKey]
-      if (url) window.open(url, "_blank")
+      if (url) window.open(url, '_blank', 'noopener,noreferrer')
       return
     }
 

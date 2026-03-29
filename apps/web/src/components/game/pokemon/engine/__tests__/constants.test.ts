@@ -811,11 +811,11 @@ describe('calculateCatchRate', () => {
     // Ultra Ball (2x) vs Poke Ball (1x) with otherwise identical params
     // Run many trials to check statistical tendency
     let ultraCatches = 0;
-    let pokeCatches = 0;
+    let _pokeCatches = 0;
     const trials = 500;
     for (let i = 0; i < trials; i++) {
       if (calculateCatchRate(100, 50, 100, 2, 1) === 4) ultraCatches++;
-      if (calculateCatchRate(100, 50, 100, 1, 1) === 4) pokeCatches++;
+      if (calculateCatchRate(100, 50, 100, 1, 1) === 4) _pokeCatches++;
     }
     // Ultra ball should catch at least as often on average
     // This is statistical, so we check a weak condition

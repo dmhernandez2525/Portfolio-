@@ -36,10 +36,11 @@ export function checkCriteria(pokemon: PokemonSpecies, category: Category): bool
       return pokemon.types.length === 1;
     case 'evolution':
       return pokemon.id % 2 === 0; // Fallback since evolvesTo isn't in base data
-    case 'stat':
+    case 'stat': {
       const statName = (category.value as string).split('>')[0] as keyof typeof pokemon.baseStats;
       const threshold = parseInt((category.value as string).split('>')[1]);
       return pokemon.baseStats[statName] >= threshold;
+    }
     default:
       return false;
   }

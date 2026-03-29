@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react"
+import { lazy, Suspense, useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, Download } from "lucide-react"
-import { HeroBackground } from "./HeroBackground"
+
+const HeroBackground = lazy(() => import("./HeroBackground").then((m) => ({ default: m.HeroBackground })))
 import { ParticleBackground } from "@/components/ui/ParticleBackground"
 import { MagneticButton } from "@/components/ui/MagneticButton"
 import { ContactModal } from "@/components/shared/ContactModal"
@@ -58,7 +59,7 @@ export function Hero() {
   }, [isPaused])
 
   const handleResumeDownload = () => {
-    window.open('/resume.pdf', '_blank')
+    window.open('/resume.pdf', '_blank', 'noopener,noreferrer')
     setShowResumeToast(true)
     setTimeout(() => setShowResumeToast(false), 4000)
   }
@@ -71,7 +72,7 @@ export function Hero() {
   return (
     <section id="hero" className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-20">
       <ParticleBackground />
-      <HeroBackground />
+      <Suspense fallback={null}><HeroBackground /></Suspense>
       
       <div className="container relative z-10 flex flex-col items-center text-center">
         <div>

@@ -11,6 +11,36 @@ export default defineConfig({
     cesiumBuildRootPath: path.resolve(__dirname, "../../node_modules/cesium/Build"),
     cesiumBuildPath: path.resolve(__dirname, "../../node_modules/cesium/Build/Cesium/"),
   })],
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('cesium') || id.includes('resium')) {
+            return 'vendor-cesium'
+          }
+          if (id.includes('three') || id.includes('@react-three/fiber') || id.includes('@react-three/drei')) {
+            return 'vendor-three'
+          }
+          if (id.includes('@codemirror/') || id.includes('@uiw/react-codemirror') || id.includes('@uiw/codemirror-themes-all') || id.includes('@replit/codemirror-vim')) {
+            return 'vendor-codemirror'
+          }
+          if (id.includes('recharts')) {
+            return 'vendor-charts'
+          }
+          if (id.includes('framer-motion')) {
+            return 'vendor-motion'
+          }
+          if (id.includes('@tsparticles/react') || id.includes('@tsparticles/slim')) {
+            return 'vendor-particles'
+          }
+          if (id.includes('react-markdown') || id.includes('react-syntax-highlighter')) {
+            return 'vendor-markdown'
+          }
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -12,11 +12,11 @@ console.log("%c💼 If you're checking out my code, maybe we should work togethe
 console.log("%c📧 Reach out: https://www.linkedin.com/in/dh25/", "font-size: 14px;");
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <SpeechProvider>
-    <React.StrictMode>
+  <React.StrictMode>
+    <SpeechProvider>
       <App />
-    </React.StrictMode>
-  </SpeechProvider>
+    </SpeechProvider>
+  </React.StrictMode>
 )
 
 initWebVitals()

@@ -8,7 +8,7 @@ export interface MetaTagConfig {
 
 const BASE_URL = "https://brainydeveloper.com"
 const SITE_NAME = "Daniel Hernandez Portfolio"
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`
+const DEFAULT_IMAGE = `${BASE_URL}/og-image.svg`
 
 export function getCanonicalUrl(path: string): string {
   return `${BASE_URL}${path}`
@@ -38,7 +38,7 @@ export function getPageMeta(path: string): MetaTagConfig {
   const routes: Record<string, MetaTagConfig> = {
     "/": {
       title: "Daniel Hernandez | Full-Stack Developer Portfolio",
-      description: "Interactive portfolio featuring 34+ projects, 10 playable browser games, AI voice assistant, and 3D globe visualization.",
+      description: "Interactive portfolio featuring 34+ projects, 16 playable browser games, AI voice assistant, and 3D globe visualization.",
       path: "/",
     },
     "/projects": {
@@ -53,7 +53,7 @@ export function getPageMeta(path: string): MetaTagConfig {
     },
     "/games": {
       title: "Games | Daniel Hernandez",
-      description: "10 playable browser games: Snake, Tetris, Chess, Pokemon, and more.",
+      description: "16 playable browser games: Snake, Tetris, Chess, Pokemon, and more.",
       path: "/games",
     },
   }

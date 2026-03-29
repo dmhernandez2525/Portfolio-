@@ -55,46 +55,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(() => {
     if (!isDemoMode) return null
     if (typeof window === 'undefined') return null
-    const stored = sessionStorage.getItem('demo-user')
-    if (!stored) return null
     try {
+      const stored = sessionStorage.getItem('demo-user')
+      if (!stored) return null
       return JSON.parse(stored) as User
     } catch {
-      sessionStorage.removeItem('demo-user')
+      try { sessionStorage.removeItem('demo-user') } catch { /* storage unavailable */ }
       return null
     }
   })
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    // In demo mode, we don't use real authentication
-    if (isDemoMode) {
-      console.warn('Demo mode enabled - use demo login instead')
-      return false
-    }
-
-    // TODO: Implement real authentication
-    // This would integrate with your auth provider (Firebase, Auth0, etc.)
-    console.log('Real auth login attempt:', email, password)
+  const login = useCallback(async (_email: string, _password: string): Promise<boolean> => {
+    // Demo mode only; real auth not implemented for portfolio
     return false
   }, [isDemoMode])
 
   const loginAsDemo = useCallback((userId: string) => {
     if (!isDemoMode) {
-      console.warn('Demo login only available in demo mode')
       return
     }
 
     const demoUser = DEMO_USERS.find(u => u.id === userId)
     if (demoUser) {
       setUser(demoUser)
-      // Store in session for persistence during page refresh
-      sessionStorage.setItem('demo-user', JSON.stringify(demoUser))
+      try { sessionStorage.setItem('demo-user', JSON.stringify(demoUser)) } catch { /* storage unavailable */ }
     }
   }, [isDemoMode])
 
   const logout = useCallback(() => {
     setUser(null)
-    sessionStorage.removeItem('demo-user')
+    try { sessionStorage.removeItem('demo-user') } catch { /* storage unavailable */ }
   }, [])
 
   const value: AuthContextType = {

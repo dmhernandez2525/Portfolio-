@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import CodeMirror, { type Extension, type ReactCodeMirrorRef } from "@uiw/react-codemirror"
 import { EditorView } from "@codemirror/view"

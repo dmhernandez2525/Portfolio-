@@ -25,7 +25,7 @@ export const TESTIMONIAL_SOURCE_LABELS: Record<TestimonialSource, string> = {
   direct: "Direct",
 }
 
-export const TESTIMONIAL_REQUEST_FORM_URL = "https://brainydeveloper.com/contact?request=testimonial"
+export const TESTIMONIAL_REQUEST_FORM_URL = "/#contact"
 
 export const DEFAULT_TESTIMONIALS: TestimonialRecord[] = [
   seedRecord("tm-1", 0, {
@@ -36,17 +36,11 @@ export const DEFAULT_TESTIMONIALS: TestimonialRecord[] = [
       "Daniel consistently shipped production-ready features under tight constraints and mentored teammates without slowing delivery.",
     rating: 5,
     source: "linkedin",
-    sourceUrl: "https://www.linkedin.com/in/dh25/",
     category: "manager",
     verified: true,
     approved: true,
     featured: true,
     tags: ["leadership", "delivery", "frontend"],
-    linkedinMeta: {
-      profileUrl: "https://www.linkedin.com/in/dh25/",
-      recommendationId: "ln-rec-001",
-      importedAt: "2026-02-01T15:45:00.000Z",
-    },
   }),
   seedRecord("tm-2", 1, {
     name: "Marcus Lee",
@@ -62,7 +56,6 @@ export const DEFAULT_TESTIMONIALS: TestimonialRecord[] = [
     approved: true,
     featured: false,
     tags: ["product", "execution"],
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   }),
   seedRecord("tm-3", 2, {
     name: "Avery Patel",
@@ -86,16 +79,10 @@ export const DEFAULT_TESTIMONIALS: TestimonialRecord[] = [
       "Daniel combines systems thinking with practical implementation detail. His PRs are clear, complete, and easy to review.",
     rating: 4,
     source: "linkedin",
-    sourceUrl: "https://www.linkedin.com/in/dh25/",
     category: "mentor",
     verified: true,
     approved: true,
     featured: false,
     tags: ["architecture", "code-quality"],
-    linkedinMeta: {
-      profileUrl: "https://www.linkedin.com/in/dh25/",
-      recommendationId: "ln-rec-002",
-      importedAt: "2026-02-02T12:10:00.000Z",
-    },
   }),
 ]

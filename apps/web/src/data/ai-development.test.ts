@@ -61,7 +61,7 @@ function expectNonEmptyArray(arr: unknown[]) {
   expect(arr.length).toBeGreaterThan(0)
 }
 
-function expectAllStringsNonEmpty(obj: Record<string, string>) {
+function _expectAllStringsNonEmpty(obj: Record<string, string>) {
   for (const [key, value] of Object.entries(obj)) {
     expect(value, `${key} should not be empty`).toBeTruthy()
     expect(typeof value, `${key} should be a string`).toBe("string")

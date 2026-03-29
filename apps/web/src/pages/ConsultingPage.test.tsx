@@ -1,5 +1,7 @@
+import React from "react"
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
 import { ConsultingPage } from "./ConsultingPage"
 
 // Mock framer-motion
@@ -24,21 +26,21 @@ vi.mock("@/context/mode-context", () => ({
 
 describe("ConsultingPage", () => {
   it("renders Daniel's profile", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Daniel Hernandez")).toBeInTheDocument()
     expect(screen.getByText("Technology Consultant")).toBeInTheDocument()
   })
 
   it("renders the featured tech audit offering", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Free Technology Audit")).toBeInTheDocument()
     expect(screen.getByText("Featured Offering")).toBeInTheDocument()
   })
 
   it("renders audit highlights", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText(/20-40 minutes/i)).toBeInTheDocument()
     expect(screen.getByText(/nda available/i)).toBeInTheDocument()
@@ -46,7 +48,7 @@ describe("ConsultingPage", () => {
   })
 
   it("renders all four service cards", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Technology Audit")).toBeInTheDocument()
     expect(screen.getByText("Custom Development")).toBeInTheDocument()
@@ -55,25 +57,25 @@ describe("ConsultingPage", () => {
   })
 
   it("shows 'Always Free' badge on tech audit card", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Always Free")).toBeInTheDocument()
   })
 
   it("renders the Book Your Free Audit CTA", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Book Your Free Audit")).toBeInTheDocument()
   })
 
   it("renders the philosophy footer", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText(/technology should be democratized/i)).toBeInTheDocument()
   })
 
   it("renders social links", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByLabelText("GitHub")).toBeInTheDocument()
     expect(screen.getByLabelText("LinkedIn")).toBeInTheDocument()
@@ -81,13 +83,13 @@ describe("ConsultingPage", () => {
   })
 
   it("renders switch mode button", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Switch Mode")).toBeInTheDocument()
   })
 
   it("renders NDA download link in header", () => {
-    render(<ConsultingPage />)
+    render(<MemoryRouter><ConsultingPage /></MemoryRouter>)
 
     expect(screen.getByText("Download NDA")).toBeInTheDocument()
   })

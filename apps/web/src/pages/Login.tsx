@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,8 +17,7 @@ export function Login() {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/admin')
-    return null
+    return <Navigate to="/admin" replace />
   }
 
   const handleDemoLogin = (userId: string) => {

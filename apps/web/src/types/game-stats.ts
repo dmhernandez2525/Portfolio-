@@ -8,6 +8,12 @@ export type GameId =
   | "mafia-wars"
   | "pokemon"
   | "shopping-cart-hero"
+  | "pokedoku"
+  | "mean-bean-machine"
+  | "oregon-trail"
+  | "poison-lizard"
+  | "coc"
+  | "fireboy-watergirl"
   | "game"
 
 export interface GameScoreRecord {

@@ -13,9 +13,7 @@ import {
   User,
   Shield,
   FileText,
-  Settings,
   BarChart3,
-  MessageSquare,
   Image,
   Code2,
   Quote,
@@ -45,13 +43,6 @@ const adminFeatures = [
     adminOnly: false,
   },
   {
-    id: "messages",
-    icon: MessageSquare,
-    title: 'Messages',
-    description: 'View contact form submissions',
-    adminOnly: false,
-  },
-  {
     id: "game-stats",
     icon: Trophy,
     title: "Game Stats",
@@ -70,13 +61,6 @@ const adminFeatures = [
     icon: BarChart3,
     title: 'Analytics',
     description: 'View site traffic and engagement',
-    adminOnly: true,
-  },
-  {
-    id: "settings",
-    icon: Settings,
-    title: 'Settings',
-    description: 'Configure site settings',
     adminOnly: true,
   },
 ]

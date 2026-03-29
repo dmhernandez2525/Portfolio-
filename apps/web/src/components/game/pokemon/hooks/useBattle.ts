@@ -7,7 +7,7 @@ import type { BattleState, Pokemon, TrainerDef, BattleType } from '../engine/typ
 import {
   createBattleState, advanceBattle, selectFight, selectItem,
   selectSwitch, selectRun, executePlayerMove, executeSwitchPokemon,
-  useItemInBattle, getPlayerMoves, getAvailableSwitches,
+  applyItemInBattle, getPlayerMoves, getAvailableSwitches,
   learnMove as learnMoveAction, skipMoveLearn as skipMoveLearnAction,
   applyEvolution as applyEvolutionAction, cancelEvolution as cancelEvolutionAction,
 } from '../engine/battle-state-machine';
@@ -85,8 +85,8 @@ export function useBattle() {
     setBattleState(prev => prev ? executeSwitchPokemon(prev, partyIndex) : null);
   }, []);
 
-  const useItem = useCallback((itemId: string, targetIndex?: number) => {
-    setBattleState(prev => prev ? useItemInBattle(prev, itemId, targetIndex) : null);
+  const applyItem = useCallback((itemId: string, targetIndex?: number) => {
+    setBattleState(prev => prev ? applyItemInBattle(prev, itemId, targetIndex) : null);
   }, []);
 
   const getMoves = useCallback(() => {
@@ -169,7 +169,7 @@ export function useBattle() {
     run,
     chooseMove,
     chooseSwitch,
-    useItem,
+    applyItem,
     getMoves,
     getSwitches,
     learnMove,

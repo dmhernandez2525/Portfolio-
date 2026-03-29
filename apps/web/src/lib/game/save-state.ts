@@ -36,7 +36,12 @@ function keyFor(gameId: string): string {
 }
 
 export function saveGameEnhancementState(state: GameEnhancementState): void {
-  getStorage().setItem(keyFor(state.gameId), JSON.stringify(state))
+  try {
+    getStorage().setItem(keyFor(state.gameId), JSON.stringify(state))
+  } catch {
+    // QuotaExceededError or other storage failure; fall back to memory
+    memoryStorage.setItem(keyFor(state.gameId), JSON.stringify(state))
+  }
 }
 
 export function loadGameEnhancementState(gameId: string): GameEnhancementState | null {

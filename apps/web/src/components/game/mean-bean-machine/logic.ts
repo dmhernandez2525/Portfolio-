@@ -99,7 +99,7 @@ export function getAIMove(board: GameBoard, pair: { primary: BeanColor, secondar
   
   return { 
     x: validCols[Math.floor(Math.random() * validCols.length)] || 2, 
-    rotation: Math.floor(Math.random() * 4) * 90 as any 
+    rotation: Math.floor(Math.random() * 4) * 90
   };
 }
 

@@ -25,7 +25,7 @@ app.use(
       if (!origin || ALLOWED_ORIGINS.includes(origin)) {
         callback(null, true)
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`))
+        callback(new Error("Origin not allowed by CORS"))
       }
     },
     methods: ["GET", "POST"],
@@ -60,12 +60,13 @@ function rateLimit(req: Request, res: Response, next: NextFunction): void {
 }
 
 // Clean up stale rate limit entries every 30 minutes
-setInterval(() => {
+const cleanupInterval = setInterval(() => {
   const now = Date.now()
   for (const [key, entry] of bookingAttempts) {
     if (now > entry.resetAt) bookingAttempts.delete(key)
   }
 }, 30 * 60 * 1000)
+cleanupInterval.unref()
 
 // Routes
 app.use("/api/health", healthRouter)

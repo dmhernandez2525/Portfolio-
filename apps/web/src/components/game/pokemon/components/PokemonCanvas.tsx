@@ -28,7 +28,7 @@ import { redBlueConfig } from '../games/red-blue/config';
 import { goldSilverConfig } from '../games/gold-silver/config';
 import { rubySapphireConfig } from '../games/ruby-sapphire/config';
 import { checkTrainerLOS } from '../engine/collision';
-import { setItemDatabase, getItemData, addItem, removeItem, useItem, buyItem, sellItem } from '../engine/inventory-system';
+import { setItemDatabase, getItemData, addItem, removeItem, applyItem, buyItem, sellItem } from '../engine/inventory-system';
 import { checkEvolution, evolvePokemon, getSpeciesName, setEvolutionDatabase } from '../engine/evolution-system';
 import { gymLeaders as kantoGymLeaders, eliteFour as kantoEliteFour, champion as kantoChampion, routeTrainers as kantoRouteTrainers, gymTrainers as kantoGymTrainers } from '../games/red-blue/trainers';
 import { gymLeaders as johtoGymLeaders, eliteFour as johtoEliteFour, champion as johtoChampion, routeTrainers as johtoRouteTrainers, gymTrainers as johtoGymTrainers } from '../games/gold-silver/trainers';
@@ -260,18 +260,18 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     if (data.category === 'pokeballs') {
       bagRef.current = removeItem(bagRef.current, itemId);
       setBagVersion(v => v + 1);
-      battle.useItem(itemId);
+      battle.applyItem(itemId);
       return;
     }
 
     if (targetIndex !== undefined) {
       const target = partyRef.current[targetIndex];
       if (!target) return;
-      const result = useItem(bagRef.current, itemId, target);
+      const result = applyItem(bagRef.current, itemId, target);
       if (result.success) {
         bagRef.current = result.bag;
         setBagVersion(v => v + 1);
-        battle.useItem(itemId, targetIndex);
+        battle.applyItem(itemId, targetIndex);
       }
     }
   }, [battle]);
@@ -313,7 +313,7 @@ export default function PokemonCanvas({ version, onBack }: PokemonCanvasProps) {
     }
 
     // Healing, status, revive, rare candy
-    const result = useItem(bagRef.current, itemId, target);
+    const result = applyItem(bagRef.current, itemId, target);
     if (result.success) {
       bagRef.current = result.bag;
       partyRef.current = [...partyRef.current];

@@ -102,7 +102,7 @@ export function executeSandboxedJS(code: string): SandboxResult {
   try {
     const wrappedCode = `"use strict"; ${code}`
 
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+     
     const fn = new Function(
       "console", "Math", "JSON", "Date", "Array", "Object", "String",
       "Number", "Boolean", "RegExp", "Map", "Set", "Symbol", "Promise",

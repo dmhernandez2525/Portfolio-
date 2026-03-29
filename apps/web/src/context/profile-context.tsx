@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 // ============================================================================
-// Local Profile System — Context & Provider
+// Local Profile System -- Context & Provider
 // ============================================================================
 // localStorage-based user profiles for game save persistence.
 // Full cloud login/sync planned for future release.

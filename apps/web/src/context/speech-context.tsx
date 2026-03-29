@@ -154,7 +154,6 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
 
   const currentRequestIdRef = useRef<string | null>(null)
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (currentRequest || queue.length === 0) return
 
@@ -175,7 +174,7 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
         setCurrentSource(null)
       })
   }, [queue, currentRequest, speak])
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const speakText = useCallback(
     (text: string, options?: SpeechSynthesisOptions, meta?: SpeechQueueMeta) => {

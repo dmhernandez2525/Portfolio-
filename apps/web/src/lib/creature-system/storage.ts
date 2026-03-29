@@ -76,7 +76,11 @@ export function saveCreatureDexState(state: CreatureDexState): void {
     unlockedLore: state.unlockedLore,
   }
 
-  storage.setItem(CREATURE_DEX_STORAGE_KEY, JSON.stringify(persisted))
+  try {
+    storage.setItem(CREATURE_DEX_STORAGE_KEY, JSON.stringify(persisted))
+  } catch {
+    // QuotaExceededError or storage disabled; silently fail
+  }
 }
 
 export function registerCreatureCatch(speciesId: string): { state: CreatureDexState; evolvedTo: string | null } {

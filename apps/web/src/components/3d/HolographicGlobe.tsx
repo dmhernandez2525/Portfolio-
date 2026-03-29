@@ -594,7 +594,7 @@ export function HolographicGlobe(props: ComponentProps<"div">) {
     const controller = viewer.scene.screenSpaceCameraController
 
     // Enable/disable all camera controls based on interaction state
-    // eslint-disable-next-line react-hooks/immutability
+    
     controller.enableRotate = isInteracting
     controller.enableZoom = isInteracting
     controller.enableTilt = isInteracting

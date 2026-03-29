@@ -61,7 +61,7 @@ export interface UseItemResult {
   bag: BagItem[];
 }
 
-export function useItem(
+export function applyItem(
   bag: BagItem[],
   itemId: string,
   target: Pokemon

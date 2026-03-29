@@ -292,7 +292,7 @@ export function executeTurn(
   let playerFainted = false;
   let opponentFainted = false;
   let expGained = 0;
-  let caughtPokemon: Pokemon | null = null;
+  const caughtPokemon: Pokemon | null = null;
   let ranAway = false;
 
   const playerBp = state.playerActive;

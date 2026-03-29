@@ -22,10 +22,14 @@ export class GameAudioEngine {
     if (this.context) return
     const audioContextCtor = window.AudioContext
     if (!audioContextCtor) return
-    this.context = new audioContextCtor()
-    this.gainNode = this.context.createGain()
-    this.gainNode.gain.value = this.volume
-    this.gainNode.connect(this.context.destination)
+    try {
+      this.context = new audioContextCtor()
+      this.gainNode = this.context.createGain()
+      this.gainNode.gain.value = this.volume
+      this.gainNode.connect(this.context.destination)
+    } catch {
+      // AudioContext creation can fail (e.g., iOS without user gesture)
+    }
   }
 
   setMuted(value: boolean): void {

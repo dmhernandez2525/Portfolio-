@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, Component, type ReactNode, type ErrorInfo } from "react"
 import { BrowserRouter } from "react-router-dom"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { GamificationProvider } from "@/components/providers/GamificationProvider"
@@ -15,6 +15,97 @@ import { ScrollToTop } from "@/components/shared/ScrollToTop"
 import { ModeSwitcher } from "@/components/shared/ModeSwitcher"
 import { AppRoutes } from "./AppRoutes"
 import { AnimatePresence, motion } from "framer-motion"
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+}
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("Application error:", error, info)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#0a0a0a",
+            color: "#e5e5e5",
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            padding: "2rem",
+          }}
+        >
+          <div style={{ maxWidth: "480px", textAlign: "center" }}>
+            <div
+              style={{
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                opacity: 0.6,
+              }}
+            >
+              :/
+            </div>
+            <h1
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 600,
+                marginBottom: "0.75rem",
+                color: "#f5f5f5",
+              }}
+            >
+              Something went wrong
+            </h1>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                lineHeight: 1.6,
+                color: "#a3a3a3",
+                marginBottom: "2rem",
+              }}
+            >
+              An unexpected error occurred while loading this page. This has been logged and will be looked into.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: "0.75rem 2rem",
+                fontSize: "0.9rem",
+                fontWeight: 500,
+                color: "#fff",
+                backgroundColor: "#2563eb",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
 
 // Console easter egg
 const logConsoleEasterEgg = () => {
@@ -108,21 +199,23 @@ function AppShell() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <GamificationProvider>
-        <BossProvider>
-          <AuthProvider>
-            <ProfileProvider>
-              <BrowserRouter>
-                <ModeProvider>
-                  <AppShell />
-                </ModeProvider>
-              </BrowserRouter>
-            </ProfileProvider>
-          </AuthProvider>
-        </BossProvider>
-      </GamificationProvider>
-    </ThemeProvider>
+    <AppErrorBoundary>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <GamificationProvider>
+          <BossProvider>
+            <AuthProvider>
+              <ProfileProvider>
+                <BrowserRouter>
+                  <ModeProvider>
+                    <AppShell />
+                  </ModeProvider>
+                </BrowserRouter>
+              </ProfileProvider>
+            </AuthProvider>
+          </BossProvider>
+        </GamificationProvider>
+      </ThemeProvider>
+    </AppErrorBoundary>
   )
 }
 

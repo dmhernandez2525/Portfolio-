@@ -308,7 +308,7 @@ export function About() {
               <Button
                 size="lg"
                 className="gap-2"
-                onClick={() => window.open('/resume.pdf', '_blank')}
+                onClick={() => window.open('/resume.pdf', '_blank', 'noopener,noreferrer')}
               >
                 <Download className="h-4 w-4" />
                 Download Resume

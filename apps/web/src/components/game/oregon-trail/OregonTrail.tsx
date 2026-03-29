@@ -60,6 +60,27 @@ export const OregonTrail: React.FC = () => {
     }));
   };
 
+  const checkSupplies = () => {
+    const s = state.supplies;
+    const alive = state.members.filter(m => m.status !== 'Dead').length;
+    setState(prev => ({
+      ...prev,
+      currentEvent: `Supplies: ${s.food}lbs food, ${s.ammunition} ammo, ${s.oxen} oxen, ${s.clothing} clothing sets, ${s.spareParts} spare parts, $${s.money}. Party: ${alive}/${state.members.length} alive.`,
+      status: 'Event'
+    }));
+  };
+
+  const viewMap = () => {
+    const totalDist = 2170;
+    const pct = Math.round((state.milesTraveled / totalDist) * 100);
+    const nextLandmark = LANDMARKS[state.location]?.name ?? 'Oregon City';
+    setState(prev => ({
+      ...prev,
+      currentEvent: `Progress: ${state.milesTraveled}/${totalDist} miles (${pct}%). Next stop: ${nextLandmark}.`,
+      status: 'Event'
+    }));
+  };
+
   const continueJourney = () => {
     setState(prev => ({ ...prev, status: 'Travel' }));
     setIsPaused(false);
@@ -86,13 +107,13 @@ export const OregonTrail: React.FC = () => {
           <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={continueJourney}>
             Continue Journey
           </Button>
-          <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={() => {/* Shop logic */}}>
+          <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={checkSupplies}>
             Check Supplies
           </Button>
           <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={handleHunt}>
             Go Hunting
           </Button>
-          <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={() => {/* Map logic */}}>
+          <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500 hover:text-black" onClick={viewMap}>
             View Map
           </Button>
         </div>

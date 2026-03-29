@@ -116,7 +116,7 @@ import {
   selectRun,
   executePlayerMove,
   executeSwitchPokemon,
-  useItemInBattle,
+  applyItemInBattle,
   getPlayerMoves,
   getAvailableSwitches,
   learnMove,
@@ -903,10 +903,10 @@ describe('executeSwitchPokemon', () => {
 });
 
 // ============================================================================
-// useItemInBattle
+// applyItemInBattle
 // ============================================================================
 
-describe('useItemInBattle', () => {
+describe('applyItemInBattle', () => {
   it('attempts to catch wild pokemon with a pokeball', () => {
     vi.mocked(attemptCatch).mockReturnValueOnce({
       shakes: 3,
@@ -915,7 +915,7 @@ describe('useItemInBattle', () => {
     });
 
     const state = makeBattleState({ type: 'wild', phase: 'item_select' });
-    const next = useItemInBattle(state, 'poke-ball');
+    const next = applyItemInBattle(state, 'poke-ball');
 
     expect(next.phase).toBe('catch_animate');
     expect(next.battleResult).toBe('caught');
@@ -929,7 +929,7 @@ describe('useItemInBattle', () => {
     });
 
     const state = makeBattleState({ type: 'wild' });
-    useItemInBattle(state, 'ultra-ball');
+    applyItemInBattle(state, 'ultra-ball');
 
     expect(attemptCatch).toHaveBeenCalledWith(state.opponentActive.pokemon, 2);
   });
@@ -940,7 +940,7 @@ describe('useItemInBattle', () => {
     });
 
     const state = makeBattleState({ type: 'wild' });
-    useItemInBattle(state, 'great-ball');
+    applyItemInBattle(state, 'great-ball');
 
     expect(attemptCatch).toHaveBeenCalledWith(state.opponentActive.pokemon, 1.5);
   });
@@ -951,7 +951,7 @@ describe('useItemInBattle', () => {
     });
 
     const state = makeBattleState({ type: 'wild' });
-    useItemInBattle(state, 'master-ball');
+    applyItemInBattle(state, 'master-ball');
 
     expect(attemptCatch).toHaveBeenCalledWith(state.opponentActive.pokemon, 255);
   });
@@ -964,7 +964,7 @@ describe('useItemInBattle', () => {
     });
 
     const state = makeBattleState({ type: 'wild', catchAttempts: 2 });
-    const next = useItemInBattle(state, 'poke-ball');
+    const next = applyItemInBattle(state, 'poke-ball');
 
     expect(next.phase).toBe('faint_check');
     expect(next.catchAttempts).toBe(3);
@@ -973,7 +973,7 @@ describe('useItemInBattle', () => {
 
   it('rejects pokeball use in trainer battles', () => {
     const state = makeBattleState({ type: 'trainer' });
-    const next = useItemInBattle(state, 'poke-ball');
+    const next = applyItemInBattle(state, 'poke-ball');
 
     expect(next.phase).toBe('action_select');
     expect(next.currentText).toBe("You can't catch a trainer's Pokemon!");
@@ -982,7 +982,7 @@ describe('useItemInBattle', () => {
 
   it('handles healing items by transitioning to faint_check', () => {
     const state = makeBattleState({ phase: 'item_select' });
-    const next = useItemInBattle(state, 'potion');
+    const next = applyItemInBattle(state, 'potion');
 
     expect(next.phase).toBe('faint_check');
     expect(next.currentText).toBe('Used potion!');

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   setItemDatabase, getItemData,
   addItem, removeItem, hasItem, getItemCount, getItemsByCategory,
-  useItem,
+  applyItem,
   canAfford, buyItem, sellItem,
 } from '../inventory-system';
 import type { BagItem, ItemData, Pokemon, PokemonMove } from '../types';
@@ -172,11 +172,11 @@ describe('inventory-system', () => {
     });
   });
 
-  describe('useItem', () => {
+  describe('applyItem', () => {
     it('heals HP with potion', () => {
       const pokemon = makePokemon({ currentHp: 50 });
       const bag: BagItem[] = [{ itemId: 'potion', quantity: 2 }];
-      const result = useItem(bag, 'potion', pokemon);
+      const result = applyItem(bag, 'potion', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.currentHp).toBe(70);
       expect(result.bag[0].quantity).toBe(1);
@@ -185,28 +185,28 @@ describe('inventory-system', () => {
     it('caps HP at max', () => {
       const pokemon = makePokemon({ currentHp: 95 });
       const bag: BagItem[] = [{ itemId: 'potion', quantity: 1 }];
-      useItem(bag, 'potion', pokemon);
+      applyItem(bag, 'potion', pokemon);
       expect(pokemon.currentHp).toBe(100);
     });
 
     it('fails on full HP pokemon', () => {
       const pokemon = makePokemon({ currentHp: 100 });
       const bag: BagItem[] = [{ itemId: 'potion', quantity: 1 }];
-      const result = useItem(bag, 'potion', pokemon);
+      const result = applyItem(bag, 'potion', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('fails on fainted pokemon for heal', () => {
       const pokemon = makePokemon({ currentHp: 0 });
       const bag: BagItem[] = [{ itemId: 'potion', quantity: 1 }];
-      const result = useItem(bag, 'potion', pokemon);
+      const result = applyItem(bag, 'potion', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('cures status with antidote', () => {
       const pokemon = makePokemon({ status: 'poison' as never });
       const bag: BagItem[] = [{ itemId: 'antidote', quantity: 1 }];
-      const result = useItem(bag, 'antidote', pokemon);
+      const result = applyItem(bag, 'antidote', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.status).toBeNull();
     });
@@ -214,14 +214,14 @@ describe('inventory-system', () => {
     it('fails antidote on wrong status', () => {
       const pokemon = makePokemon({ status: 'burn' as never });
       const bag: BagItem[] = [{ itemId: 'antidote', quantity: 1 }];
-      const result = useItem(bag, 'antidote', pokemon);
+      const result = applyItem(bag, 'antidote', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('full heal cures any status', () => {
       const pokemon = makePokemon({ status: 'burn' as never });
       const bag: BagItem[] = [{ itemId: 'full-heal', quantity: 1 }];
-      const result = useItem(bag, 'full-heal', pokemon);
+      const result = applyItem(bag, 'full-heal', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.status).toBeNull();
     });
@@ -229,14 +229,14 @@ describe('inventory-system', () => {
     it('fails heal_status on healthy pokemon', () => {
       const pokemon = makePokemon({ status: null });
       const bag: BagItem[] = [{ itemId: 'antidote', quantity: 1 }];
-      const result = useItem(bag, 'antidote', pokemon);
+      const result = applyItem(bag, 'antidote', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('revives a fainted pokemon', () => {
       const pokemon = makePokemon({ currentHp: 0 });
       const bag: BagItem[] = [{ itemId: 'revive', quantity: 1 }];
-      const result = useItem(bag, 'revive', pokemon);
+      const result = applyItem(bag, 'revive', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.currentHp).toBe(50); // 50% of 100 HP
     });
@@ -244,14 +244,14 @@ describe('inventory-system', () => {
     it('fails revive on alive pokemon', () => {
       const pokemon = makePokemon({ currentHp: 50 });
       const bag: BagItem[] = [{ itemId: 'revive', quantity: 1 }];
-      const result = useItem(bag, 'revive', pokemon);
+      const result = applyItem(bag, 'revive', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('restores PP with ether', () => {
       const pokemon = makePokemon({ moves: [makeMove({ pp: 20, maxPp: 35 })] });
       const bag: BagItem[] = [{ itemId: 'ether', quantity: 1 }];
-      const result = useItem(bag, 'ether', pokemon);
+      const result = applyItem(bag, 'ether', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.moves[0].pp).toBe(30);
     });
@@ -259,14 +259,14 @@ describe('inventory-system', () => {
     it('fails ether when all PP full', () => {
       const pokemon = makePokemon({ moves: [makeMove({ pp: 35, maxPp: 35 })] });
       const bag: BagItem[] = [{ itemId: 'ether', quantity: 1 }];
-      const result = useItem(bag, 'ether', pokemon);
+      const result = applyItem(bag, 'ether', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('levels up with rare candy', () => {
       const pokemon = makePokemon({ level: 50 });
       const bag: BagItem[] = [{ itemId: 'rare-candy', quantity: 1 }];
-      const result = useItem(bag, 'rare-candy', pokemon);
+      const result = applyItem(bag, 'rare-candy', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.level).toBe(51);
       expect(result.message).toContain('Lv. 51');
@@ -275,27 +275,27 @@ describe('inventory-system', () => {
     it('fails rare candy at level 100', () => {
       const pokemon = makePokemon({ level: 100 });
       const bag: BagItem[] = [{ itemId: 'rare-candy', quantity: 1 }];
-      const result = useItem(bag, 'rare-candy', pokemon);
+      const result = applyItem(bag, 'rare-candy', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('returns error for unknown item', () => {
       const pokemon = makePokemon();
-      const result = useItem([], 'nonexistent', pokemon);
+      const result = applyItem([], 'nonexistent', pokemon);
       expect(result.success).toBe(false);
       expect(result.message).toBe('Unknown item!');
     });
 
     it('returns error when bag is empty of item', () => {
       const pokemon = makePokemon({ currentHp: 50 });
-      const result = useItem([], 'potion', pokemon);
+      const result = applyItem([], 'potion', pokemon);
       expect(result.success).toBe(false);
     });
 
     it('heals HP and cures status with full-restore', () => {
       const pokemon = makePokemon({ currentHp: 30, status: 'burn' as never });
       const bag: BagItem[] = [{ itemId: 'full-restore', quantity: 1 }];
-      const result = useItem(bag, 'full-restore', pokemon);
+      const result = applyItem(bag, 'full-restore', pokemon);
       expect(result.success).toBe(true);
       expect(pokemon.currentHp).toBe(100);
       expect(pokemon.status).toBeNull();
